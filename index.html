@@ -3,264 +3,410 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sovereign Meditation</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500&display=swap" rel="stylesheet">
+  <title>Sovereign Traveller</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #030712;
+      --bg: #020617;
       --text: #f8fafc;
-      --accent: #8b5cf6;
+      --primary: #8b5cf6;
+      --panel: rgba(15, 23, 42, 0.6);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
     body {
       font-family: 'Outfit', sans-serif;
       background-color: var(--bg);
       color: var(--text);
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      width: 100vw;
-      -webkit-font-smoothing: antialiased;
+      height: 100vh; width: 100vw;
     }
-    
-    /* Animated Gradient Background */
-    .bg-gradient {
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #030712 50%);
-      animation: rotateBg 40s linear infinite;
+
+    /* ─── PARALLAX SCENE ─── */
+    .scene {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, #09090b 0%, #1e1b4b 60%, #020617 100%);
       z-index: 1;
     }
-    @keyframes rotateBg {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .stars {
+      position: absolute; inset: 0;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0));
+      background-repeat: repeat;
+      background-size: 200px 200px;
+      animation: twinkle 4s infinite alternate;
+      opacity: 0.5;
     }
+    @keyframes twinkle { 0% {opacity:0.3;} 100% {opacity:0.7;} }
     
-    /* Main Container */
-    .container {
-      position: relative;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      flex: 1;
-      padding: 2rem;
-      backdrop-filter: blur(40px);
-      -webkit-backdrop-filter: blur(40px);
-    }
-    
-    /* Views */
-    .view {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-      transform: translateY(20px) scale(0.98);
-      padding: 2rem;
-    }
-    .view.active {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(0) scale(1);
+    .moon {
+      position: absolute; top: 10%; right: 15%;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: #fef08a;
+      box-shadow: 0 0 60px #fef08a;
     }
 
-    /* Home View */
-    .greeting {
-      font-size: 2.2rem;
-      font-weight: 200;
-      letter-spacing: 0.1em;
-      margin-bottom: 0.5rem;
-      color: rgba(255,255,255,0.95);
-      text-align: center;
+    /* Infinite Panning Layers */
+    .layer {
+      position: absolute; bottom: 15%; left: 0; right: 0;
+      height: 200px;
+      background-repeat: repeat-x;
+      background-position: bottom;
+      will-change: background-position;
     }
-    .subtitle {
-      font-size: 1rem;
-      font-weight: 200;
-      color: rgba(255,255,255,0.5);
-      margin-bottom: 4rem;
-      letter-spacing: 0.05em;
-      text-align: center;
+    .mountains {
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150"><path d="M0,150 L75,50 L150,150 Z" fill="%231e293b"/><path d="M100,150 L200,20 L300,150 Z" fill="%230f172a"/></svg>');
+      background-size: 300px 150px;
+      animation: pan 60s linear infinite;
+      opacity: 0.8;
+      bottom: 20%;
     }
-    .options {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      width: 100%;
-      max-width: 340px;
+    .trees-back {
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="100" viewBox="0 0 150 100"><polygon points="75,10 40,100 110,100" fill="%2309090b"/><polygon points="30,40 0,100 60,100" fill="%23020617"/></svg>');
+      background-size: 150px 100px;
+      animation: pan 25s linear infinite;
+      bottom: 15%;
     }
-    .opt-btn {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 1.4rem 1.5rem;
-      border-radius: 20px;
-      color: #fff;
-      font-family: inherit;
-      font-size: 1.1rem;
-      font-weight: 300;
-      letter-spacing: 0.05em;
-      cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
+    .trees-front {
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" viewBox="0 0 200 150"><polygon points="100,0 50,150 150,150" fill="%23000000"/></svg>');
+      background-size: 200px 150px;
+      animation: pan 12s linear infinite;
+      bottom: 10%; z-index: 3;
+    }
+    .ground {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 15%;
+      background: #000; z-index: 2;
+    }
+    @keyframes pan { 100% { background-position: -1000px bottom; } }
+
+    /* ─── CHARACTER ─── */
+    .char-container {
+      position: absolute; bottom: 12%; left: 50%;
+      transform: translateX(-50%);
+      width: 120px; height: 120px;
+      z-index: 4;
+    }
+    .char-svg {
+      width: 100%; height: 100%;
+      display: none;
+      filter: drop-shadow(0 10px 10px rgba(0,0,0,0.8));
+    }
+    .char-svg.active { display: block; }
+    
+    /* Walking Bob Animation */
+    .walk-bob { animation: bob 0.6s ease-in-out infinite alternate; transform-origin: bottom; }
+    .walk-leg-l { animation: legL 0.6s linear infinite alternate; transform-origin: top; }
+    .walk-leg-r { animation: legR 0.6s linear infinite alternate; transform-origin: top; }
+    
+    @keyframes bob { 0% { transform: translateY(0); } 100% { transform: translateY(-8px); } }
+    @keyframes legL { 0% { transform: rotate(15deg); } 100% { transform: rotate(-15deg); } }
+    @keyframes legR { 0% { transform: rotate(-15deg); } 100% { transform: rotate(15deg); } }
+
+    /* ─── UI PANELS ─── */
+    .ui-layer {
+      position: absolute; inset: 0; z-index: 10;
+      display: flex; flex-direction: column;
       justify-content: space-between;
-      align-items: center;
-      backdrop-filter: blur(10px);
+      padding: 2rem; pointer-events: none;
     }
-    .opt-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
-      transform: translateY(-4px);
-      border-color: rgba(139, 92, 246, 0.4);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-    .opt-btn:active {
-      transform: translateY(0) scale(0.98);
-    }
-    .opt-btn span:last-child {
-      color: rgba(255,255,255,0.4);
-      font-size: 0.9rem;
-      font-weight: 200;
-    }
-
-    /* Meditation View */
-    .med-circle-wrap {
-      position: relative; width: 320px; height: 320px; 
-      display: flex; align-items: center; justify-content: center; 
-      margin-bottom: 5rem;
-    }
-    .med-blob {
-      position: absolute; inset: 0; border-radius: 50%;
-      background: radial-gradient(circle at 50% 50%, rgba(139,92,246,0.15), transparent 70%);
-      border: 1px solid rgba(255,255,255,0.03);
-      animation: breatheBlob 8s ease-in-out infinite;
-    }
-    .med-blob:nth-child(2) { animation-delay: -2.6s; background: radial-gradient(circle at 50% 50%, rgba(236,72,153,0.1), transparent 70%); }
-    .med-blob:nth-child(3) { animation-delay: -5.3s; background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.1), transparent 70%); }
+    .ui-layer > * { pointer-events: auto; }
     
-    @keyframes breatheBlob {
-      0%, 100% { transform: scale(0.85); opacity: 0.3; }
-      50% { transform: scale(1.4); opacity: 1; }
-    }
-    
-    .med-timer {
-      position: relative; z-index: 2;
-      font-size: 6rem; font-weight: 100; letter-spacing: -0.04em;
-      color: #fff; font-variant-numeric: tabular-nums;
-      text-shadow: 0 0 50px rgba(0,0,0,0.8);
-    }
-    
-    .med-msg {
-      font-size: 1.2rem; color: rgba(255,255,255,0.8); font-weight: 300; letter-spacing: 0.1em;
-      text-align: center;
-      animation: breatheText 8s ease-in-out infinite;
+    /* Top: Timer */
+    .header {
+      display: flex; flex-direction: column; align-items: center;
+      margin-top: 2rem;
       transition: opacity 0.5s;
     }
-    @keyframes breatheText {
-      0%, 100% { opacity: 0.3; transform: translateY(4px); }
-      50% { opacity: 1; transform: translateY(-4px); }
+    .timer {
+      font-size: 6rem; font-weight: 200; letter-spacing: -0.02em;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      font-variant-numeric: tabular-nums;
+    }
+    .status-msg {
+      font-size: 1.2rem; font-weight: 300; letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.7); text-transform: uppercase;
+      animation: pulse 4s infinite alternate;
+    }
+    @keyframes pulse { 0% {opacity:0.4;} 100% {opacity:1;} }
+
+    /* Bottom: Controls */
+    .controls {
+      display: flex; gap: 2rem; align-items: flex-end;
+      width: 100%; max-width: 1000px; margin: 0 auto;
     }
     
-    .btn-close {
-      position: absolute; top: 40px; right: 30px;
-      width: 44px; height: 44px;
+    .panel {
+      background: var(--panel); border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 24px; padding: 1.5rem;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      flex: 1;
+    }
+    .panel-title {
+      font-size: 0.8rem; font-weight: 500; letter-spacing: 0.1em;
+      color: var(--primary); margin-bottom: 1rem; text-transform: uppercase;
+    }
+
+    /* Mixers */
+    .track { display: flex; align-items: center; margin-bottom: 1rem; gap: 1rem; }
+    .track:last-child { margin-bottom: 0; }
+    .t-icon { font-size: 1.2rem; width: 30px; text-align: center; }
+    .t-name { width: 80px; font-size: 0.9rem; color: rgba(255,255,255,0.8); }
+    input[type=range] {
+      flex: 1; height: 4px; border-radius: 2px;
+      -webkit-appearance: none; background: rgba(255,255,255,0.1);
+      outline: none; cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 14px; height: 14px;
+      border-radius: 50%; background: var(--primary);
+    }
+    
+    /* Buttons */
+    .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+    .btn {
       background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 50%; color: rgba(255,255,255,0.6);
-      font-size: 1.2rem; cursor: pointer; transition: all 0.3s;
-      z-index: 100; display: flex; align-items: center; justify-content: center;
+      color: #fff; padding: 0.8rem; border-radius: 12px; font-family: inherit;
+      font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
     }
-    .btn-close:hover { 
-      color: #fff; background: rgba(255,255,255,0.15); 
-      transform: scale(1.05);
+    .btn:hover { background: rgba(255,255,255,0.1); }
+    .btn.active { background: var(--primary); border-color: var(--primary); }
+    
+    .play-btn {
+      grid-column: span 2; background: #fff; color: #000;
+      font-weight: 600; font-size: 1.1rem; padding: 1rem;
+      border-radius: 12px; border: none; cursor: pointer;
+      margin-top: 0.5rem; transition: transform 0.2s;
     }
+    .play-btn:active { transform: scale(0.98); }
+
+    /* Hide UI Mode */
+    .hide-ui .controls { opacity: 0.1; transition: opacity 1s; }
+    .hide-ui .controls:hover { opacity: 1; }
   </style>
 </head>
 <body>
-  <div class="bg-gradient"></div>
-  
-  <div class="container">
-    <!-- HOME VIEW: SESSION SELECTOR -->
-    <div id="view-home" class="view active">
-      <h1 class="greeting">Find your center.</h1>
-      <p class="subtitle">เลือกเวลาที่คุณต้องการสงบจิตใจ</p>
-      
-      <div class="options">
-        <button class="opt-btn" onclick="startSession(5)">
-          <span>Quick Reset</span> <span>5 min</span>
-        </button>
-        <button class="opt-btn" onclick="startSession(10)">
-          <span>Deep Focus</span> <span>10 min</span>
-        </button>
-        <button class="opt-btn" onclick="startSession(15)">
-          <span>Body Scan</span> <span>15 min</span>
-        </button>
-        <button class="opt-btn" onclick="startSession(30)">
-          <span>Profound Calm</span> <span>30 min</span>
-        </button>
-      </div>
+
+  <!-- SCENE -->
+  <div class="scene">
+    <div class="stars"></div>
+    <div class="moon"></div>
+    <div class="layer mountains"></div>
+    <div class="layer trees-back"></div>
+    <div class="layer trees-front"></div>
+    <div class="ground"></div>
+  </div>
+
+  <!-- CHARACTERS (SVG 100% Reliable, No external images) -->
+  <div class="char-container">
+    <!-- 0: Traveler -->
+    <svg id="char-0" class="char-svg active" viewBox="0 0 100 100">
+      <g class="walk-bob">
+        <!-- Cape -->
+        <path d="M40,20 Q50,0 60,20 L80,75 L20,75 Z" fill="#7c3aed"/>
+        <!-- Face hole -->
+        <circle cx="58" cy="25" r="5" fill="#000"/>
+        <circle cx="59" cy="24" r="2" fill="#fff"/>
+        <!-- Backpack -->
+        <rect x="25" y="30" width="15" height="25" rx="5" fill="#4c1d95"/>
+      </g>
+      <!-- Legs -->
+      <rect class="walk-leg-l" x="40" y="70" width="8" height="25" fill="#1e1b4b" rx="4"/>
+      <rect class="walk-leg-r" x="55" y="70" width="8" height="25" fill="#0f172a" rx="4"/>
+    </svg>
+
+    <!-- 1: Samurai -->
+    <svg id="char-1" class="char-svg" viewBox="0 0 100 100">
+      <g class="walk-bob">
+        <!-- Hat (Kasa) -->
+        <path d="M20,25 Q50,5 80,25 Z" fill="#d97706"/>
+        <!-- Body -->
+        <rect x="40" y="25" width="20" height="40" fill="#b91c1c" rx="5"/>
+        <!-- Scarf -->
+        <path d="M35,30 L65,30 L60,45 Z" fill="#fef08a"/>
+        <!-- Katana -->
+        <line x1="30" y1="45" x2="5" y2="70" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+        <line x1="30" y1="45" x2="40" y2="35" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+      </g>
+      <rect class="walk-leg-l" x="42" y="60" width="6" height="30" fill="#7f1d1d" rx="3"/>
+      <rect class="walk-leg-r" x="52" y="60" width="6" height="30" fill="#450a0a" rx="3"/>
+    </svg>
+
+    <!-- 2: Spirit Wolf -->
+    <svg id="char-2" class="char-svg" viewBox="0 0 100 100">
+      <g class="walk-bob">
+        <!-- Body -->
+        <rect x="20" y="40" width="55" height="25" rx="12" fill="#94a3b8"/>
+        <!-- Tail -->
+        <path d="M25,45 Q10,50 5,65 Q15,60 20,55 Z" fill="#cbd5e1"/>
+        <!-- Head -->
+        <circle cx="80" cy="42" r="14" fill="#94a3b8"/>
+        <!-- Snout -->
+        <path d="M85,42 L98,48 L85,52 Z" fill="#94a3b8"/>
+        <!-- Ear -->
+        <polygon points="75,32 82,20 85,32" fill="#cbd5e1"/>
+        <!-- Eye -->
+        <circle cx="82" cy="40" r="2" fill="#38bdf8" filter="drop-shadow(0 0 2px #38bdf8)"/>
+      </g>
+      <!-- Legs -->
+      <rect class="walk-leg-l" x="30" y="60" width="6" height="25" fill="#64748b" rx="3"/>
+      <rect class="walk-leg-r" x="45" y="60" width="6" height="25" fill="#475569" rx="3"/>
+      <rect class="walk-leg-l" x="65" y="60" width="6" height="25" fill="#64748b" rx="3"/>
+      <rect class="walk-leg-r" x="75" y="60" width="6" height="25" fill="#475569" rx="3"/>
+    </svg>
+  </div>
+
+  <!-- UI LAYER -->
+  <div class="ui-layer" id="ui-layer">
+    <div class="header">
+      <div class="timer" id="timer">00:00</div>
+      <div class="status-msg" id="msg">Awaiting Journey</div>
     </div>
 
-    <!-- MEDITATION VIEW -->
-    <div id="view-med" class="view">
-      <button class="btn-close" onclick="stopSession()">✕</button>
-      
-      <div class="med-circle-wrap">
-        <div class="med-blob"></div>
-        <div class="med-blob"></div>
-        <div class="med-blob"></div>
-        <div id="timer" class="med-timer">05:00</div>
+    <div class="controls">
+      <!-- Session Settings -->
+      <div class="panel">
+        <div class="panel-title">1. Time & Avatar</div>
+        <div class="btn-grid mb-3">
+          <button class="btn time-btn" onclick="setTime(5, this)">5 Min</button>
+          <button class="btn time-btn" onclick="setTime(10, this)">10 Min</button>
+          <button class="btn time-btn active" onclick="setTime(15, this)">15 Min</button>
+          <button class="btn time-btn" onclick="setTime(30, this)">30 Min</button>
+        </div>
+        <div class="btn-grid">
+          <button class="btn char-btn active" onclick="setChar(0, this)">นักเดินทาง</button>
+          <button class="btn char-btn" onclick="setChar(1, this)">ซามูไร</button>
+          <button class="btn char-btn" onclick="setChar(2, this)">หมาป่า</button>
+        </div>
       </div>
-      
-      <div id="msg" class="med-msg">หายใจเข้า...</div>
+
+      <!-- Audio Mixer -->
+      <div class="panel">
+        <div class="panel-title">2. Atmosphere Mixer</div>
+        <div class="track">
+          <div class="t-icon">🎧</div><div class="t-name">Lofi Music</div>
+          <input type="range" id="vol-music" min="0" max="100" value="40" oninput="updateVol('music')">
+        </div>
+        <div class="track">
+          <div class="t-icon">🌧️</div><div class="t-name">Rain</div>
+          <input type="range" id="vol-rain" min="0" max="100" value="0" oninput="updateVol('rain')">
+        </div>
+        <div class="track">
+          <div class="t-icon">🔥</div><div class="t-name">Campfire</div>
+          <input type="range" id="vol-fire" min="0" max="100" value="0" oninput="updateVol('fire')">
+        </div>
+        <div class="track">
+          <div class="t-icon">🌲</div><div class="t-name">Forest</div>
+          <input type="range" id="vol-forest" min="0" max="100" value="0" oninput="updateVol('forest')">
+        </div>
+        <button class="play-btn" id="playBtn" onclick="toggleJourney()">▶ START JOURNEY</button>
+      </div>
     </div>
   </div>
 
+  <!-- AUDIO ELEMENTS (Using reliable direct links) -->
+  <audio id="audio-rain" loop src="https://cdn.pixabay.com/download/audio/2021/08/09/audio_d07eb021e1.mp3"></audio>
+  <audio id="audio-fire" loop src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_a0a5242eb0.mp3"></audio>
+  <audio id="audio-forest" loop src="https://cdn.pixabay.com/download/audio/2021/09/06/audio_40b2a5ebbb.mp3"></audio>
+  
+  <!-- YT IFrame for Music -->
+  <div id="yt-player" style="display:none;"></div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
+    let player;
+    let isPlaying = false;
+    let timeRemaining = 15 * 60;
     let interval;
-    let timeRemaining = 0;
-    
-    function startSession(minutes) {
-      document.getElementById('view-home').classList.remove('active');
-      document.getElementById('view-med').classList.add('active');
-      
-      timeRemaining = minutes * 60;
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('yt-player', {
+        height: '0', width: '0',
+        videoId: 'jfKfPfyJRdk', // Lofi Girl 24/7 stream
+        playerVars: { 'autoplay': 0, 'controls': 0 },
+        events: { 'onReady': () => player.setVolume(40) }
+      });
+    }
+
+    function setTime(m, btn) {
+      if(isPlaying) return;
+      timeRemaining = m * 60;
+      document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
       updateTimerDisplay();
-      
-      // Sync text with initial animation state
-      document.getElementById('msg').textContent = 'หายใจเข้า...';
-      
-      clearInterval(interval);
-      interval = setInterval(() => {
-        timeRemaining--;
-        updateTimerDisplay();
-        
-        // 8 second breathing cycle (4s in, 4s out)
-        const msg = document.getElementById('msg');
-        if (timeRemaining % 8 === 4) msg.textContent = 'หายใจออก...';
-        if (timeRemaining % 8 === 0) msg.textContent = 'หายใจเข้า...';
-        
-        if (timeRemaining <= 0) {
-          stopSession();
-        }
-      }, 1000);
     }
-    
-    function stopSession() {
-      clearInterval(interval);
-      document.getElementById('view-med').classList.remove('active');
-      document.getElementById('view-home').classList.add('active');
+
+    function setChar(idx, btn) {
+      document.querySelectorAll('.char-svg').forEach(el => el.classList.remove('active'));
+      document.getElementById('char-'+idx).classList.add('active');
+      document.querySelectorAll('.char-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
     }
-    
+
+    function updateVol(track) {
+      const val = document.getElementById('vol-' + track).value;
+      if(track === 'music') {
+        if(player && player.setVolume) player.setVolume(val);
+      } else {
+        document.getElementById('audio-' + track).volume = val / 100;
+      }
+    }
+
+    function toggleJourney() {
+      const btn = document.getElementById('playBtn');
+      if(!isPlaying) {
+        isPlaying = true;
+        btn.textContent = '⏸ PAUSE JOURNEY';
+        document.body.classList.add('hide-ui');
+        document.getElementById('msg').textContent = 'Keep walking. Keep breathing.';
+        
+        if(player && player.playVideo) player.playVideo();
+        const rain = document.getElementById('audio-rain');
+        const fire = document.getElementById('audio-fire');
+        const forest = document.getElementById('audio-forest');
+        
+        rain.volume = document.getElementById('vol-rain').value / 100;
+        fire.volume = document.getElementById('vol-fire').value / 100;
+        forest.volume = document.getElementById('vol-forest').value / 100;
+        
+        rain.play().catch(e=>console.log('Audio error:', e));
+        fire.play().catch(e=>console.log('Audio error:', e));
+        forest.play().catch(e=>console.log('Audio error:', e));
+        
+        clearInterval(interval);
+        interval = setInterval(() => {
+          timeRemaining--;
+          updateTimerDisplay();
+          if(timeRemaining <= 0) {
+            toggleJourney(); // Auto stop
+            document.getElementById('msg').textContent = 'Journey Complete.';
+          }
+        }, 1000);
+      } else {
+        isPlaying = false;
+        btn.textContent = '▶ RESUME JOURNEY';
+        document.body.classList.remove('hide-ui');
+        clearInterval(interval);
+        
+        if(player && player.pauseVideo) player.pauseVideo();
+        document.getElementById('audio-rain').pause();
+        document.getElementById('audio-fire').pause();
+        document.getElementById('audio-forest').pause();
+      }
+    }
+
     function updateTimerDisplay() {
       const m = String(Math.floor(timeRemaining / 60)).padStart(2, '0');
       const s = String(timeRemaining % 60).padStart(2, '0');
       document.getElementById('timer').textContent = `${m}:${s}`;
     }
+    
+    // Init display
+    updateTimerDisplay();
   </script>
 </body>
 </html>
