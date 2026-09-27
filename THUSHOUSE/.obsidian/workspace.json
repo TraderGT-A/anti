@@ -1,0 +1,217 @@
+{
+  "main": {
+    "id": "36dfa579669c902f",
+    "type": "split",
+    "children": [
+      {
+        "id": "99fa5f7b39ffe0ef",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f8a3365350a2a0ae",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "26b0e3021bfee767",
+    "type": "split",
+    "children": [
+      {
+        "id": "b410ac88a792e8c7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "867615327cba18e9",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "8d9910895e69d8df",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "file:",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "ecd105481f383c75",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "6651c00c51a4cd65",
+    "type": "split",
+    "children": [
+      {
+        "id": "614535814cd49b19",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2cd935aef9a2b6a0",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "3fa8a9357a10af22",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "995ff27e1b2dbfec",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "060e8b7e611803c5",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "194fc1fa7de43c47",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "867615327cba18e9",
+  "lastOpenFiles": [
+    "000_Index",
+    "2026-09-26.md",
+    "Transcripts ปรับพื้นฐาน/20-ศิลปะของ Money Management.md",
+    "Untitled 1.canvas",
+    "Untitled.canvas",
+    "Welcome.md",
+    "create a link.md",
+    "Transcripts ปรับพื้นฐาน/19-Create System.md",
+    "Transcripts ปรับพื้นฐาน/18-How to Look Back.md",
+    "Transcripts ปรับพื้นฐาน/17-Global Events II.md",
+    "Transcripts ปรับพื้นฐาน/16-Global Events I.md",
+    "Transcripts ปรับพื้นฐาน/15-Chart Pattern.md",
+    "Transcripts ปรับพื้นฐาน/14-Dow Theory.md",
+    "Transcripts ปรับพื้นฐาน/13-Candlestick.md",
+    "Transcripts ปรับพื้นฐาน/12-Unlock TradingView P2.md",
+    "Transcripts ปรับพื้นฐาน/11-Unlock TradingView P1.md",
+    "Transcripts ปรับพื้นฐาน/10-Basic TradingView P2.md",
+    "Transcripts ปรับพื้นฐาน/09-Basic TradingView P1.md",
+    "Transcripts ปรับพื้นฐาน/08-21 Steps P2.md",
+    "Transcripts ปรับพื้นฐาน/07-21 Steps P1.md",
+    "Transcripts ปรับพื้นฐาน/06-Gearing and Position Sizing Part 4.md",
+    "Transcripts ปรับพื้นฐาน/05-Gearing and Position Sizing Part 3.md",
+    "Transcripts ปรับพื้นฐาน/04-Gearing and Position Sizing Part 2.md",
+    "Transcripts ปรับพื้นฐาน/03-Gearing and Position Sizing Part 1.md",
+    "Transcripts ปรับพื้นฐาน/02-พื้นฐาน Futures II.md",
+    "Transcripts ปรับพื้นฐาน/01-พื้นฐาน Futures I.md",
+    "Transcripts ปรับพื้นฐาน/00-สารบัญ.md",
+    "Transcripts ปรับพื้นฐาน",
+    "Untitled 1.base",
+    "Untitled.base"
+  ]
+}

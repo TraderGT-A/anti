@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THUS · 13 Candlestick</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&family=Sarabun:wght@400;600;700&display=swap">
+<style>html,body{margin:0;padding:0}
+body{background:#1C0A30;font-family:'Sarabun',Tahoma,sans-serif}
+.bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 24px;background:#2A1340;color:#F4A57F;font:600 20px 'Kanit',Tahoma,sans-serif}
+.bar button{font:600 18px 'Sarabun',Tahoma,sans-serif;background:#F4A57F;color:#2A1340;border:0;border-radius:8px;padding:8px 16px;cursor:pointer}
+.deck{padding:24px 0}
+:root{--z:1}
+.holder{width:calc(1920px * var(--z));height:calc(1080px * var(--z));margin:0 auto 24px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.slide{width:1920px;height:1080px;overflow:hidden;transform:scale(var(--z));transform-origin:0 0}
+section{width:1920px;height:1080px;position:relative;overflow:hidden;box-sizing:border-box}
+section *{margin:0;box-sizing:border-box}
+section div:not([style*="display"]){display:flex;flex-direction:column}
+section ul,section ol{padding-left:1.3em}
+section table{border-collapse:collapse}
+section th,section td{padding:.35em .6em;border-bottom:1px solid #E6DDEB;vertical-align:top}
+section iframe{border:0;background:transparent}
+@page{size:1920px 1080px;margin:0}
+@media print{
+  :root{--z:1 !important}
+  body{background:none}
+  .bar{display:none}
+  .deck{padding:0}
+  .holder{width:1920px;height:1080px;margin:0;box-shadow:none;break-after:page;page-break-after:always}
+  .slide{transform:none}
+}</style></head>
+<body><div class="bar"><span>THUS · House of Traders · 13 Candlestick</span><button onclick="window.print()">บันทึกเป็น PDF</button></div>
+<div class="deck">
+<div class="holder"><div class="slide"><section id="cover" style="background:radial-gradient(circle at 90% 95%, #C8641F 0%, #5A1F4A 24%, #1C0A30 58%); color:#FAF7FB; font-family:'Sarabun', Tahoma, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:space-between">
+<div style="position:absolute; left:0; top:0; width:640px; height:320px; opacity:0.55; background:repeating-linear-gradient(120deg, #7B3FC4 0px, #7B3FC4 3px, transparent 3px, transparent 18px)"></div>
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#FAF7FB; letter-spacing:4px; text-align:right">THUS</p>
+<div style="display:flex; flex-direction:column; gap:28px">
+<p style="font-size:28px; font-weight:600; color:#F4A57F; letter-spacing:2px">BASIC CLASS · บทที่ 13</p>
+<h1 style="font-family:'Kanit', Tahoma, sans-serif; font-size:128px; font-weight:600; line-height:1.1; color:#F4A57F">CANDLESTICK</h1>
+<div style="width:900px; height:3px; background:#8E6BB0"></div>
+<p style="font-size:34px; line-height:1.4; color:#D9CCE6; width:1400px">อ่านแท่งเทียน · Body บอกใครชนะ · Wick บอกความลังเล · Price Action</p>
+</div>
+<p style="font-size:26px; color:#B8A6CC">House of Traders · ชีทประกอบคลิป Candlestick</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="anatomy" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Candlestick · บทที่ 13</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">1 แท่ง = 1 Timeframe = 4 ค่า</h2>
+<div style="display:flex; gap:40px; align-items:start">
+<div style="position:relative; width:1000px; height:560px; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px">
+<svg aria-label="แท่งเทียนขาขึ้นสีเขียวและขาลงสีแดง พร้อมตำแหน่ง Open High Low Close" width="1000" height="560" viewBox="0 0 1000 560" style="position:absolute; left:0; top:0">
+<line x1="330" y1="40" x2="330" y2="500" stroke="#1F7A52" stroke-width="6"/>
+<rect x="270" y="160" width="120" height="220" fill="#1F8A5B"/>
+<line x1="740" y1="40" x2="740" y2="500" stroke="#B3261E" stroke-width="6"/>
+<rect x="680" y="160" width="120" height="220" fill="#C23B2E"/>
+</svg>
+<p style="position:absolute; left:350px; top:22px; width:120px; font-size:26px; font-weight:600; color:#2A1340">High</p>
+<p style="position:absolute; left:402px; top:142px; width:140px; font-size:26px; font-weight:600; color:#1F7A52">Close</p>
+<p style="position:absolute; left:402px; top:344px; width:140px; font-size:26px; font-weight:600; color:#1F7A52">Open</p>
+<p style="position:absolute; left:350px; top:470px; width:120px; font-size:26px; font-weight:600; color:#2A1340">Low</p>
+<p style="position:absolute; left:760px; top:22px; width:120px; font-size:26px; font-weight:600; color:#2A1340">High</p>
+<p style="position:absolute; left:812px; top:142px; width:140px; font-size:26px; font-weight:600; color:#B3261E">Open</p>
+<p style="position:absolute; left:812px; top:344px; width:140px; font-size:26px; font-weight:600; color:#B3261E">Close</p>
+<p style="position:absolute; left:760px; top:470px; width:120px; font-size:26px; font-weight:600; color:#2A1340">Low</p>
+<p style="position:absolute; left:24px; top:80px; width:220px; font-size:26px; color:#6A2C9E">ไส้บน (Wick)</p>
+<p style="position:absolute; left:24px; top:250px; width:220px; font-size:26px; font-weight:600; color:#6A2C9E">เนื้อเทียน (Body)</p>
+<p style="position:absolute; left:24px; top:420px; width:220px; font-size:26px; color:#6A2C9E">ไส้ล่าง (Wick)</p>
+<p style="position:absolute; left:250px; top:515px; width:220px; font-size:24px; font-weight:600; color:#1F7A52; text-align:center">แท่งเขียว = ขึ้น</p>
+<p style="position:absolute; left:640px; top:515px; width:220px; font-size:24px; font-weight:600; color:#B3261E; text-align:center">แท่งแดง = ลง</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:16px">
+<p style="font-size:27px; line-height:1.45; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 22px"><b>เขียว:</b> Open ต่ำกว่า Close</p>
+<p style="font-size:27px; line-height:1.45; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 22px"><b>แดง:</b> Open สูงกว่า Close</p>
+<p style="font-size:27px; line-height:1.45; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 22px"><b>Body</b> = ช่วงระหว่าง Open กับ Close</p>
+<p style="font-size:27px; line-height:1.45; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 22px"><b>Wick</b> = ส่วนที่วิ่งเกินออกไป (High / Low)</p>
+<p style="font-size:27px; line-height:1.45; color:#FAF7FB; background:#2A1340; border-radius:14px; padding:16px 22px">TF Day 1 แท่ง = 1 วัน · H1 1 แท่ง = 1 ชั่วโมง</p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · แท่งเทียนบอกแค่ Open High Low Close ระหว่างทางวิ่งอย่างไร ต้องย่อไปดู TF เล็ก</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="close" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Candlestick · บทที่ 13</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">ต้องรอแท่งปิดก่อนเสมอ</h2>
+<div style="width:980px; display:flex; flex-direction:column; gap:20px">
+<p style="font-size:27px; line-height:1.4">แท่ง H1 เดียวกัน ดูคนละเวลา สีเปลี่ยนได้ (เส้นประ = ราคาเปิด)</p>
+<div style="display:flex; gap:20px">
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:16px; display:flex; flex-direction:column; align-items:center; gap:8px">
+<svg aria-label="13:15 ราคาวิ่งขึ้นเหนือราคาเปิด แท่งเป็นสีเขียว" width="240" height="300" viewBox="0 0 240 300">
+<line x1="20" y1="200" x2="220" y2="200" stroke="#8E6BB0" stroke-width="2" stroke-dasharray="8 6"/>
+<line x1="120" y1="135" x2="120" y2="205" stroke="#1F7A52" stroke-width="4"/>
+<rect x="90" y="140" width="60" height="60" fill="#1F8A5B"/>
+</svg>
+<p style="font-size:26px; font-weight:600; color:#2A1340">13:15</p>
+<p style="font-size:24px; color:#1F7A52; text-align:center">วิ่งขึ้น = ตอนนี้เขียว</p>
+</div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:16px; display:flex; flex-direction:column; align-items:center; gap:8px">
+<svg aria-label="13:35 ราคาทุบลงต่ำกว่าราคาเปิด แท่งกลายเป็นสีแดง" width="240" height="300" viewBox="0 0 240 300">
+<line x1="20" y1="200" x2="220" y2="200" stroke="#8E6BB0" stroke-width="2" stroke-dasharray="8 6"/>
+<line x1="120" y1="135" x2="120" y2="270" stroke="#B3261E" stroke-width="4"/>
+<rect x="90" y="200" width="60" height="60" fill="#C23B2E"/>
+</svg>
+<p style="font-size:26px; font-weight:600; color:#2A1340">13:35</p>
+<p style="font-size:24px; color:#B3261E; text-align:center">ทุบลง = กลายเป็นแดง</p>
+</div>
+<div style="flex:1; background:#FFFDFE; border:2px solid #6A2C9E; border-radius:16px; padding:16px; display:flex; flex-direction:column; align-items:center; gap:8px">
+<svg aria-label="14:00 แท่งปิดเหนือราคาเปิด เป็นสีเขียวมีไส้ล่างยาว" width="240" height="300" viewBox="0 0 240 300">
+<line x1="20" y1="200" x2="220" y2="200" stroke="#8E6BB0" stroke-width="2" stroke-dasharray="8 6"/>
+<line x1="120" y1="135" x2="120" y2="275" stroke="#1F7A52" stroke-width="4"/>
+<rect x="90" y="150" width="60" height="50" fill="#1F8A5B"/>
+</svg>
+<p style="font-size:26px; font-weight:600; color:#2A1340">14:00 ปิดแล้ว</p>
+<p style="font-size:24px; color:#1F7A52; text-align:center">เขียว ไส้ล่างยาว</p>
+</div>
+</div>
+<div style="display:flex; gap:20px">
+<p style="flex:1; font-size:26px; line-height:1.4; color:#2A1340; background:#F3ECF8; border-radius:14px; padding:16px 22px">1 แท่ง H1 = 4 แท่ง M15</p>
+<p style="flex:1; font-size:26px; line-height:1.4; color:#2A1340; background:#F3ECF8; border-radius:14px; padding:16px 22px">1 แท่ง Day = 24 แท่ง H1 (ตลาด 24 ชม.)</p>
+</div>
+</div>
+<iframe style="position:absolute; left:1150px; top:300px; width:640px; height:560px" srcdoc="<!doctype html><html><head><meta charset=&quot;utf-8&quot;><style>
+body{margin:0;background:#FFFDFE;font-family:Tahoma,'Segoe UI',sans-serif;color:#2A1340;border:1px solid #E6DDEB;border-radius:20px;height:558px;box-sizing:border-box;overflow:hidden}
+#t{padding:18px 24px 0;font-size:26px;font-weight:700}
+#n{padding:4px 24px 0;font-size:24px;color:#75688A}
+</style></head><body>
+<div id=&quot;t&quot;></div><div id=&quot;n&quot;>ดูสด: แท่งกำลังก่อตัว</div>
+<svg id=&quot;s&quot; viewBox=&quot;0 0 640 470&quot; width=&quot;640&quot; height=&quot;470&quot;></svg>
+<script>
+var N=50;function p(t){if(t<=18)return 100-8*t/18;if(t<=40)return 92+14*(t-18)/22;return 106-3*(t-40)/10}
+function y(v){return 440-(v-86)*17}
+var s=document.getElementById('s'),T=document.getElementById('t');
+function draw(k){var o=100,c=p(k),h=o,l=o;for(var i=0;i<=k;i++){var v=p(i);if(v>h)h=v;if(v<l)l=v}
+var up=c>=o,col=up?'#1F8A5B':'#C23B2E',x=320;
+var g='<line x1=&quot;60&quot; y1=&quot;'+y(o)+'&quot; x2=&quot;580&quot; y2=&quot;'+y(o)+'&quot; stroke=&quot;#8E6BB0&quot; stroke-width=&quot;2&quot; stroke-dasharray=&quot;8 6&quot;/>';
+g+='<text x=&quot;64&quot; y=&quot;'+(y(o)-10)+'&quot; font-size=&quot;24&quot; fill=&quot;#6A2C9E&quot;>ราคาเปิด</text>';
+g+='<line x1=&quot;'+x+'&quot; y1=&quot;'+y(h)+'&quot; x2=&quot;'+x+'&quot; y2=&quot;'+y(l)+'&quot; stroke=&quot;'+col+'&quot; stroke-width=&quot;5&quot;/>';
+g+='<rect x=&quot;'+(x-50)+'&quot; y=&quot;'+y(Math.max(o,c))+'&quot; width=&quot;100&quot; height=&quot;'+Math.max(4,Math.abs(y(o)-y(c)))+'&quot; fill=&quot;'+col+'&quot;/>';
+s.innerHTML=g;var m=Math.round(k*60/N);
+T.textContent=k>=N?'14:00 · ปิดแล้ว = เขียว':'13:'+(m<10?'0':'')+m+' · ยังไม่ปิด = '+(up?'เขียว':'แดง');T.style.color=up?'#1F7A52':'#B3261E'}
+var k=N;draw(k);
+function step(){if(k>=N){k=0;draw(k);setTimeout(step,600);return}k++;draw(k);setTimeout(step,k>=N?3000:140)}
+setTimeout(step,3000);
+</script></body></html>"></iframe>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ตลาดโลก แท่ง Day ปิดราวตี 3–4 เวลาไทย · ภาพขวาเคลื่อนไหวเมื่อเปิดผ่านลิงก์</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="body" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Candlestick · บทที่ 13</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">เนื้อเทียน (Body) บอกว่าใครชนะ และชนะแรงแค่ไหน</h2>
+<div style="display:flex; gap:28px">
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:26px; display:flex; flex-direction:column; align-items:center; gap:12px">
+<svg aria-label="แท่งเขียว Body ใหญ่ แทบไม่มีไส้" width="300" height="320" viewBox="0 0 300 320">
+<line x1="150" y1="30" x2="150" y2="300" stroke="#1F7A52" stroke-width="4"/>
+<rect x="105" y="36" width="90" height="260" fill="#1F8A5B"/>
+</svg>
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#1F7A52">Body ใหญ่ ไม่มีไส้</h3>
+<p style="font-size:26px; line-height:1.45; text-align:center">ชนะขาดลอย ไม่ลังเลเลย ปิดแทบจะที่ High</p>
+</div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:26px; display:flex; flex-direction:column; align-items:center; gap:12px">
+<svg aria-label="แท่งเขียว Body เล็ก" width="300" height="320" viewBox="0 0 300 320">
+<line x1="150" y1="100" x2="150" y2="230" stroke="#1F7A52" stroke-width="4"/>
+<rect x="105" y="140" width="90" height="50" fill="#1F8A5B"/>
+</svg>
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#2A1340">Body เล็ก</h3>
+<p style="font-size:26px; line-height:1.45; text-align:center">ชนะ แต่ชนะไม่มาก</p>
+</div>
+<div style="flex:1.3; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:26px; display:flex; flex-direction:column; align-items:center; gap:12px">
+<svg aria-label="แท่งแดงต่อกัน 4 แท่ง Body เล็กลงเรื่อย ๆ" width="420" height="320" viewBox="0 0 420 320">
+<line x1="60" y1="20" x2="60" y2="170" stroke="#B3261E" stroke-width="4"/><rect x="30" y="25" width="60" height="140" fill="#C23B2E"/>
+<line x1="160" y1="150" x2="160" y2="250" stroke="#B3261E" stroke-width="4"/><rect x="130" y="160" width="60" height="80" fill="#C23B2E"/>
+<line x1="260" y1="230" x2="260" y2="295" stroke="#B3261E" stroke-width="4"/><rect x="230" y="240" width="60" height="40" fill="#C23B2E"/>
+<line x1="360" y1="270" x2="360" y2="310" stroke="#B3261E" stroke-width="4"/><rect x="330" y="280" width="60" height="16" fill="#C23B2E"/>
+</svg>
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#B3261E">แดง Body เล็กลงเรื่อย ๆ</h3>
+<p style="font-size:26px; line-height:1.45; text-align:center">แรงขายยังชนะ แต่ Momentum ลดลง</p>
+</div>
+</div>
+<p style="font-size:28px; line-height:1.4; color:#2A1340; background:#F3ECF8; border-radius:16px; padding:18px 28px">แท่งเขียวต่อกัน 3–5 แท่ง = ตลาดอยากขึ้นต่อ · ปิดชนะ High ก่อนหน้าได้หมด = น่าจะขึ้นต่อ</p>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ตัวอย่างในคลิป: ทองคำ 13 มี.ค. แท่งเขียวเกือบทั้งแท่งเป็น Body</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="wick" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Candlestick · บทที่ 13</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">ไส้เทียน (Wick) บอกความลังเล</h2>
+<div style="display:flex; gap:28px">
+<div style="width:380px; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:24px; display:flex; flex-direction:column; align-items:center; gap:10px">
+<svg aria-label="แท่งมีไส้ล่างยาว" width="240" height="300" viewBox="0 0 240 300">
+<line x1="120" y1="30" x2="120" y2="290" stroke="#1F7A52" stroke-width="4"/><rect x="85" y="40" width="70" height="50" fill="#1F8A5B"/>
+</svg>
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#1F7A52">ไส้ล่างยาว</h3>
+<p style="font-size:26px; line-height:1.45; text-align:center">มีแรงซื้อกลับ</p>
+</div>
+<div style="width:380px; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:24px; display:flex; flex-direction:column; align-items:center; gap:10px">
+<svg aria-label="แท่งมีไส้บนยาว" width="240" height="300" viewBox="0 0 240 300">
+<line x1="120" y1="10" x2="120" y2="270" stroke="#B3261E" stroke-width="4"/><rect x="85" y="210" width="70" height="50" fill="#C23B2E"/>
+</svg>
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#B3261E">ไส้บนยาว</h3>
+<p style="font-size:26px; line-height:1.45; text-align:center">พยายามขึ้น แต่มีคนขายกด</p>
+</div>
+<div style="flex:1; background:#FFFDFE; border:2px solid #6A2C9E; border-radius:20px; padding:24px; display:flex; flex-direction:column; gap:10px">
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#2A1340">อ่านต่อกันในขาขึ้น</h3>
+<svg aria-label="แดงใหญ่ แดงเล็ก แท่งไส้ยาว แล้วแท่งเขียว" width="740" height="240" viewBox="0 0 740 240">
+<line x1="90" y1="20" x2="90" y2="130" stroke="#B3261E" stroke-width="4"/><rect x="55" y="25" width="70" height="100" fill="#C23B2E"/>
+<line x1="270" y1="110" x2="270" y2="175" stroke="#B3261E" stroke-width="4"/><rect x="235" y="120" width="70" height="45" fill="#C23B2E"/>
+<line x1="450" y1="120" x2="450" y2="235" stroke="#1F7A52" stroke-width="4"/><rect x="415" y="150" width="70" height="16" fill="#1F8A5B"/>
+<line x1="630" y1="55" x2="630" y2="165" stroke="#1F7A52" stroke-width="4"/><rect x="595" y="65" width="70" height="95" fill="#1F8A5B"/>
+</svg>
+<div style="display:flex; gap:8px">
+<p style="flex:1; font-size:24px; text-align:center">แดงใหญ่</p>
+<p style="flex:1; font-size:24px; text-align:center">แดงเล็กลง</p>
+<p style="flex:1; font-size:24px; text-align:center">ไส้ยาว ลังเล</p>
+<p style="flex:1; font-size:24px; font-weight:600; color:#1F7A52; text-align:center">เขียว = ซื้อชนะ</p>
+</div>
+<p style="font-size:26px; line-height:1.45; color:#2A1340; background:#F3ECF8; border-radius:12px; padding:14px 20px">ถ้าเทรนด์ยก High ยก Low อยู่ = จังหวะเข้า Long ตามเทรนด์เดิมได้</p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ในขาลง ถ้าท้ายแท่งแรงซื้อกลับจนปิดเหนือราคาเปิด (ไส้ล่างยาว) คือจุดที่อาจกลับตัว</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="half" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Candlestick · บทที่ 13</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">กฎครึ่งแท่ง: สัญญาณกลับตัวระยะสั้น</h2>
+<div style="display:flex; gap:32px">
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:26px 30px; display:flex; flex-direction:column; gap:12px">
+<p style="font-size:28px; font-weight:600; color:#2A1340">ในขาลง</p>
+<div style="position:relative; width:700px; height:340px">
+<svg aria-label="แท่งแดงใหญ่ ตามด้วยแท่งเขียวที่ปิดเหนือครึ่งของแท่งแดง" width="700" height="340" viewBox="0 0 700 340">
+<line x1="200" y1="20" x2="200" y2="320" stroke="#B3261E" stroke-width="5"/><rect x="150" y="30" width="100" height="280" fill="#C23B2E"/>
+<line x1="80" y1="170" x2="520" y2="170" stroke="#6A2C9E" stroke-width="3" stroke-dasharray="10 8"/>
+<line x1="380" y1="110" x2="380" y2="320" stroke="#1F7A52" stroke-width="5"/><rect x="330" y="120" width="100" height="190" fill="#1F8A5B"/>
+</svg>
+<p style="position:absolute; left:470px; top:120px; width:230px; font-size:26px; font-weight:600; color:#6A2C9E">ครึ่งแท่งแดง</p>
+<p style="position:absolute; left:470px; top:60px; width:230px; font-size:24px; color:#1F7A52">ปิดเหนือเส้นนี้</p>
+</div>
+<p style="font-size:26px; line-height:1.45">เขียวปิด <b>เกินครึ่ง</b>ของแดงก่อนหน้า = ขาลงระยะสั้นน่าจะจบ</p>
+<div style="display:flex; gap:12px">
+<p style="flex:1; font-size:24px; line-height:1.4; color:#2A1340; background:#F3ECF8; border-radius:12px; padding:12px 16px">Short อยู่ → <b>Take Profit</b></p>
+<p style="flex:1; font-size:24px; line-height:1.4; color:#2A1340; background:#F3ECF8; border-radius:12px; padding:12px 16px">รอ Long → <b>จุดตัดสินใจเข้า</b></p>
+</div>
+</div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:26px 30px; display:flex; flex-direction:column; gap:12px">
+<p style="font-size:28px; font-weight:600; color:#2A1340">ในขาขึ้น (กลับด้าน)</p>
+<div style="position:relative; width:700px; height:340px">
+<svg aria-label="แท่งเขียวใหญ่ ตามด้วยแท่งแดงที่ปิดต่ำกว่าครึ่งของแท่งเขียว" width="700" height="340" viewBox="0 0 700 340">
+<line x1="200" y1="20" x2="200" y2="320" stroke="#1F7A52" stroke-width="5"/><rect x="150" y="30" width="100" height="280" fill="#1F8A5B"/>
+<line x1="80" y1="170" x2="520" y2="170" stroke="#6A2C9E" stroke-width="3" stroke-dasharray="10 8"/>
+<line x1="380" y1="20" x2="380" y2="240" stroke="#B3261E" stroke-width="5"/><rect x="330" y="30" width="100" height="200" fill="#C23B2E"/>
+</svg>
+<p style="position:absolute; left:470px; top:120px; width:230px; font-size:26px; font-weight:600; color:#6A2C9E">ครึ่งแท่งเขียว</p>
+<p style="position:absolute; left:470px; top:190px; width:230px; font-size:24px; color:#B3261E">ปิดใต้เส้นนี้</p>
+</div>
+<p style="font-size:26px; line-height:1.45">แดงปิด <b>ต่ำกว่าครึ่ง</b>ของเขียวก่อนหน้า = ขาขึ้นระยะสั้นอ่อนแรง หรือจะพักตัว</p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ครึ่งแท่ง = กึ่งกลางของ Body แท่งก่อนหน้า</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="patterns" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:28px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Candlestick · บทที่ 13</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">Price Action 6 แบบที่ควรรู้</h2>
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #1F8A5B; border-radius:16px; padding:14px 22px; display:flex; flex-direction:column; gap:4px">
+<svg aria-label="Hammer: ลงมาสองแท่งแล้วเกิดแท่ง Body เล็กไส้ล่างยาว" width="360" height="170" viewBox="0 0 360 200">
+<line x1="60" y1="35" x2="60" y2="85" stroke="#B3261E" stroke-width="4"/><rect x="45" y="40" width="30" height="40" fill="#C23B2E"/>
+<line x1="130" y1="75" x2="130" y2="125" stroke="#B3261E" stroke-width="4"/><rect x="115" y="80" width="30" height="40" fill="#C23B2E"/>
+<line x1="210" y1="115" x2="210" y2="195" stroke="#1F7A52" stroke-width="4"/><rect x="195" y="120" width="30" height="12" fill="#1F8A5B"/>
+</svg>
+<p style="font-size:28px; font-weight:600; color:#2A1340">Hammer · 1 แท่ง</p>
+<p style="font-size:24px; line-height:1.4">หลังลง ไส้ล่างยาว → คาดขึ้น</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #1F8A5B; border-radius:16px; padding:14px 22px; display:flex; flex-direction:column; gap:4px">
+<svg aria-label="Morning Star: แดงใหญ่ แท่งเล็ก แล้วเขียวปิดเกินครึ่ง" width="360" height="170" viewBox="0 0 360 200">
+<line x1="80" y1="25" x2="80" y2="135" stroke="#B3261E" stroke-width="4"/><rect x="62" y="30" width="36" height="100" fill="#C23B2E"/>
+<line x1="160" y1="140" x2="160" y2="165" stroke="#1F7A52" stroke-width="4"/><rect x="145" y="145" width="30" height="8" fill="#1F8A5B"/>
+<line x1="240" y1="55" x2="240" y2="145" stroke="#1F7A52" stroke-width="4"/><rect x="222" y="60" width="36" height="80" fill="#1F8A5B"/>
+</svg>
+<p style="font-size:28px; font-weight:600; color:#2A1340">Morning Star · 3 แท่ง</p>
+<p style="font-size:24px; line-height:1.4">ขาลง: แดง → เล็ก → เขียวปิดเกินครึ่ง</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #1F8A5B; border-radius:16px; padding:14px 22px; display:flex; flex-direction:column; gap:4px">
+<svg aria-label="Bullish Engulfing: แท่งเขียวใหญ่กลืนแท่งแดงเล็ก" width="360" height="170" viewBox="0 0 360 200">
+<line x1="130" y1="75" x2="130" y2="125" stroke="#B3261E" stroke-width="4"/><rect x="113" y="80" width="34" height="40" fill="#C23B2E"/>
+<line x1="210" y1="50" x2="210" y2="140" stroke="#1F7A52" stroke-width="4"/><rect x="190" y="58" width="40" height="72" fill="#1F8A5B"/>
+</svg>
+<p style="font-size:28px; font-weight:600; color:#2A1340">Bullish Engulfing · 2 แท่ง</p>
+<p style="font-size:24px; line-height:1.4">เขียวกลืนแดงทั้งแท่ง (ผู้สอนใช้บ่อย)</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #C23B2E; border-radius:16px; padding:14px 22px; display:flex; flex-direction:column; gap:4px">
+<svg aria-label="Hanging Man: ขึ้นมาสองแท่งแล้วเกิดแท่ง Body เล็กไส้ล่างยาว" width="360" height="170" viewBox="0 0 360 200">
+<line x1="60" y1="115" x2="60" y2="165" stroke="#1F7A52" stroke-width="4"/><rect x="45" y="120" width="30" height="40" fill="#1F8A5B"/>
+<line x1="130" y1="75" x2="130" y2="125" stroke="#1F7A52" stroke-width="4"/><rect x="115" y="80" width="30" height="40" fill="#1F8A5B"/>
+<line x1="210" y1="45" x2="210" y2="130" stroke="#B3261E" stroke-width="4"/><rect x="195" y="50" width="30" height="12" fill="#C23B2E"/>
+</svg>
+<p style="font-size:28px; font-weight:600; color:#2A1340">Hanging Man · 1 แท่ง</p>
+<p style="font-size:24px; line-height:1.4">หลังขึ้น รูปคล้าย Hammer → คาดลง</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #C23B2E; border-radius:16px; padding:14px 22px; display:flex; flex-direction:column; gap:4px">
+<svg aria-label="Evening Star: เขียวใหญ่ แท่งเล็ก แล้วแดงปิดต่ำกว่าครึ่ง" width="360" height="170" viewBox="0 0 360 200">
+<line x1="80" y1="65" x2="80" y2="175" stroke="#1F7A52" stroke-width="4"/><rect x="62" y="70" width="36" height="100" fill="#1F8A5B"/>
+<line x1="160" y1="35" x2="160" y2="60" stroke="#B3261E" stroke-width="4"/><rect x="145" y="45" width="30" height="8" fill="#C23B2E"/>
+<line x1="240" y1="55" x2="240" y2="145" stroke="#B3261E" stroke-width="4"/><rect x="222" y="60" width="36" height="80" fill="#C23B2E"/>
+</svg>
+<p style="font-size:28px; font-weight:600; color:#2A1340">Evening Star · 3 แท่ง</p>
+<p style="font-size:24px; line-height:1.4">ขาขึ้น: เขียว → เล็ก → แดงปิดต่ำกว่าครึ่ง</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #C23B2E; border-radius:16px; padding:14px 22px; display:flex; flex-direction:column; gap:4px">
+<svg aria-label="Bearish Engulfing: แท่งแดงใหญ่กลืนแท่งเขียวเล็ก" width="360" height="170" viewBox="0 0 360 200">
+<line x1="130" y1="75" x2="130" y2="125" stroke="#1F7A52" stroke-width="4"/><rect x="113" y="80" width="34" height="40" fill="#1F8A5B"/>
+<line x1="210" y1="60" x2="210" y2="150" stroke="#B3261E" stroke-width="4"/><rect x="190" y="70" width="40" height="72" fill="#C23B2E"/>
+</svg>
+<p style="font-size:28px; font-weight:600; color:#2A1340">Bearish Engulfing · 2 แท่ง</p>
+<p style="font-size:24px; line-height:1.4">แดงกลืนเขียวทั้งแท่ง</p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · แถวบน (ขอบเขียว) = คาดขึ้น · แถวล่าง (ขอบแดง) = คาดลง · แท่งเดียวข้อมูลน้อย ด่วนสรุปเกินไป</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="trade" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Candlestick · Workshop H4</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">ใช้เทรดได้ แต่ไม่ได้แม่นเสมอ</h2>
+<div style="display:flex; gap:32px">
+<div style="flex:1; background:#FFFDFE; border:2px solid #17778A; border-radius:20px; padding:24px 28px; display:flex; flex-direction:column; gap:10px">
+<p style="font-size:28px; font-weight:600; color:#17778A">ถูก: Morning Star ท้ายขาลง</p>
+<div style="position:relative; width:700px; height:340px">
+<svg aria-label="ขาลงแล้วเกิด Morning Star เข้า Long หลังแท่งเขียวปิด ตั้ง Stop Loss ที่ Low" width="700" height="340" viewBox="0 0 700 340">
+<line x1="60" y1="20" x2="60" y2="110" stroke="#B3261E" stroke-width="4"/><rect x="42" y="25" width="36" height="75" fill="#C23B2E"/>
+<line x1="140" y1="80" x2="140" y2="200" stroke="#B3261E" stroke-width="4"/><rect x="122" y="90" width="36" height="100" fill="#C23B2E"/>
+<line x1="220" y1="200" x2="220" y2="260" stroke="#1F7A52" stroke-width="4"/><rect x="205" y="210" width="30" height="10" fill="#1F8A5B"/>
+<line x1="300" y1="120" x2="300" y2="215" stroke="#1F7A52" stroke-width="4"/><rect x="282" y="125" width="36" height="85" fill="#1F8A5B"/>
+<line x1="380" y1="80" x2="380" y2="150" stroke="#1F7A52" stroke-width="4"/><rect x="362" y="90" width="36" height="45" fill="#1F8A5B"/>
+<line x1="460" y1="40" x2="460" y2="110" stroke="#1F7A52" stroke-width="4"/><rect x="442" y="50" width="36" height="50" fill="#1F8A5B"/>
+<line x1="280" y1="125" x2="560" y2="125" stroke="#2A1340" stroke-width="3"/>
+<line x1="180" y1="260" x2="560" y2="260" stroke="#B3261E" stroke-width="3" stroke-dasharray="10 8"/>
+</svg>
+<p style="position:absolute; left:570px; top:108px; width:130px; font-size:26px; font-weight:600; color:#2A1340">Entry</p>
+<p style="position:absolute; left:570px; top:243px; width:130px; font-size:26px; font-weight:600; color:#B3261E">SL ที่ Low</p>
+</div>
+<p style="font-size:26px; line-height:1.45">เข้าหลังแท่งเขียวปิด · SL ใต้ Low ของรูปแบบ → กลับตัวขึ้นจริง</p>
+</div>
+<div style="flex:1; background:#FFFDFE; border:2px solid #B3261E; border-radius:20px; padding:24px 28px; display:flex; flex-direction:column; gap:10px">
+<p style="font-size:28px; font-weight:600; color:#B3261E">พลาด: เห็น Bearish Engulfing แล้ว Short ทันที</p>
+<div style="position:relative; width:700px; height:340px">
+<svg aria-label="เข้า Short หลัง Bearish Engulfing ตั้ง SL ที่ High เดิม แต่ราคาขึ้นไปชน Stop" width="700" height="340" viewBox="0 0 700 340">
+<line x1="60" y1="190" x2="60" y2="270" stroke="#1F7A52" stroke-width="4"/><rect x="42" y="200" width="36" height="60" fill="#1F8A5B"/>
+<line x1="140" y1="120" x2="140" y2="210" stroke="#1F7A52" stroke-width="4"/><rect x="122" y="130" width="36" height="70" fill="#1F8A5B"/>
+<line x1="220" y1="100" x2="220" y2="175" stroke="#1F7A52" stroke-width="4"/><rect x="202" y="110" width="36" height="40" fill="#1F8A5B"/>
+<line x1="300" y1="100" x2="300" y2="200" stroke="#B3261E" stroke-width="4"/><rect x="280" y="105" width="40" height="85" fill="#C23B2E"/>
+<line x1="380" y1="110" x2="380" y2="200" stroke="#1F7A52" stroke-width="4"/><rect x="362" y="120" width="36" height="70" fill="#1F8A5B"/>
+<line x1="460" y1="50" x2="460" y2="130" stroke="#1F7A52" stroke-width="4"/><rect x="442" y="60" width="36" height="60" fill="#1F8A5B"/>
+<line x1="280" y1="190" x2="560" y2="190" stroke="#2A1340" stroke-width="3"/>
+<line x1="200" y1="96" x2="560" y2="96" stroke="#B3261E" stroke-width="3" stroke-dasharray="10 8"/>
+</svg>
+<p style="position:absolute; left:570px; top:173px; width:130px; font-size:26px; font-weight:600; color:#2A1340">Short</p>
+<p style="position:absolute; left:570px; top:60px; width:130px; font-size:26px; font-weight:600; color:#B3261E">SL โดน</p>
+</div>
+<p style="font-size:26px; line-height:1.45">สวนเทรนด์ขาขึ้น ราคาขึ้นไปชน SL ที่ High เดิม</p>
+</div>
+</div>
+<p style="font-size:28px; line-height:1.4; color:#FAF7FB; background:#2A1340; border-radius:16px; padding:18px 28px">บทเรียน: รูปแบบแท่งเทียนเป็นแค่การคาดการณ์ <b>ใช้ร่วมกับเทรนด์</b>จึงได้ผลดี</p>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ภาพจำลองจาก Workshop บนกราฟจริง TF H4 ในคลิป</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="timeframe" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Candlestick · บทที่ 13</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">เร็วแต่ไม่แม่น: ใช้ใน TF ช้า</h2>
+<div style="display:flex; gap:28px">
+<div style="flex:1; background:#FFFDFE; border:2px solid #17778A; border-radius:20px; padding:28px 32px; display:flex; flex-direction:column; gap:10px">
+<p style="font-size:30px; font-weight:600; color:#17778A">ข้อดี</p>
+<p style="font-size:27px; line-height:1.5">เร็ว เป็นข้อมูลจากราคาโดยตรง เห็นทันทีว่าตลาดน่าจะไปทางไหน</p>
+</div>
+<div style="flex:1; background:#FFFDFE; border:2px solid #B8511F; border-radius:20px; padding:28px 32px; display:flex; flex-direction:column; gap:10px">
+<p style="font-size:30px; font-weight:600; color:#B8511F">ข้อเสีย</p>
+<p style="font-size:27px; line-height:1.5">เร็วเกินไป ไม่แม่นขนาดนั้น ตัดสินใจบ่อยจนสับสน</p>
+</div>
+</div>
+<div style="display:flex; gap:10px; align-items:end">
+<div style="flex:1; display:flex; flex-direction:column; gap:8px"><div style="height:60px; background:#E4D6F1; border-radius:8px"></div><p style="font-size:26px; text-align:center">M5 · M15</p></div>
+<div style="flex:1; display:flex; flex-direction:column; gap:8px"><div style="height:90px; background:#C9B3E0; border-radius:8px"></div><p style="font-size:26px; text-align:center">H1</p></div>
+<div style="flex:1; display:flex; flex-direction:column; gap:8px"><div style="height:130px; background:#6A2C9E; border-radius:8px"></div><p style="font-size:26px; font-weight:600; color:#6A2C9E; text-align:center">H4</p></div>
+<div style="flex:1; display:flex; flex-direction:column; gap:8px"><div style="height:170px; background:#2A1340; border-radius:8px"></div><p style="font-size:26px; font-weight:600; color:#2A1340; text-align:center">Day ขึ้นไป</p></div>
+</div>
+<p style="font-size:24px; color:#75688A">แท่งสูง = ความน่าเชื่อถือของแท่งเทียนตามคำแนะนำของผู้สอน (เข้ม = แนะนำ)</p>
+<div style="display:flex; gap:24px">
+<p style="flex:1; font-size:26px; line-height:1.45; color:#2A1340; background:#F3ECF8; border-radius:16px; padding:18px 24px">TF เล็กต้องมีความรู้อื่นช่วย: แนวรับแนวต้าน, Demand/Supply</p>
+<p style="flex:1; font-size:26px; line-height:1.45; color:#2A1340; background:#F6C4DC; border-radius:16px; padding:18px 24px"><b>บทถัดไป:</b> Chart Pattern = แท่ง 20–30 แท่งมองเป็นภาพ + Dow Theory</p>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · Candlestick ถูกคิดค้นมาจากแท่ง Day</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="recap" style="background:radial-gradient(circle at 92% 96%, #A34E1C 0%, #4A1A45 22%, #1C0A30 55%); color:#FAF7FB; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:36px">
+<p style="font-size:24px; font-weight:600; color:#F4A57F; letter-spacing:1px">ทบทวนก่อนจบ</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#F4A57F">ตอบได้ไหม?</h2>
+<ol style="font-size:32px; line-height:1.6; color:#E9E0F2">
+<li>แท่งเทียน 1 แท่งให้ข้อมูลกี่ค่า อะไรบ้าง</li>
+<li>ทำไมต้องรอแท่งปิดก่อนตัดสินใจ</li>
+<li>ไส้ล่างยาวบอกอะไร</li>
+<li>ในขาลง แท่งเขียวต้องปิดตรงไหนถึงเป็นสัญญาณกลับตัวระยะสั้น</li>
+<li>ควรใช้แท่งเทียนกับ Timeframe ไหน</li>
+</ol>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#B8A6CC">เฉลย: 1 สี่ค่า O H L C · 2 ระหว่างแท่งสีเปลี่ยนได้ · 3 มีแรงซื้อกลับ · 4 เกินครึ่งของแท่งแดงก่อนหน้า · 5 H4 หรือ Day ขึ้นไป</p>
+
+</section>
+</div></div>
+</div>
+<script>function fit(){var z=Math.min(1,(document.documentElement.clientWidth-32)/1920);document.documentElement.style.setProperty('--z',z)}
+window.addEventListener('beforeprint',function(){document.documentElement.style.setProperty('--z',1)});
+window.addEventListener('afterprint',fit);
+window.addEventListener('resize',fit);fit();</script>
+</body></html>

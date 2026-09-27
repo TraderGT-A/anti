@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THUS · 09-10 Basic TradingView</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&family=Sarabun:wght@400;600;700&display=swap">
+<style>html,body{margin:0;padding:0}
+body{background:#1C0A30;font-family:'Sarabun',Tahoma,sans-serif}
+.bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 24px;background:#2A1340;color:#F4A57F;font:600 20px 'Kanit',Tahoma,sans-serif}
+.bar button{font:600 18px 'Sarabun',Tahoma,sans-serif;background:#F4A57F;color:#2A1340;border:0;border-radius:8px;padding:8px 16px;cursor:pointer}
+.deck{padding:24px 0}
+:root{--z:1}
+.holder{width:calc(1920px * var(--z));height:calc(1080px * var(--z));margin:0 auto 24px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.slide{width:1920px;height:1080px;overflow:hidden;transform:scale(var(--z));transform-origin:0 0}
+section{width:1920px;height:1080px;position:relative;overflow:hidden;box-sizing:border-box}
+section *{margin:0;box-sizing:border-box}
+section div:not([style*="display"]){display:flex;flex-direction:column}
+section ul,section ol{padding-left:1.3em}
+section table{border-collapse:collapse}
+section th,section td{padding:.35em .6em;border-bottom:1px solid #E6DDEB;vertical-align:top}
+section iframe{border:0;background:transparent}
+@page{size:1920px 1080px;margin:0}
+@media print{
+  :root{--z:1 !important}
+  body{background:none}
+  .bar{display:none}
+  .deck{padding:0}
+  .holder{width:1920px;height:1080px;margin:0;box-shadow:none;break-after:page;page-break-after:always}
+  .slide{transform:none}
+}</style></head>
+<body><div class="bar"><span>THUS · House of Traders · 09-10 Basic TradingView</span><button onclick="window.print()">บันทึกเป็น PDF</button></div>
+<div class="deck">
+<div class="holder"><div class="slide"><section id="cover" style="background:radial-gradient(circle at 90% 95%, #C8641F 0%, #5A1F4A 24%, #1C0A30 58%); color:#FAF7FB; font-family:'Sarabun', Tahoma, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:space-between">
+<div style="position:absolute; left:0; top:0; width:640px; height:320px; opacity:0.55; background:repeating-linear-gradient(120deg, #7B3FC4 0px, #7B3FC4 3px, transparent 3px, transparent 18px)"></div>
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#FAF7FB; letter-spacing:4px; text-align:right">THUS</p>
+<div style="display:flex; flex-direction:column; gap:28px">
+<p style="font-size:28px; font-weight:600; color:#F4A57F; letter-spacing:2px">BASIC CLASS · บทที่ 09–10</p>
+<h1 style="font-family:'Kanit', Tahoma, sans-serif; font-size:128px; font-weight:600; line-height:1.1; color:#F4A57F">BASIC TRADINGVIEW</h1>
+<div style="width:900px; height:3px; background:#8E6BB0"></div>
+<p style="font-size:34px; line-height:1.4; color:#D9CCE6; width:1400px">Layout · เครื่องมือวาด · Template · Alert · Bar Replay · Watchlist · Financials</p>
+</div>
+<p style="font-size:26px; color:#B8A6CC">House of Traders · ชีทประกอบคลิป Basic TradingView P1–P2</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="plans" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Basic TradingView · บทที่ 09</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">เริ่มต้น: ใช้ที่ไหน และเลือกแพ็กเกจไหน</h2>
+<div style="display:flex; gap:20px">
+<p style="flex:1; font-size:26px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:18px 24px"><b>แอปมือถือ</b> iOS / Android</p>
+<p style="flex:1; font-size:26px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:18px 24px"><b>Browser</b> tradingview.com</p>
+<p style="flex:1; font-size:26px; line-height:1.4; color:#FAF7FB; background:#6A2C9E; border-radius:16px; padding:18px 24px"><b>Desktop App</b> ผู้สอนใช้ · แยกจาก Chrome</p>
+<p style="flex:1; font-size:26px; line-height:1.4; color:#2A1340; background:#F6C4DC; border-radius:16px; padding:18px 24px"><b>ต้องล็อกอิน</b> ไม่งั้นเซฟอะไรไม่ได้</p>
+</div>
+<table style="font-size:26px; color:#4B3D5E; width:1664px">
+<tr style="background:#2A1340"><th style="width:18%; color:#FAF7FB; text-align:left">&#160;</th><th style="width:27%; color:#FAF7FB; text-align:left">ฟรี</th><th style="width:27%; color:#FAF7FB; text-align:left">Essential</th><th style="width:28%; color:#FAF7FB; text-align:left">Premium</th></tr>
+<tr style="background:#FFFDFE"><td><b>ราคา / ปี</b></td><td>0</td><td>~155 USD (~5,000 กว่าบาท)</td><td>หมื่นกว่าบาท (ผู้สอนหารกับเพื่อน)</td></tr>
+<tr style="background:#F3ECF8"><td><b>ชาร์ตต่อแท็บ</b></td><td>1</td><td>2</td><td>~6–8</td></tr>
+<tr style="background:#FFFDFE"><td><b>จุดเด่น / ข้อจำกัด</b></td><td>เซฟ Layout ได้ 1 · ย้อนกราฟ ~7 ปี · Replay เฉพาะ TF Day</td><td>อินดิเคเตอร์ 5 ตัว · Replay TF 1–5 นาที (ย้อนไม่ไกล)</td><td>Alert และ Layout/Template เยอะ · TF ระดับวินาที เช่น 10s</td></tr>
+</table>
+<p style="font-size:28px; line-height:1.4; color:#2A1340; background:#F6C4DC; border-radius:16px; padding:20px 28px"><b>Black Friday</b> ลดได้ถึง ~60–70% · จะซื้อหรือต่ออายุรายปี ให้รอช่วงนี้ · มือใหม่ใช้แบบฟรีก็พอเริ่มได้</p>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ราคาและสิทธิ์ของแต่ละแพ็กเกจเปลี่ยนได้ เช็กบนเว็บก่อนซื้อ</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="map" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Basic TradingView · บทที่ 09</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">แผนที่หน้าจอ: 4 แถบรอบกราฟ</h2>
+<div style="position:relative; width:1664px; height:580px">
+<div style="position:absolute; left:0; top:0; width:1664px; height:96px; background:#2A1340; border-radius:14px; padding:0 28px; display:flex; align-items:center">
+<p style="font-size:26px; color:#FAF7FB"><span style="color:#F4A57F"><b>แถบบน</b></span> · Symbol Search · Compare · Timeframe · Chart Type · Indicators · Template · Alert · Replay</p>
+</div>
+<div style="position:absolute; left:0; top:112px; width:240px; height:360px; background:#6A2C9E; border-radius:14px; padding:24px; display:flex; flex-direction:column; gap:10px">
+<p style="font-size:24px; font-weight:600; color:#F6C4DC">แถบซ้าย</p>
+<p style="font-size:28px; font-weight:600; color:#FAF7FB">เครื่องมือวาด</p>
+<p style="font-size:24px; line-height:1.4; color:#EFE6F5">Trend Line · Fibo · Pattern · Long / Short</p>
+</div>
+<div style="position:absolute; left:256px; top:112px; width:952px; height:360px; background:#FFFDFE; border:2px solid #E6DDEB; border-radius:14px; padding:20px 24px; display:flex; flex-direction:column; gap:8px">
+<svg aria-label="กราฟแท่งเทียนตัวอย่างกำลังขึ้น" width="900" height="250" viewBox="0 0 900 250">
+<g stroke-width="2">
+<line x1="30" y1="140" x2="30" y2="180" stroke="#17778A"/><rect x="18" y="150" width="24" height="20" fill="#17778A"/>
+<line x1="86" y1="125" x2="86" y2="165" stroke="#17778A"/><rect x="74" y="135" width="24" height="20" fill="#17778A"/>
+<line x1="142" y1="128" x2="142" y2="160" stroke="#B8511F"/><rect x="130" y="135" width="24" height="15" fill="#B8511F"/>
+<line x1="198" y1="105" x2="198" y2="155" stroke="#17778A"/><rect x="186" y="115" width="24" height="33" fill="#17778A"/>
+<line x1="254" y1="90" x2="254" y2="128" stroke="#17778A"/><rect x="242" y="100" width="24" height="20" fill="#17778A"/>
+<line x1="310" y1="94" x2="310" y2="126" stroke="#B8511F"/><rect x="298" y="100" width="24" height="18" fill="#B8511F"/>
+<line x1="366" y1="102" x2="366" y2="138" stroke="#B8511F"/><rect x="354" y="110" width="24" height="20" fill="#B8511F"/>
+<line x1="422" y1="82" x2="422" y2="132" stroke="#17778A"/><rect x="410" y="90" width="24" height="35" fill="#17778A"/>
+<line x1="478" y1="60" x2="478" y2="100" stroke="#17778A"/><rect x="466" y="70" width="24" height="25" fill="#17778A"/>
+<line x1="534" y1="66" x2="534" y2="96" stroke="#B8511F"/><rect x="522" y="72" width="24" height="16" fill="#B8511F"/>
+<line x1="590" y1="45" x2="590" y2="86" stroke="#17778A"/><rect x="578" y="55" width="24" height="25" fill="#17778A"/>
+<line x1="646" y1="30" x2="646" y2="66" stroke="#17778A"/><rect x="634" y="40" width="24" height="20" fill="#17778A"/>
+<line x1="702" y1="38" x2="702" y2="70" stroke="#B8511F"/><rect x="690" y="45" width="24" height="17" fill="#B8511F"/>
+<line x1="758" y1="20" x2="758" y2="56" stroke="#17778A"/><rect x="746" y="30" width="24" height="20" fill="#17778A"/>
+<line x1="814" y1="12" x2="814" y2="42" stroke="#17778A"/><rect x="802" y="20" width="24" height="15" fill="#17778A"/>
+<line x1="870" y1="18" x2="870" y2="48" stroke="#B8511F"/><rect x="858" y="25" width="24" height="15" fill="#B8511F"/>
+</g>
+<line x1="0" y1="210" x2="900" y2="210" stroke="#E6DDEB" stroke-width="2"/>
+</svg>
+<p style="font-size:24px; color:#6A2C9E"><b>กราฟ</b> · ดับเบิลคลิก = ขยายหน้าต่างนั้นเต็มจอ</p>
+</div>
+<div style="position:absolute; left:1224px; top:112px; width:440px; height:360px; background:#17778A; border-radius:14px; padding:24px; display:flex; flex-direction:column; gap:10px">
+<p style="font-size:24px; font-weight:600; color:#CFEAEE">แถบขวา</p>
+<p style="font-size:28px; font-weight:600; color:#FAF7FB">รายการและข้อมูล</p>
+<p style="font-size:24px; line-height:1.45; color:#E3F2F4">Watchlist · Alerts · Object Tree · Ideas / Chat · Economic Calendar</p>
+</div>
+<div style="position:absolute; left:0; top:488px; width:1664px; height:92px; background:#E4D6F1; border-radius:14px; padding:0 28px; display:flex; align-items:center">
+<p style="font-size:26px; color:#2A1340"><b>แถบล่าง</b> · ปุ่มช่วงเวลา 1D · 5D · 1M · 1Y · 5Y ปรับ Timeframe ให้เอง (เลือก 5Y แสดงเป็น Weekly) · Stock Screener</p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · Stock Screener สอนในคลาสถัดไป</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="layout" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Basic TradingView · บทที่ 09</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">Layout = โต๊ะทำงานแยกชุด</h2>
+<div style="display:flex; gap:32px">
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:26px 30px; display:flex; flex-direction:column; gap:12px">
+<p style="font-size:26px; font-weight:600; color:#6A2C9E">Layout "FTMO" · EURUSD</p>
+<svg aria-label="กราฟเดียวกันใน Layout แรก มีเส้นแนวนอนและกรอบโซน" width="700" height="240" viewBox="0 0 700 240">
+<rect x="420" y="30" width="280" height="40" fill="#F6C4DC" opacity="0.7"/>
+<line x1="0" y1="80" x2="700" y2="80" stroke="#6A2C9E" stroke-width="3" stroke-dasharray="10 8"/>
+<line x1="0" y1="130" x2="700" y2="130" stroke="#6A2C9E" stroke-width="3" stroke-dasharray="10 8"/>
+<polyline points="0,170 70,145 140,155 210,110 280,122 350,78 420,95 490,55 560,72 630,35 700,46" fill="none" stroke="#2A1340" stroke-width="4"/>
+</svg>
+<p style="font-size:24px; color:#75688A">แนวรับ-ต้าน + โซน</p>
+</div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:26px 30px; display:flex; flex-direction:column; gap:12px">
+<p style="font-size:26px; font-weight:600; color:#17778A">Layout "THUS" · EURUSD</p>
+<svg aria-label="กราฟเดียวกันใน Layout ที่สอง มีเส้นเทรนด์และอินดิเคเตอร์ด้านล่าง" width="700" height="240" viewBox="0 0 700 240">
+<line x1="0" y1="180" x2="700" y2="60" stroke="#17778A" stroke-width="4"/>
+<polyline points="0,170 70,145 140,155 210,110 280,122 350,78 420,95 490,55 560,72 630,35 700,46" fill="none" stroke="#2A1340" stroke-width="4"/>
+<line x1="0" y1="215" x2="700" y2="215" stroke="#E6DDEB" stroke-width="2"/>
+<g fill="#6A2C9E"><rect x="20" y="205" width="30" height="10"/><rect x="80" y="200" width="30" height="15"/><rect x="140" y="208" width="30" height="7"/><rect x="200" y="196" width="30" height="19"/><rect x="260" y="200" width="30" height="15"/><rect x="320" y="192" width="30" height="23"/><rect x="380" y="198" width="30" height="17"/><rect x="440" y="190" width="30" height="25"/><rect x="500" y="195" width="30" height="20"/><rect x="560" y="188" width="30" height="27"/><rect x="620" y="192" width="30" height="23"/></g>
+</svg>
+<p style="font-size:24px; color:#75688A">เส้นเทรนด์ + อินดิเคเตอร์อีกชุด</p>
+</div>
+</div>
+<p style="font-size:28px; line-height:1.4; color:#2A1340">สินทรัพย์เดียวกัน แต่แต่ละ Layout จำ <b>Watchlist · เส้นที่วาด · อินดิเคเตอร์ · พื้นหลัง</b> แยกกัน</p>
+<div style="display:flex; gap:16px; align-items:center">
+<p style="font-size:26px; font-weight:600; color:#FAF7FB; background:#6A2C9E; border-radius:12px; padding:14px 22px">กด + ที่แท็บ</p>
+<div style="display:flex; flex:none; width:56px; align-self:center; align-items:center"><svg width="56" height="24" viewBox="0 0 56 24"><line x1="0" y1="12" x2="44" y2="12" stroke="#6A2C9E" stroke-width="3"/><polygon points="44,6 56,12 44,18" fill="#6A2C9E"/></svg></div>
+<p style="font-size:26px; font-weight:600; color:#FAF7FB; background:#6A2C9E; border-radius:12px; padding:14px 22px">Create New Layout</p>
+<div style="display:flex; flex:none; width:56px; align-self:center; align-items:center"><svg width="56" height="24" viewBox="0 0 56 24"><line x1="0" y1="12" x2="44" y2="12" stroke="#6A2C9E" stroke-width="3"/><polygon points="44,6 56,12 44,18" fill="#6A2C9E"/></svg></div>
+<p style="font-size:26px; font-weight:600; color:#FAF7FB; background:#6A2C9E; border-radius:12px; padding:14px 22px">Rename</p>
+<div style="display:flex; flex:none; width:56px; align-self:center; align-items:center"><svg width="56" height="24" viewBox="0 0 56 24"><line x1="0" y1="12" x2="44" y2="12" stroke="#6A2C9E" stroke-width="3"/><polygon points="44,6 56,12 44,18" fill="#6A2C9E"/></svg></div>
+<p style="font-size:26px; font-weight:600; color:#FAF7FB; background:#6A2C9E; border-radius:12px; padding:14px 22px">Save</p>
+<p style="flex:1; font-size:26px; line-height:1.4; color:#2A1340; background:#F6C4DC; border-radius:12px; padding:14px 22px">ลองกลยุทธ์ใหม่ใน Layout แยก ไม่ต้องลบของเดิม</p>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · เปลี่ยนสินทรัพย์ที่ Symbol Search เช่น พิมพ์ XAUUSD</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="drawing" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Basic TradingView · บทที่ 09</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">แถบซ้าย: เครื่องมือวาด 6 กลุ่ม</h2>
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px">
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #6A2C9E; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#2A1340">Lines</h3>
+<p style="font-size:24px; line-height:1.45">Trend Line · Ray · Horizontal Ray · Parallel Channel · Extend ซ้าย/ขวาได้</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #6A2C9E; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#2A1340">Fibonacci</h3>
+<p style="font-size:24px; line-height:1.45">Fib Retracement</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #6A2C9E; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#2A1340">Patterns</h3>
+<p style="font-size:24px; line-height:1.45">XABCD · Head and Shoulders · Elliott 1–5 และ ABC ไม่ต้อง Label เอง</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #17778A; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#2A1340">Projection</h3>
+<p style="font-size:24px; line-height:1.45">Long / Short Position เห็น Risk:Reward ทันที (หน้าถัดไป)</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #6A2C9E; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#2A1340">Measure</h3>
+<p style="font-size:24px; line-height:1.45">Price Range · Date &amp; Price Range บอกจำนวนแท่ง วัน และราคา</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #6A2C9E; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#2A1340">Annotation</h3>
+<p style="font-size:24px; line-height:1.45">Brush / Highlighter · Arrow · ป้ายราคา</p>
+</div>
+</div>
+<div style="display:flex; gap:24px">
+<div style="flex:1; background:#F3ECF8; border-radius:16px; padding:22px 28px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:28px; font-weight:600; color:#2A1340">กดดาว = Favorite</p>
+<p style="font-size:26px; line-height:1.45">กดดาวเครื่องมือที่ใช้บ่อย → Show Favorite Drawing Tools ได้แถบลอยไว้ใช้เร็ว ๆ</p>
+</div>
+<div style="flex:1.4; background:#2A1340; border-radius:16px; padding:22px 28px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:28px; font-weight:600; color:#F4A57F">Drawing Template (จุดเด่นของ TradingView)</p>
+<p style="font-size:26px; line-height:1.45; color:#E9E0F2">ตั้งสี ขอบ พื้นหลัง ความโปร่ง → Save As Template → เรียกใช้คลิกเดียว เช่น โซน H1 / H4 / M15 คนละสี, Red Zone, Stop Loss</p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ทุกเส้นปรับสี ความหนา และแบบเส้น (ทึบ ประ จุด) ได้</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="position" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Basic TradingView · บทที่ 09</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">Long Position: เห็นความเสี่ยงก่อนกดเข้า</h2>
+<div style="display:flex; gap:56px; align-items:start">
+<div style="position:relative; width:780px; height:540px">
+<div style="position:absolute; left:120px; top:20px; width:420px; height:336px; background:#D3ECEF; border:2px solid #17778A"></div>
+<div style="position:absolute; left:120px; top:356px; width:420px; height:128px; background:#F6D8CC; border:2px solid #B8511F"></div>
+<div style="position:absolute; left:96px; top:353px; width:470px; height:5px; background:#2A1340"></div>
+<p style="position:absolute; left:140px; top:150px; width:380px; font-size:34px; font-weight:600; color:#0F5A68; text-align:center">TP ~42 เหรียญ</p>
+<p style="position:absolute; left:140px; top:196px; width:380px; font-size:24px; color:#0F5A68; text-align:center">กำไรเป้าหมาย</p>
+<p style="position:absolute; left:140px; top:392px; width:380px; font-size:32px; font-weight:600; color:#8A3A14; text-align:center">SL ~16 เหรียญ</p>
+<p style="position:absolute; left:580px; top:334px; width:200px; font-size:28px; font-weight:600; color:#2A1340">Entry</p>
+<p style="position:absolute; left:580px; top:40px; width:200px; font-size:30px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:12px; padding:12px 16px; text-align:center">R:R ≈ 2.56</p>
+<p style="position:absolute; left:0; top:498px; width:780px; font-size:24px; color:#75688A">กล่องบน = ทางกำไร · กล่องล่าง = ทางขาดทุน · Short Position กลับด้านกัน</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:18px">
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:26px; font-weight:600; color:#6A2C9E">1 · วางเครื่องมือ</p>
+<p style="font-size:26px; line-height:1.45">แถบซ้าย → Projection → Long หรือ Short Position ลากจุดเข้า SL และ TP</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:26px; font-weight:600; color:#6A2C9E">2 · ตั้งค่าให้เห็นตลอด</p>
+<p style="font-size:26px; line-height:1.45">Always Show Stats · ปรับขนาดตัวอักษรให้อ่านง่าย</p>
+</div>
+<div style="background:#2A1340; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:26px; font-weight:600; color:#F4A57F">3 · ใส่ทุนและ Risk</p>
+<p style="font-size:26px; line-height:1.45; color:#E9E0F2">คำนวณ Position Size ให้เลย เชื่อมกับบท Gearing</p>
+</div>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ตัวเลขจากตัวอย่างในคลิป</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="compare" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Basic TradingView · บทที่ 09</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">Compare: เทียบหลายสินทรัพย์ในกราฟเดียว</h2>
+<p style="font-size:28px; line-height:1.4">ตัวอย่างในคลิป: ผลตอบแทนย้อนหลัง 1 ปี (ณ วันที่ไลฟ์)</p>
+<div style="display:flex; flex-direction:column; gap:22px">
+<div style="display:flex; gap:24px; align-items:center">
+<p style="width:220px; font-size:30px; font-weight:600; color:#2A1340">Bitcoin</p>
+<div style="width:1100px; height:64px; background:#B8511F; border-radius:10px"></div>
+<p style="font-size:34px; font-weight:600; color:#B8511F">+150%</p>
+</div>
+<div style="display:flex; gap:24px; align-items:center">
+<p style="width:220px; font-size:30px; font-weight:600; color:#2A1340">ทองคำ</p>
+<div style="width:242px; height:64px; background:#D9892E; border-radius:10px"></div>
+<p style="font-size:34px; font-weight:600; color:#2A1340">+33%</p>
+</div>
+<div style="display:flex; gap:24px; align-items:center">
+<p style="width:220px; font-size:30px; font-weight:600; color:#2A1340">S&amp;P 500</p>
+<div style="width:220px; height:64px; background:#6A2C9E; border-radius:10px"></div>
+<p style="font-size:34px; font-weight:600; color:#2A1340">+30%</p>
+</div>
+<div style="display:flex; gap:24px; align-items:center">
+<p style="width:220px; font-size:30px; font-weight:600; color:#2A1340">Nasdaq</p>
+<div style="width:213px; height:64px; background:#17778A; border-radius:10px"></div>
+<p style="font-size:34px; font-weight:600; color:#2A1340">+29%</p>
+</div>
+</div>
+<div style="display:flex; gap:24px">
+<p style="flex:1; font-size:26px; line-height:1.45; color:#2A1340; background:#F3ECF8; border-radius:16px; padding:20px 26px"><b>วิธีใช้:</b> แถบบน → Compare → พิมพ์ชื่อสินทรัพย์ที่จะเทียบ</p>
+<p style="flex:1; font-size:26px; line-height:1.45; color:#2A1340; background:#F3ECF8; border-radius:16px; padding:20px 26px"><b>อีกตัวอย่าง:</b> SET เทียบ DXY เห็นดอลลาร์แข็งค่าขณะที่ SET Sideways</p>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ตัวเลขเปลี่ยนตามวันที่ดู ใช้เพื่อเข้าใจวิธีเทียบเท่านั้น</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="indicators" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Basic TradingView · บทที่ 09</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">Indicator Template: สลับชุดอินดิเคเตอร์ในคลิกเดียว</h2>
+<div style="display:flex; gap:14px; align-items:stretch">
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:20px 22px; display:flex; flex-direction:column; gap:6px">
+<p style="font-size:24px; font-weight:600; color:#6A2C9E">ขั้น 1</p>
+<p style="font-size:26px; line-height:1.4">ค้นหาตัวมาตรฐาน เช่น MACD, RSI</p>
+</div>
+<div style="display:flex; flex:none; width:48px; align-self:center; align-items:center"><svg width="48" height="24" viewBox="0 0 48 24"><line x1="0" y1="12" x2="36" y2="12" stroke="#6A2C9E" stroke-width="3"/><polygon points="36,6 48,12 36,18" fill="#6A2C9E"/></svg></div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:20px 22px; display:flex; flex-direction:column; gap:6px">
+<p style="font-size:24px; font-weight:600; color:#6A2C9E">ขั้น 2</p>
+<p style="font-size:26px; line-height:1.4">Settings ปรับเส้น สี ค่า เช่น RSI 14</p>
+</div>
+<div style="display:flex; flex:none; width:48px; align-self:center; align-items:center"><svg width="48" height="24" viewBox="0 0 48 24"><line x1="0" y1="12" x2="36" y2="12" stroke="#6A2C9E" stroke-width="3"/><polygon points="36,6 48,12 36,18" fill="#6A2C9E"/></svg></div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:20px 22px; display:flex; flex-direction:column; gap:6px">
+<p style="font-size:24px; font-weight:600; color:#6A2C9E">ขั้น 3</p>
+<p style="font-size:26px; line-height:1.4">Save Template ตั้งชื่อ เช่น "THUS MACD"</p>
+</div>
+<div style="display:flex; flex:none; width:48px; align-self:center; align-items:center"><svg width="48" height="24" viewBox="0 0 48 24"><line x1="0" y1="12" x2="36" y2="12" stroke="#6A2C9E" stroke-width="3"/><polygon points="36,6 48,12 36,18" fill="#6A2C9E"/></svg></div>
+<div style="flex:1; background:#2A1340; border-radius:16px; padding:20px 22px; display:flex; flex-direction:column; gap:6px">
+<p style="font-size:24px; font-weight:600; color:#F4A57F">ขั้น 4</p>
+<p style="font-size:26px; line-height:1.4; color:#E9E0F2">กดดาว แล้วสลับชุดได้ทันที</p>
+</div>
+</div>
+<div style="display:flex; gap:16px; align-items:center">
+<p style="font-size:26px; color:#75688A">Template ของผู้สอน:</p>
+<p style="font-size:26px; font-weight:600; color:#2A1340; background:#E4D6F1; border-radius:30px; padding:10px 26px">Clean</p>
+<p style="font-size:26px; font-weight:600; color:#FAF7FB; background:#6A2C9E; border-radius:30px; padding:10px 26px">TZC (ระบบหลัก)</p>
+<p style="font-size:26px; font-weight:600; color:#2A1340; background:#E4D6F1; border-radius:30px; padding:10px 26px">All Index</p>
+<p style="font-size:26px; font-weight:600; color:#2A1340; background:#E4D6F1; border-radius:30px; padding:10px 26px">US Stock</p>
+</div>
+<div style="display:flex; gap:24px">
+<div style="flex:1; background:#FFFDFE; border:2px solid #B3261E; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:28px; font-weight:600; color:#B3261E">ระวัง</p>
+<p style="font-size:26px; line-height:1.45">อย่าใช้อินดิเคเตอร์ของคนอื่นแบบมั่ว ๆ ไม่รู้ว่าเขาคำนวณอย่างไร ใช้ตัวมาตรฐานเป็นหลัก</p>
+</div>
+<div style="flex:1; background:#F3ECF8; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:28px; font-weight:600; color:#2A1340">Pine Editor</p>
+<p style="font-size:26px; line-height:1.45">แก้โค้ดได้ เช่น เพิ่ม Zero Line ให้ MACD เขียนไม่เป็นให้ ChatGPT ช่วยแล้วปรับเอง</p>
+</div>
+<div style="flex:1; background:#F6C4DC; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:28px; font-weight:600; color:#2A1340">ซ่อนบางตัวแล้วอยากให้จำ</p>
+<p style="font-size:26px; line-height:1.45; color:#2A1340">ต้องเซฟ Template ทับใหม่</p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · TZC = ระบบของผู้สอน มี RSI, Stochastic ฯลฯ</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="alert" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Basic TradingView · บทที่ 09</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">Alert: ทำการบ้านแล้วให้กราฟเรียกเรา</h2>
+<div style="display:flex; gap:48px; align-items:center">
+<div style="position:relative; width:760px; height:480px">
+<div style="position:absolute; left:0; top:0; width:760px; height:480px; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px"></div>
+<div style="position:absolute; left:60px; top:150px; width:560px; height:170px; background:#F3ECF8; border:2px solid #6A2C9E"></div>
+<div style="position:absolute; left:40px; top:147px; width:620px; height:4px; background:#D9892E"></div>
+<div style="position:absolute; left:40px; top:318px; width:620px; height:4px; background:#D9892E"></div>
+<p style="position:absolute; left:80px; top:210px; width:520px; font-size:28px; color:#6A2C9E; text-align:center">กรอบ Sideways ที่วาดไว้</p>
+<p style="position:absolute; left:470px; top:96px; width:280px; font-size:24px; font-weight:600; color:#FAF7FB; background:#D9892E; border-radius:8px; padding:4px 12px">Alert ขอบบน</p>
+<p style="position:absolute; left:470px; top:334px; width:280px; font-size:24px; font-weight:600; color:#FAF7FB; background:#D9892E; border-radius:8px; padding:4px 12px">Alert ขอบล่าง</p>
+<p style="position:absolute; left:40px; top:406px; width:680px; font-size:24px; color:#75688A">หลุดขอบไหนก่อน = Breakout ฝั่งนั้น มือถือเด้งเตือน</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:14px">
+<p style="font-size:28px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 22px"><b>1</b> · วางเมาส์ที่ราคาบนแกนขวา กด <b>+ → Add Alert</b></p>
+<p style="font-size:28px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 22px"><b>2</b> · เลือก Crossing เช่น SET ที่ 1,440</p>
+<p style="font-size:28px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 22px"><b>3</b> · <b>Lock</b> เส้นไว้ไม่ให้ขยับ</p>
+<p style="font-size:28px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 22px"><b>4</b> · เปิดแจ้งเตือนในแอปมือถือ / นาฬิกา</p>
+<p style="font-size:28px; line-height:1.4; color:#FAF7FB; background:#17778A; border-radius:14px; padding:16px 22px"><b>ผลลัพธ์:</b> ไม่ต้องนั่งเฝ้ากราฟ</p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ดู Alert ที่ตั้งไว้และประวัติการเตือนได้ที่แถบขวา → Alerts</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="replay" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Basic TradingView · บทที่ 09–10</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">Bar Replay: ย้อนเวลาแล้วเทรดทีละแท่ง</h2>
+<div style="display:flex; flex-direction:column; gap:16px; width:820px">
+<p style="font-size:28px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 22px"><b>1</b> · กด <b>Replay</b> เลือกวันเวลาเริ่ม กราฟหลังจากนั้นจะหายไป</p>
+<p style="font-size:28px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 22px"><b>2</b> · ตั้งกติกาก่อน เช่น "หลุดกรอบลง = Short" SL : TP = 1 : 2</p>
+<p style="font-size:28px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 22px"><b>3</b> · กด <b>Shift + →</b> เลื่อนทีละแท่ง ดูว่าชน TP หรือ SL</p>
+<p style="font-size:28px; line-height:1.4; color:#FAF7FB; background:#6A2C9E; border-radius:14px; padding:16px 22px"><b>4</b> · จดผลทุกไม้ลง Excel แล้วสรุปสถิติ</p>
+<p style="font-size:26px; line-height:1.4; color:#2A1340; background:#F6C4DC; border-radius:14px; padding:16px 22px">ฟรี: เฉพาะ TF Day · Essential: TF 1–5 นาที ย้อนไม่ไกล · Premium: ถึงระดับวินาที</p>
+</div>
+<iframe style="position:absolute; left:1000px; top:300px; width:792px; height:560px" srcdoc="<!doctype html><html><head><meta charset=&quot;utf-8&quot;><style>
+body{margin:0;background:#FFFDFE;font-family:Tahoma,'Segoe UI',sans-serif;color:#2A1340;border:1px solid #E6DDEB;border-radius:20px;height:558px;box-sizing:border-box;overflow:hidden}
+.top{display:flex;align-items:center;gap:12px;padding:18px 24px 0;font-size:24px}
+.k{display:inline-block;border:2px solid #6A2C9E;border-bottom-width:5px;border-radius:8px;padding:2px 12px;font-weight:700;color:#6A2C9E;background:#F3ECF8;transition:transform .15s,background .15s}
+.k.p{transform:translateY(3px);background:#E4D6F1}
+#st{margin-left:auto;font-weight:700;font-size:24px}
+</style></head><body>
+<div class=&quot;top&quot;><span class=&quot;k&quot; id=&quot;k1&quot;>Shift</span>+<span class=&quot;k&quot; id=&quot;k2&quot;>→</span><span id=&quot;st&quot;></span></div>
+<svg id=&quot;s&quot; viewBox=&quot;0 0 760 470&quot; width=&quot;760&quot; height=&quot;470&quot;></svg>
+<script>
+var d=[[50,56,47,54],[54,57,50,51],[51,55,46,48],[48,53,45,52],[52,57,49,50],[50,54,46,47],[47,52,45,51],[51,55,47,49],[49,50,40,41],[41,43,35,37],[37,40,32,33],[33,36,29,30]];
+function y(p){return 440-(p-24)*11}
+var n=d.length,s=document.getElementById('s'),st=document.getElementById('st');
+function draw(k){var h='';
+h+='<rect x=&quot;20&quot; y=&quot;'+y(57)+'&quot; width=&quot;420&quot; height=&quot;'+(y(45)-y(57))+'&quot; fill=&quot;#F3ECF8&quot; stroke=&quot;#6A2C9E&quot; stroke-width=&quot;2&quot;/>';
+h+='<text x=&quot;30&quot; y=&quot;'+(y(57)-10)+'&quot; font-size=&quot;24&quot; fill=&quot;#6A2C9E&quot;>กรอบ</text>';
+if(k>=9){var x0=20+8*52-4;h+='<rect x=&quot;'+x0+'&quot; y=&quot;'+y(48)+'&quot; width=&quot;'+(740-x0)+'&quot; height=&quot;'+(y(44)-y(48))+'&quot; fill=&quot;#F6D8CC&quot;/>';
+h+='<rect x=&quot;'+x0+'&quot; y=&quot;'+y(44)+'&quot; width=&quot;'+(740-x0)+'&quot; height=&quot;'+(y(36)-y(44))+'&quot; fill=&quot;#D3ECEF&quot;/>';
+h+='<text x=&quot;'+(x0+200)+'&quot; y=&quot;'+(y(48)+30)+'&quot; font-size=&quot;24&quot; fill=&quot;#8A3A14&quot;>SL</text>';
+h+='<text x=&quot;'+(x0+200)+'&quot; y=&quot;'+(y(36)-12)+'&quot; font-size=&quot;24&quot; fill=&quot;#0F5A68&quot;>TP</text>';}
+for(var i=0;i<k;i++){var c=d[i],x=40+i*52,up=c[3]>=c[0],col=up?'#17778A':'#B8511F';
+h+='<line x1=&quot;'+x+'&quot; y1=&quot;'+y(c[1])+'&quot; x2=&quot;'+x+'&quot; y2=&quot;'+y(c[2])+'&quot; stroke=&quot;'+col+'&quot; stroke-width=&quot;3&quot;/>';
+h+='<rect x=&quot;'+(x-14)+'&quot; y=&quot;'+y(Math.max(c[0],c[3]))+'&quot; width=&quot;28&quot; height=&quot;'+Math.max(3,Math.abs(y(c[0])-y(c[3])))+'&quot; fill=&quot;'+col+'&quot;/>';}
+s.innerHTML=h;
+st.textContent=k<9?'แท่งที่ '+k+' · รอดู':(k<10?'หลุดกรอบ → Short':'ชน TP · +2R');
+st.style.color=k>=10?'#17778A':'#2A1340';}
+var k=n;draw(k);
+function press(){var a=document.getElementById('k1'),b=document.getElementById('k2');a.classList.add('p');b.classList.add('p');setTimeout(function(){a.classList.remove('p');b.classList.remove('p')},180)}
+function step(){if(k>=n){k=1;draw(k);setTimeout(step,900);return}k++;press();draw(k);setTimeout(step,k>=n?2600:800)}
+setTimeout(step,2600);
+</script></body></html>"></iframe>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ภาพขวา: เปิดผ่านลิงก์จะเห็นแท่งเทียนเดินทีละแท่ง · วิธีละเอียดดูบท How to Look Back</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="multichart" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Basic TradingView · บทที่ 10</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">หลายกราฟในจอเดียว + Link ให้เปลี่ยนตามกัน</h2>
+<div style="display:flex; gap:20px; align-items:center">
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:22px 26px; display:flex; flex-direction:column; gap:10px">
+<p style="font-size:26px; font-weight:600; color:#2A1340">XAUUSD · 4H</p>
+<svg aria-label="กราฟทอง 4 ชั่วโมง พร้อมเส้น crosshair" width="660" height="220" viewBox="0 0 660 220">
+<polyline points="0,180 80,150 160,160 240,110 320,120 400,70 480,90 560,50 660,40" fill="none" stroke="#2A1340" stroke-width="4"/>
+<line x1="400" y1="0" x2="400" y2="220" stroke="#B8511F" stroke-width="3" stroke-dasharray="8 6"/>
+</svg>
+</div>
+<p style="font-size:26px; font-weight:600; color:#FAF7FB; background:#6A2C9E; border-radius:30px; padding:12px 20px; text-align:center">Link</p>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:22px 26px; display:flex; flex-direction:column; gap:10px">
+<p style="font-size:26px; font-weight:600; color:#2A1340">XAUUSD · 1H</p>
+<svg aria-label="กราฟทอง 1 ชั่วโมง พร้อมเส้น crosshair ตำแหน่งเดียวกัน" width="660" height="220" viewBox="0 0 660 220">
+<polyline points="0,150 40,140 80,160 120,130 160,138 200,110 240,125 280,100 320,112 360,80 400,95 440,70 480,85 520,60 560,72 600,50 660,55" fill="none" stroke="#2A1340" stroke-width="4"/>
+<line x1="400" y1="0" x2="400" y2="220" stroke="#B8511F" stroke-width="3" stroke-dasharray="8 6"/>
+</svg>
+</div>
+</div>
+<p style="font-size:24px; color:#75688A">เส้นประส้ม = Crosshair ชี้เวลาเดียวกันทั้งสองกราฟ</p>
+<div style="display:flex; gap:24px">
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #6A2C9E; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:28px; font-weight:600; color:#2A1340">Link Symbol</p>
+<p style="font-size:26px; line-height:1.45">เปลี่ยนสินทรัพย์ครั้งเดียว ทุกกราฟเปลี่ยนตาม ไม่ Link = ดูคนละตัวได้</p>
+</div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #B8511F; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:28px; font-weight:600; color:#2A1340">Link Time / Crosshair</p>
+<p style="font-size:26px; line-height:1.45">เลื่อนกราฟหนึ่ง อีกกราฟเลื่อนตาม</p>
+</div>
+<div style="flex:1; background:#F3ECF8; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:28px; font-weight:600; color:#2A1340">กี่กราฟ?</p>
+<p style="font-size:26px; line-height:1.45">เริ่มต้น 2 · Premium ~6–8 · ผู้สอนดูกราฟเดียว</p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ทองมีหลายโบรก (OANDA, IC Markets) ราคาอาจต่างกันเล็กน้อย</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="shortcuts" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Basic TradingView · บทที่ 09–10</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">คีย์ลัดและ Chart Settings ที่ใช้บ่อย</h2>
+<div style="display:flex; gap:40px">
+<div style="flex:1.2; display:flex; flex-direction:column; gap:16px">
+<div style="display:flex; gap:20px; align-items:center; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:14px 20px">
+<p style="width:330px; font-size:28px; font-weight:700; color:#6A2C9E; background:#F3ECF8; border:2px solid #6A2C9E; border-radius:10px; padding:6px 14px; text-align:center">Shift + F</p>
+<p style="flex:1; font-size:27px">เต็มจอ (กดอีกครั้งเพื่อออก)</p>
+</div>
+<div style="display:flex; gap:20px; align-items:center; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:14px 20px">
+<p style="width:330px; font-size:28px; font-weight:700; color:#6A2C9E; background:#F3ECF8; border:2px solid #6A2C9E; border-radius:10px; padding:6px 14px; text-align:center">Ctrl + Shift + S</p>
+<p style="flex:1; font-size:27px">Copy ภาพกราฟ แล้ว Ctrl + V วางในแชท</p>
+</div>
+<div style="display:flex; gap:20px; align-items:center; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:14px 20px">
+<p style="width:330px; font-size:28px; font-weight:700; color:#6A2C9E; background:#F3ECF8; border:2px solid #6A2C9E; border-radius:10px; padding:6px 14px; text-align:center">Shift + →</p>
+<p style="flex:1; font-size:27px">Bar Replay เลื่อนทีละแท่ง</p>
+</div>
+<div style="display:flex; gap:20px; align-items:center; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:14px 20px">
+<p style="width:330px; font-size:28px; font-weight:700; color:#6A2C9E; background:#F3ECF8; border:2px solid #6A2C9E; border-radius:10px; padding:6px 14px; text-align:center">ดับเบิลคลิก</p>
+<p style="flex:1; font-size:27px">ขยายหน้าต่างกราฟหรืออินดิเคเตอร์</p>
+</div>
+<div style="display:flex; gap:20px; align-items:center; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:14px 20px">
+<p style="width:330px; font-size:28px; font-weight:700; color:#6A2C9E; background:#F3ECF8; border:2px solid #6A2C9E; border-radius:10px; padding:6px 14px; text-align:center">พิมพ์ 7 + Enter</p>
+<p style="flex:1; font-size:27px">คลิกกราฟแล้วพิมพ์ตัวเลข = Timeframe แปลก ๆ</p>
+</div>
+</div>
+<div style="flex:1; background:#2A1340; border-radius:20px; padding:30px 34px; display:flex; flex-direction:column; gap:14px">
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:36px; font-weight:600; color:#F4A57F">Chart Settings</h3>
+<p style="font-size:26px; line-height:1.45; color:#E9E0F2"><b>Symbol</b> · สี Body / Border / Wick ของแท่งขึ้นและลง</p>
+<p style="font-size:26px; line-height:1.45; color:#E9E0F2"><b>Watermark</b> · ชื่อสินทรัพย์ตัวใหญ่กลางจอ แคปภาพไปคุยแล้วรู้ทันทีว่าตัวไหน</p>
+<p style="font-size:26px; line-height:1.45; color:#E9E0F2"><b>Trading</b> · เชื่อมโบรก เช่น YLG, InnovestX</p>
+<p style="font-size:26px; line-height:1.45; color:#E9E0F2"><b>Events</b> · ข่าว, Session Break, วันประกาศงบ</p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · Take Snapshot มีทั้งดาวน์โหลดภาพ, Copy Image และ Copy Link</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="watchlist" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Basic TradingView · บทที่ 10</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">Watchlist แบ่ง Section + Economic Calendar</h2>
+<div style="display:flex; gap:48px">
+<div style="width:560px; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:24px 28px; display:flex; flex-direction:column; gap:10px">
+<p style="font-size:28px; font-weight:600; color:#2A1340">Watchlist ของผู้สอน</p>
+<p style="font-size:24px; font-weight:600; color:#FAF7FB; background:#6A2C9E; border-radius:6px; padding:4px 14px">COMMODITY</p>
+<p style="font-size:26px; padding:0 14px">MGC · Micro Gold (CME)</p>
+<p style="font-size:26px; padding:0 14px">XAUUSD · ทองคำ</p>
+<p style="font-size:24px; font-weight:600; color:#FAF7FB; background:#17778A; border-radius:6px; padding:4px 14px">INDEX</p>
+<p style="font-size:26px; padding:0 14px">S50</p>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#E4D6F1; border-radius:6px; padding:4px 14px">FOREX MAJOR</p>
+<p style="font-size:26px; padding:0 14px">EURUSD</p>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#E4D6F1; border-radius:6px; padding:4px 14px">FOREX MINOR</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:18px">
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:20px 26px; display:flex; flex-direction:column; gap:6px">
+<p style="font-size:28px; font-weight:600; color:#6A2C9E">เพิ่ม Section</p>
+<p style="font-size:26px; line-height:1.45">เมนูของลิสต์ → Add Section → ตั้งชื่อ → ลากสินทรัพย์เข้าไป</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:20px 26px; display:flex; flex-direction:column; gap:6px">
+<p style="font-size:28px; font-weight:600; color:#6A2C9E">แชร์ลิสต์</p>
+<p style="font-size:26px; line-height:1.45">Share List → Copy Link ส่งให้เพื่อนกด Add / Save Watchlist (น่าจะต้องใช้แพ็กเกจเสียเงิน)</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:20px 26px; display:flex; flex-direction:column; gap:6px">
+<p style="font-size:28px; font-weight:600; color:#6A2C9E">กดดาว + ใส่สี</p>
+<p style="font-size:26px; line-height:1.45">ลิสต์ที่ใช้บ่อยสลับได้เร็ว · แบบฟรีเซฟได้ 1 ลิสต์</p>
+</div>
+<div style="background:#2A1340; border-radius:16px; padding:20px 26px; display:flex; flex-direction:column; gap:6px">
+<p style="font-size:28px; font-weight:600; color:#F4A57F">Economic Calendar (แถบขวา)</p>
+<p style="font-size:26px; line-height:1.45; color:#E9E0F2">ดูข่าวที่กำลังจะออก เช่น Crude Oil Inventory 22:30 (คนเทรด WTI ต้องดู) · ตลาดแรงงานสหรัฐฯ 20:30</p>
+</div>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · เวลาข่าวเป็นเวลาไทยตามตัวอย่างในคลิป</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="financials" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Basic TradingView · บทที่ 10</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">Financials: รู้จักบริษัทคร่าว ๆ ใน 5 นาที</h2>
+<div style="display:flex; gap:40px">
+<div style="flex:1.3; display:grid; grid-template-columns:1fr 1fr; gap:16px">
+<p style="font-size:26px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 20px"><b>ธุรกิจ</b> · ทำอะไร HQ ผู้ถือหุ้น CEO</p>
+<p style="font-size:26px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 20px"><b>Market Cap</b> · โครงสร้างทุน หนี้มากไหม</p>
+<p style="font-size:26px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 20px"><b>Revenue / Net Margin</b> · โตต่อเนื่องไหม</p>
+<p style="font-size:26px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 20px"><b>Revenue Breakdown</b> · รายได้มาจากสินค้า/ประเทศไหน</p>
+<p style="font-size:26px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 20px"><b>Statistics</b> · PE, P/S, P/B, ROE, ROA</p>
+<p style="font-size:26px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 20px"><b>Dividends</b> · วัน XD วันจ่าย จำนวน</p>
+<p style="font-size:26px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 20px"><b>Earnings</b> · ผลงานจริง + คาดการณ์ไตรมาสหน้า</p>
+<p style="font-size:26px; line-height:1.4; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 20px"><b>Symbol Info</b> · ตลาด Sector Industry เว็บไซต์</p>
+</div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:26px 30px; display:flex; flex-direction:column; gap:14px">
+<p style="font-size:28px; font-weight:600; color:#2A1340">ตัวอย่างหุ้นไทย: COCOCO</p>
+<p style="font-size:24px; color:#75688A">Net Margin ต่อเนื่อง 3 ช่วง</p>
+<div style="display:flex; gap:28px; align-items:end; height:260px; padding:0 20px">
+<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:8px"><p style="font-size:26px; font-weight:600; color:#2A1340">3%</p><div style="width:100px; height:62px; background:#E4D6F1; border-radius:8px 8px 0 0"></div></div>
+<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:8px"><p style="font-size:26px; font-weight:600; color:#2A1340">8%</p><div style="width:100px; height:124px; background:#8E6BB0; border-radius:8px 8px 0 0"></div></div>
+<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:8px"><p style="font-size:26px; font-weight:600; color:#17778A">11.6%</p><div style="width:100px; height:180px; background:#17778A; border-radius:8px 8px 0 0"></div></div>
+</div>
+<p style="font-size:24px; line-height:1.45">ธุรกิจมะพร้าว · รายได้หลักจากกะทิและน้ำมะพร้าว</p>
+</div>
+</div>
+<p style="font-size:26px; line-height:1.4; color:#2A1340; background:#F3ECF8; border-radius:14px; padding:16px 24px">ดูหุ้นต่างประเทศได้ละเอียดมาก เช่น ZTS (Zoetis) Net Margin 23% → 24% → 26% (2019–2021) · เวอร์ชันฟรีอาจถูกล็อกบางส่วน</p>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ข้อมูลเป็นตัวอย่างในคลิป ไม่ใช่คำแนะนำซื้อขาย</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="strategy" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Basic TradingView · บทที่ 10</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">Strategy สำคัญกว่า Tactic (หลักซุนวู)</h2>
+<div style="display:flex; gap:48px">
+<div style="display:grid; grid-template-columns:200px 380px 380px; gap:12px">
+<p style="font-size:24px">&#160;</p>
+<p style="font-size:26px; font-weight:600; color:#2A1340; text-align:center">Tactic ดี</p>
+<p style="font-size:26px; font-weight:600; color:#2A1340; text-align:center">Tactic ไม่ดี</p>
+<p style="font-size:26px; font-weight:600; color:#2A1340; padding:60px 0 0">Strategy ดี</p>
+<div style="height:170px; background:#17778A; border-radius:16px; padding:20px; display:flex; flex-direction:column; justify-content:center"><p style="font-size:30px; font-weight:600; color:#FAF7FB; text-align:center">ดีที่สุด</p></div>
+<div style="height:170px; background:#D3ECEF; border:2px solid #17778A; border-radius:16px; padding:20px; display:flex; flex-direction:column; justify-content:center"><p style="font-size:30px; font-weight:600; color:#0F5A68; text-align:center">ยังพอรอด</p></div>
+<p style="font-size:26px; font-weight:600; color:#2A1340; padding:60px 0 0">Strategy ไม่ดี</p>
+<div style="height:170px; background:#F6D8CC; border:2px solid #B8511F; border-radius:16px; padding:20px; display:flex; flex-direction:column; justify-content:center"><p style="font-size:30px; font-weight:600; color:#8A3A14; text-align:center">ไม่สำเร็จ</p></div>
+<div style="height:170px; background:#B8511F; border-radius:16px; padding:20px; display:flex; flex-direction:column; justify-content:center"><p style="font-size:30px; font-weight:600; color:#FFF6EF; text-align:center">ไม่สำเร็จ</p></div>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:18px">
+<div style="background:#2A1340; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:6px">
+<p style="font-size:28px; font-weight:600; color:#F4A57F">Strategy = เลือกกิจการดี</p>
+<p style="font-size:26px; line-height:1.45; color:#E9E0F2">ทำกำไรได้ ชนะคู่แข่ง · สร้าง Basket หุ้นดีก่อน</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:6px">
+<p style="font-size:28px; font-weight:600; color:#6A2C9E">Tactic = จับจังหวะ</p>
+<p style="font-size:26px; line-height:1.45">เช่น MACD เหนือ 0 หรือหุ้นดีที่กำลังย่อลึก</p>
+</div>
+<div style="background:#F3ECF8; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:6px">
+<p style="font-size:28px; font-weight:600; color:#2A1340">คลาสหน้า: Scan หุ้น</p>
+<p style="font-size:26px; line-height:1.45">หุ้น ~500 ตัว + เงื่อนไข (MACD Week/Month เหนือ 0, งบโต QoQ และ YoY, มีกำไร) → เหลือ ~10 ตัว</p>
+</div>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · หุ้นดีที่เปิด Gap ลงเพราะงบไม่ดี อาจเป็นโอกาส ถ้าทำการบ้านแล้ว</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="recap" style="background:radial-gradient(circle at 92% 96%, #A34E1C 0%, #4A1A45 22%, #1C0A30 55%); color:#FAF7FB; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:36px">
+<p style="font-size:24px; font-weight:600; color:#F4A57F; letter-spacing:1px">ทบทวนก่อนจบ</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#F4A57F">ตอบได้ไหม?</h2>
+<ol style="font-size:32px; line-height:1.6; color:#E9E0F2">
+<li>อยากลองกลยุทธ์ใหม่โดยไม่ลบเส้นเดิม ต้องทำอะไร</li>
+<li>เครื่องมือไหนบอก Risk:Reward ทันทีที่วาง</li>
+<li>คีย์ลัด Copy ภาพกราฟไปวางในแชทคืออะไร</li>
+<li>Backtest ทีละแท่งใช้ฟังก์ชันและคีย์ลัดอะไร</li>
+<li>Strategy กับ Tactic อะไรสำคัญกว่า เพราะอะไร</li>
+</ol>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#B8A6CC">เฉลย: 1 สร้าง Layout ใหม่ · 2 Long/Short Position · 3 Ctrl+Shift+S · 4 Bar Replay + Shift+→ · 5 Strategy</p>
+
+</section>
+</div></div>
+</div>
+<script>function fit(){var z=Math.min(1,(document.documentElement.clientWidth-32)/1920);document.documentElement.style.setProperty('--z',z)}
+window.addEventListener('beforeprint',function(){document.documentElement.style.setProperty('--z',1)});
+window.addEventListener('afterprint',fit);
+window.addEventListener('resize',fit);fit();</script>
+</body></html>

@@ -1,0 +1,25 @@
+# Sovereign Life RPG — .gitignore
+# ========================================
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+*.code-workspace
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temp
+*.tmp
+*.bak
+~*
+
+# ไม่เอาไฟล์ส่วนตัว
+*.pdf
+*.zip

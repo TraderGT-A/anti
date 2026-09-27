@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THUS · 14 Dow Theory</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&family=Sarabun:wght@400;600;700&display=swap">
+<style>html,body{margin:0;padding:0}
+body{background:#1C0A30;font-family:'Sarabun',Tahoma,sans-serif}
+.bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 24px;background:#2A1340;color:#F4A57F;font:600 20px 'Kanit',Tahoma,sans-serif}
+.bar button{font:600 18px 'Sarabun',Tahoma,sans-serif;background:#F4A57F;color:#2A1340;border:0;border-radius:8px;padding:8px 16px;cursor:pointer}
+.deck{padding:24px 0}
+:root{--z:1}
+.holder{width:calc(1920px * var(--z));height:calc(1080px * var(--z));margin:0 auto 24px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.slide{width:1920px;height:1080px;overflow:hidden;transform:scale(var(--z));transform-origin:0 0}
+section{width:1920px;height:1080px;position:relative;overflow:hidden;box-sizing:border-box}
+section *{margin:0;box-sizing:border-box}
+section div:not([style*="display"]){display:flex;flex-direction:column}
+section ul,section ol{padding-left:1.3em}
+section table{border-collapse:collapse}
+section th,section td{padding:.35em .6em;border-bottom:1px solid #E6DDEB;vertical-align:top}
+section iframe{border:0;background:transparent}
+@page{size:1920px 1080px;margin:0}
+@media print{
+  :root{--z:1 !important}
+  body{background:none}
+  .bar{display:none}
+  .deck{padding:0}
+  .holder{width:1920px;height:1080px;margin:0;box-shadow:none;break-after:page;page-break-after:always}
+  .slide{transform:none}
+}</style></head>
+<body><div class="bar"><span>THUS · House of Traders · 14 Dow Theory</span><button onclick="window.print()">บันทึกเป็น PDF</button></div>
+<div class="deck">
+<div class="holder"><div class="slide"><section id="cover" style="background:radial-gradient(circle at 90% 95%, #C8641F 0%, #5A1F4A 24%, #1C0A30 58%); color:#FAF7FB; font-family:'Sarabun', Tahoma, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:space-between">
+<div style="position:absolute; left:0; top:0; width:640px; height:320px; opacity:0.55; background:repeating-linear-gradient(120deg, #7B3FC4 0px, #7B3FC4 3px, transparent 3px, transparent 18px)"></div>
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#FAF7FB; letter-spacing:4px; text-align:right">THUS</p>
+<div style="display:flex; flex-direction:column; gap:28px">
+<p style="font-size:28px; font-weight:600; color:#F4A57F; letter-spacing:2px">BASIC CLASS · บทที่ 14</p>
+<h1 style="font-family:'Kanit', Tahoma, sans-serif; font-size:128px; font-weight:600; line-height:1.1; color:#F4A57F">DOW THEORY</h1>
+<div style="width:900px; height:3px; background:#8E6BB0"></div>
+<p style="font-size:34px; line-height:1.4; color:#D9CCE6; width:1400px">เชื่อกราฟ · เทรนด์ 3 ระดับ · ตลาด 3 เฟส · เทรนด์จบเมื่อไร · วิธี Mark High / Low</p>
+</div>
+<p style="font-size:26px; color:#B8A6CC">House of Traders · ชีทประกอบคลิป Dow Theory</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="principles" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Dow Theory · บทที่ 14</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">6 หลักของ Dow Theory</h2>
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px">
+<div style="background:#2A1340; border-radius:18px; padding:26px 28px; display:flex; flex-direction:column; gap:10px">
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:44px; font-weight:600; color:#F4A57F">1</p>
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#FAF7FB">Market Discounts Everything</h3>
+<p style="font-size:26px; line-height:1.45; color:#D9CCE6">ข่าว ความลับ การเตรียมสงคราม สะท้อนในกราฟหมดแล้ว → <b>เชื่อกราฟ</b></p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-radius:18px; padding:26px 28px; display:flex; flex-direction:column; gap:10px">
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:44px; font-weight:600; color:#6A2C9E">2</p>
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#2A1340">ตลาดมี 3 เทรนด์</h3>
+<p style="font-size:26px; line-height:1.45">ขึ้น ลง Sideways และมี 3 ระดับเวลา</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-radius:18px; padding:26px 28px; display:flex; flex-direction:column; gap:10px">
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:44px; font-weight:600; color:#6A2C9E">3</p>
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#2A1340">เทรนด์หลักมี 3 เฟส</h3>
+<p style="font-size:26px; line-height:1.45">Accumulation · Mark Up · Distribution</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-radius:18px; padding:26px 28px; display:flex; flex-direction:column; gap:10px">
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:44px; font-weight:600; color:#6A2C9E">4</p>
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#2A1340">ต้องยืนยันซึ่งกันและกัน</h3>
+<p style="font-size:26px; line-height:1.45">สัญญาณต่าง ๆ ต้องไปทางเดียวกัน</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-radius:18px; padding:26px 28px; display:flex; flex-direction:column; gap:10px">
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:44px; font-weight:600; color:#6A2C9E">5</p>
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#2A1340">Volume ยืนยันเทรนด์</h3>
+<p style="font-size:26px; line-height:1.45">Breakout ขึ้นต้องมี Volume หนุน (โดยเฉพาะหุ้น)</p>
+</div>
+<div style="background:#2A1340; border-radius:18px; padding:26px 28px; display:flex; flex-direction:column; gap:10px">
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:44px; font-weight:600; color:#F4A57F">6</p>
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#FAF7FB">เทรนด์ไปต่อจนกว่าจะกลับตัวชัด</h3>
+<p style="font-size:26px; line-height:1.45; color:#D9CCE6">ขึ้นจนกว่าจะลง ลงจนกว่าจะขึ้น</p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · การ์ดสีเข้ม = 2 ข้อที่ผู้สอนเน้นที่สุด</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="levels" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:28px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Dow Theory · บทที่ 14</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">เทรนด์ 3 ระดับ ซ้อนกันอยู่</h2>
+<div style="display:flex; gap:24px; align-items:center; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:18px; padding:18px 26px">
+<div style="width:430px; display:flex; flex-direction:column; gap:4px">
+<p style="font-size:30px; font-weight:600; color:#2A1340">Primary · Monthly</p>
+<p style="font-size:24px; line-height:1.4">หลายปี–สิบปี เช่น อินเทอร์เน็ต, AI</p>
+</div>
+<svg aria-label="เส้นขาขึ้นยาวเรียบ" width="1100" height="120" viewBox="0 0 1100 120"><path d="M10,110 C300,100 600,70 1090,10" fill="none" stroke="#2A1340" stroke-width="6"/></svg>
+</div>
+<div style="display:flex; gap:24px; align-items:center; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:18px; padding:18px 26px">
+<div style="width:430px; display:flex; flex-direction:column; gap:4px">
+<p style="font-size:30px; font-weight:600; color:#6A2C9E">Secondary · Weekly</p>
+<p style="font-size:24px; line-height:1.4">พักตัวในเทรนด์หลัก หลักไตรมาส (2–3 เดือน)</p>
+</div>
+<svg aria-label="ขาขึ้นที่มีการย่อตัวเป็นช่วง ๆ" width="1100" height="120" viewBox="0 0 1100 120"><polyline points="10,110 250,60 380,90 640,35 780,70 1090,10" fill="none" stroke="#6A2C9E" stroke-width="5"/></svg>
+</div>
+<div style="display:flex; gap:24px; align-items:center; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:18px; padding:18px 26px">
+<div style="width:430px; display:flex; flex-direction:column; gap:4px">
+<p style="font-size:30px; font-weight:600; color:#17778A">Minor · Daily</p>
+<p style="font-size:24px; line-height:1.4">ที่เทรดกันจริง (H1, H4 ซ้อนอยู่ใน Day)</p>
+</div>
+<svg aria-label="ขาขึ้นแบบฟันปลาถี่" width="1100" height="120" viewBox="0 0 1100 120"><polyline points="10,110 70,90 110,100 170,75 210,88 260,60 300,78 360,65 400,85 460,55 500,70 560,40 600,58 650,35 700,66 760,50 800,70 860,38 900,52 960,25 1000,40 1090,10" fill="none" stroke="#17778A" stroke-width="4"/></svg>
+</div>
+<p style="font-size:28px; line-height:1.4; color:#2A1340; background:#F6C4DC; border-radius:16px; padding:18px 28px"><b>ทองคำตอนไลฟ์:</b> ขาขึ้นครบทั้ง 3 ระดับ (Monthly ยก High ยก Low มา 20–30 ปี)</p>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ตัวอย่าง Secondary: AI ย่อตัวตอน AI ของจีนเข้ามา แต่ภาพใหญ่ยังขาขึ้น</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="phases" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:28px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Dow Theory · บทที่ 14</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">วงจรตลาด: เงินก้อนใหญ่อยู่ที่ Mark Up</h2>
+<div style="position:relative; width:1664px; height:430px">
+<div style="position:absolute; left:0; top:0; width:500px; height:430px; background:#F3ECF8"></div>
+<div style="position:absolute; left:500px; top:0; width:420px; height:430px; background:#D3ECEF"></div>
+<div style="position:absolute; left:920px; top:0; width:380px; height:430px; background:#FBE9D6"></div>
+<div style="position:absolute; left:1300px; top:0; width:364px; height:430px; background:#F6D8CC"></div>
+<svg aria-label="ราคานอนสะสม แล้วพุ่งขึ้น แกว่งที่ด้านบน แล้วทุบลง" width="1664" height="430" viewBox="0 0 1664 430" style="position:absolute; left:0; top:0">
+<polyline points="20,340 80,325 140,345 200,330 260,348 320,332 380,344 440,330 500,320 560,280 620,250 680,200 740,170 800,130 860,110 920,100 980,120 1040,95 1100,118 1160,92 1220,115 1300,105 1360,170 1420,230 1480,280 1540,310 1640,340" fill="none" stroke="#2A1340" stroke-width="6"/>
+</svg>
+<p style="position:absolute; left:20px; top:20px; width:460px; font-size:30px; font-weight:600; color:#6A2C9E">1 · Accumulation</p>
+<p style="position:absolute; left:20px; top:66px; width:460px; font-size:24px; line-height:1.4">สะสม Sideways นาน 1–3 ปี ยังไม่มีใครรู้จัก</p>
+<p style="position:absolute; left:520px; top:220px; width:380px; font-size:30px; font-weight:600; color:#0F5A68">2 · Mark Up</p>
+<p style="position:absolute; left:520px; top:266px; width:380px; font-size:24px; line-height:1.4">เบรก ATH คนทั่วไปเริ่มรู้จัก (Public)</p>
+<p style="position:absolute; left:940px; top:170px; width:340px; font-size:30px; font-weight:600; color:#8A5A12">3 · Distribution</p>
+<p style="position:absolute; left:940px; top:216px; width:340px; font-size:24px; line-height:1.4">คนถือยาวทยอยขายให้คนมาใหม่</p>
+<p style="position:absolute; left:1320px; top:20px; width:330px; font-size:30px; font-weight:600; color:#8A3A14">4 · Mark Down</p>
+<p style="position:absolute; left:1320px; top:66px; width:330px; font-size:24px; line-height:1.4">ข่าวดีเกินไป ฟองสบู่แตก คนเริ่มบ่น</p>
+</div>
+<div style="display:flex; gap:24px">
+<p style="flex:1; font-size:26px; line-height:1.45; color:#2A1340; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:18px 24px"><b>Bitcoin:</b> 4–5 ปีแรกสะสม → พุ่งถึงหมื่นเหรียญแรก ทุกคนถาม "Bitcoin คืออะไร"</p>
+<p style="flex:1; font-size:26px; line-height:1.45; color:#FAF7FB; background:#17778A; border-radius:16px; padding:18px 24px">เล่น Long เป็นหลัก → หาเฟส Mark Up ซื้อ แล้วทยอยขายช่วง Distribution</p>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · เฟส Accumulation ไม่รู้ว่าจะนานแค่ไหน คนส่วนใหญ่จึงซื้อตอนเบรก All-time High</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="trendtypes" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:28px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Dow Theory · บทที่ 14</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">หน้าตาของเทรนด์แต่ละแบบ</h2>
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px">
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #17778A; border-radius:16px; padding:16px 22px; display:flex; flex-direction:column; gap:6px">
+<svg aria-label="ยก High ยก Low" width="480" height="150" viewBox="0 0 480 150"><polyline points="10,140 90,80 140,110 230,50 280,80 370,20 420,50 470,10" fill="none" stroke="#17778A" stroke-width="5"/></svg>
+<p style="font-size:28px; font-weight:600; color:#2A1340">Uptrend</p>
+<p style="font-size:24px; line-height:1.4">ยก High ยก Low (HH + HL)</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #B8511F; border-radius:16px; padding:16px 22px; display:flex; flex-direction:column; gap:6px">
+<svg aria-label="High ต่ำลง Low ต่ำลง" width="480" height="150" viewBox="0 0 480 150"><polyline points="10,10 90,70 140,40 230,100 280,70 370,130 420,100 470,140" fill="none" stroke="#B8511F" stroke-width="5"/></svg>
+<p style="font-size:28px; font-weight:600; color:#2A1340">Downtrend</p>
+<p style="font-size:24px; line-height:1.4">Lower High + Lower Low ไม่ผ่าน High เดิม</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #8E6BB0; border-radius:16px; padding:16px 22px; display:flex; flex-direction:column; gap:6px">
+<svg aria-label="แกว่งในกรอบสี่เหลี่ยม" width="480" height="150" viewBox="0 0 480 150"><rect x="10" y="30" width="460" height="90" fill="#F3ECF8" stroke="#8E6BB0" stroke-width="2" stroke-dasharray="8 6"/><polyline points="10,110 80,35 150,115 220,40 290,112 360,30 430,118 470,70" fill="none" stroke="#6A2C9E" stroke-width="5"/></svg>
+<p style="font-size:28px; font-weight:600; color:#2A1340">Sideways</p>
+<p style="font-size:24px; line-height:1.4">ฟันปลา ไม่มีทิศทาง ตีกรอบได้</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #8E6BB0; border-radius:16px; padding:16px 22px; display:flex; flex-direction:column; gap:6px">
+<svg aria-label="ขึ้นอ่อนแรง ย่อลึกเกือบถึง Low เดิม" width="480" height="150" viewBox="0 0 480 150"><polyline points="10,140 100,70 160,132 250,55 310,120 400,40 460,105" fill="none" stroke="#6A2C9E" stroke-width="5"/></svg>
+<p style="font-size:28px; font-weight:600; color:#2A1340">Sideways Up</p>
+<p style="font-size:24px; line-height:1.4">คล้ายขาขึ้นแต่อ่อนแรง ย่อลึกเกือบถึง Low เดิม</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #17778A; border-radius:16px; padding:16px 22px; display:flex; flex-direction:column; gap:6px">
+<svg aria-label="ขาขึ้นแรง ย่อตื้น" width="480" height="150" viewBox="0 0 480 150"><polyline points="10,145 110,95 135,105 240,55 262,64 370,18 392,26 470,5" fill="none" stroke="#17778A" stroke-width="5"/></svg>
+<p style="font-size:28px; font-weight:600; color:#2A1340">Strong Uptrend</p>
+<p style="font-size:24px; line-height:1.4">Low ใหม่แทบไม่ย่อลงมาแตะ High ก่อนหน้า</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #B8511F; border-radius:16px; padding:16px 22px; display:flex; flex-direction:column; gap:6px">
+<svg aria-label="ขาลงแรง เด้งน้อย" width="480" height="150" viewBox="0 0 480 150"><polyline points="10,5 110,55 135,45 240,95 262,86 370,132 392,124 470,145" fill="none" stroke="#B8511F" stroke-width="5"/></svg>
+<p style="font-size:28px; font-weight:600; color:#2A1340">Strong Downtrend</p>
+<p style="font-size:24px; line-height:1.4">หลุดแล้วลงแรง เด้งไม่ค่อยเหนือ Low เดิม</p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · Sideways Down = ลงไม่จริงจัง ย้อนเข้ากรอบเยอะ แต่ราคาเฉลี่ยไหลลง · Strong Uptrend เจอไม่บ่อย</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="reversal" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Dow Theory · บทที่ 14</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">ขาขึ้นจบเมื่อไร: ต้องครบ LH + LL</h2>
+<div style="display:flex; justify-content:end">
+<div style="width:600px; display:flex; flex-direction:column; gap:16px">
+<p style="font-size:27px; line-height:1.45; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 22px"><b>HH + HL</b> สม่ำเสมอ = ขาขึ้นไปต่อ</p>
+<p style="font-size:27px; line-height:1.45; background:#FFFDFE; border:2px solid #D9892E; border-radius:14px; padding:16px 22px"><b>Lower High</b> อย่างเดียว = <b>ยังไม่ใช่</b>สัญญาณกลับตัว (รีบ Short ได้ แต่เสี่ยง)</p>
+<p style="font-size:27px; line-height:1.45; color:#FAF7FB; background:#B8511F; border-radius:14px; padding:16px 22px"><b>Lower High + Lower Low</b> = Clear Reversal</p>
+<p style="font-size:27px; line-height:1.45; color:#2A1340; background:#F3ECF8; border-radius:14px; padding:16px 22px">เทรนด์จบ ≠ ขาลงทันที มักเข้า <b>Sideways</b> ก่อนเลือกทาง</p>
+<p style="font-size:24px; line-height:1.4; color:#75688A">ขาลงกลับด้าน: ต้องครบ HH + HL · แค่ HH ยังไม่พอ</p>
+</div>
+</div>
+<iframe style="position:absolute; left:128px; top:300px; width:1000px; height:580px" srcdoc="<!doctype html><html><head><meta charset=&quot;utf-8&quot;><style>
+body{margin:0;background:#FFFDFE;font-family:Tahoma,'Segoe UI',sans-serif;border:1px solid #E6DDEB;border-radius:20px;height:578px;box-sizing:border-box;overflow:hidden}
+#t{padding:16px 24px 0;font-size:26px;font-weight:700;color:#2A1340;height:40px}
+</style></head><body>
+<div id=&quot;t&quot;></div>
+<svg id=&quot;s&quot; viewBox=&quot;0 0 1000 520&quot; width=&quot;1000&quot; height=&quot;520&quot;></svg>
+<script>
+var P=[[30,470,''],[140,300,''],[220,380,'HL'],[340,200,'HH'],[420,300,'HL'],[540,120,'HH'],[620,250,'HL'],[720,190,'LH'],[830,340,'LL'],[900,270,''],[970,330,'']];
+var M=['ขาขึ้นเริ่ม','ขาขึ้นเริ่ม','ยก Low = HL','ทำ High ใหม่ = HH','HL อีกครั้ง','HH อีกครั้ง · ขาขึ้นยังอยู่','HL ล่าสุด (เส้นประ)','Lower High · ยังไม่พอ','หลุด Low ล่าสุด = LL · Clear Reversal','เทรนด์จบ → มักเข้า Sideways','เทรนด์จบ → มักเข้า Sideways'];
+var s=document.getElementById('s'),T=document.getElementById('t');
+function col(l){return l=='LH'?'#D9892E':l=='LL'?'#B8511F':'#17778A'}
+function draw(k){var g='';if(k>=6)g+='<line x1=&quot;620&quot; y1=&quot;250&quot; x2=&quot;990&quot; y2=&quot;250&quot; stroke=&quot;#8E6BB0&quot; stroke-width=&quot;3&quot; stroke-dasharray=&quot;10 8&quot;/>';
+var pts=P.slice(0,k+1).map(function(p){return p[0]+','+p[1]}).join(' ');
+g+='<polyline points=&quot;'+pts+'&quot; fill=&quot;none&quot; stroke=&quot;#2A1340&quot; stroke-width=&quot;5&quot;/>';
+for(var i=1;i<=k;i++){var p=P[i];if(!p[2])continue;var up=(p[2]=='HH'||p[2]=='LH');
+g+='<circle cx=&quot;'+p[0]+'&quot; cy=&quot;'+p[1]+'&quot; r=&quot;9&quot; fill=&quot;'+col(p[2])+'&quot;/>';
+g+='<text x=&quot;'+(p[0]-24)+'&quot; y=&quot;'+(up?p[1]-20:p[1]+40)+'&quot; font-size=&quot;28&quot; font-weight=&quot;700&quot; fill=&quot;'+col(p[2])+'&quot;>'+p[2]+'</text>';}
+s.innerHTML=g;T.textContent=M[k];T.style.color=k>=8?'#B8511F':(k==7?'#8A5A12':'#2A1340')}
+var k=P.length-1;draw(k);
+function step(){if(k>=P.length-1){k=0;draw(k);setTimeout(step,700);return}k++;draw(k);setTimeout(step,k>=P.length-1?4000:(k>=7?1600:900))}
+setTimeout(step,4000);
+</script></body></html>"></iframe>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · HH = Higher High · HL = Higher Low · LH = Lower High · LL = Lower Low · ภาพซ้ายเคลื่อนไหวเมื่อเปิดผ่านลิงก์</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="mark" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Dow Theory · บทที่ 14</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">วิธี Mark High / Low</h2>
+<div style="display:flex; gap:40px; align-items:start">
+<div style="position:relative; width:960px; height:560px; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px">
+<svg aria-label="ขาขึ้นจาก Low ไปจุดสูง ย่อลง 30 เปอร์เซ็นต์ แล้วขึ้นไปทำ High ใหม่" width="960" height="560" viewBox="0 0 960 560" style="position:absolute; left:0; top:0">
+<line x1="360" y1="120" x2="700" y2="120" stroke="#8E6BB0" stroke-width="2" stroke-dasharray="8 6"/>
+<line x1="360" y1="216" x2="700" y2="216" stroke="#8E6BB0" stroke-width="2" stroke-dasharray="8 6"/>
+<polyline points="80,440 360,120 500,216 740,50" fill="none" stroke="#2A1340" stroke-width="6"/>
+<circle cx="80" cy="440" r="12" fill="#17778A"/><circle cx="360" cy="120" r="12" fill="#6A2C9E"/><circle cx="500" cy="216" r="12" fill="#17778A"/><circle cx="740" cy="50" r="12" fill="#6A2C9E"/>
+</svg>
+<p style="position:absolute; left:40px; top:462px; width:260px; font-size:26px; font-weight:600; color:#0F5A68">1 · เริ่มจาก Low</p>
+<p style="position:absolute; left:180px; top:60px; width:180px; font-size:26px; font-weight:600; color:#6A2C9E">2 · จุดสูง</p>
+<p style="position:absolute; left:710px; top:150px; width:240px; font-size:26px; font-weight:600; color:#6A2C9E">ย่อ ~30%</p>
+<p style="position:absolute; left:440px; top:240px; width:360px; font-size:26px; font-weight:600; color:#0F5A68">3 · ย่อพอ → Mark High ได้</p>
+<p style="position:absolute; left:760px; top:40px; width:190px; font-size:26px; font-weight:600; color:#6A2C9E">4 · High ใหม่</p>
+<p style="position:absolute; left:500px; top:320px; width:440px; font-size:24px; line-height:1.4; color:#4B3D5E">High ใหม่เกิด → ยืนยันว่าจุดที่ย่อคือ Low จริง</p>
+</div>
+<div style="flex:1; display:flex; flex-direction:column; gap:18px">
+<div style="background:#2A1340; border-radius:16px; padding:22px 26px; display:flex; flex-direction:column; gap:8px">
+<p style="font-size:28px; font-weight:600; color:#F4A57F">กฎหลัก</p>
+<p style="font-size:27px; line-height:1.5; color:#FAF7FB">Mark <b>High</b> ได้เมื่อเกิด <b>Low ใหม่</b></p>
+<p style="font-size:27px; line-height:1.5; color:#FAF7FB">Mark <b>Low</b> ได้เมื่อเกิด <b>High ใหม่</b></p>
+</div>
+<p style="font-size:26px; line-height:1.45; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 22px">จุดสูงสุดยังไม่ใช่ High แน่นอน เพราะอาจขึ้นต่อ</p>
+<p style="font-size:26px; line-height:1.45; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:14px; padding:16px 22px">ย่อ/ดีด ~<b>30%</b> ของขาก่อนหน้า = น่าจะเป็นจุดสวิง (วัดด้วย Fibonacci ได้)</p>
+<p style="font-size:26px; line-height:1.45; color:#2A1340; background:#F6C4DC; border-radius:14px; padding:16px 22px">Low ใหม่ + High ต่ำลง = <b>Market Structure Change</b></p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · 30% เป็นเกณฑ์ส่วนตัวของผู้สอน · ยิ่งฝึกบ่อยยิ่ง Mark ได้เร็ว</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="workshop" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Dow Theory · Workshop</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">3 สถานการณ์จากกราฟจริง</h2>
+<div style="display:flex; gap:24px">
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #17778A; border-radius:18px; padding:22px 26px; display:flex; flex-direction:column; gap:10px">
+<svg aria-label="ขาลงแล้วเบรกขึ้นทำ High ใหม่และ Low ยกขึ้น" width="460" height="220" viewBox="0 0 460 220"><polyline points="10,20 80,110 120,70 190,170 240,120 300,150 380,60 420,90 450,40" fill="none" stroke="#2A1340" stroke-width="5"/><line x1="120" y1="70" x2="450" y2="70" stroke="#17778A" stroke-width="2" stroke-dasharray="8 6"/></svg>
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:30px; font-weight:600; color:#0F5A68">1 · Structure Shift</h3>
+<p style="font-size:25px; line-height:1.45">คิดว่าขาลง แต่เบรกทำ High ใหม่ และ Low ยกขึ้น → เปลี่ยนเป็นขาขึ้น</p>
+</div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #D9892E; border-radius:18px; padding:22px 26px; display:flex; flex-direction:column; gap:10px">
+<svg aria-label="ขาขึ้นทำ Lower Low แล้วดีดกลับไปทำ High ใหม่" width="460" height="220" viewBox="0 0 460 220"><polyline points="10,200 90,90 150,140 230,50 290,170 360,90 400,110 450,30" fill="none" stroke="#2A1340" stroke-width="5"/><line x1="150" y1="140" x2="450" y2="140" stroke="#D9892E" stroke-width="2" stroke-dasharray="8 6"/></svg>
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:30px; font-weight:600; color:#8A5A12">2 · ยังไม่ใช่ MSC</h3>
+<p style="font-size:25px; line-height:1.45">มีแค่ Lower Low แล้วดีดเกิน 30% ยังไม่ยืนยัน Lower High → สุดท้ายทำ High ใหม่ ขาขึ้นยังอยู่</p>
+</div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-top:6px solid #B8511F; border-radius:18px; padding:22px 26px; display:flex; flex-direction:column; gap:10px">
+<svg aria-label="ขาขึ้นจบด้วย LH และ LL แล้วแกว่ง Sideways ก่อนเบรกขึ้นรอบใหม่" width="460" height="220" viewBox="0 0 460 220"><polyline points="10,200 70,80 110,120 160,30 200,110 240,60 280,150 320,90 360,150 400,85 450,20" fill="none" stroke="#2A1340" stroke-width="5"/><rect x="270" y="80" width="140" height="80" fill="none" stroke="#8E6BB0" stroke-width="2" stroke-dasharray="8 6"/></svg>
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:30px; font-weight:600; color:#8A3A14">3 · ขาขึ้นจบ</h3>
+<p style="font-size:25px; line-height:1.45">ครบ LL + LH → เทรนด์จบ แต่ไม่ใช่ขาลงทันที Sideways ก่อน แล้วเบรกขึ้นรอบใหม่</p>
+</div>
+</div>
+<p style="font-size:28px; line-height:1.4; color:#FAF7FB; background:#2A1340; border-radius:16px; padding:18px 28px">ต้องให้ราคาหลุด Low ล่าสุดก่อน จึงยืนยันได้ว่าจุดสูงล่าสุดเป็น Lower High</p>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ภาพจำลองจาก Workshop ในคลิป · MSC = Market Structure Change</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="realcharts" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:28px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Dow Theory · กราฟจริง</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">อ่านเฟสบนกราฟจริง</h2>
+<div style="display:flex; flex-direction:column; gap:16px">
+<div style="display:flex; gap:20px; align-items:center; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:16px 22px">
+<p style="width:220px; font-size:30px; font-weight:600; color:#2A1340">ทองคำ</p>
+<div style="flex:1; display:flex; gap:6px">
+<p style="flex:2; font-size:24px; color:#2A1340; background:#E4D6F1; border-radius:8px; padding:8px 12px">Sideways 2–3 ปี (ถึง 2023)</p>
+<p style="flex:1; font-size:24px; color:#FAF7FB; background:#17778A; border-radius:8px; padding:8px 12px">Mark Up</p>
+<p style="flex:1; font-size:24px; color:#2A1340; background:#E4D6F1; border-radius:8px; padding:8px 12px">สะสมต่อ</p>
+<p style="flex:1.4; font-size:24px; color:#FAF7FB; background:#17778A; border-radius:8px; padding:8px 12px">เบรก ATH = Mark Up</p>
+</div>
+</div>
+<div style="display:flex; gap:20px; align-items:center; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:16px 22px">
+<p style="width:220px; font-size:30px; font-weight:600; color:#2A1340">Disney</p>
+<div style="flex:1; display:flex; gap:6px">
+<p style="flex:2; font-size:24px; color:#2A1340; background:#E4D6F1; border-radius:8px; padding:8px 12px">Accumulation 2015–2019</p>
+<p style="flex:1; font-size:24px; color:#FAF7FB; background:#17778A; border-radius:8px; padding:8px 12px">Mark Up</p>
+<p style="flex:1; font-size:24px; color:#2A1340; background:#FBE9D6; border-radius:8px; padding:8px 12px">Distribution</p>
+<p style="flex:1.4; font-size:24px; color:#FAF7FB; background:#B8511F; border-radius:8px; padding:8px 12px">Mark Down ~200 วัน</p>
+</div>
+</div>
+<div style="display:flex; gap:20px; align-items:center; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:16px 22px">
+<p style="width:220px; font-size:30px; font-weight:600; color:#2A1340">Starbucks</p>
+<div style="flex:1; display:flex; gap:6px">
+<p style="flex:1; font-size:24px; color:#2A1340; background:#E4D6F1; border-radius:8px; padding:8px 12px">Accumulation</p>
+<p style="flex:1; font-size:24px; color:#FAF7FB; background:#17778A; border-radius:8px; padding:8px 12px">Mark Up</p>
+<p style="flex:1; font-size:24px; color:#2A1340; background:#FBE9D6; border-radius:8px; padding:8px 12px">Distribution</p>
+<p style="flex:1.4; font-size:24px; color:#2A1340; background:#F3ECF8; border-radius:8px; padding:8px 12px">ทุบลง → Sideways</p>
+</div>
+</div>
+<div style="display:flex; gap:20px; align-items:center; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:16px; padding:16px 22px">
+<p style="width:220px; font-size:30px; font-weight:600; color:#2A1340">S50</p>
+<p style="flex:1; font-size:26px; color:#FAF7FB; background:#B8511F; border-radius:8px; padding:8px 16px">ยังทำ Low ใหม่ ดีดไม่ทำ High ใหม่ = ขาลงยังอยู่</p>
+</div>
+</div>
+<p style="font-size:28px; line-height:1.4; color:#2A1340; background:#F6C4DC; border-radius:16px; padding:18px 28px">"ไม่มีอะไรแพงเกินไป และไม่มีอะไรถูกเกินไป" · เทรนด์อยู่ตราบที่โครงสร้างยังไม่เปลี่ยน</p>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · สีเขียวอมฟ้า = Mark Up · ส้ม = Mark Down · สถานะกราฟ ณ วันที่ไลฟ์</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="recap" style="background:radial-gradient(circle at 92% 96%, #A34E1C 0%, #4A1A45 22%, #1C0A30 55%); color:#FAF7FB; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:36px">
+<p style="font-size:24px; font-weight:600; color:#F4A57F; letter-spacing:1px">ทบทวนก่อนจบ</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#F4A57F">ตอบได้ไหม?</h2>
+<ol style="font-size:32px; line-height:1.6; color:#E9E0F2">
+<li>Market Discounts Everything สรุปสั้น ๆ ว่าอะไร</li>
+<li>เทรนด์ 3 ระดับ ใช้ Timeframe อะไรบ้าง</li>
+<li>เฟสไหนที่ผู้สอนทำเงินได้มากที่สุด</li>
+<li>เห็น Lower High อย่างเดียว เรียกว่าขาขึ้นจบหรือยัง</li>
+<li>จะ Mark High ได้เมื่อไร</li>
+</ol>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#B8A6CC">เฉลย: 1 เชื่อกราฟ · 2 Monthly / Weekly / Daily · 3 Mark Up · 4 ยัง ต้องมี Lower Low ด้วย · 5 เมื่อเกิด Low ใหม่ (หรือย่อ ~30%)</p>
+
+</section>
+</div></div>
+</div>
+<script>function fit(){var z=Math.min(1,(document.documentElement.clientWidth-32)/1920);document.documentElement.style.setProperty('--z',z)}
+window.addEventListener('beforeprint',function(){document.documentElement.style.setProperty('--z',1)});
+window.addEventListener('afterprint',fit);
+window.addEventListener('resize',fit);fit();</script>
+</body></html>

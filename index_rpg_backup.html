@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+<meta name="theme-color" content="#030712"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Sovereign Life RPG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════════════
+   SOVEREIGN LIFE RPG v5.0 — PRODUCTION
+   Cyberpunk / Luxury Dark Glass Dashboard
+   Chief: โอ๊ต | UI: เจมส์ | Game: บิ๊ก | QA: เก้า
+   ═══════════════════════════════════════════════════════ */
+
+:root {
+  --bg:         #030712;
+  --bg-1:       #060d1a;
+  --bg-2:       #0a1120;
+  --bg-card:    rgba(255,255,255,0.03);
+  --bg-hover:   rgba(255,255,255,0.055);
+
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-border-hi: rgba(255,255,255,0.15);
+
+  --v:     #7c3aed;   /* violet accent */
+  --v2:    #8b5cf6;
+  --v3:    #a78bfa;
+  --cyan:  #06b6d4;
+  --cyan2: #22d3ee;
+  --pink:  #ec4899;
+  --pink2: #f472b6;
+  --green: #10b981;
+  --green2:#34d399;
+  --gold:  #f59e0b;
+  --gold2: #fbbf24;
+  --red:   #ef4444;
+  --orange:#f97316;
+
+  --ink:   #f1f5f9;
+  --ink2:  #94a3b8;
+  --ink3:  #475569;
+  --ink4:  #1e293b;
+
+  --r:     16px;
+  --r-lg:  24px;
+  --r-xl:  32px;
+  --r-pill:999px;
+
+  --safe-t: env(safe-area-inset-top,0px);
+  --safe-b: env(safe-area-inset-bottom,0px);
+  --top-h:  60px;
+  --nav-h:  64px;
+  --sb-w:   240px;
+}
+
+/* ── RESET ── */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{height:100%;background:var(--bg);}
+body{
+  font-family:'Outfit','Prompt',system-ui,sans-serif;
+  background:var(--bg); color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  height:100dvh; height:100vh;
+  overflow:hidden;
+}
+
+/* ── AMBIENT MESH BACKGROUND ── */
+.ambient{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 15%, rgba(124,58,237,.18), transparent 65%),
+    radial-gradient(ellipse 50% 45% at 85% 80%, rgba(6,182,212,.12), transparent 65%),
+    radial-gradient(ellipse 45% 35% at 75% 20%, rgba(236,72,153,.08), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 30% 90%, rgba(16,185,129,.06), transparent 60%);
+}
+.ambient-noise{
+  position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ══════════════════════════════════════════
+   APP LAYOUT
+══════════════════════════════════════════ */
+.app{
+  position:relative; z-index:1;
+  display:flex; flex-direction:column;
+  height:100%;
+}
+
+/* ══════════════════════════════════════════
+   SIDEBAR (desktop)
+══════════════════════════════════════════ */
+.sidebar{
+  display:none;
+  flex-direction:column;
+  width:var(--sb-w);
+  height:100%;
+  padding:24px 16px;
+  border-right:1px solid var(--glass-border);
+  background:rgba(6,13,26,.7);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  position:fixed; left:0; top:0; bottom:0; z-index:100;
+  gap:6px;
+}
+.sb-brand{
+  display:flex; align-items:center; gap:12px;
+  padding:8px 10px 20px; border-bottom:1px solid var(--glass-border);
+  margin-bottom:12px;
+}
+.sb-mark{
+  width:36px; height:36px; border-radius:10px;
+  background:linear-gradient(135deg,var(--v),var(--cyan));
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 0 16px rgba(124,58,237,.4);
+}
+.sb-mark svg{width:18px;height:18px;stroke:#fff;}
+.sb-title{font-size:.82rem;font-weight:800;letter-spacing:.12em;color:var(--ink);}
+.sb-sub{font-size:.62rem;font-weight:500;letter-spacing:.08em;color:var(--v3);margin-top:1px;}
+
+.sb-btn{
+  display:flex; align-items:center; gap:10px;
+  width:100%; padding:10px 12px; border:none;
+  background:transparent; color:var(--ink3);
+  border-radius:var(--r); cursor:pointer;
+  font-size:.84rem; font-weight:500;
+  font-family:inherit; letter-spacing:.01em;
+  transition:all .18s; text-align:left;
+}
+.sb-btn svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor;}
+.sb-btn:hover{background:var(--bg-hover);color:var(--ink);}
+.sb-btn.active{
+  background:rgba(124,58,237,.15);
+  color:var(--v3);
+  box-shadow:inset 0 0 0 1px rgba(124,58,237,.25);
+}
+.sb-sep{
+  margin:8px 0; border:none;
+  border-top:1px solid var(--glass-border);
+}
+.sb-footer{margin-top:auto; padding:16px 10px 0; border-top:1px solid var(--glass-border);}
+.sb-player-info{display:flex;flex-direction:column;gap:8px;}
+.sb-lv-row{display:flex;align-items:center;justify-content:space-between;}
+.sb-lv-badge{
+  font-size:.68rem; font-weight:800; letter-spacing:.06em;
+  padding:3px 10px; border-radius:var(--r-pill);
+  background:rgba(124,58,237,.2); color:var(--v3);
+  border:1px solid rgba(124,58,237,.3);
+}
+.sb-gold-pill{
+  font-size:.72rem; font-weight:700; color:var(--gold);
+  display:flex; align-items:center; gap:4px;
+}
+.sb-exp-bar{height:3px;background:rgba(255,255,255,.06);border-radius:var(--r-pill);margin-top:4px;overflow:hidden;}
+.sb-exp-fill{height:100%;background:linear-gradient(90deg,var(--v),var(--cyan));border-radius:var(--r-pill);transition:width .8s ease;}
+
+/* ══════════════════════════════════════════
+   MAIN AREA
+══════════════════════════════════════════ */
+.main{
+  display:flex; flex-direction:column; flex:1; overflow:hidden;
+}
+
+/* ══════════════════════════════════════════
+   TOP BAR
+══════════════════════════════════════════ */
+.top-bar{
+  flex-shrink:0;
+  padding-top:var(--safe-t);
+  background:rgba(3,7,18,.85);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--glass-border);
+  z-index:50;
+}
+.top-inner{
+  height:var(--top-h);
+  display:flex; align-items:center;
+  padding:0 18px; gap:12px;
+}
+.top-logo{
+  display:flex; align-items:center; gap:10px; flex:1;
+  text-decoration:none;
+}
+.top-logo-mark{
+  width:30px; height:30px; border-radius:8px;
+  background:linear-gradient(135deg,var(--v),var(--cyan));
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 0 12px rgba(124,58,237,.35);
+}
+.top-logo-mark svg{width:16px;height:16px;stroke:#fff;}
+.top-wordmark{
+  font-size:.78rem; font-weight:800;
+  letter-spacing:.1em; color:var(--ink);
+  display:none;
+}
+.top-gold{
+  display:flex; align-items:center; gap:5px;
+  font-size:.78rem; font-weight:700; color:var(--gold2);
+  background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.2);
+  padding:5px 12px; border-radius:var(--r-pill); white-space:nowrap;
+}
+.top-lv{
+  font-size:.72rem; font-weight:800; letter-spacing:.04em;
+  background:rgba(124,58,237,.18); color:var(--v3);
+  border:1px solid rgba(124,58,237,.25);
+  padding:5px 12px; border-radius:var(--r-pill); white-space:nowrap;
+}
+.exp-track{
+  height:2px; background:rgba(255,255,255,.05);
+  position:relative; overflow:hidden;
+}
+.exp-track-fill{
+  height:100%; border-radius:var(--r-pill);
+  background:linear-gradient(90deg,var(--v),var(--cyan),var(--green));
+  transition:width .8s cubic-bezier(.4,0,.2,1);
+  position:relative;
+}
+.exp-track-fill::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);
+  animation:shimmer 2.5s ease-in-out infinite;
+}
+@keyframes shimmer{0%{transform:translateX(-200%)}60%,100%{transform:translateX(200%)}}
+
+/* ══════════════════════════════════════════
+   PAGES
+══════════════════════════════════════════ */
+.pages{
+  flex:1; overflow:hidden; position:relative;
+}
+.page{
+  position:absolute; inset:0;
+  overflow-y:auto; overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  display:none; padding:20px 16px 24px;
+}
+.page.active{display:block;}
+
+/* ══════════════════════════════════════════
+   GLASS CARD COMPONENT
+══════════════════════════════════════════ */
+.glass{
+  position:relative;
+  background:var(--bg-card);
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  border-radius:var(--r);
+  /* Gradient border via pseudo */
+}
+.glass::before{
+  content:''; position:absolute; inset:0;
+  border-radius:inherit; pointer-events:none;
+  padding:1px;
+  background:linear-gradient(135deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,.03) 50%,rgba(255,255,255,.00));
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+}
+.glass.glow-v:hover{ box-shadow:0 0 0 1px rgba(124,58,237,.4),0 24px 48px rgba(0,0,0,.4),inset 0 0 24px rgba(124,58,237,.04); }
+.glass.glow-cyan:hover{ box-shadow:0 0 0 1px rgba(6,182,212,.4),0 24px 48px rgba(0,0,0,.4); }
+
+/* Shimmer progress bar */
+.prog-outer{
+  height:8px; border-radius:var(--r-pill);
+  background:rgba(255,255,255,.06); overflow:hidden; position:relative;
+}
+.prog-fill{
+  height:100%; border-radius:var(--r-pill);
+  position:relative; overflow:hidden;
+  transition:width .8s cubic-bezier(.4,0,.2,1);
+}
+.prog-fill::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+  animation:shimmer 2.5s ease-in-out infinite;
+}
+
+.prog-outer.thin{ height:4px; }
+.prog-outer.thick{ height:12px; }
+
+/* Section tag */
+.stag{
+  display:inline-flex; align-items:center; gap:10px;
+  font-size:.62rem; font-weight:700;
+  letter-spacing:.3em; text-transform:uppercase;
+  color:var(--v3); margin-bottom:14px;
+}
+.stag-line{height:1px;width:28px;background:linear-gradient(90deg,var(--v3),transparent);}
+
+/* ══════════════════════════════════════════
+   HOME PAGE
+══════════════════════════════════════════ */
+.home-hero{
+  padding:22px 20px 18px; margin-bottom:14px;
+  background:var(--bg-card);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-radius:var(--r-lg);
+  position:relative; overflow:hidden;
+}
+.home-hero::before{
+  content:''; position:absolute; inset:0;
+  border-radius:inherit; pointer-events:none; padding:1px;
+  background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.02));
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+}
+.home-hero::after{
+  content:''; position:absolute;
+  top:-60px; right:-60px; width:220px; height:220px;
+  background:radial-gradient(circle,rgba(124,58,237,.18),transparent 70%);
+  pointer-events:none;
+}
+.hero-top{display:flex; align-items:center; gap:16px; margin-bottom:18px;}
+.hero-avatar{
+  width:68px; height:68px; border-radius:var(--r);
+  background:linear-gradient(135deg,#1a0d40,#0d1a30);
+  border:1px solid rgba(124,58,237,.35);
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.2rem; flex-shrink:0;
+  box-shadow:0 0 24px rgba(124,58,237,.25);
+  animation:floatAvatar 5s ease-in-out infinite;
+}
+@keyframes floatAvatar{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.hero-info{flex:1;min-width:0;}
+.hero-lv{
+  font-size:.62rem; font-weight:700; letter-spacing:.1em;
+  color:var(--v3); text-transform:uppercase; margin-bottom:4px;
+  display:flex; align-items:center; gap:6px;
+}
+.hero-lv-dot{width:5px;height:5px;border-radius:50%;background:var(--v3);box-shadow:0 0 6px var(--v3);}
+.hero-name{
+  font-size:1.2rem; font-weight:700;
+  letter-spacing:-.015em; color:var(--ink); margin-bottom:2px;
+}
+.hero-class{ font-size:.72rem; font-weight:400; color:var(--ink3); }
+.hero-gold{
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:.75rem; font-weight:600; color:var(--gold2);
+  background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.2);
+  padding:4px 11px; border-radius:var(--r-pill); margin-top:8px;
+}
+.exp-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
+.exp-lbl{font-size:.62rem; font-weight:600; color:var(--ink3); letter-spacing:.06em; text-transform:uppercase;}
+.exp-txt{font-size:.68rem; font-weight:700; color:var(--v3);}
+.exp-main{
+  height:8px; border-radius:var(--r-pill);
+  background:rgba(255,255,255,.06); overflow:hidden;
+}
+.exp-fill{
+  height:100%; border-radius:var(--r-pill);
+  background:linear-gradient(90deg,var(--v),var(--cyan));
+  transition:width .8s cubic-bezier(.4,0,.2,1);
+  position:relative; overflow:hidden;
+}
+.exp-fill::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);
+  animation:shimmer 2.5s ease-in-out infinite;
+}
+
+/* Week tracker */
+.week-card{
+  padding:14px 16px; margin-bottom:14px;
+  background:var(--bg-card);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  border-radius:var(--r); border:1px solid var(--glass-border);
+}
+.week-dots{display:flex; gap:6px; margin-top:8px;}
+.wd{
+  flex:1; height:38px; border-radius:10px;
+  background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+  display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:4px; transition:all .3s;
+}
+.wd.done{
+  background:rgba(16,185,129,.1);
+  border-color:rgba(16,185,129,.3);
+}
+.wd-l{font-size:.55rem; font-weight:700; letter-spacing:.04em; color:var(--ink3);}
+.wd-dot{width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.12); transition:all .3s;}
+.wd.done .wd-dot{background:var(--green2); box-shadow:0 0 8px rgba(52,211,153,.6);}
+
+/* Mini stats */
+.mini-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px;}
+.ms{
+  background:var(--bg-card); border:1px solid var(--glass-border);
+  border-radius:var(--r); padding:14px 10px; text-align:center;
+  transition:border-color .2s, background .2s;
+  cursor:default;
+}
+.ms:hover{background:var(--bg-hover); border-color:var(--glass-border-hi);}
+.ms-icon{font-size:.95rem; margin-bottom:6px; opacity:.85;}
+.ms-val{font-size:1.15rem; font-weight:800; letter-spacing:-.02em; margin-bottom:2px;}
+.ms-lbl{font-size:.56rem; font-weight:600; color:var(--ink3); text-transform:uppercase; letter-spacing:.08em;}
+
+/* Activity */
+.act-empty{
+  text-align:center; padding:32px 16px;
+  color:var(--ink3); font-size:.82rem; line-height:1.8;
+}
+.act-row{
+  display:flex; align-items:center; gap:12px;
+  padding:11px 13px; border-radius:12px;
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.05);
+  margin-bottom:7px;
+  transition:background .15s;
+}
+.act-row:hover{background:rgba(255,255,255,.04);}
+.act-ico{
+  width:36px; height:36px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.95rem; flex-shrink:0;
+}
+.act-info{flex:1;min-width:0;}
+.act-lbl{font-size:.82rem; font-weight:500; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.act-time{font-size:.62rem; color:var(--ink3); margin-top:2px;}
+.act-xp{font-size:.72rem; font-weight:800; color:var(--green2); flex-shrink:0;}
+
+/* ══════════════════════════════════════════
+   PILLARS PAGE
+══════════════════════════════════════════ */
+.pillar-card{
+  display:flex; align-items:center; gap:14px;
+  background:var(--bg-card); border:1px solid var(--glass-border);
+  border-radius:var(--r); padding:14px 16px; margin-bottom:10px;
+  cursor:pointer; transition:all .18s;
+  -webkit-user-select:none; position:relative; overflow:hidden;
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+}
+.pillar-card::after{
+  content:''; position:absolute; inset:0; border-radius:inherit;
+  background:transparent; transition:background .18s;
+}
+.pillar-card:hover{border-color:var(--glass-border-hi); background:var(--bg-hover);}
+.pillar-card:active{ transform:scale(.98);}
+.p-ico{
+  width:48px; height:48px; border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.55rem; flex-shrink:0; position:relative;
+}
+.p-body{flex:1; min-width:0;}
+.p-name{font-size:.88rem; font-weight:700; letter-spacing:-.005em; margin-bottom:2px;}
+.p-sub{font-size:.68rem; color:var(--ink2); font-weight:400; margin-bottom:8px;}
+.p-prog{height:3px; background:rgba(255,255,255,.06); border-radius:var(--r-pill); overflow:hidden;}
+.p-prog-fill{height:100%; border-radius:var(--r-pill); transition:width .6s; position:relative; overflow:hidden;}
+.p-prog-fill::after{content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent); animation:shimmer 3s ease-in-out infinite;}
+.p-right{display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0;}
+.p-lv{font-size:.62rem; font-weight:800; letter-spacing:.06em; padding:3px 9px; border-radius:var(--r-pill); text-transform:uppercase;}
+.p-xp-txt{font-size:.6rem; color:var(--ink3); font-weight:500;}
+.p-chevron{color:var(--ink3); display:flex; align-items:center;}
+.p-chevron svg{width:14px;height:14px;stroke:currentColor;}
+
+/* ══════════════════════════════════════════
+   BOSS PAGE
+══════════════════════════════════════════ */
+.boss-card{
+  background:var(--bg-card); backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(124,58,237,.2);
+  border-radius:var(--r-lg); padding:28px 20px;
+  margin-bottom:14px; position:relative; overflow:hidden;
+  text-align:center;
+  box-shadow:0 0 60px rgba(124,58,237,.08), 0 40px 80px rgba(0,0,0,.4);
+  transition:transform .12s;
+}
+.boss-card::before{
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(124,58,237,.15),transparent 65%);
+  pointer-events:none;
+}
+.boss-card.shake{animation:bossShake .45s cubic-bezier(.36,.07,.19,.97);}
+@keyframes bossShake{
+  0%,100%{transform:translateX(0) scale(1)}
+  10%,50%,90%{transform:translateX(-5px) scale(.99)}
+  30%,70%{transform:translateX(5px) scale(1.01)}
+}
+.boss-avatar-wrap{position:relative; display:inline-block; margin-bottom:14px;}
+.boss-ring{
+  width:110px; height:110px; border-radius:50%;
+  border:2px solid transparent;
+  background:linear-gradient(var(--bg-card),var(--bg-card)) padding-box,
+             linear-gradient(135deg,var(--v),var(--pink),var(--v)) border-box;
+  display:flex; align-items:center; justify-content:center;
+  animation:ringPulse 2.5s ease-in-out infinite alternate;
+  position:relative;
+}
+@keyframes ringPulse{
+  from{box-shadow:0 0 10px rgba(124,58,237,.5),0 0 30px rgba(124,58,237,.2);}
+  to  {box-shadow:0 0 20px rgba(236,72,153,.6),0 0 50px rgba(236,72,153,.25);}
+}
+.boss-ring::before{
+  content:''; position:absolute; inset:-4px;
+  border-radius:50%; border:1px solid rgba(255,255,255,.06);
+  animation:rotateSlow 12s linear infinite;
+}
+@keyframes rotateSlow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.boss-emoji-xl{font-size:3.5rem; line-height:1; display:block; filter:drop-shadow(0 0 20px rgba(236,72,153,.4)); animation:bossFloat 4s ease-in-out infinite;}
+@keyframes bossFloat{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.boss-name{font-size:1.65rem; font-weight:800; letter-spacing:-.02em; color:var(--pink2); text-shadow:0 0 24px rgba(236,72,153,.5); margin-bottom:2px;}
+.boss-sub{font-size:.7rem; color:var(--ink3); font-weight:400; margin-bottom:4px;}
+.boss-timer{font-size:.68rem; font-weight:700; color:var(--orange); margin-bottom:20px; letter-spacing:.02em;}
+.boss-hp-track{
+  height:10px; background:rgba(255,255,255,.06);
+  border-radius:var(--r-pill); overflow:hidden; margin-bottom:6px;
+}
+.boss-hp-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--red),var(--pink));
+  border-radius:var(--r-pill);
+  transition:width .8s cubic-bezier(.4,0,.2,1);
+  position:relative; overflow:hidden;
+}
+.boss-hp-fill::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);
+  animation:shimmer 2s ease-in-out infinite;
+}
+.boss-hp-row{
+  display:flex; justify-content:space-between;
+  font-size:.7rem; color:var(--ink2); font-weight:600;
+}
+.boss-dead-banner{
+  background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.2);
+  border-radius:var(--r); padding:16px; text-align:center;
+  color:var(--gold2); font-weight:700; font-size:.88rem;
+  margin-bottom:14px; letter-spacing:.01em;
+}
+
+/* Attack list */
+.atk-list{
+  background:var(--bg-card); backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r); overflow:hidden; margin-bottom:14px;
+}
+.atk-row{
+  display:flex; align-items:center; gap:14px;
+  padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.04);
+  cursor:pointer; transition:background .15s; -webkit-user-select:none;
+}
+.atk-row:last-child{border-bottom:none;}
+.atk-row:active:not([disabled]){background:rgba(255,255,255,.04);}
+.atk-row[disabled]{opacity:.3; pointer-events:none;}
+.atk-ico{
+  width:42px; height:42px; border-radius:12px;
+  background:rgba(124,58,237,.12); border:1px solid rgba(124,58,237,.2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.25rem; flex-shrink:0;
+}
+.atk-body{flex:1;}
+.atk-name{font-size:.86rem; font-weight:600; color:var(--ink); margin-bottom:2px;}
+.atk-cost{font-size:.68rem; color:var(--ink3);}
+.atk-dmg{
+  font-size:.78rem; font-weight:800; color:var(--pink2); flex-shrink:0;
+  background:rgba(236,72,153,.1); border:1px solid rgba(236,72,153,.2);
+  padding:5px 12px; border-radius:var(--r-pill); white-space:nowrap;
+}
+
+/* Blog */
+.blog-card{
+  background:var(--bg-card); border:1px solid var(--glass-border);
+  border-radius:var(--r); padding:14px 16px;
+}
+.blog-list{display:flex; flex-direction:column; gap:5px; max-height:160px; overflow-y:auto;}
+.blog-row{
+  font-size:.72rem; padding:6px 10px; border-radius:8px;
+  background:rgba(255,255,255,.025); color:var(--ink3); line-height:1.4;
+}
+.blog-row.hit{color:var(--orange);}
+.blog-row.act{color:var(--cyan2);}
+.blog-row.kill{color:var(--gold2); font-weight:700;}
+
+/* ══════════════════════════════════════════
+   VAULT PAGE
+══════════════════════════════════════════ */
+.vault-hero{
+  text-align:center; padding:28px 16px 20px; margin-bottom:16px;
+}
+.vault-hero-num{
+  font-size:3.5rem; font-weight:300;
+  letter-spacing:-.04em; color:var(--ink);
+  margin-bottom:2px; line-height:1;
+}
+.vault-hero-gold{color:var(--gold2);}
+.vault-hero-lbl{font-size:.65rem; font-weight:700; color:var(--ink3); letter-spacing:.2em; text-transform:uppercase;}
+
+.vault-list{
+  background:var(--bg-card); backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r); overflow:hidden;
+}
+.vault-row{
+  display:flex; align-items:center; gap:14px;
+  padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.04);
+}
+.vault-row:last-child{border-bottom:none;}
+.vault-ico{
+  width:48px; height:48px; border-radius:14px;
+  background:rgba(255,255,255,.04); border:1px solid var(--glass-border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.7rem; flex-shrink:0;
+}
+.vault-body{flex:1; min-width:0;}
+.vault-name{font-size:.88rem; font-weight:700; color:var(--ink); margin-bottom:2px;}
+.vault-desc{font-size:.7rem; color:var(--ink3); font-weight:400;}
+.vault-cost{font-size:.72rem; font-weight:700; color:var(--gold2); margin-top:3px;}
+.vault-btn{
+  font-size:.72rem; font-weight:700; letter-spacing:.02em; flex-shrink:0;
+  color:var(--gold2); white-space:nowrap;
+  background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.25);
+  padding:7px 14px; border-radius:var(--r-pill); cursor:pointer;
+  font-family:inherit; transition:all .15s;
+}
+.vault-btn:active:not(:disabled){background:rgba(245,158,11,.22); transform:scale(.96);}
+.vault-btn:disabled{opacity:.3; pointer-events:none;}
+
+/* ══════════════════════════════════════════
+   STATS PAGE
+══════════════════════════════════════════ */
+.radar-card{
+  background:var(--bg-card); backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r-lg); padding:20px;
+  display:flex; justify-content:center; margin-bottom:14px;
+  box-shadow:0 0 40px rgba(124,58,237,.06);
+}
+#radar-svg{width:100%; max-width:280px; height:280px; overflow:visible;}
+
+.stat-list{
+  background:var(--bg-card); backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r); overflow:hidden;
+}
+.stat-row{
+  display:flex; align-items:center; gap:12px;
+  padding:13px 16px; border-bottom:1px solid rgba(255,255,255,.04);
+}
+.stat-row:last-child{border-bottom:none;}
+.sr-ico{font-size:1.1rem; width:28px; text-align:center; flex-shrink:0;}
+.sr-lbl{font-size:.76rem; font-weight:700; width:72px; flex-shrink:0; letter-spacing:.01em;}
+.sr-bar{flex:1; height:5px; background:rgba(255,255,255,.06); border-radius:var(--r-pill); overflow:hidden;}
+.sr-fill{height:100%; border-radius:var(--r-pill); transition:width .8s cubic-bezier(.4,0,.2,1); position:relative; overflow:hidden;}
+.sr-fill::after{content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent); animation:shimmer 2.5s ease-in-out infinite;}
+.sr-val{font-size:.82rem; font-weight:800; width:30px; text-align:right; letter-spacing:-.01em;}
+
+/* ══════════════════════════════════════════
+   BOTTOM NAV (mobile)
+══════════════════════════════════════════ */
+.bottom-nav{
+  flex-shrink:0;
+  padding-bottom:var(--safe-b);
+  background:rgba(3,7,18,.95);
+  backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+  border-top:1px solid var(--glass-border);
+  display:flex; align-items:center;
+  padding-left:4px; padding-right:4px;
+  height:calc(var(--nav-h) + var(--safe-b));
+  padding-bottom:calc(var(--safe-b) + 6px);
+  gap:2px;
+}
+.nav-btn{
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  height:52px; border:none; background:none;
+  color:var(--ink3); cursor:pointer; gap:4px;
+  border-radius:12px; transition:all .2s; padding:0 4px;
+}
+.nav-btn svg{width:20px; height:20px; stroke:currentColor; stroke-width:1.75; fill:none; stroke-linecap:round; stroke-linejoin:round;}
+.nav-btn.active{color:var(--v3); background:rgba(124,58,237,.12);}
+.nav-lbl{font-size:.54rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; line-height:1;}
+
+/* ══════════════════════════════════════════
+   BOTTOM SHEET
+══════════════════════════════════════════ */
+.scrim{
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.72); z-index:100;
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+}
+.scrim.open{display:block;}
+.sheet{
+  position:fixed; bottom:0; left:0; right:0;
+  max-width:480px; margin:0 auto;
+  background:rgba(10,17,32,.98);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:24px 24px 0 0;
+  z-index:101; max-height:86vh;
+  display:flex; flex-direction:column;
+  transform:translateY(100%);
+  transition:transform .32s cubic-bezier(.4,0,.2,1);
+  padding-bottom:calc(var(--safe-b) + var(--nav-h));
+  box-shadow:0 -40px 80px rgba(0,0,0,.5),0 0 0 1px rgba(124,58,237,.15);
+  backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+}
+.sheet.open{transform:translateY(0);}
+.sheet-handle{display:flex; justify-content:center; padding:12px 0 8px;}
+.sheet-handle-bar{width:36px; height:3px; background:rgba(255,255,255,.15); border-radius:var(--r-pill);}
+.sheet-hdr{padding:4px 18px 14px; border-bottom:1px solid rgba(255,255,255,.06);}
+.sheet-title{font-size:1rem; font-weight:700; display:flex; align-items:center; gap:8px; color:var(--ink); letter-spacing:-.01em;}
+.sheet-body{overflow-y:auto; padding:14px 16px; flex:1; -webkit-overflow-scrolling:touch;}
+.sheet-task{
+  width:100%; display:flex; align-items:center; justify-content:space-between;
+  background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+  color:var(--ink); padding:12px 14px; border-radius:12px;
+  font-size:.84rem; font-weight:500; cursor:pointer; margin-bottom:7px;
+  text-align:left; transition:all .12s; font-family:inherit;
+  -webkit-user-select:none;
+}
+.sheet-task:active{background:rgba(124,58,237,.12); border-color:rgba(124,58,237,.3);}
+.task-rwd{display:flex; gap:6px; align-items:center; flex-shrink:0; margin-left:8px;}
+.xp-t{font-size:.7rem; font-weight:800; color:var(--green2);}
+.gd-t{font-size:.7rem; font-weight:800; color:var(--gold2);}
+.sheet-div{border:none; border-top:1px solid rgba(255,255,255,.06); margin:6px 0 12px;}
+.sheet-custom{display:flex; gap:8px;}
+.sheet-inp{
+  flex:1; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+  color:var(--ink); padding:11px 14px; border-radius:12px;
+  font-size:.84rem; font-family:inherit; font-weight:400;
+}
+.sheet-inp:focus{outline:none; border-color:rgba(124,58,237,.5); background:rgba(124,58,237,.06);}
+.sheet-inp::placeholder{color:var(--ink3);}
+.sheet-ok{
+  background:linear-gradient(135deg,var(--v),#6d28d9);
+  color:#fff; border:none; padding:11px 18px; border-radius:12px;
+  font-size:.84rem; font-weight:800; cursor:pointer;
+  font-family:inherit; flex-shrink:0; transition:opacity .15s;
+  box-shadow:0 4px 16px rgba(124,58,237,.35);
+}
+.sheet-ok:active{opacity:.8; transform:scale(.96);}
+
+/* ══════════════════════════════════════════
+   NOTIFICATIONS
+══════════════════════════════════════════ */
+.notif-feed{
+  position:fixed;
+  top:calc(var(--safe-t) + var(--top-h) + 10px);
+  left:12px; right:12px;
+  display:flex; flex-direction:column; gap:6px;
+  z-index:300; pointer-events:none;
+}
+.notif{
+  background:rgba(10,17,32,.95);
+  border:1px solid rgba(255,255,255,.1);
+  border-left:3px solid var(--green);
+  color:var(--ink); padding:10px 14px; border-radius:12px;
+  font-size:.78rem; font-weight:500; line-height:1.5;
+  box-shadow:0 16px 40px rgba(0,0,0,.6);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  animation:notifIn .28s cubic-bezier(.34,1.4,.64,1), notifOut .3s ease 2.7s forwards;
+}
+.notif.warn{border-left-color:var(--orange);}
+.notif.lvup{border-left-color:var(--gold2); font-weight:700; color:var(--ink); font-size:.82rem;}
+@keyframes notifIn{from{transform:translateY(-14px);opacity:0}to{transform:none;opacity:1}}
+@keyframes notifOut{to{opacity:0;transform:translateY(-8px)}}
+
+/* ══════════════════════════════════════════
+   MEDITATION UI (FULLSCREEN)
+══════════════════════════════════════════ */
+.med-overlay{
+  position:fixed; inset:0; z-index:9999;
+  background:linear-gradient(180deg, #0f172a 0%, #312e81 50%, #030712 100%);
+  display:none; flex-direction:column; align-items:center; justify-content:center;
+  color:#fff; opacity:0; transition:opacity 1s ease;
+  overflow:hidden;
+}
+.med-overlay.open{display:flex; opacity:1;}
+.med-close{
+  position:absolute; top:40px; right:24px;
+  background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+  color:#fff; font-size:1.2rem; width:44px; height:44px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.2s; z-index:10;
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+}
+.med-close:active{transform:scale(0.9);}
+.med-label{
+  position:absolute; top:52px;
+  font-size:0.85rem; font-weight:400; letter-spacing:0.3em;
+  color:rgba(255,255,255,0.7); text-transform:uppercase; z-index:10;
+}
+.med-circle-wrap{
+  position:relative; width:280px; height:280px; 
+  display:flex; align-items:center; justify-content:center; 
+  margin-bottom:50px;
+}
+.med-blob{
+  position:absolute; inset:0; border-radius:50%;
+  background:radial-gradient(circle at 50% 50%, rgba(139,92,246,0.2), transparent 70%);
+  border:1px solid rgba(255,255,255,0.08);
+  animation:breatheBlob 8s ease-in-out infinite;
+}
+.med-blob:nth-child(2){ animation-delay:-2.6s; background:radial-gradient(circle at 50% 50%, rgba(236,72,153,0.15), transparent 70%); }
+.med-blob:nth-child(3){ animation-delay:-5.3s; background:radial-gradient(circle at 50% 50%, rgba(6,182,212,0.15), transparent 70%); }
+
+@keyframes breatheBlob {
+  0%, 100% { transform: scale(0.85); opacity: 0.4; }
+  50% { transform: scale(1.4); opacity: 1; }
+}
+.med-timer{
+  position:relative; z-index:2;
+  font-size:5.5rem; font-weight:200; letter-spacing:-0.03em;
+  color:#fff; font-variant-numeric: tabular-nums;
+  font-family: 'Outfit', sans-serif;
+  text-shadow:0 0 40px rgba(0,0,0,0.5);
+}
+.med-msg{
+  font-size:1.15rem; color:rgba(255,255,255,0.85); font-weight:300; letter-spacing:0.1em;
+  text-align:center; max-width:80%; opacity:0;
+  animation: breatheText 8s ease-in-out infinite;
+  transition: opacity 0.5s;
+}
+@keyframes breatheText {
+  0%, 100% { opacity: 0.4; transform:translateY(3px); }
+  50% { opacity: 1; transform:translateY(-3px); }
+}
+
+/* ══════════════════════════════════════════
+   DESKTOP OVERRIDES
+══════════════════════════════════════════ */
+@media(min-width:900px){
+  body{ overflow:hidden; }
+  .app{ flex-direction:row; }
+  .sidebar{ display:flex; }
+  .main{
+    margin-left:var(--sb-w);
+    display:flex; flex-direction:column; flex:1; overflow:hidden;
+  }
+  .bottom-nav{ display:none; }
+  .page{ padding:28px 32px 32px; }
+  .top-wordmark{ display:block; }
+  .top-logo-mark{ display:none; }
+
+  /* Home 2-col desktop */
+  .home-desktop-grid{
+    display:grid; grid-template-columns:320px 1fr;
+    gap:20px; align-items:start;
+  }
+  .home-desktop-right{ display:flex; flex-direction:column; gap:0; }
+
+  /* Pillars 3-col desktop */
+  #p-list{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:12px;
+  }
+  #p-list .pillar-card{ margin-bottom:0; }
+
+  /* Boss centered */
+  .boss-max{ max-width:600px; margin:0 auto; }
+
+  /* Vault 2-col desktop */
+  #v-list{ display:grid; grid-template-columns:repeat(1,1fr); }
+
+  /* Stats 2-col */
+  .stats-desktop{
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:20px; align-items:start;
+  }
+  .stats-desktop .radar-card{ margin-bottom:0; }
+  .stats-desktop .stat-list{ margin-bottom:0; }
+
+  .notif-feed{
+    left:calc(var(--sb-w) + 16px);
+    right:16px;
+  }
+}
+
+@media(min-width:1200px){
+  :root{ --sb-w:260px; }
+  #p-list{ grid-template-columns:repeat(3,1fr); }
+}
+
+::-webkit-scrollbar{width:0;}
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+<div class="ambient-noise"></div>
+
+<div class="app">
+
+  <!-- ── SIDEBAR (desktop) ── -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sb-title">SOVEREIGN</div>
+        <div class="sb-sub">LIFE RPG</div>
+      </div>
+    </div>
+
+    <button class="sb-btn active" onclick="switchTab('home',this)" id="sb-home">
+      <svg viewBox="0 0 24 24"><path d="M3 12L12 3l9 9M5 10v10h5v-5h4v5h5V10"/></svg>
+      <span>หน้าหลัก</span>
+    </button>
+    <button class="sb-btn" onclick="switchTab('pillars',this)" id="sb-pillars">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke-width="1.75"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke-width="1.75"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke-width="1.75"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke-width="1.75"/></svg>
+      <span>6 เสาหลัก</span>
+    </button>
+    <button class="sb-btn" onclick="switchTab('boss',this)" id="sb-boss">
+      <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 019 9c0 3.6-2 6.7-5 8.3V21H8v-.7C5 18.7 3 15.6 3 12a9 9 0 019-9z" stroke-width="1.75"/><circle cx="9" cy="12" r="1.5" fill="currentColor"/><circle cx="15" cy="12" r="1.5" fill="currentColor"/><path d="M9 18h6"/></svg>
+      <span>Boss Raid</span>
+    </button>
+    <button class="sb-btn" onclick="switchTab('vault',this)" id="sb-vault">
+      <svg viewBox="0 0 24 24" stroke-width="1.75"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+      <span>Reward Vault</span>
+    </button>
+    <button class="sb-btn" onclick="switchTab('stats',this)" id="sb-stats">
+      <svg viewBox="0 0 24 24" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Stats</span>
+    </button>
+
+    <div class="sb-footer">
+      <div class="sb-player-info">
+        <div class="sb-lv-row">
+          <div class="sb-lv-badge" id="sb-lv">Lv. 1</div>
+          <div class="sb-gold-pill">🪙 <span id="sb-gold">0</span></div>
+        </div>
+        <div class="sb-exp-bar">
+          <div class="sb-exp-fill" id="sb-exp-fill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <div class="top-inner">
+        <div class="top-logo">
+          <div class="top-logo-mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </div>
+          <span class="top-wordmark">SOVEREIGN LIFE RPG</span>
+        </div>
+        <div class="top-gold">🪙 <span id="t-gold">0</span></div>
+        <div class="top-lv" id="t-lv">Lv. 1</div>
+      </div>
+      <div class="exp-track">
+        <div class="exp-track-fill" id="t-exp" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- PAGES -->
+    <div class="pages">
+
+      <!-- HOME -->
+      <div class="page active" id="page-home">
+        <div class="home-desktop-grid">
+          <div class="home-desktop-left">
+            <!-- Hero Card -->
+            <div class="home-hero" style="margin-bottom:14px;">
+              <div class="hero-top">
+                <div class="hero-avatar" id="h-avatar">🧙</div>
+                <div class="hero-info">
+                  <div class="hero-lv"><div class="hero-lv-dot"></div><span id="h-lv-txt">Level 1</span></div>
+                  <div class="hero-name" id="h-name">Sovereign</div>
+                  <div class="hero-class" id="h-class">Novice Sovereign</div>
+                  <div class="hero-gold">🪙 <span id="h-gold">0</span> Gold</div>
+                </div>
+              </div>
+              <div class="exp-row">
+                <span class="exp-lbl">EXP Progress</span>
+                <span class="exp-txt" id="h-exp-txt">0 / 100</span>
+              </div>
+              <div class="exp-main">
+                <div class="exp-fill" id="h-exp-bar" style="width:0%"></div>
+              </div>
+            </div>
+            <!-- Week -->
+            <div class="week-card">
+              <div class="stag" style="margin-bottom:0"><span>สัปดาห์นี้</span></div>
+              <div class="week-dots" id="h-week"></div>
+            </div>
+          </div>
+          <div class="home-desktop-right">
+            <div class="stag" style="margin-bottom:10px;"><span>Stats Overview</span><span class="stag-line"></span></div>
+            <div class="mini-stats" id="h-stats" style="margin-bottom:14px;"></div>
+            <div class="stag"><span>กิจกรรมล่าสุด</span><span class="stag-line"></span></div>
+            <div id="h-activity"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PILLARS -->
+      <div class="page" id="page-pillars">
+        <div class="stag" style="margin-bottom:16px;"><span>6 เสาหลัก</span><span class="stag-line"></span><span style="color:var(--ink3);font-size:.6rem;text-transform:none;letter-spacing:.05em;font-weight:400;">แตะเพื่อบันทึก</span></div>
+        <div id="p-list"></div>
+      </div>
+
+      <!-- BOSS -->
+      <div class="page" id="page-boss">
+        <div class="boss-max">
+          <div class="boss-card" id="boss-card">
+            <div class="boss-avatar-wrap">
+              <div class="boss-ring">
+                <span class="boss-emoji-xl">🦥</span>
+              </div>
+            </div>
+            <div class="boss-name">Shadow Sloth</div>
+            <div class="boss-sub">「มังกรแห่งความเฉื่อยชา」· สัปดาห์ที่ <span id="b-wk">1</span></div>
+            <div class="boss-timer" id="b-timer">⏰ กำลังคำนวณ...</div>
+            <div class="boss-hp-track">
+              <div class="boss-hp-fill" id="b-hp-bar" style="width:100%"></div>
+            </div>
+            <div class="boss-hp-row" style="margin-top:7px;">
+              <span>❤️ <span id="b-hp">500</span> / <span id="b-hpmax">500</span> HP</span>
+              <span>💥 DMG รวม <span id="b-dmg">0</span></span>
+            </div>
+          </div>
+          <div id="b-dead" style="display:none" class="boss-dead-banner">🏆 Shadow Sloth ถูกสังหาร! รอรีเซ็ตสัปดาห์ถัดไป</div>
+          <div class="stag" style="margin-bottom:10px;"><span>โจมตี</span><span class="stag-line"></span></div>
+          <div class="atk-list" id="b-atks"></div>
+          <div class="stag" style="margin:16px 0 10px;"><span>Battle Log</span><span class="stag-line"></span></div>
+          <div class="blog-card">
+            <div class="blog-list" id="b-log">
+              <div class="blog-row" style="color:var(--ink4)">ยังไม่มีบันทึก...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VAULT -->
+      <div class="page" id="page-vault">
+        <div class="vault-hero">
+          <div class="vault-hero-num"><span class="vault-hero-gold" id="v-gold">0</span></div>
+          <div class="vault-hero-lbl">🪙 Gold คงเหลือ</div>
+        </div>
+        <div class="stag"><span>Rewards</span><span class="stag-line"></span></div>
+        <div class="vault-list" id="v-list"></div>
+      </div>
+
+      <!-- STATS -->
+      <div class="page" id="page-stats">
+        <div class="stats-desktop">
+          <div>
+            <div class="stag" style="margin-bottom:12px;"><span>Radar</span><span class="stag-line"></span></div>
+            <div class="radar-card">
+              <svg id="radar-svg" viewBox="0 0 280 280"></svg>
+            </div>
+          </div>
+          <div>
+            <div class="stag" style="margin-bottom:10px;"><span>6-Axis Stats</span><span class="stag-line"></span></div>
+            <div class="stat-list" id="s-bars"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /pages -->
+  </div><!-- /main -->
+
+  <!-- BOTTOM NAV (mobile) -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('home',this)">
+      <svg viewBox="0 0 24 24"><path d="M3 12L12 3l9 9M5 10v10h5v-5h4v5h5V10"/></svg>
+      <span class="nav-lbl">หน้าหลัก</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('pillars',this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      <span class="nav-lbl">เสาหลัก</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('boss',this)">
+      <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 019 9c0 3.6-2 6.7-5 8.3V21H8v-.7C5 18.7 3 15.6 3 12a9 9 0 019-9z"/><circle cx="9" cy="12" r="1.5" fill="currentColor"/><circle cx="15" cy="12" r="1.5" fill="currentColor"/><path d="M9 18h6"/></svg>
+      <span class="nav-lbl">Boss</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('vault',this)">
+      <svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+      <span class="nav-lbl">Vault</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('stats',this)">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span class="nav-lbl">Stats</span>
+    </button>
+  </nav>
+
+</div><!-- /app -->
+
+<!-- SCRIM + SHEET -->
+<div class="scrim" id="scrim" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"><div class="sheet-handle-bar"></div></div>
+  <div class="sheet-hdr">
+    <div class="sheet-title"><span id="sh-icon"></span><span id="sh-title"></span></div>
+  </div>
+  <div class="sheet-body">
+    <div id="sh-tasks"></div>
+    <hr class="sheet-div"/>
+    <div class="sheet-custom">
+      <input class="sheet-inp" id="sh-inp" placeholder="กิจกรรมเอง..."
+             onkeydown="if(event.key==='Enter')logCustom()"/>
+      <button class="sheet-ok" onclick="logCustom()">+ XP</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIF -->
+<!-- MEDITATION UI -->
+<div id="med-overlay" class="med-overlay">
+  <button class="med-close" onclick="stopMeditation(false)">✕</button>
+  <div id="med-label" class="med-label">MEDITATION</div>
+  <div class="med-circle-wrap">
+    <div class="med-blob"></div>
+    <div class="med-blob"></div>
+    <div class="med-blob"></div>
+    <div id="med-timer" class="med-timer">05:00</div>
+  </div>
+  <div id="med-msg" class="med-msg">หายใจเข้า...</div>
+</div>
+<!-- /MEDITATION UI -->
+
+<div class="notif-feed" id="notif-feed"></div>
+
+<script>
+/* ═════════════════════════════════════════════════
+   SOVEREIGN LIFE RPG v5.0 — Production Engine
+   ═════════════════════════════════════════════════ */
+
+const DEF = () => ({
+  level:1, exp:0, gold:0,
+  bossHP:500, bossMaxHP:500, bossDmg:0, weekNum:1,
+  weekDays:[false,false,false,false,false,false,false],
+  stats:{mind:0,body:0,wealth:0,fuel:0,strength:0,endurance:0},
+  pillars:{
+    meditation:{exp:0,level:1,totalExp:0}, journal:{exp:0,level:1,totalExp:0},
+    finance:{exp:0,level:1,totalExp:0},    nutrition:{exp:0,level:1,totalExp:0},
+    weight:{exp:0,level:1,totalExp:0},     running:{exp:0,level:1,totalExp:0},
+  },
+  log:[], lastLogin:null,
+});
+
+let S; try{S=JSON.parse(localStorage.getItem('slrpg5')||'null')||DEF();}catch(e){S=DEF();}
+const save=()=>{try{localStorage.setItem('slrpg5',JSON.stringify(S));}catch(e){}};
+
+const EXP_LV = lv => Math.floor(100*Math.pow(1.35,lv-1));
+const P_EXP_LV = 250;
+const TITLES=[[1,'Novice Sovereign'],[4,'Rising Champion'],[7,'Proven Warrior'],[11,'Elite Sovereign'],[16,'Legendary Master']];
+const charTitle=lv=>{let t=TITLES[0][1];for(const[m,n]of TITLES)if(lv>=m)t=n;return t;};
+const DAYS_TH=['อา','จ','อ','พ','พฤ','ศ','ส'];
+
+const PILLARS=[
+  {id:'meditation',icon:'🧘',name:'สมาธิ',full:'สมาธิ (Meditation)',color:'#8b5cf6',stat:'mind',
+   desc:'เจริญสติ · นั่งสมาธิ · หายใจ',tasks:[
+    {label:'นั่งสมาธิ 10 นาที',exp:20,gold:5},{label:'นั่งสมาธิ 20 นาที',exp:40,gold:10},
+    {label:'นั่งสมาธิ 30 นาที',exp:60,gold:15},{label:'Body Scan 15 นาที',exp:30,gold:8},
+    {label:'Breathing 4-7-8',exp:15,gold:3},{label:'Walking Meditation',exp:25,gold:6},
+  ]},
+  {id:'journal',icon:'📔',name:'Journal',full:'Journal (บันทึก)',color:'#06b6d4',stat:'mind',
+   desc:'บันทึกความคิด · ฝัน · เป้าหมาย',tasks:[
+    {label:'Morning Pages 3 หน้า',exp:30,gold:8},{label:'Gratitude 3 ข้อ',exp:15,gold:4},
+    {label:'Review วันนี้',exp:20,gold:5},{label:'วางแผนพรุ่งนี้',exp:20,gold:5},
+    {label:'Brain Dump 10 นาที',exp:25,gold:6},
+  ]},
+  {id:'finance',icon:'💰',name:'บัญชี',full:'บัญชี (Finance)',color:'#f59e0b',stat:'wealth',
+   desc:'บันทึกรายรับ-รายจ่าย · ลงทุน',tasks:[
+    {label:'บันทึกรายจ่ายวันนี้',exp:20,gold:5},{label:'ทบทวนแผนการเงิน',exp:35,gold:15},
+    {label:'อ่านบทความการเงิน',exp:25,gold:8},{label:'อัปเดต Budget Sheet',exp:30,gold:10},
+    {label:'ตรวจ Portfolio',exp:25,gold:8},
+  ]},
+  {id:'nutrition',icon:'🥗',name:'คุมแคล',full:'คุมแคล (Nutrition)',color:'#10b981',stat:'fuel',
+   desc:'ควบคุมแคลอรี่ · กินสะอาด',tasks:[
+    {label:'บันทึก Calorie วันนี้',exp:20,gold:5},{label:'กินผักผลไม้ครบ',exp:25,gold:6},
+    {label:'ดื่มน้ำ 2L+',exp:15,gold:4},{label:'งดน้ำตาลทั้งวัน',exp:30,gold:10},
+    {label:'Meal Prep สำเร็จ',exp:40,gold:12},
+  ]},
+  {id:'weight',icon:'🏋️',name:'เวท',full:'เวท (Weight Training)',color:'#f97316',stat:'strength',
+   desc:'ฝึกกล้ามเนื้อ · เวท · คาลิสธีนิกส์',tasks:[
+    {label:'Workout 30+ นาที',exp:40,gold:12},{label:'Workout 60+ นาที',exp:70,gold:20},
+    {label:'Push-up 50 ครั้ง',exp:25,gold:7},{label:'Pull-up 20 ครั้ง',exp:30,gold:9},
+    {label:'Core Training 15 นาที',exp:30,gold:8},
+  ]},
+  {id:'running',icon:'🏃',name:'วิ่ง',full:'วิ่ง (Running)',color:'#ec4899',stat:'endurance',
+   desc:'วิ่ง · Cardio · ออกกำลังกาย',tasks:[
+    {label:'วิ่ง 3 กม.',exp:35,gold:10},{label:'วิ่ง 5 กม.',exp:55,gold:16},
+    {label:'วิ่ง 10 กม.',exp:100,gold:30},{label:'Walk 30 นาที',exp:20,gold:5},
+    {label:'Jump Rope 500',exp:30,gold:8},
+  ]},
+];
+
+const STATS_DEF=[
+  {id:'mind',     label:'Mind',      icon:'🧠',color:'#8b5cf6'},
+  {id:'body',     label:'Body',      icon:'💪',color:'#f97316'},
+  {id:'wealth',   label:'Wealth',    icon:'💰',color:'#f59e0b'},
+  {id:'fuel',     label:'Fuel',      icon:'🔋',color:'#10b981'},
+  {id:'strength', label:'Strength',  icon:'⚡',color:'#ec4899'},
+  {id:'endurance',label:'Endurance', icon:'🏅',color:'#06b6d4'},
+];
+
+const BOSS_ATKS=[
+  {label:'ตีด้วยสมาธิ',ico:'🧘',dmg:30,costStat:'mind',costAmt:2,desc:'Mind -2'},
+  {label:'ระเบิดพลัง',ico:'⚡',dmg:55,costStat:'strength',costAmt:3,desc:'Strength -3'},
+  {label:'Sprint Rush',ico:'🏃',dmg:45,costStat:'endurance',costAmt:2,desc:'Endurance -2'},
+];
+
+const VAULT=[
+  {ico:'🎮',name:'เล่นเกม 1 ชม.',cost:30,desc:'เกมอะไรก็ได้ 1 ชม. เต็มๆ'},
+  {ico:'🍜',name:'Cheat Meal 1 มื้อ',cost:50,desc:'กินของชอบ ไม่ต้องนับแคล'},
+  {ico:'😴',name:'นอนดึก 1 คืน',cost:40,desc:'ยกเว้น Bedtime 1 คืน'},
+  {ico:'🛒',name:'ซื้อ Wishlist',cost:200,desc:'ของใน Wishlist 1 ชิ้น'},
+  {ico:'🎬',name:'ดูหนัง/ซีรีส์',cost:25,desc:'บินทั้งวัน ไม่จำกัด'},
+  {ico:'🏖️',name:'Day Off เต็มวัน',cost:150,desc:'พัก 100% ไม่มี Guilt'},
+];
+
+// ── NAV ──────────────────────────────────────
+let currentTab='home';
+function switchTab(tab,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn,.sb-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  btn.classList.add('active');
+  // Also sync sidebar
+  const sbBtn = document.getElementById('sb-'+tab);
+  if(sbBtn) sbBtn.classList.add('active');
+  currentTab=tab; renderPage(tab);
+}
+function renderPage(t){
+  if(t==='home')    renderHome();
+  if(t==='pillars') renderPillars();
+  if(t==='boss')    renderBoss();
+  if(t==='vault')   renderVault();
+  if(t==='stats')   renderStats();
+}
+
+// ── TOP BAR & SIDEBAR ────────────────────────
+function renderTopBar(){
+  const need=EXP_LV(S.level);
+  const pct=Math.min(100,(S.exp/need)*100);
+  const g=S.gold, lv=`Lv. ${S.level}`;
+  document.getElementById('t-gold').textContent = g;
+  document.getElementById('t-lv').textContent   = lv;
+  document.getElementById('t-exp').style.width  = pct+'%';
+  document.getElementById('sb-lv').textContent  = lv;
+  document.getElementById('sb-gold').textContent= g;
+  document.getElementById('sb-exp-fill').style.width=pct+'%';
+}
+
+// ── HOME ─────────────────────────────────────
+function renderHome(){
+  renderTopBar();
+  const need=EXP_LV(S.level); const pct=Math.min(100,(S.exp/need)*100);
+  document.getElementById('h-exp-bar').style.width=pct+'%';
+  document.getElementById('h-exp-txt').textContent=`${S.exp} / ${need}`;
+  document.getElementById('h-class').textContent=charTitle(S.level);
+  document.getElementById('h-gold').textContent=S.gold;
+  document.getElementById('h-lv-txt').textContent=`Level ${S.level}`;
+
+  const wd=document.getElementById('h-week'); wd.innerHTML='';
+  S.weekDays.forEach((done,i)=>{
+    wd.innerHTML+=`<div class="wd${done?' done':''}">
+      <div class="wd-l">${DAYS_TH[i]}</div><div class="wd-dot"></div></div>`;
+  });
+
+  const ms=document.getElementById('h-stats'); ms.innerHTML='';
+  STATS_DEF.forEach(st=>{
+    const v=S.stats[st.id]||0;
+    ms.innerHTML+=`<div class="ms">
+      <div class="ms-icon">${st.icon}</div>
+      <div class="ms-val" style="color:${st.color}">${v}</div>
+      <div class="ms-lbl">${st.label}</div>
+    </div>`;
+  });
+
+  const al=document.getElementById('h-activity');
+  if(!S.log||!S.log.length){
+    al.innerHTML=`<div class="act-empty">ยังไม่มีกิจกรรม<br>ไปแตะ <strong>เสาหลัก</strong> เพื่อเริ่มสะสม EXP</div>`;
+    return;
+  }
+  al.innerHTML='';
+  S.log.slice(0,6).forEach(e=>{
+    const p=PILLARS.find(x=>x.id===e.pillar)||{icon:'⚡',color:'#8b5cf6'};
+    const t=new Date(e.ts);
+    const ts=t.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})+' · '+t.toLocaleDateString('th-TH',{day:'numeric',month:'short'});
+    al.innerHTML+=`<div class="act-row">
+      <div class="act-ico" style="background:${p.color}18;border:1px solid ${p.color}30">${p.icon}</div>
+      <div class="act-info">
+        <div class="act-lbl">${e.label}</div>
+        <div class="act-time">${ts}</div>
+      </div>
+      <div class="act-xp">+${e.exp} XP</div>
+    </div>`;
+  });
+}
+
+// ── PILLARS ──────────────────────────────────
+function renderPillars(){
+  const el=document.getElementById('p-list'); el.innerHTML='';
+  PILLARS.forEach(p=>{
+    const ps=S.pillars[p.id];
+    const cur=ps.exp%P_EXP_LV; const pct=Math.min(100,(cur/P_EXP_LV)*100);
+    el.innerHTML+=`
+    <div class="pillar-card" onclick="openSheet('${p.id}')">
+      <div class="p-ico" style="background:${p.color}18;border:1px solid ${p.color}30;">${p.icon}</div>
+      <div class="p-body">
+        <div class="p-name" style="color:${p.color}">${p.full}</div>
+        <div class="p-sub">${p.desc}</div>
+        <div class="p-prog"><div class="p-prog-fill" style="width:${pct}%;background:${p.color}"></div></div>
+      </div>
+      <div class="p-right">
+        <div class="p-lv" style="background:${p.color}18;color:${p.color};border:1px solid ${p.color}30">Lv.${ps.level}</div>
+        <div class="p-xp-txt">${cur}/${P_EXP_LV}</div>
+      </div>
+      <div class="p-chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
+    </div>`;
+  });
+}
+
+// ── BOSS ─────────────────────────────────────
+function renderBoss(){
+  renderTopBar();
+  const dead=S.bossHP<=0; const pct=Math.max(0,(S.bossHP/S.bossMaxHP)*100);
+  document.getElementById('b-hp-bar').style.width=pct+'%';
+  document.getElementById('b-hp').textContent=Math.max(0,S.bossHP);
+  document.getElementById('b-hpmax').textContent=S.bossMaxHP;
+  document.getElementById('b-dmg').textContent=S.bossDmg;
+  document.getElementById('b-wk').textContent=S.weekNum;
+  document.getElementById('b-dead').style.display=dead?'block':'none';
+
+  const now=new Date(); const toMon=(8-now.getDay())%7||7;
+  const nxt=new Date(now); nxt.setDate(now.getDate()+toMon); nxt.setHours(0,0,0,0);
+  const diff=nxt-now;
+  const hh=String(Math.floor(diff/3600000)).padStart(2,'0');
+  const mm=String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+  document.getElementById('b-timer').textContent=`⏰ รีเซ็ตใน ${toMon} วัน ${hh}:${mm} น.`;
+
+  const wrap=document.getElementById('b-atks'); wrap.innerHTML='';
+  BOSS_ATKS.forEach((a,i)=>{
+    const ok=!dead&&S.stats[a.costStat]>=a.costAmt;
+    wrap.innerHTML+=`
+    <div class="atk-row" onclick="attackBoss(${i})" ${!ok?'disabled':''}>
+      <div class="atk-ico">${a.ico}</div>
+      <div class="atk-body">
+        <div class="atk-name">${a.label}</div>
+        <div class="atk-cost">${a.desc}</div>
+      </div>
+      <div class="atk-dmg">−${a.dmg} HP</div>
+    </div>`;
+  });
+}
+
+// ── VAULT ────────────────────────────────────
+function renderVault(){
+  renderTopBar();
+  document.getElementById('v-gold').textContent=S.gold;
+  const el=document.getElementById('v-list'); el.innerHTML='';
+  VAULT.forEach((r,i)=>{
+    el.innerHTML+=`
+    <div class="vault-row">
+      <div class="vault-ico">${r.ico}</div>
+      <div class="vault-body">
+        <div class="vault-name">${r.name}</div>
+        <div class="vault-desc">${r.desc}</div>
+        <div class="vault-cost">🪙 ${r.cost} Gold</div>
+      </div>
+      <button class="vault-btn" onclick="redeem(${i})" ${S.gold<r.cost?'disabled':''}>แลก</button>
+    </div>`;
+  });
+}
+
+// ── STATS ────────────────────────────────────
+function renderStats(){
+  // Holographic Radar SVG
+  const svg=document.getElementById('radar-svg');
+  const cx=140,cy=140,R=100,n=6;
+  const lbs=['Mind','Body','Wealth','Fuel','Str','End'];
+  const clrs=['#8b5cf6','#f97316','#f59e0b','#10b981','#ec4899','#06b6d4'];
+  const keys=['mind','body','wealth','fuel','strength','endurance'];
+  const vals=keys.map(k=>Math.min(1,(S.stats[k]||0)/50));
+  let h='';
+
+  // Outer rotating dashed ring
+  h+=`<circle cx="${cx}" cy="${cy}" r="${R+14}" fill="none" stroke="rgba(139,92,246,0.2)" stroke-width="1" stroke-dasharray="6 4">
+    <animateTransform attributeName="transform" type="rotate" from="0 ${cx} ${cy}" to="360 ${cx} ${cy}" dur="20s" repeatCount="indefinite"/>
+  </circle>`;
+  h+=`<circle cx="${cx}" cy="${cy}" r="${R+20}" fill="none" stroke="rgba(6,182,212,0.1)" stroke-width="1" stroke-dasharray="3 8">
+    <animateTransform attributeName="transform" type="rotate" from="360 ${cx} ${cy}" to="0 ${cx} ${cy}" dur="30s" repeatCount="indefinite"/>
+  </circle>`;
+
+  // Grid rings
+  [.25,.5,.75,1].forEach((r,ri)=>{
+    let pts='';
+    for(let i=0;i<n;i++){const a=(i/n)*Math.PI*2-Math.PI/2; pts+=`${cx+Math.cos(a)*R*r},${cy+Math.sin(a)*R*r} `;}
+    const op=[.06,.1,.14,.18][ri];
+    h+=`<polygon points="${pts.trim()}" fill="none" stroke="rgba(255,255,255,${op})" stroke-width="1"/>`;
+  });
+
+  // Axes
+  for(let i=0;i<n;i++){
+    const a=(i/n)*Math.PI*2-Math.PI/2;
+    h+=`<line x1="${cx}" y1="${cy}" x2="${cx+Math.cos(a)*R}" y2="${cy+Math.sin(a)*R}" stroke="rgba(255,255,255,.07)" stroke-width="1"/>`;
+  }
+
+  // Data polygon with glow
+  let dpts='';
+  for(let i=0;i<n;i++){const a=(i/n)*Math.PI*2-Math.PI/2; const r=vals[i]*R; dpts+=`${cx+Math.cos(a)*r},${cy+Math.sin(a)*r} `;}
+  h+=`<defs><filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
+  h+=`<polygon points="${dpts.trim()}" fill="rgba(139,92,246,.15)" stroke="rgba(139,92,246,.8)" stroke-width="2" filter="url(#glow)"/>`;
+
+  // Dots + labels
+  for(let i=0;i<n;i++){
+    const a=(i/n)*Math.PI*2-Math.PI/2; const r=vals[i]*R;
+    h+=`<circle cx="${cx+Math.cos(a)*r}" cy="${cy+Math.sin(a)*r}" r="5" fill="${clrs[i]}" stroke="#030712" stroke-width="2" filter="url(#glow)"/>`;
+    const lx=cx+Math.cos(a)*(R+20); const ly=cy+Math.sin(a)*(R+20);
+    h+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" fill="${clrs[i]}" font-size="10" font-weight="700" font-family="Outfit,sans-serif">${lbs[i]}</text>`;
+  }
+  svg.innerHTML=h;
+
+  // Stat bars
+  const el=document.getElementById('s-bars'); el.innerHTML='';
+  STATS_DEF.forEach(st=>{
+    const v=S.stats[st.id]||0; const pct=Math.min(100,(v/50)*100);
+    el.innerHTML+=`
+    <div class="stat-row">
+      <div class="sr-ico">${st.icon}</div>
+      <div class="sr-lbl" style="color:${st.color}">${st.label}</div>
+      <div class="sr-bar">
+        <div class="sr-fill" style="width:${pct}%;background:linear-gradient(90deg,${st.color}99,${st.color});box-shadow:0 0 8px ${st.color}50"></div>
+      </div>
+      <div class="sr-val" style="color:${st.color}">${v}</div>
+    </div>`;
+  });
+}
+
+// ── SHEET ────────────────────────────────────
+let activePillar=null;
+let medInterval=null;
+let medSeconds=0;
+let medTask=null;
+
+function startMeditation(label, exp, gold) {
+  document.getElementById('scrim').classList.remove('open');
+  document.getElementById('sheet').classList.remove('open');
+  activePillar = null;
+  
+  const ui = document.getElementById('med-overlay');
+  ui.style.display = 'flex';
+  setTimeout(()=>ui.classList.add('open'), 10);
+  
+  let m = 5;
+  const match = label.match(/\d+/);
+  if(match && !label.includes('4-7-8')) {
+    m = parseInt(match[0]);
+  } else if (label.includes('4-7-8')) {
+    m = 3;
+  }
+  
+  medSeconds = m * 60;
+  medTask = {exp, gold, label};
+  
+  document.getElementById('med-label').textContent = label;
+  updateMedTimer();
+  
+  clearInterval(medInterval);
+  medInterval = setInterval(()=>{
+    medSeconds--;
+    updateMedTimer();
+    
+    // Toggle breathing text every 4 seconds
+    const msg = document.getElementById('med-msg');
+    if(medSeconds % 8 === 4) msg.textContent = 'หายใจออก...';
+    if(medSeconds % 8 === 0) msg.textContent = 'หายใจเข้า...';
+    
+    if(medSeconds <= 0) stopMeditation(true);
+  }, 1000);
+}
+
+function updateMedTimer() {
+  const m = String(Math.floor(medSeconds/60)).padStart(2,'0');
+  const s = String(medSeconds%60).padStart(2,'0');
+  document.getElementById('med-timer').textContent = `${m}:${s}`;
+}
+
+function stopMeditation(completed) {
+  clearInterval(medInterval);
+  
+  const ui = document.getElementById('med-overlay');
+  ui.classList.remove('open');
+  setTimeout(()=>ui.style.display = 'none', 1000);
+  
+  if(completed && medTask) {
+    logTask('meditation', medTask.exp, medTask.gold, medTask.label);
+  } else if(!completed) {
+    notif('ยกเลิกการทำสมาธิแล้ว', 'warn');
+  }
+}
+
+function openSheet(id){
+  activePillar=id; const p=PILLARS.find(x=>x.id===id);
+  document.getElementById('sh-icon').textContent=p.icon;
+  document.getElementById('sh-title').textContent=p.full;
+  document.getElementById('sh-inp').value='';
+  const tl=document.getElementById('sh-tasks'); tl.innerHTML='';
+  p.tasks.forEach(t=>{
+    let act = `logTask('${id}',${t.exp},${t.gold},\`${t.label.replace(/`/g,"'")}\`)`;
+    if(id === 'meditation') {
+      act = `startMeditation(\`${t.label}\`, ${t.exp}, ${t.gold})`;
+    }
+    tl.innerHTML+=`
+    <button class="sheet-task" onclick="${act}">
+      <span>${t.label}</span>
+      <div class="task-rwd"><span class="xp-t">+${t.exp} XP</span><span class="gd-t">🪙${t.gold}</span></div>
+    </button>`;
+  });
+  document.getElementById('scrim').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+}
+function closeSheet(){
+  document.getElementById('scrim').classList.remove('open');
+  document.getElementById('sheet').classList.remove('open');
+  activePillar=null;
+}
+
+// ── GAME LOGIC ───────────────────────────────
+function gainExp(amt){
+  S.exp+=amt;
+  while(S.exp>=EXP_LV(S.level)){S.exp-=EXP_LV(S.level);S.level++;notif(`🏆 LEVEL UP! → Lv. ${S.level}`,'lvup');}
+}
+function gainPillarExp(id,amt){
+  const ps=S.pillars[id]; ps.totalExp+=amt; ps.exp+=amt;
+  while(ps.exp>=ps.level*P_EXP_LV){
+    ps.exp-=ps.level*P_EXP_LV; ps.level++;
+    const p=PILLARS.find(x=>x.id===id);
+    notif(`${p.icon} ${p.name} ขึ้น Lv. ${ps.level}`);
+  }
+}
+function logTask(pillarId,exp,gold,label){
+  const p=PILLARS.find(x=>x.id===pillarId);
+  gainExp(exp); gainPillarExp(pillarId,exp);
+  S.gold+=gold;
+  S.stats[p.stat]=Math.min(100,(S.stats[p.stat]||0)+Math.ceil(exp/18));
+  if(pillarId==='weight'||pillarId==='running')
+    S.stats.body=Math.min(100,(S.stats.body||0)+Math.ceil(exp/25));
+  const dmg=Math.max(1,Math.floor(exp/6));
+  hitBoss(dmg,`${p.icon} "${label}"`);
+  S.weekDays[new Date().getDay()]=true;
+  S.log.unshift({ts:Date.now(),label,exp,gold,pillar:pillarId});
+  if(S.log.length>100)S.log.pop();
+  save(); closeSheet();
+  notif(`+${exp} XP · 🪙 +${gold}`);
+  renderTopBar(); renderPage(currentTab);
+}
+function logCustom(){
+  const v=document.getElementById('sh-inp').value.trim();
+  if(!v||!activePillar)return;
+  logTask(activePillar,15,3,v);
+}
+function hitBoss(dmg,src){
+  if(S.bossHP<=0)return;
+  S.bossHP=Math.max(0,S.bossHP-dmg); S.bossDmg+=dmg;
+  bossLog(`${src} −${dmg} HP`,'act');
+  if(S.bossHP<=0){bossLog('💀 Shadow Sloth ถูกสังหาร! +100 Gold','kill');S.gold+=100;notif('⚔️ Boss Defeated! +100 Gold','lvup');}
+  if(currentTab==='boss'){renderBoss(); shakeBoss();}
+}
+function shakeBoss(){
+  const el=document.getElementById('boss-card');
+  el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+}
+function attackBoss(i){
+  const a=BOSS_ATKS[i];
+  if(S.bossHP<=0)return;
+  if(S.stats[a.costStat]<a.costAmt){notif(`${a.costStat} ไม่พอ`,'warn');return;}
+  S.stats[a.costStat]-=a.costAmt;
+  gainExp(a.dmg*2); S.gold+=5;
+  hitBoss(a.dmg,`${a.ico} ${a.label}`);
+  save(); renderPage('boss'); renderTopBar();
+}
+function redeem(i){
+  const r=VAULT[i];
+  if(S.gold<r.cost){notif('Gold ไม่พอ!','warn');return;}
+  S.gold-=r.cost; save(); renderVault();
+  notif(`${r.ico} แลก "${r.name}" สำเร็จ!`);
+}
+function bossLog(msg,cls=''){
+  const el=document.getElementById('b-log');
+  const ph=el.querySelector('[style*="ink4"]'); if(ph)ph.remove();
+  const t=new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  const d=document.createElement('div'); d.className='blog-row '+cls;
+  d.textContent=`${t}  ${msg}`; el.prepend(d);
+}
+function notif(msg,type=''){
+  const f=document.getElementById('notif-feed');
+  const el=document.createElement('div');
+  el.className=`notif${type?' '+type:''}`;
+  el.textContent=msg; f.appendChild(el);
+  setTimeout(()=>el.remove(),3200);
+}
+
+// ── WEEKLY RESET ─────────────────────────────
+function checkReset(){
+  const now=new Date(); const last=S.lastLogin?new Date(S.lastLogin):null;
+  if(last){
+    const diff=(now-last)/86400000;
+    const crossMon=now.getDay()===1&&last.getDay()!==1&&diff>=1;
+    if(diff>=7||crossMon){
+      S.weekNum++; S.bossMaxHP=Math.floor(500*Math.pow(1.12,S.weekNum-1));
+      S.bossHP=S.bossMaxHP; S.bossDmg=0;
+      S.weekDays=[false,false,false,false,false,false,false];
+      notif(`📅 สัปดาห์ที่ ${S.weekNum} เริ่มแล้ว — สู้!`);
+    }
+  }
+  S.lastLogin=new Date().toISOString(); save();
+}
+
+setInterval(()=>{if(currentTab==='boss')renderBoss();},60000);
+
+checkReset(); renderTopBar(); renderHome();
+console.log('%c⚔️ SOVEREIGN LIFE v5.0 — PRODUCTION BUILD','color:#8b5cf6;font-weight:900;font-size:14px');
+</script>
+</body>
+</html>

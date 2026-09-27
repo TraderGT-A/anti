@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THUS · 03-06 Gearing &amp; Position Sizing</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&family=Sarabun:wght@400;600;700&display=swap">
+<style>html,body{margin:0;padding:0}
+body{background:#1C0A30;font-family:'Sarabun',Tahoma,sans-serif}
+.bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 24px;background:#2A1340;color:#F4A57F;font:600 20px 'Kanit',Tahoma,sans-serif}
+.bar button{font:600 18px 'Sarabun',Tahoma,sans-serif;background:#F4A57F;color:#2A1340;border:0;border-radius:8px;padding:8px 16px;cursor:pointer}
+.deck{padding:24px 0}
+:root{--z:1}
+.holder{width:calc(1920px * var(--z));height:calc(1080px * var(--z));margin:0 auto 24px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.slide{width:1920px;height:1080px;overflow:hidden;transform:scale(var(--z));transform-origin:0 0}
+section{width:1920px;height:1080px;position:relative;overflow:hidden;box-sizing:border-box}
+section *{margin:0;box-sizing:border-box}
+section div:not([style*="display"]){display:flex;flex-direction:column}
+section ul,section ol{padding-left:1.3em}
+section table{border-collapse:collapse}
+section th,section td{padding:.35em .6em;border-bottom:1px solid #E6DDEB;vertical-align:top}
+section iframe{border:0;background:transparent}
+@page{size:1920px 1080px;margin:0}
+@media print{
+  :root{--z:1 !important}
+  body{background:none}
+  .bar{display:none}
+  .deck{padding:0}
+  .holder{width:1920px;height:1080px;margin:0;box-shadow:none;break-after:page;page-break-after:always}
+  .slide{transform:none}
+}</style></head>
+<body><div class="bar"><span>THUS · House of Traders · 03-06 Gearing &amp; Position Sizing</span><button onclick="window.print()">บันทึกเป็น PDF</button></div>
+<div class="deck">
+<div class="holder"><div class="slide"><section id="cover" style="background:radial-gradient(circle at 90% 95%, #C8641F 0%, #5A1F4A 24%, #1C0A30 58%); color:#FAF7FB; font-family:'Sarabun', Tahoma, sans-serif; padding:128px; display:flex; flex-direction:column; justify-content:space-between">
+<div style="position:absolute; left:0; top:0; width:640px; height:320px; opacity:0.55; background:repeating-linear-gradient(120deg, #7B3FC4 0px, #7B3FC4 3px, transparent 3px, transparent 18px)"></div>
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:32px; font-weight:600; color:#FAF7FB; letter-spacing:4px; text-align:right">THUS</p>
+<div style="display:flex; flex-direction:column; gap:28px">
+<p style="font-size:28px; font-weight:600; color:#F4A57F; letter-spacing:2px">BASIC CLASS · บทที่ 03–06</p>
+<h1 style="font-family:'Kanit', Tahoma, sans-serif; font-size:120px; font-weight:600; line-height:1.1; color:#F4A57F">GEARING &amp;<br>POSITION SIZING</h1>
+<div style="width:900px; height:3px; background:#8E6BB0"></div>
+<p style="font-size:34px; line-height:1.4; color:#D9CCE6; width:1400px">เทรด Futures ก็เหมือนขับรถ: รู้ว่าเมื่อไรควรเร่ง ชะลอ เบรก หรือหยุด</p>
+</div>
+<p style="font-size:26px; color:#B8A6CC">House of Traders · ชีทประกอบคลิป Gearing and Position Sizing Part 1–4</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="gear" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:36px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Gearing · บทที่ 03</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">เกียร์ = มูลค่าสัญญารวม ÷ เงินในพอร์ต</h2>
+<div style="display:flex; gap:40px; align-items:start">
+<div style="flex:1; display:flex; flex-direction:column; gap:24px">
+<div style="background:#2A1340; border-radius:20px; padding:32px 36px; display:flex; flex-direction:column; gap:10px">
+<p style="font-size:24px; color:#F4A57F; font-weight:600">ตัวอย่าง S50 ราคา 1,000</p>
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:40px; font-weight:500; line-height:1.3; color:#FAF7FB">1,000 × 200 = 200,000 บาท ต่อ 1 สัญญา</p>
+</div>
+<div style="display:flex; flex-direction:column; gap:12px">
+<p style="font-size:24px; color:#75688A">พอร์ต 200,000 เปิด 4 สัญญา = มูลค่า 800,000</p>
+<div style="display:flex; gap:8px; align-items:center">
+<div style="width:120px; height:48px; background:#6A2C9E; border-radius:8px"></div>
+<div style="width:120px; height:48px; background:#E4D6F1; border-radius:8px"></div>
+<div style="width:120px; height:48px; background:#E4D6F1; border-radius:8px"></div>
+<div style="width:120px; height:48px; background:#E4D6F1; border-radius:8px"></div>
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:40px; font-weight:600; color:#6A2C9E">= เกียร์ 4</p>
+</div>
+<p style="font-size:24px; color:#75688A">แท่งเข้ม = เงินในพอร์ต · แท่งอ่อน = ส่วนที่ยืมจาก Leverage</p>
+</div>
+</div>
+<table style="flex:1; font-size:28px; color:#4B3D5E; background:#FFFDFE">
+<tr style="background:#EFE6F5"><th style="width:38%; text-align:left">เงินในพอร์ต</th><th style="width:30%; text-align:left">สัญญา</th><th style="width:32%; text-align:left">เกียร์</th></tr>
+<tr><td>200,000</td><td>1</td><td>1 เท่า</td></tr>
+<tr><td>100,000</td><td>1</td><td>2 เท่า</td></tr>
+<tr><td>200,000</td><td>4</td><td>4 เท่า</td></tr>
+<tr><td>200,000</td><td>10</td><td>10 เท่า</td></tr>
+</table>
+</div>
+<p style="font-size:28px; line-height:1.4; color:#2A1340; background:#F3ECF8; border-radius:16px; padding:20px 28px">คิด <b>ต่อพอร์ต</b> ไม่ใช่ต่อไม้: ถือ S50 5 เท่า + ทอง 5 เท่า = พอร์ตรวม <b>10 เท่า</b></p>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="pct" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Gearing · บทที่ 03</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">ตลาดสวนทาง 1% → พอร์ตลบ 1% × เกียร์</h2>
+<div style="display:flex; flex-direction:column; gap:16px">
+<div style="display:flex; gap:24px; align-items:center"><p style="width:180px; font-size:30px; font-weight:600; color:#2A1340">เกียร์ 1</p><div style="width:110px; height:44px; background:#9FC7CF; border-radius:8px"></div><p style="font-size:30px; font-weight:600">−1%</p></div>
+<div style="display:flex; gap:24px; align-items:center"><p style="width:180px; font-size:30px; font-weight:600; color:#2A1340">เกียร์ 2</p><div style="width:220px; height:44px; background:#4E9FAE; border-radius:8px"></div><p style="font-size:30px; font-weight:600">−2%</p></div>
+<div style="display:flex; gap:24px; align-items:center"><p style="width:180px; font-size:30px; font-weight:600; color:#2A1340">เกียร์ 3</p><div style="width:330px; height:44px; background:#17778A; border-radius:8px"></div><p style="font-size:30px; font-weight:600">−3%</p></div>
+<div style="display:flex; gap:24px; align-items:center"><p style="width:180px; font-size:30px; font-weight:600; color:#2A1340">เกียร์ 5</p><div style="width:550px; height:44px; background:#D9892E; border-radius:8px"></div><p style="font-size:30px; font-weight:600">−5%</p></div>
+<div style="display:flex; gap:24px; align-items:center"><p style="width:180px; font-size:30px; font-weight:600; color:#2A1340">เกียร์ 7</p><div style="width:770px; height:44px; background:#B3261E; border-radius:8px"></div><p style="font-size:30px; font-weight:600">−7%</p></div>
+</div>
+<div style="display:flex; gap:28px">
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:24px 30px">
+<p style="font-size:26px; line-height:1.5"><b>พอร์ต 10 ล้าน เกียร์ 7</b> (~333 สัญญา S50)<br>1 จุด = 66,600 บาท · สวน 10 จุด = −666,000 (~7%)</p>
+</div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:24px 30px">
+<p style="font-size:26px; line-height:1.5"><b>Bitcoin</b> เหวี่ยงวันละ 5–6% ได้บ่อย<br>ใช้เกียร์ 5 → พอร์ตบวก/ลบได้ถึง <b>30%</b> ในวันเดียว</p>
+</div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · ใช้ได้กับทุกสินค้า Futures</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="table" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Position Sizing · บทที่ 05</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">เปิดได้กี่สัญญา (S50 ราคา 863)</h2>
+<table style="font-size:28px; color:#4B3D5E; background:#FFFDFE">
+<tr style="background:#EFE6F5"><th style="width:16%; text-align:left">เกียร์</th><th style="width:27%; text-align:left">วางเงิน/สัญญา</th><th style="width:19%; text-align:left">300,000</th><th style="width:19%; text-align:left">1 ล้าน</th><th style="width:19%; text-align:left">4 ล้าน</th></tr>
+<tr><td>1</td><td>172,600</td><td>1</td><td>5</td><td>23</td></tr>
+<tr><td>2</td><td>86,300</td><td>3</td><td>11</td><td>46</td></tr>
+<tr><td>3</td><td>≈ 57,500</td><td>5</td><td>17</td><td>69</td></tr>
+<tr style="background:#F6E4EE"><td>4 · ปีแรกสูงสุด</td><td>≈ 43,150</td><td>6</td><td>23</td><td>92</td></tr>
+<tr><td>5</td><td>≈ 34,500</td><td>8</td><td>28</td><td>115</td></tr>
+</table>
+<div style="display:flex; gap:28px">
+<p style="flex:1; font-size:26px; line-height:1.45; color:#2A1340; background:#F3ECF8; border-radius:16px; padding:20px 26px"><b>วางเงินต่อสัญญา</b> = มูลค่าสัญญา ÷ เกียร์</p>
+<p style="flex:1; font-size:26px; line-height:1.45; color:#2A1340; background:#F3ECF8; border-radius:16px; padding:20px 26px">IM จริงแค่ ~6,790 แต่ <b>"วางเงินเต็ม"</b> ตามเกียร์ จะไม่โดน Margin Call</p>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · S50 เหวี่ยงเฉลี่ย 12–15 จุด/สัปดาห์</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="limits" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Gearing · บทที่ 03–06</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">ควรใช้เกียร์เท่าไร</h2>
+<div style="position:relative; width:1664px; height:240px">
+<div style="position:absolute; left:0; top:90px; width:347px; height:64px; background:#17778A; border-radius:12px 0 0 12px"></div>
+<div style="position:absolute; left:347px; top:90px; width:139px; height:64px; background:#D9892E"></div>
+<div style="position:absolute; left:486px; top:90px; width:1178px; height:64px; background:#B3261E; border-radius:0 12px 12px 0"></div>
+<p style="position:absolute; left:20px; top:104px; width:320px; font-size:28px; font-weight:700; color:#FAF7FB">ปลอดภัย</p>
+<p style="position:absolute; left:506px; top:104px; width:600px; font-size:28px; font-weight:700; color:#FAF7FB">Over-leverage</p>
+<div style="position:absolute; left:139px; top:70px; width:4px; height:104px; background:#2A1340"></div>
+<div style="position:absolute; left:312px; top:70px; width:4px; height:104px; background:#2A1340"></div>
+<div style="position:absolute; left:486px; top:70px; width:4px; height:104px; background:#2A1340"></div>
+<div style="position:absolute; left:1660px; top:70px; width:4px; height:104px; background:#2A1340"></div>
+<p style="position:absolute; left:40px; top:10px; width:200px; font-size:26px; font-weight:700; color:#2A1340; text-align:center">2x</p>
+<p style="position:absolute; left:40px; top:184px; width:200px; font-size:24px; color:#4B3D5E; text-align:center">Sideways / ไม่ถนัด</p>
+<p style="position:absolute; left:214px; top:10px; width:200px; font-size:26px; font-weight:700; color:#2A1340; text-align:center">4–5x</p>
+<p style="position:absolute; left:250px; top:184px; width:230px; font-size:24px; color:#4B3D5E; text-align:center">มือใหม่ (ปีแรก ≤ 4)</p>
+<p style="position:absolute; left:388px; top:10px; width:200px; font-size:26px; font-weight:700; color:#2A1340; text-align:center">7x</p>
+<p style="position:absolute; left:488px; top:184px; width:300px; font-size:24px; color:#4B3D5E; text-align:center">เพดานสำหรับคนเก๋า</p>
+<p style="position:absolute; left:1424px; top:10px; width:240px; font-size:26px; font-weight:700; color:#B3261E; text-align:right">~24x</p>
+<p style="position:absolute; left:1284px; top:184px; width:380px; font-size:24px; color:#4B3D5E; text-align:right">ใช้เงินหมด: สวน ~4% พอร์ตแตก</p>
+</div>
+<div style="display:flex; gap:24px">
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-top:8px solid #17778A; border-radius:18px; padding:24px 28px"><p style="font-size:26px; line-height:1.45">เทรดเดอร์เก่งที่อยู่รอด ส่วนใหญ่ใช้ <b>ไม่เกิน 4–5 เท่า</b></p></div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-top:8px solid #D9892E; border-radius:18px; padding:24px 28px"><p style="font-size:26px; line-height:1.45">ตลาดไม่ถนัด (Sideways) ลดเหลือ <b>ไม่เกิน 2 เท่า</b> "ขับรถรอ"</p></div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-top:8px solid #B3261E; border-radius:18px; padding:24px 28px"><p style="font-size:26px; line-height:1.45">อยากอัดเต็ม ใช้ได้แค่ <b>"พอร์ตเชลย"</b> ที่แยกจากกำไร</p></div>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · Leverage สูงสุดที่ตลาดให้คำนวณจาก IM ~6,790 บาท/สัญญา</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="wall" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">Mindset · บทที่ 03–05</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">พอร์ตโต ความเสี่ยงเท่าเดิม แต่ใจต้องโตตาม</h2>
+<div style="display:flex; gap:28px">
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:30px; display:flex; flex-direction:column; gap:14px">
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:34px; font-weight:600; color:#6A2C9E">Compounding</h3>
+<svg aria-label="เส้นกราฟพอร์ตโตแบบทบต้น" width="440" height="180" viewBox="0 0 440 180"><line x1="10" y1="170" x2="430" y2="170" stroke="#E6DDEB" stroke-width="4"/><path d="M10 165 C 150 160, 260 140, 330 100 S 410 30, 430 10" fill="none" stroke="#6A2C9E" stroke-width="9" stroke-linecap="round"/></svg>
+<p style="font-size:26px; line-height:1.45">ความสม่ำเสมอ × เวลา × จำนวนเงิน<br>300,000 → 660,000 ใน 1 ปี (ถ้าเก็บครึ่งหนึ่งของกำไร)</p>
+</div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:30px; display:flex; flex-direction:column; gap:14px">
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:34px; font-weight:600; color:#B8511F">กำแพงทางจิตใจ</h3>
+<div style="display:flex; align-items:end; gap:14px; height:180px">
+<div style="width:70px; height:60px; background:#E4D6F1; border-radius:8px 8px 0 0"></div>
+<div style="width:70px; height:110px; background:#C6A9E0; border-radius:8px 8px 0 0"></div>
+<div style="width:70px; height:160px; background:#8E5BC0; border-radius:8px 8px 0 0"></div>
+<div style="width:16px; height:180px; background:#B8511F; border-radius:6px"></div>
+<div style="width:70px; height:150px; background:#8E5BC0; border-radius:8px 8px 0 0"></div>
+</div>
+<p style="font-size:26px; line-height:1.45">เพื่อนผู้สอน: 10 → 20 ล้านในปีกว่า แล้ว <b>ติดที่ 20 ล้าน 5–6 ปี</b> เพราะรับการลดลงไม่ได้</p>
+</div>
+<div style="flex:1; background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:30px; display:flex; flex-direction:column; gap:14px">
+<h3 style="font-family:'Kanit', Tahoma, sans-serif; font-size:34px; font-weight:600; color:#B3261E">ขาดทุน → ลดสัญญา</h3>
+<div style="display:flex; align-items:center; gap:16px; height:180px">
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:64px; font-weight:600; color:#2A1340">115</p>
+<div style="display:flex; flex:none; width:80px; align-self:center; align-items:center"><svg width="80" height="24" viewBox="0 0 80 24"><line x1="0" y1="12" x2="70" y2="12" stroke="#B3261E" stroke-width="2"/><polygon points="70,7 80,12 70,17" fill="#B3261E"/></svg></div>
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:64px; font-weight:600; color:#B3261E">75</p>
+</div>
+<p style="font-size:26px; line-height:1.45">พอร์ต 4 ล้าน ลบ 33% ต้องลดสัญญาตาม <b>อย่าเล่นเท่าเดิมเพื่อเอาคืน</b></p>
+</div>
+</div>
+<p style="font-size:28px; line-height:1.4; color:#2A1340; background:#F3ECF8; border-radius:16px; padding:18px 28px">เงิน 100,000 กับ 100 ล้าน <b>หมดได้เร็วพอกัน</b> ถ้าใช้เกียร์ 15–20 เท่า</p>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="rules" style="background:#FAF7FB; color:#4B3D5E; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:32px">
+<div style="position:absolute; left:0; bottom:0; width:1920px; height:24px; background:linear-gradient(90deg, #2A0F45, #6A2C9E 70%, #F4A57F)"></div>
+<p style="font-size:24px; font-weight:600; color:#2A1340; background:#F6C4DC; border-radius:8px; padding:6px 18px; align-self:start">กฎประจำตัว · บทที่ 04–06</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#2A1340">4 สัญญาณว่าต้องลดเกียร์</h2>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:28px 32px; display:flex; gap:20px; align-items:start">
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:56px; font-weight:600; line-height:1; color:#6A2C9E">1</p>
+<p style="font-size:28px; line-height:1.45">เสียแล้วต้องทำกำไร <b>เกิน 2–3 รอบ</b> กว่าจะได้พอร์ตคืน</p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:28px 32px; display:flex; gap:20px; align-items:start">
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:56px; font-weight:600; line-height:1; color:#6A2C9E">2</p>
+<p style="font-size:28px; line-height:1.45">ใจแกว่ง กล้า ๆ กลัว ๆ หรือ <b>ประคองพอร์ตไม่ได้</b></p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:28px 32px; display:flex; gap:20px; align-items:start">
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:56px; font-weight:600; line-height:1; color:#6A2C9E">3</p>
+<p style="font-size:28px; line-height:1.45">กำไรหอมหวานจน <b>อยากเร่ง</b> หรือขาดทุนจน <b>อยากเอาคืน</b></p>
+</div>
+<div style="background:#FFFDFE; border:1px solid #E6DDEB; border-radius:20px; padding:28px 32px; display:flex; gap:20px; align-items:start">
+<p style="font-family:'Kanit', Tahoma, sans-serif; font-size:56px; font-weight:600; line-height:1; color:#6A2C9E">4</p>
+<p style="font-size:28px; line-height:1.45">ตลาดอยู่ในช่วงที่ <b>ไม่ใช่ฤดูของเรา</b> (สาย Trend เจอ Sideways)</p>
+</div>
+</div>
+<div style="display:flex; gap:24px">
+<p style="flex:1; font-size:26px; line-height:1.45; color:#2A1340; background:#F6C4DC; border-radius:16px; padding:20px 26px"><b>ชีวิตต้องมีการเว้นวรรค</b> ทั้งช่วงกำไรและช่วงขาดทุนหนัก</p>
+<p style="flex:1; font-size:26px; line-height:1.45; color:#2A1340; background:#F3ECF8; border-radius:16px; padding:20px 26px">ระวัง <b>Noise</b>: รายได้โต ค่าใช้จ่ายก็โต ถึงจุดพอใจแล้ว ถอนส่วนเกินไปลงที่เสี่ยงน้อยกว่า</p>
+</div>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#75688A">THUS · House of Traders · กว่าจะหาเงินจากตลาดได้ เฉลี่ย 3–4 ปี การเรียนเป็นแค่ 5–10%</p>
+
+</section>
+</div></div>
+<div class="holder"><div class="slide"><section id="recap" style="background:radial-gradient(circle at 92% 96%, #A34E1C 0%, #4A1A45 22%, #1C0A30 55%); color:#FAF7FB; font-family:'Sarabun', Tahoma, sans-serif; padding:112px 128px 160px; display:flex; flex-direction:column; gap:36px">
+<p style="font-size:24px; font-weight:600; color:#F4A57F; letter-spacing:1px">เช็กความเข้าใจ</p>
+<h2 style="font-family:'Kanit', Tahoma, sans-serif; font-size:60px; font-weight:600; line-height:1.15; color:#F4A57F">ลองคำนวณด้วยตัวเอง</h2>
+<ol style="font-size:32px; line-height:1.6; color:#E9E0F2">
+<li>พอร์ต 500,000 เปิด S50 (ราคา 1,000) 5 สัญญา ใช้เกียร์เท่าไร</li>
+<li>ใช้เกียร์ 4 แล้ว S50 สวนทาง 2% พอร์ตลบกี่เปอร์เซ็นต์</li>
+<li>ปีแรกของการเทรด ผู้สอนแนะนำเกียร์สูงสุดเท่าไร</li>
+<li>พอร์ตลดลง 33% ควรทำอย่างไรกับจำนวนสัญญา</li>
+<li>ถือ S50 เกียร์ 3 และทองเกียร์ 3 พร้อมกัน พอร์ตรวมเกียร์เท่าไร</li>
+</ol>
+<p style="position:absolute; left:128px; bottom:56px; width:1664px; font-size:24px; color:#B8A6CC">เฉลย: 2 เท่า · −8% · ไม่เกิน 4 · ลดลงตามพอร์ต ไม่เล่นเท่าเดิม · 6 เท่า</p>
+
+</section>
+</div></div>
+</div>
+<script>function fit(){var z=Math.min(1,(document.documentElement.clientWidth-32)/1920);document.documentElement.style.setProperty('--z',z)}
+window.addEventListener('beforeprint',function(){document.documentElement.style.setProperty('--z',1)});
+window.addEventListener('afterprint',fit);
+window.addEventListener('resize',fit);fit();</script>
+</body></html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sovereign Meditation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #030712;
+      --text: #f8fafc;
+      --accent: #8b5cf6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    /* Animated Gradient Background */
+    .bg-gradient {
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #030712 50%);
+      animation: rotateBg 40s linear infinite;
+      z-index: 1;
+    }
+    @keyframes rotateBg {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Main Container */
+    .container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      padding: 2rem;
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+    }
+    
+    /* Views */
+    .view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateY(20px) scale(0.98);
+      padding: 2rem;
+    }
+    .view.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Home View */
+    .greeting {
+      font-size: 2.2rem;
+      font-weight: 200;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+      color: rgba(255,255,255,0.95);
+      text-align: center;
+    }
+    .subtitle {
+      font-size: 1rem;
+      font-weight: 200;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 4rem;
+      letter-spacing: 0.05em;
+      text-align: center;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 340px;
+    }
+    .opt-btn {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 1.4rem 1.5rem;
+      border-radius: 20px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 1.1rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(10px);
+    }
+    .opt-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-4px);
+      border-color: rgba(139, 92, 246, 0.4);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .opt-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+    .opt-btn span:last-child {
+      color: rgba(255,255,255,0.4);
+      font-size: 0.9rem;
+      font-weight: 200;
+    }
+
+    /* Meditation View */
+    .med-circle-wrap {
+      position: relative; width: 320px; height: 320px; 
+      display: flex; align-items: center; justify-content: center; 
+      margin-bottom: 5rem;
+    }
+    .med-blob {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, rgba(139,92,246,0.15), transparent 70%);
+      border: 1px solid rgba(255,255,255,0.03);
+      animation: breatheBlob 8s ease-in-out infinite;
+    }
+    .med-blob:nth-child(2) { animation-delay: -2.6s; background: radial-gradient(circle at 50% 50%, rgba(236,72,153,0.1), transparent 70%); }
+    .med-blob:nth-child(3) { animation-delay: -5.3s; background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.1), transparent 70%); }
+    
+    @keyframes breatheBlob {
+      0%, 100% { transform: scale(0.85); opacity: 0.3; }
+      50% { transform: scale(1.4); opacity: 1; }
+    }
+    
+    .med-timer {
+      position: relative; z-index: 2;
+      font-size: 6rem; font-weight: 100; letter-spacing: -0.04em;
+      color: #fff; font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 50px rgba(0,0,0,0.8);
+    }
+    
+    .med-msg {
+      font-size: 1.2rem; color: rgba(255,255,255,0.8); font-weight: 300; letter-spacing: 0.1em;
+      text-align: center;
+      animation: breatheText 8s ease-in-out infinite;
+      transition: opacity 0.5s;
+    }
+    @keyframes breatheText {
+      0%, 100% { opacity: 0.3; transform: translateY(4px); }
+      50% { opacity: 1; transform: translateY(-4px); }
+    }
+    
+    .btn-close {
+      position: absolute; top: 40px; right: 30px;
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 50%; color: rgba(255,255,255,0.6);
+      font-size: 1.2rem; cursor: pointer; transition: all 0.3s;
+      z-index: 100; display: flex; align-items: center; justify-content: center;
+    }
+    .btn-close:hover { 
+      color: #fff; background: rgba(255,255,255,0.15); 
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  
+  <div class="container">
+    <!-- HOME VIEW: SESSION SELECTOR -->
+    <div id="view-home" class="view active">
+      <h1 class="greeting">Find your center.</h1>
+      <p class="subtitle">เลือกเวลาที่คุณต้องการสงบจิตใจ</p>
+      
+      <div class="options">
+        <button class="opt-btn" onclick="startSession(5)">
+          <span>Quick Reset</span> <span>5 min</span>
+        </button>
+        <button class="opt-btn" onclick="startSession(10)">
+          <span>Deep Focus</span> <span>10 min</span>
+        </button>
+        <button class="opt-btn" onclick="startSession(15)">
+          <span>Body Scan</span> <span>15 min</span>
+        </button>
+        <button class="opt-btn" onclick="startSession(30)">
+          <span>Profound Calm</span> <span>30 min</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- MEDITATION VIEW -->
+    <div id="view-med" class="view">
+      <button class="btn-close" onclick="stopSession()">✕</button>
+      
+      <div class="med-circle-wrap">
+        <div class="med-blob"></div>
+        <div class="med-blob"></div>
+        <div class="med-blob"></div>
+        <div id="timer" class="med-timer">05:00</div>
+      </div>
+      
+      <div id="msg" class="med-msg">หายใจเข้า...</div>
+    </div>
+  </div>
+
+  <script>
+    let interval;
+    let timeRemaining = 0;
+    
+    function startSession(minutes) {
+      document.getElementById('view-home').classList.remove('active');
+      document.getElementById('view-med').classList.add('active');
+      
+      timeRemaining = minutes * 60;
+      updateTimerDisplay();
+      
+      // Sync text with initial animation state
+      document.getElementById('msg').textContent = 'หายใจเข้า...';
+      
+      clearInterval(interval);
+      interval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        
+        // 8 second breathing cycle (4s in, 4s out)
+        const msg = document.getElementById('msg');
+        if (timeRemaining % 8 === 4) msg.textContent = 'หายใจออก...';
+        if (timeRemaining % 8 === 0) msg.textContent = 'หายใจเข้า...';
+        
+        if (timeRemaining <= 0) {
+          stopSession();
+        }
+      }, 1000);
+    }
+    
+    function stopSession() {
+      clearInterval(interval);
+      document.getElementById('view-med').classList.remove('active');
+      document.getElementById('view-home').classList.add('active');
+    }
+    
+    function updateTimerDisplay() {
+      const m = String(Math.floor(timeRemaining / 60)).padStart(2, '0');
+      const s = String(timeRemaining % 60).padStart(2, '0');
+      document.getElementById('timer').textContent = `${m}:${s}`;
+    }
+  </script>
+</body>
+</html>
