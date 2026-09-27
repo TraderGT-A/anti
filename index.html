@@ -308,32 +308,161 @@
     </div>
   </div>
 
-  <!-- AUDIO ELEMENTS (Using reliable direct links) -->
-  <audio id="audio-rain" loop src="https://cdn.pixabay.com/download/audio/2021/08/09/audio_d07eb021e1.mp3"></audio>
-  <audio id="audio-fire" loop src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_a0a5242eb0.mp3"></audio>
-  <audio id="audio-forest" loop src="https://cdn.pixabay.com/download/audio/2021/09/06/audio_40b2a5ebbb.mp3"></audio>
-  
-  <!-- YT IFrame for Music -->
-  <div id="yt-player" style="display:none;"></div>
-
-  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
-    let player;
+    // ─── Web Audio API Sound Engine (ไม่พึ่งไฟล์ภายนอก 100%) ───
+    let audioCtx = null;
+    const nodes = {};
+    const volumes = { rain: 0, fire: 0, forest: 0, music: 40 };
     let isPlaying = false;
     let timeRemaining = 15 * 60;
     let interval;
 
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player('yt-player', {
-        height: '0', width: '0',
-        videoId: 'jfKfPfyJRdk', // Lofi Girl 24/7 stream
-        playerVars: { 'autoplay': 0, 'controls': 0 },
-        events: { 'onReady': () => player.setVolume(40) }
-      });
+    function initAudio() {
+      if (audioCtx) return;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
 
+    // สร้างเสียงฝนจาก White Noise
+    function createRain(vol) {
+      if (nodes.rain) return;
+      const bufferSize = audioCtx.sampleRate * 2;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+      
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.loop = true;
+
+      // กรองให้เป็นเสียงฝน (Pink-ish noise)
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 1200;
+
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.value = vol / 100 * 0.8;
+
+      source.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      source.start();
+      nodes.rain = { source, gainNode };
+    }
+
+    // สร้างเสียงแคมป์ไฟ (Crackling fire)
+    function createFire(vol) {
+      if (nodes.fire) return;
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.value = vol / 100 * 0.5;
+      gainNode.connect(audioCtx.destination);
+      nodes.fire = { gainNode };
+
+      // เสียงไฟ = noise burst ถี่ๆ แบบ random
+      function crackle() {
+        if (!nodes.fire) return;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.value = 80 + Math.random() * 120;
+        g.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08 + Math.random() * 0.1);
+        osc.connect(g);
+        g.connect(gainNode);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+        setTimeout(crackle, 80 + Math.random() * 300);
+      }
+      crackle();
+    }
+
+    // สร้างเสียงป่า (Crickets / Birds tone)
+    function createForest(vol) {
+      if (nodes.forest) return;
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.value = vol / 100 * 0.4;
+      gainNode.connect(audioCtx.destination);
+      nodes.forest = { gainNode };
+
+      // เสียงจักจั่น
+      function cricket() {
+        if (!nodes.forest) return;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = 2800 + Math.random() * 400;
+        g.gain.setValueAtTime(0, audioCtx.currentTime);
+        g.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.05);
+        g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+        osc.connect(g);
+        g.connect(gainNode);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+        setTimeout(cricket, 50 + Math.random() * 200);
+      }
+      cricket();
+    }
+
+    // สร้างเสียงดนตรี Lofi (Chord + Bass)
+    function createMusic(vol) {
+      if (nodes.music) return;
+      const masterGain = audioCtx.createGain();
+      masterGain.gain.value = vol / 100 * 0.3;
+      masterGain.connect(audioCtx.destination);
+      nodes.music = { gainNode: masterGain };
+
+      // Chords แบบ Lofi
+      const chords = [
+        [261.6, 329.6, 392, 523.3],  // C major
+        [293.7, 370.0, 440.0, 587.3], // D minor
+        [349.2, 440.0, 523.3, 698.5], // F major
+        [392.0, 493.9, 587.3, 784.0], // G major
+      ];
+      let chordIdx = 0;
+
+      function playChord() {
+        if (!nodes.music) return;
+        const chord = chords[chordIdx % chords.length];
+        chordIdx++;
+        chord.forEach(freq => {
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.value = freq / 2; // ลงอ็อคทาฟให้เป็น Lofi
+          g.gain.setValueAtTime(0.3, audioCtx.currentTime);
+          g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.8);
+          osc.connect(g);
+          g.connect(masterGain);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 2);
+        });
+        setTimeout(playChord, 2000);
+      }
+      playChord();
+    }
+
+    function setVolNode(track, val) {
+      volumes[track] = val;
+      if (nodes[track]) {
+        nodes[track].gainNode.gain.setTargetAtTime(
+          val / 100 * (track === 'rain' ? 0.8 : track === 'fire' ? 0.5 : track === 'forest' ? 0.4 : 0.3),
+          audioCtx.currentTime, 0.1
+        );
+      }
+    }
+
+    function stopAll() {
+      Object.keys(nodes).forEach(k => {
+        try {
+          if (nodes[k].source) nodes[k].source.stop();
+          if (nodes[k].gainNode) nodes[k].gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.3);
+        } catch(e) {}
+      });
+      Object.keys(nodes).forEach(k => delete nodes[k]);
+    }
+
+    // ─── UI Functions ───
     function setTime(m, btn) {
-      if(isPlaying) return;
+      if (isPlaying) return;
       timeRemaining = m * 60;
       document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
@@ -348,42 +477,42 @@
     }
 
     function updateVol(track) {
-      const val = document.getElementById('vol-' + track).value;
-      if(track === 'music') {
-        if(player && player.setVolume) player.setVolume(val);
-      } else {
-        document.getElementById('audio-' + track).volume = val / 100;
-      }
+      const val = +document.getElementById('vol-' + track).value;
+      volumes[track] = val;
+      if (isPlaying && audioCtx) setVolNode(track, val);
     }
 
     function toggleJourney() {
       const btn = document.getElementById('playBtn');
-      if(!isPlaying) {
+      if (!isPlaying) {
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
         isPlaying = true;
         btn.textContent = '⏸ PAUSE JOURNEY';
         document.body.classList.add('hide-ui');
         document.getElementById('msg').textContent = 'Keep walking. Keep breathing.';
-        
-        if(player && player.playVideo) player.playVideo();
-        const rain = document.getElementById('audio-rain');
-        const fire = document.getElementById('audio-fire');
-        const forest = document.getElementById('audio-forest');
-        
-        rain.volume = document.getElementById('vol-rain').value / 100;
-        fire.volume = document.getElementById('vol-fire').value / 100;
-        forest.volume = document.getElementById('vol-forest').value / 100;
-        
-        rain.play().catch(e=>console.log('Audio error:', e));
-        fire.play().catch(e=>console.log('Audio error:', e));
-        forest.play().catch(e=>console.log('Audio error:', e));
-        
+
+        // เริ่มเสียงตาม slider ที่ตั้งไว้
+        if (volumes.rain > 0) createRain(volumes.rain);
+        if (volumes.fire > 0) createFire(volumes.fire);
+        if (volumes.forest > 0) createForest(volumes.forest);
+        if (volumes.music > 0) createMusic(volumes.music);
+
+        // ถ้า slider Rain เป็น 0 แต่กด play ก็เปิดเสียงฝนนิดนึง default
+        if (volumes.rain === 0 && volumes.fire === 0 && volumes.forest === 0 && volumes.music === 0) {
+          document.getElementById('vol-rain').value = 60;
+          volumes.rain = 60;
+          createRain(60);
+        }
+
         clearInterval(interval);
         interval = setInterval(() => {
           timeRemaining--;
           updateTimerDisplay();
-          if(timeRemaining <= 0) {
-            toggleJourney(); // Auto stop
-            document.getElementById('msg').textContent = 'Journey Complete.';
+          if (timeRemaining <= 0) {
+            toggleJourney();
+            document.getElementById('msg').textContent = 'Journey Complete. 🌙';
           }
         }, 1000);
       } else {
@@ -391,11 +520,8 @@
         btn.textContent = '▶ RESUME JOURNEY';
         document.body.classList.remove('hide-ui');
         clearInterval(interval);
-        
-        if(player && player.pauseVideo) player.pauseVideo();
-        document.getElementById('audio-rain').pause();
-        document.getElementById('audio-fire').pause();
-        document.getElementById('audio-forest').pause();
+        stopAll();
+        if (audioCtx) { audioCtx.close(); audioCtx = null; }
       }
     }
 
@@ -404,11 +530,16 @@
       const s = String(timeRemaining % 60).padStart(2, '0');
       document.getElementById('timer').textContent = `${m}:${s}`;
     }
-    
-    // Init display
+
     updateTimerDisplay();
+    
+    // Set initial slider to non-zero so user can see it's ready
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('vol-rain').value = 60;
+      volumes.rain = 60;
+      document.getElementById('vol-music').value = 50;
+      volumes.music = 50;
+    });
   </script>
 </body>
 </html>
-
-<!-- force update -->
