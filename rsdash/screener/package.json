@@ -1,0 +1,19 @@
+{
+  "name": "rs-screener",
+  "version": "1.0.0",
+  "description": "RS Dashboard Screener — Thai Stock Momentum Strategy",
+  "type": "module",
+  "scripts": {
+    "screen": "node screener.mjs",
+    "screen:html": "node screener.mjs --html",
+    "screen:json": "node screener.mjs --json",
+    "screen:full": "node screener.mjs --html --json",
+    "weekly": "node weekly.mjs",
+    "weekly:full": "node weekly.mjs --html --json",
+    "top10": "node screener.mjs --top=10",
+    "top5": "node screener.mjs --top=5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

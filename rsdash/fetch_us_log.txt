@@ -1,0 +1,10 @@
+S&P500: 503 | have 0
+  60/503 got=60 fails=0
+  120/503 got=118 fails=2
+  180/503 got=178 fails=2
+  240/503 got=238 fails=2
+  300/503 got=298 fails=2
+  360/503 got=358 fails=2
+  420/503 got=418 fails=2
+  480/503 got=478 fails=2
+DONE: symbols=501 got=501 fails=2

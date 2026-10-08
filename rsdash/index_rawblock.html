@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RS Dashboard — หุ้นไทย</title>
+<script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { background-color:#05070b; color:#e9edf2; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  .scard { background:#0d1219; border:1px solid #1e2634; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+  .scard:hover { border-color:#2b3a55; }
+  .pos { color:#30d158; } .neg { color:#ff453a; }
+  .pill { font-size:10px; padding:1px 7px; border-radius:6px; background:#161d29; color:#8b99a9; border:1px solid #243044; white-space:nowrap; }
+  .tag-market { font-size:9px; padding:1px 6px; border-radius:5px; background:#1c2635; color:#c3ccd9; border:1px solid #2a3950; }
+  .sma-legend { font-size:10px; font-weight:700; }
+  .tf-chip { font-size:10px; padding:1px 7px; border-radius:6px; background:#101724; color:#7a8798; border:1px solid #263346; cursor:pointer; }
+  .tf-chip.active { background:#1d2b46; color:#8ab4ff; border-color:#3b5f96; }
+  .chart { width:100%; height:200px; }
+    @media (min-width:1024px) { .chart { height:220px; } }
+    /* มือถือ 1 คอลัมน์ -> กราฟใหญ่พอ (200px) ไม่บีบ */
+  .tip { position:relative; cursor:pointer; }
+  .tip > .tipbox { display:none; position:absolute; left:0; bottom:calc(100% + 6px); z-index:60; width:230px; max-width:80vw; background:#0d1720; border:1px solid #2b3a55; border-radius:8px; padding:8px 10px; font-size:11px; line-height:1.4; color:#cdd7e2; box-shadow:0 4px 14px rgba(0,0,0,.5); white-space:normal; }
+  .tip:hover > .tipbox, .tip:focus > .tipbox, .tip.tap > .tipbox { display:block; }
+  /* ตอนกดค้างบนมือถือ กล่องไม่ถูกตัดข้าง */
+  .tip { position:relative }
+  #progressBar { transition:width .3s ease; }
+  th.sortable { cursor:pointer; user-select:none; transition:color .15s; }
+  th.sortable:hover { color:#7fb0ff; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Kanit:wght@400;700;900&family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+<style id="rawblock">
+  /* ===================== RawBlock design layer (v1) =====================
+     ดิบ · ขอบดำหนา · ไม่มีมุมโค้ง · ไม่มีเงา · ตัวอักษรและเส้นเป็นตัวจัดวาง
+     แผน+เหตุผล: RAWBLOCK_UI_PLAN.md | ชั้นนี้แตะ "หน้าตา" เท่านั้น ไม่แตะข้อมูล/ลอจิก */
+  :root{
+    --rb-bg:#fff; --rb-fg:#000; --rb-fg2:#333; --rb-fg3:#555;
+    --rb-line:#000; --rb-sunken:#F0F0F0; --rb-hover:#E8E8E8;
+    --rb-inv-bg:#000; --rb-inv-fg:#fff;
+    --rb-blue:#0000FF; --rb-ok:#008000; --rb-warn:#FFA500; --rb-err:#FF0000;
+  }
+  /* โหมดมืด: สลับดำ-ขาวทั้งระบบ (โครงเดิมไม่ขยับ) + เร่งสีข้อมูลให้อ่านบนพื้นดำได้ */
+  html.rb-dark{
+    --rb-bg:#000; --rb-fg:#fff; --rb-fg2:#DADADA; --rb-fg3:#A6A6A6;
+    --rb-line:#fff; --rb-sunken:#141414; --rb-hover:#242424;
+    --rb-inv-bg:#fff; --rb-inv-fg:#000;
+    --rb-blue:#7C9BFF; --rb-ok:#00D65C; --rb-warn:#FFC24D; --rb-err:#FF5147;
+  }
+  html,body{ background:var(--rb-bg) !important; color:var(--rb-fg) !important; font-family:'Work Sans','Noto Sans Thai',system-ui,-apple-system,sans-serif !important; }
+  *{ border-radius:0 !important; box-shadow:none !important; }
+  h1,h2,h3{ font-family:'Archivo Black','Kanit','Work Sans',sans-serif !important; font-weight:700 !important; font-synthesis-weight:none; text-transform:uppercase; letter-spacing:.02em; }
+  ::-webkit-scrollbar{ width:12px; height:12px }
+  ::-webkit-scrollbar-track{ background:var(--rb-bg); border-left:3px solid var(--rb-line) }
+  ::-webkit-scrollbar-thumb{ background:var(--rb-inv-bg); border:2px solid var(--rb-bg) }
+  h1{ font-size:22px !important; line-height:1.05 !important; overflow-wrap:break-word; }
+  h2{ font-size:15px !important; line-height:1.15 !important; }
+  @media (min-width:768px){ h1{ font-size:34px !important } h2{ font-size:17px !important } }
+  @media (max-width:640px){
+    .max-w-7xl > div:first-child{ flex-wrap:wrap }
+    .max-w-7xl > div:first-child > div{ flex-wrap:wrap }
+    h1{ flex:1 1 100%; font-size:20px !important }
+  }
+  .font-extrabold,.font-black{ font-family:'Space Mono','Kanit',ui-monospace,monospace !important; }
+
+  /* 1) ขนาดตัวอักษร: ดันค่าที่เล็กเกินขึ้นหนึ่งขั้น (อ่านง่าย) */
+  [class~="text-[8px]"]{ font-size:11px !important }
+  [class~="text-[9px]"]{ font-size:12px !important }
+  [class~="text-[10px]"]{ font-size:13px !important }
+  [class~="text-[11px]"]{ font-size:13px !important }
+  [class~="text-[12px]"]{ font-size:14px !important }
+  [class~="text-[13px]"]{ font-size:15px !important }
+  [class~="text-[14px]"]{ font-size:15px !important }
+  [class~="text-[15px]"]{ font-size:16px !important }
+
+  /* 2) พื้นผิว: กรมท่าเข้ม -> ขาว / กล่องซ้อน -> เทาอ่อน */
+  [class*="bg-[#05070b]"], [class*="bg-[#0d1219]"]{ background:var(--rb-bg) !important }
+  [class*="bg-[#0a0f16]"], [class*="bg-[#101724]"], [class*="bg-[#161d29]"], [class*="bg-[#0f1520]"], [class*="bg-[#0f1622]"], [class*="bg-[#0d1521]"]{ background:var(--rb-sunken) !important }
+  [class*="bg-[#0f1a12]"]{ background:var(--rb-bg) !important; border-color:var(--rb-ok) !important }
+  [class*="bg-[#1a0f12]"]{ background:var(--rb-bg) !important; border-color:var(--rb-err) !important }
+  [class*="hover:bg-[#101724]"]:hover, [class*="hover:bg-[#111827]"]:hover, [class*="hover:bg-[#161d29]"]:hover{ background:var(--rb-hover) !important }
+  [class*="bg-emerald-500/15"], [class*="bg-emerald-700/20"], [class*="bg-emerald-900/30"]{ background:var(--rb-bg) !important; border-color:var(--rb-ok) !important }
+  [class*="bg-rose-500/15"], [class*="bg-rose-900/30"]{ background:var(--rb-bg) !important; border-color:var(--rb-err) !important }
+  [class*="bg-amber-400/10"], [class*="bg-amber-600/20"]{ background:var(--rb-bg) !important; border-color:var(--rb-warn) !important }
+  [class*="bg-sky-700/20"], [class*="bg-slate-700/20"]{ background:var(--rb-bg) !important; border-color:var(--rb-fg) !important }
+  [class~="bg-emerald-400"], [class~="bg-emerald-500"]{ background:var(--rb-ok) !important }
+  [class~="bg-rose-500"]{ background:var(--rb-err) !important }
+  [class~="bg-amber-400"]{ background:var(--rb-warn) !important }
+  [class~="bg-sky-500"]{ background:var(--rb-blue) !important }
+  [class*="bg-gradient-to-r"]{ background-image:none !important }
+  [class*="from-emerald-600"]{ background-color:var(--rb-ok) !important }
+  [class*="from-rose-600"]{ background-color:var(--rb-err) !important }
+  [class*="from-sky-600"]{ background-color:var(--rb-blue) !important }
+  #progressBar{ background:var(--rb-inv-bg) !important }
+  [style*="background:#0a0f16"]{ background:var(--rb-sunken) !important; border:1px solid var(--rb-line) !important }
+
+  /* 3) เส้นขอบ = ตัวจัดวางหลัก (แทนเงา) */
+  [class~="border"]{ border:3px solid var(--rb-line) !important }
+  [class*="border-[#1e2634]"], [class*="border-[#16202e]"], [class*="border-[#1a2332]"], [class*="border-[#161d29]"]{ border:3px solid var(--rb-line) !important }
+  [class*="border-[#243044]"]{ border:2px solid var(--rb-line) !important }
+  [class*="border-emerald-"]{ border-color:var(--rb-ok) !important }
+  [class*="border-rose-"], [class*="border-red-"]{ border-color:var(--rb-err) !important }
+  [class*="border-amber-"], [class*="border-yellow-"]{ border-color:var(--rb-warn) !important }
+  [class*="border-sky-"]{ border-color:var(--rb-blue) !important }
+  [class*="border-slate-"]{ border-color:var(--rb-fg) !important }
+  [class*="border-b"]{ border-bottom:1px solid var(--rb-line) !important }
+  thead [class*="border-b"], thead[class*="border-b"], th[class*="border-b"]{ border-bottom:3px solid var(--rb-line) !important }
+
+  /* 4) ตัวอักษร */
+  [class~="text-slate-200"], [class~="text-slate-300"]{ color:var(--rb-fg) !important }
+  [class~="text-slate-400"]{ color:var(--rb-fg2) !important }
+  [class~="text-slate-500"], [class~="text-slate-600"]{ color:var(--rb-fg3) !important }
+  [class*="text-white"]{ color:var(--rb-fg) !important }
+  [class*="text-sky-"]{ color:var(--rb-blue) !important }
+  [class*="text-emerald-"]{ color:var(--rb-ok) !important }
+  [class*="text-rose-"], [class*="text-red-"]{ color:var(--rb-err) !important }
+  [class*="text-amber-"], [class*="text-yellow-"]{ color:var(--rb-warn) !important }
+  [class*="text-fuchsia-"]{ color:var(--rb-err) !important }
+  .pos{ color:var(--rb-ok) !important } .neg{ color:var(--rb-err) !important }
+
+  /* 5) องค์ประกอบ */
+  .scard{ background:var(--rb-bg) !important; border:3px solid var(--rb-line) !important }
+  .scard:hover{ border-width:5px !important }
+  .pill{ background:var(--rb-bg) !important; color:var(--rb-fg) !important; border:2px solid var(--rb-line) !important; font-family:'Space Mono','Kanit',monospace !important; font-size:11px !important; padding:2px 8px !important; text-transform:uppercase; letter-spacing:1px }
+  .tag-market{ background:var(--rb-inv-bg) !important; color:var(--rb-inv-fg) !important; border:0 !important; font-family:'Space Mono','Kanit',monospace !important; font-size:11px !important; padding:2px 8px !important; text-transform:uppercase; letter-spacing:1px }
+  .sma-legend{ font-family:'Space Mono','Kanit',monospace !important; font-size:12px !important }
+  .tf-chip{ background:var(--rb-bg) !important; color:var(--rb-fg) !important; border:2px solid var(--rb-line) !important; font-family:'Space Mono','Kanit',monospace !important; font-size:12px !important; font-weight:700 !important; line-height:1.2 !important; padding:6px 12px !important; min-height:32px; text-transform:uppercase; letter-spacing:.5px }
+  .tf-chip:hover{ background:var(--rb-inv-bg) !important; color:var(--rb-inv-fg) !important }
+  .tf-chip.active{ background:var(--rb-inv-bg) !important; color:var(--rb-inv-fg) !important }
+  #progressPanel{ border:3px solid var(--rb-line) !important }
+  .tip>.tipbox{ background:var(--rb-inv-bg) !important; color:var(--rb-inv-fg) !important; border:0 !important; font-family:'Space Mono','Kanit',monospace !important; font-size:13px !important; line-height:1.45 !important; padding:8px 12px !important; max-width:260px !important }
+  .tip>.tipbox *{ color:var(--rb-inv-fg) !important }
+  th{ font-family:'Archivo Black','Kanit',sans-serif !important; font-weight:400 !important; font-size:12px !important; text-transform:uppercase; letter-spacing:1px; color:var(--rb-fg) !important; border-bottom:3px solid var(--rb-line) !important }
+  th.sortable:hover{ color:var(--rb-blue) !important }
+  tbody tr:hover{ background:var(--rb-hover) !important }
+  input[class], select[class], textarea[class]{ background:var(--rb-sunken) !important; color:var(--rb-fg) !important; border:3px solid var(--rb-line) !important; font-family:'Space Mono','Kanit',monospace !important; font-size:13px !important; padding:8px 10px !important; min-height:40px }
+  input[class]:focus, select[class]:focus{ border-width:5px !important; background:var(--rb-bg) !important; outline:none !important }
+  input[type="checkbox"]{ width:20px !important; height:20px !important; min-height:20px !important; accent-color:var(--rb-inv-bg); border:3px solid var(--rb-line) !important }
+  [class~="bg-sky-600"]{ background:var(--rb-inv-bg) !important; border:3px solid var(--rb-line) !important; font-family:'Archivo Black',sans-serif !important; font-size:12px !important; text-transform:uppercase; letter-spacing:2px }
+  [class~="bg-sky-600"]:hover{ background:var(--rb-bg) !important; color:var(--rb-fg) !important }
+  [class~="bg-slate-700"]{ background:var(--rb-bg) !important; color:var(--rb-fg) !important; border:3px solid var(--rb-line) !important; font-family:'Archivo Black',sans-serif !important }
+  [class~="bg-slate-700"]:hover{ background:var(--rb-inv-bg) !important; color:var(--rb-inv-fg) !important }
+  [class~="bg-emerald-600"]{ background:var(--rb-inv-bg) !important; border:3px solid var(--rb-line) !important }
+
+  /* 6) ตัวอักษรขาวเฉพาะพื้นที่กลับสี (ต้องอยู่หลังข้อ 4) */
+  [class~="bg-sky-600"], [class~="bg-emerald-600"], .tf-chip.active, .tag-market, .tip>.tipbox, .tip>.tipbox *{ color:var(--rb-inv-fg) !important }
+  .tf-chip.active:hover{ background:var(--rb-bg) !important; color:var(--rb-fg) !important }
+
+  /* 7) พื้นคุณภาพขั้นต่ำ: focus มองเห็น + เคารพ reduced motion */
+  .tip{ color:var(--rb-fg) !important; cursor:help; padding:0 3px; font-size:13px !important }
+  :focus-visible{ outline:3px solid var(--rb-line) !important; outline-offset:2px }
+  @media (prefers-reduced-motion:reduce){ *{ transition:none !important; animation:none !important } }
+
+  /* 8) เต็มจอ เต็มสัดส่วน: ขอบชิดขึ้น ไม่มีที่ว่างข้าง/ระหว่างบล็อก-การ์ด */
+  body{ padding:8px !important }
+  .max-w-7xl{ max-width:100% !important; margin-left:0 !important; margin-right:0 !important }
+  [class*="mb-2"]{ margin-bottom:4px !important }
+  [class*="mb-3"]{ margin-bottom:6px !important }
+  [class*="mb-4"]{ margin-bottom:6px !important }
+  [class*="my-3"], [class*="my-4"]{ margin-top:6px !important; margin-bottom:6px !important }
+  [class*="gap-2"], [class*="gap-3"], [class*="gap-4"]{ gap:6px !important }
+  [class*="space-y-2"] > * + *{ margin-top:4px !important }
+  #cardsView, #cv, #top20Main, #indexBar{ width:100% !important; gap:6px !important }
+  [id$="Panel"]{ padding:10px !important }
+  #rbThemeBtn{ min-width:78px; text-transform:none }
+</style>
+</head>
+<body class="p-3 sm:p-4 md:p-6">
+<div class="max-w-7xl mx-auto">
+
+  <div class="flex items-center justify-between flex-wrap gap-3 mb-1">
+    <h1 class="text-lg md:text-xl font-bold flex items-center gap-2">
+      RS Dashboard <span class="text-slate-400 font-semibold">· <span id="stockCount">0</span> stocks</span> <span class="tip text-[10px] text-slate-500">ⓘ<span class="tipbox">ตัวบนสุดของชื่อ = ผ่านเกณฑ์ขั้นต่ำลงตาราง (value/ราคา/mcap/volume) · ทั้งกระดาน = หุ้นผ่านเกณฑ์คำนวณ RS (ตัด junk)</span></span>
+    </h1>
+    <div class="flex items-center gap-3">
+          <!-- ปุ่มปรับขนาดตัวหนังสือ (zoom เว็บ) -->
+          <div class="flex gap-1 bg-[#0a0f16] p-1 rounded-lg border border-[#243044]" title="ปรับขนาดตัวหนังสือทั่วเว็บ">
+            <button onclick="fontZoom(-1)" class="tf-chip">A−</button>
+            <button onclick="fontZoom(1)" class="tf-chip">A+</button>
+            <button onclick="fontZoom(0)" class="tf-chip" title="คืนค่าปกติ">↺</button>
+          </div>
+          <!-- สลับ โหมดสว่าง / โหมดมืด (จำค่าไว้ใน localStorage) -->
+          <button id="rbThemeBtn" class="tf-chip" onclick="toggleTheme()" title="สลับ โหมดสว่าง / โหมดมืด">🌙 มืด</button>
+          <!-- ตลาดสลับไทย/US -->
+          <div class="flex gap-1 bg-[#0a0f16] p-1 rounded-lg border border-[#243044]">
+            <button id="tabTh" class="tf-chip active" onclick="switchMarket('thailand')">🇹🇭 ไทย</button>
+            <button id="tabUs" class="tf-chip" onclick="switchMarket('america')">🇺🇸 US</button>
+          </div>
+      <span id="lastUpdateText" class="text-slate-300 text-sm"></span>
+            <span id="marketBadge" class="bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 rounded">RS Dashboard · หุ้นไทย</span>
+          </div>
+        </div>
+
+        <!-- Navigation: แยกหน้า ภาพรวมตลาด / หุ้น (Cards-Table) -->
+        <div class="flex gap-1 bg-[#0a0f16] p-1 rounded-lg border border-[#243044] my-3 w-fit">
+          <button id="navOverview" class="tf-chip active" onclick="setPage('overview')">🌐 ภาพรวม</button>
+                    <button id="navStocks" class="tf-chip" onclick="setPage('stocks')">📊 หุ้น</button>
+                    <button id="navTop20" class="tf-chip" onclick="setPage('top20')">🏆 Top20</button>
+                  </div>
+
+                  <!-- 🏆 Top 20 ผลตอบแทน (YTD / 1 ปี / 2 ปี) — แยกไทย/เมกา -->
+                  <div id="top20Panel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                      <h2 class="text-sm font-bold flex items-center gap-2">🏆 Top 20 ผลตอบแทน</h2>
+                      <button id="tpTh" class="tf-chip active" onclick="setTopMk('thailand')">🇹🇭 ไทย</button>
+                      <button id="tpUs" class="tf-chip" onclick="setTopMk('america')">🇺🇸 อเมริกา</button>
+                      <span class="flex items-center gap-1 ml-auto">
+                        <button id="tpViewTable" class="tf-chip active" onclick="setTopView('table')">📋 ตาราง</button>
+                        <button id="tpViewCard" class="tf-chip" onclick="setTopView('card')">🗂️ การ์ด</button>
+                      </span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-1 mb-1">
+                      <span class="text-[10px] text-slate-500">Universe:</span>
+                      <button id="tpUniAll" class="tf-chip active" onclick="setTopUniverse('all')">ทั้งหมด (หุ้นสามัญ)</button>
+                      <button id="tpUniRS" class="tf-chip" onclick="setTopUniverse('rs')">ผ่านเกณฑ์ RS</button>
+                      <button id="tpUniIdx" class="tf-chip" onclick="setTopUniverse('idx')">แบ่งกลุ่ม Index</button>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-1 mb-2">
+                      <span class="text-[10px] text-slate-500">เรียง:</span>
+                      <button id="tpSortYTD" class="tf-chip active" onclick="setTopSort('pYTD')">ปีนี้ YTD</button>
+                      <button id="tpSort1y" class="tf-chip" onclick="setTopSort('p1y')">1 ปี</button>
+                      <button id="tpSort2y" class="tf-chip" onclick="setTopSort('p2y')">2 ปี</button>
+                      <button class="tf-chip" onclick="toggleTopDir()" title="สลับ มาก→น้อย / น้อย→มาก">↑↓</button>
+                      <span class="text-[10px] text-slate-500 ml-auto">แตะชื่อหุ้น = กราฟเต็ม</span>
+                    </div>
+                    <div id="top20Main"></div>
+                  </div>
+
+  <!-- 📰 Market Brief: สรุป Breadth เทียบวาน/สัปดาห์ + แนวโน้มเข้าใจง่าย (บนสุดสุด) -->
+    <div class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-4 mb-3" id="marketBriefPanel">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-sm font-bold flex items-center gap-2">
+          📰 Market Brief
+          <span class="text-slate-500 font-normal text-xs">การเปลี่ยนแปลง Breadth เทียบวาน / เทียบสัปดาห์</span>
+          <span class="tip text-slate-500">ⓘ<span class="tipbox" style="width:300px">📰 ตัวเลข = %หุ้นที่ปิดสูงกว่าเส้นค่าเฉลี่ย (Breadth) แยก MA50(ระยะสั้น) / MA200(ระยะยาว)<br>
+· Δ1D = เทียบวันก่อน · Δ1W = เทียบ 5 วันทำการก่อน (▲=กว้างขึ้น ▼=แคบลง)<br>
+· อ่านคู่ MA50 vs MA200: ต่างกันมาก = แรงส่งระยะสั้นไม่ตามระยะยาว (ระวัง)<br>
+· สีป้ายใต้ card ชี้โทน: เขียว=กว้างพอ/ฟื้น, แดง=แคบ/อ่อน, เหลือง=กลาง</span></span>
+        </h2>
+        <button onclick="renderMarketBrief()" class="tf-chip">🔄</button>
+      </div>
+      <div id="marketBriefBody" class="text-[13px] text-slate-400">โหลด...</div>
+    </div>
+
+    <!-- 📊 Index bar บนสุด (SET/SET50/SET100/mai: เปิด/ปิด/เปลี่ยน) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3" id="indexBar"></div>
+
+  <!-- 📈 สรุปตลาด + คำแนะนำ -->
+  <div class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-4 mb-4" id="marketSummaryPanel">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-sm font-bold flex items-center gap-2">
+        📋 สรุปตลาด &amp; คำแนะนำ
+        <span class="tip text-slate-500">ⓘ<span class="tipbox">อิงแนวทาง O'Neil/CANSLIM: ดูแนวโน้มตลาด (M) + Breadth (กว้างของการขึ้น) + มูลค่าซื้อขายหุ้นขึ้น/ลง (1D) + ผู้นำ (RS≥90) + ธีมแข็งแกร่ง</span></span>
+      </h2>
+      <button onclick="loadSummary()" class="tf-chip">🔄 โหลดสรุป</button>
+    </div>
+    <div id="marketSummaryBody" class="space-y-2 text-sm"></div>
+  </div>
+
+  <!-- 📊 สรุป Megatrend (จาก research รายเดือน) -->
+    <div id="megatrendPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-4 mb-4">
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+      <h2 class="text-sm font-bold flex items-center gap-2">
+        📊 Megatrend ประจำเดือน
+        <span class="text-slate-500 font-normal text-xs">จากงานวิจัยรายเดือน (US+ไทย)</span>
+        <button class="text-slate-500 tip hover:text-sky-400">ⓘ<span class="tipbox">สรุปธีม megatrend จากงานวิจัย (Morgan Stanley / BlackRock / KGI / กสิกร ฯลฯ) อัปเดตเดือนละครั้ง — ใช้เป็นไอเดียดูกลุ่มหุ้น ไม่ใช่เกณฑ์จริง (เกณฑ์จริงคือ RS≥80 + กลุ่มเดียวกัน)</span></button>
+      </h2>
+      <span class="text-[11px] text-slate-500" id="megatrendDate"></span>
+    </div>
+    <div id="megatrendBody" class="grid grid-cols-1 md:grid-cols-2 gap-2"></div>
+  </div>
+
+  <div id="searchBar" class="flex flex-wrap items-center gap-2 my-4">
+    <input id="searchInput" placeholder="🔍 ค้นหาหุ้น..." class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white w-44 focus:border-sky-600">
+    <select id="groupFilter" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white">
+          <option value="ALL">ทุกกลุ่ม</option>
+        </select>
+    <select id="viewMode" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white">
+      <option value="table" selected>Table View</option>
+            <option value="card">Cards View</option>
+    </select>
+    <select id="rsFilter" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white">
+      <option value="0">RS ทั้งหมด</option>
+            <option value="50">RS ≥ 50</option>
+            <option value="70" selected>RS ≥ 70</option>
+            <option value="80">RS ≥ 80</option>
+            <option value="90">RS ≥ 90</option>
+    </select>
+    <select id="perPageSel" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white">
+          <option value="10" selected>แสดง 10</option>
+          <option value="20">แสดง 20</option>
+          <option value="30">แสดง 30</option>
+          <option value="50">แสดง 50</option>
+        </select>
+            <select id="sortMain" onchange="setSortMain(this.value)" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white" title="เรียงหลัก (ใช้ได้ทั้ง Card และ Table)">
+      <option value="rs">เรียง: RS</option>
+      <option value="change">เรียง: Change</option>
+      <option value="price">เรียง: ราคา</option>
+      <option value="val">เรียง: Value</option>
+      <option value="p3m">เรียง: 3M%</option>
+      <option value="rD">เรียง: ΔRank</option>
+      <option value="ticker">เรียง: Ticker</option>
+      <option value="p1m">เรียง: 1M%</option>
+      <option value="p1y">เรียง: 1Y%</option>
+    </select>
+    <button onclick="toggleSortDir()" id="sortDirBtn" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm text-slate-200 hover:border-sky-600" title="สลับทิศ">↓</button>
+    <select id="sortSec" onchange="setSortSecondary(this.value)" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white" title="คอลัมน์รอง (เรียงต่อเมื่อคอลัมน์หลักเท่ากัน)">
+              <option value="">＋ คอลัมน์รอง</option>
+              <option value="change">เรียงตาม Change</option>
+              <option value="val">เรียงตาม Value</option>
+              <option value="p3m">เรียงตาม 3M%</option>
+              <option value="rD">เรียงตาม ΔRank</option>
+              <option value="ticker">เรียงตาม Ticker</option>
+            </select>
+                <div class="flex-1"></div>
+    <button id="btnUpdate" onclick="runUpdate(true)" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-4 py-2 rounded-lg">🔄 Update</button>
+    <button onclick="runUpdate(false)" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold px-4 py-2 rounded-lg">♻️ แคช</button>
+    <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer select-none" title="โหลดราคาใหม่ทุก 3 นาทีอัตโนมัติ (แบบเบา ไม่วาดกราฟใหม่) — ข้อมูลเป็นแบบดีเลย์ ~15 นาที (delayed quote) ไม่ใช่ real-time">
+          <input id="autoRefresh" type="checkbox" class="accent-sky-500" onchange="toggleAutoRefresh()">
+          ⏱ อัตโนมัติ 3นาที <span class="text-amber-400/90 text-[10px]">· ดีเลย์~15นาที</span>
+        </label>
+  </div>
+
+  <div id="progressPanel" class="hidden bg-[#0d1219] border border-sky-900 p-3 rounded-xl mb-4">
+    <div class="flex justify-between text-xs mb-2">
+      <span id="progressStatus" class="text-sky-300 font-semibold">กำลังเริ่ม...</span>
+      <span><span id="progressPercent" class="text-sky-400 font-bold">0%</span> · ⏱ <span id="timerText" class="text-sky-300">0.0s</span></span>
+    </div>
+    <div class="w-full bg-[#05070b] rounded-full h-2 overflow-hidden"><div id="progressBar" class="bg-gradient-to-r from-sky-500 to-emerald-400 h-full rounded-full" style="width:0%"></div></div>
+  </div>
+
+  <!-- Money Flow แยก in/out ต่อ TF -->
+    <div id="flowPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-4 mb-4">
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+      <h2 class="text-sm font-bold flex items-center gap-2">
+        💰 มูลค่าซื้อขาย หุ้นขึ้น/ลง <span class="text-slate-500 font-normal text-xs">(วันนี้)</span>
+        <span class="tip text-slate-500">ⓘ<span class="tipbox">= มูลค่าซื้อขายรวมของหุ้นที่ราคาขึ้น(ช่อง เขียว)/ลง(ช่อง แดง) วันนี้ล่าสุด ใช้ทิศทางราคาเป็นตัวแทน ไม่ใช่ เงินไหลสุทธิจริง (ไม่มีข้อมูล net-flow)</span></span>
+      </h2>
+      <div class="flex gap-1 bg-[#0a0f16] p-1 rounded-lg border border-[#243044]">
+        <button class="tf-chip active" data-flowtf="1d" onclick="setFlowTF('1d')">วันนี้</button>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-3 mb-3 text-xs" id="flowSums"></div>
+    <div id="flowBars" class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 max-h-[320px] overflow-auto cursor-pointer"></div>
+  </div>
+
+  <!-- Themes ที่จัดจาก RS แข็งแกร่ง (#2) -->
+    <div id="themesPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-4 mb-4">
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+      <h2 class="text-sm font-bold flex items-center gap-2">
+        🎯 Themes จาก RS แข็งแกร่ง
+        <span class="text-slate-500 font-normal text-xs">กลุ่มหุ้น RS≥80 ใน Industry เดียวกัน เรียงอันดับ</span>
+        <button class="text-slate-500 tip hover:text-sky-400">ⓘ<span class="tipbox">ธีม = Industry ที่มีหุ้น RS≥80 อย่างน้อย 2 ตัว เรียงจากผลรวมค่า RS + มูลค่าซื้อขาย ดูว่าหุ้นแรงกระจุกตัวกลุ่มไหน</span></button>
+      </h2>
+    </div>
+    <div id="themeList" class="grid grid-cols-1 md:grid-cols-2 gap-2"></div>
+      </div>
+
+      <!-- 🚀 TOP GAIN / LOSS แยก TH/US + logo + ชื่อ + val filter + เลือกกลุ่ม -->
+      <div id="topglPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-4 mb-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <h2 class="text-sm font-bold flex items-center gap-2">
+                🚀 TOP GAIN / LOSS <span class="text-slate-500 font-normal text-xs">แยกตลาด · กดสลับไทย/อเมริกา</span>
+                <span class="tip text-slate-500">ⓘ<span class="tipbox">เรียง % เปลี่ยนวันนี้สูงสุด (Gain) / ต่ำสุด (Loss) · val ขั้นต่ำเลือกได้ (ไทย=บาท, อเมริกา=ดอลลาร์)</span></span>
+              </h2>
+              <div class="flex items-center gap-1.5 text-xs">
+                <div class="flex gap-1 bg-[#0a0f16] p-1 rounded-lg border border-[#243044]">
+                  <button id="glmTh" class="tf-chip active" onclick="switchGLMarket('thailand')">🇹🇭 ไทย</button>
+                  <button id="glmUs" class="tf-chip" onclick="switchGLMarket('america')">🇺🇸 อเมริกา</button>
+                </div>
+                <select id="glGroup" onchange="renderTopGL()" class="bg-[#0a0f16] border border-[#243044] rounded-lg px-2 py-1 text-xs outline-none text-white">
+                  <option value="ALL">ทุกกลุ่ม</option>
+                  <option value="SET50">SET50</option>
+                  <option value="SET100">SET100</option>
+                  <option value="mai/Small">mai &amp; Small</option>
+                  <option value="MegaCap">Mega Cap</option>
+                  <option value="LargeCap">Large Cap</option>
+                  <option value="MidCap">Mid Cap</option>
+                  <option value="SmallCap">Small Cap</option>
+                </select>
+                <select id="glVal" onchange="renderTopGL()" class="bg-[#0a0f16] border border-[#243044] rounded-lg px-2 py-1 text-xs outline-none text-white">
+                  <option value="5" selected>Val ≥ 5M</option>
+                  <option value="30">Val ≥ 30M</option>
+                  <option value="100">Val ≥ 100M</option>
+                  <option value="300">Val ≥ 300M</option>
+                </select>
+                <select id="glCount" onchange="renderTopGL()" class="bg-[#0a0f16] border border-[#243044] rounded-lg px-2 py-1 text-xs outline-none text-white">
+                  <option value="5">TOP 5</option>
+                  <option value="10" selected>TOP 10</option>
+                  <option value="15">TOP 15</option>
+                </select>
+              </div>
+            </div>
+            <div id="glBody" class="text-[10px] text-slate-400">โหลด...</div>
+      </div>
+
+  <!-- Modal: หุ้นในกลุ่ม (ธีม หรือ Industry เงินไหล) -->
+  <div id="groupModal" class="fixed inset-0 z-50 hidden items-start justify-center p-4 bg-black/80 overflow-y-auto">
+      <div class="m-auto bg-[#0d1219] border border-[#1e2634] rounded-xl max-w-lg w-full p-5 relative max-h-[85vh] overflow-y-auto">
+      <button onclick="closeGroupModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white font-bold text-xl bg-[#161d29] w-8 h-8 rounded-full">✕</button>
+      <div id="groupModalTitle" class="text-lg font-bold mb-4 pr-8"></div>
+      <div id="groupModalBody" class="space-y-1.5"></div>
+    </div>
+  </div>
+
+  <div id="cardsView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-3"></div>
+
+  <div id="tableView" class="hidden overflow-x-auto bg-[#0d1219] rounded-xl border border-[#1e2634]">
+    <table class="w-full text-right text-sm">
+      <thead class="bg-[#05070b] text-slate-400 border-b border-[#1e2634]">
+        <tr>
+          <th class="p-4 text-left sortable" onclick="sortTable('rs',event)" title="คลิก=คอลัมน์หลัก · Shift+คลิก=คอลัมน์รอง · กดซ้ำ=สลับทิศ">RS/Rank ↕</th>
+          <th class="p-4 text-left sortable" onclick="sortTable('ticker',event)" title="กดเพื่อเรียง">Ticker ↕</th>
+          <th class="p-4 sortable" onclick="sortTable('price',event)" title="กดเพื่อเรียง">Price ↕</th>
+          <th class="p-4 sortable" onclick="sortTable('change',event)" title="กดเพื่อเรียง">Change ↕</th>
+          <th class="p-4 sortable" onclick="sortTable('val',event)" title="กดเพื่อเรียง">Value(M) ↕</th>
+          <th class="p-4 sortable" onclick="sortTable('p3m',event)" title="กดเพื่อเรียง">3M% ↕</th>
+          <th class="p-4 sortable" onclick="sortTable('relVol',event)" title="กดเพื่อเรียง">RVOL ↕</th>
+          <th class="p-4 sortable" onclick="sortTable('rD',event)" title="กดเพื่อเรียง">ΔRank ↕</th>
+          <th class="p-4 text-left">Theme</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="text-center text-slate-500 text-[11px] mt-6">rsdashclean.vercel.app • ข้อมูลไทยล้วน • 📈 RS เต็มตลาด</div>
+</div>
+
+<div id="chartModal" class="fixed inset-0 z-50 hidden items-start justify-center p-4 bg-black/80 overflow-y-auto">
+  <div class="m-auto bg-[#0d1219] border border-[#1e2634] rounded-xl max-w-4xl w-full p-5 relative max-h-[85vh] overflow-y-auto">
+    <button onclick="closeModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white font-bold text-xl bg-[#161d29] w-8 h-8 rounded-full">✕</button>
+    <div class="mb-2 pr-10">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span id="modalLogo"></span>
+            <span id="modalTicker" class="text-2xl font-black shrink-0"></span><span id="modalRS" class="shrink-0"></span>
+            <span id="modalCap"></span>
+            <span id="modalRVOL"></span>
+            <span id="modalVol"></span><span id="modalCrowd"></span><span id="modalTheme" class="shrink-0"></span>
+            <span id="modalName" class="text-xs text-slate-400 ml-1 truncate"></span>
+          </div>
+        </div>
+        <div class="flex gap-1.5 bg-[#0a0f16] p-1 rounded-lg border border-[#243044] w-fit mb-3">
+          <button class="tf-chip" onclick="changeModalTF('30m')">30m</button>
+          <button class="tf-chip" onclick="changeModalTF('1d')">1D</button>
+          <button class="tf-chip" onclick="changeModalTF('1wk')">1W</button>
+          <button class="tf-chip" onclick="changeModalTF('1mo')">1M</button>
+          <button class="tf-chip active" onclick="changeModalTF('1y')">1Y</button>
+        </div>
+    <div id="modalChart" class="w-full h-[420px] rounded-lg bg-[#05070b] border border-[#1e2634]"></div>
+    <div id="modalDR" class="mt-2"></div>
+<script>
+/* ==== RawBlock theme runtime: โหมดสว่าง/มืด (จำค่าใน localStorage) + ทาสีกราฟให้ตรงธีม ====
+   ต้องมาก่อนสคริปต์หลัก เพื่อ patch LightweightCharts.createChart ก่อนวาดกราฟครั้งแรก */
+(function(){
+  var d=false;
+  try{ d=(localStorage.getItem('rb_dark')==='1'); }catch(e){}
+  window.__RB_THEME = d ? 'dark' : 'light';
+  if(d) document.documentElement.classList.add('rb-dark');
+  var MAP = {
+    light:{'#008000':'#008000','#FF0000':'#FF0000','#0000FF':'#0000FF','#FFA500':'#FFA500',
+           'rgba(0,128,0,.8)':'rgba(0,128,0,.8)','rgba(255,0,0,.8)':'rgba(255,0,0,.8)'},
+    dark:{'#008000':'#00D65C','#FF0000':'#FF5147','#0000FF':'#7C9BFF','#FFA500':'#FFC24D',
+          'rgba(0,128,0,.8)':'rgba(0,214,92,.75)','rgba(255,0,0,.8)':'rgba(255,81,71,.75)'}
+  };
+  function remap(c){ if(!c) return c; var t=MAP[window.__RB_THEME]||MAP.light; return t[c]||c; }
+  function wrapSeries(s){ if(!s) return s; var sd=s.setData;
+    if(sd) s.setData=function(dd){ if(Array.isArray(dd)) dd=dd.map(function(x){ return (x&&x.color)?{time:x.time,value:x.value,color:remap(x.color)}:x; }); return sd.call(s,dd); };
+    return s; }
+  var KEYS=['upColor','downColor','wickUpColor','wickDownColor','borderUpColor','borderDownColor','color','priceLineColor'];
+  function paint(opts){ if(!opts) return opts; for(var i=0;i<KEYS.length;i++){ if(opts[KEYS[i]]) opts[KEYS[i]]=remap(opts[KEYS[i]]); } return opts; }
+  window.__RB_PATCH = function(){
+    if(!window.LightweightCharts || LightweightCharts.__rbPatched) return;
+    var CC = LightweightCharts.createChart;
+    LightweightCharts.createChart = function(el,o){
+      o = o || {}; var dark = (window.__RB_THEME==='dark');
+      o.layout = Object.assign({}, o.layout, {background:{color: dark?'#000000':'#ffffff'}, textColor: dark?'#ffffff':'#000000'});
+      o.rightPriceScale = Object.assign({}, o.rightPriceScale, {borderColor: dark?'#ffffff':'#000000'});
+      o.timeScale = Object.assign({}, o.timeScale, {borderColor: dark?'#ffffff':'#000000'});
+      var ch = CC.call(LightweightCharts, el, o);
+      ['addCandlestickSeries','addLineSeries','addHistogramSeries','addAreaSeries','addBarSeries'].forEach(function(fn){
+        if(!ch[fn]) return; var orig = ch[fn];
+        ch[fn] = function(op){ return wrapSeries(orig.call(ch, paint(op || {}))); };
+      });
+      return ch;
+    };
+    LightweightCharts.__rbPatched = true;
+  };
+  window.__RB_PATCH();
+  window.__RB_REDRAW = function(){
+    try{
+      if(typeof renderSummary==='function' && typeof summaryData!=='undefined' && summaryData) renderSummary(summaryData);
+      if(typeof renderMarketBreadth==='function') renderMarketBreadth();
+      if(typeof renderMarketBrief==='function') renderMarketBrief();
+      if(typeof renderView==='function') renderView();
+      if(typeof renderFlow==='function') renderFlow();
+      if(typeof renderThemes==='function') renderThemes();
+      if(typeof renderMegatrend==='function') renderMegatrend();
+      if(typeof renderTopGL==='function') renderTopGL();
+      if(typeof loadIndex==='function') loadIndex();
+      if(typeof renderTop20==='function' && typeof topRows!=='undefined' && topRows && topRows.length) renderTop20();
+    }catch(e){}
+  };
+  window.toggleTheme = function(){
+    var dark = document.documentElement.classList.toggle('rb-dark');
+    window.__RB_THEME = dark ? 'dark' : 'light';
+    try{ localStorage.setItem('rb_dark', dark ? '1' : '0'); }catch(e){}
+    var b = document.getElementById('rbThemeBtn'); if(b) b.textContent = dark ? '☀️ สว่าง' : '🌙 มืด';
+    window.__RB_REDRAW();
+  };
+  var rbT = null;
+  function rbRelayout(){
+    if(rbT) clearTimeout(rbT);
+    rbT = setTimeout(function(){
+      window.__RB_PATCH();
+      try{ if(typeof renderMarketBreadth==='function') renderMarketBreadth(); }catch(e){}
+      try{ if(typeof loadIndex==='function') loadIndex(); }catch(e){}
+    }, 400);
+  }
+  window.addEventListener('resize', rbRelayout);
+  document.addEventListener('DOMContentLoaded', function(){
+    window.__RB_PATCH();
+    var b = document.getElementById('rbThemeBtn');
+    if(b) b.textContent = (window.__RB_THEME==='dark') ? '☀️ สว่าง' : '🌙 มืด';
+    // กันเคสเดิม: ตอนแรกกล่องยังกว้าง 0 → กราฟยึด fallback 320px แล้วไม่เต็มกล่อง
+    // วาดใหม่ "เฉพาะเมื่อ" กราฟแคบกว่ากล่องจริงชัดเจน (ถ้าปกติไม่แตะเลย)
+    setTimeout(function(){
+      try{
+        var e = document.getElementById('breadthHistChart');
+        if(!e) return;
+        var c = e.querySelector('canvas');
+        if(c && e.clientWidth > 200 && c.clientWidth < e.clientWidth * 0.8){
+          // ลำดับเดียวกับตอนสลับธีม (renderSummary ก่อน) — พิสูจน์แล้วว่าได้กราฟเต็มกล่อง
+          if(typeof renderSummary==='function' && typeof summaryData!=='undefined' && summaryData) renderSummary(summaryData);
+          if(typeof renderMarketBreadth==='function') renderMarketBreadth();
+        }
+      }catch(err){}
+    }, 2600);
+  });
+})();
+</script>
+  </div>
+</div>
+
+<script>
+const US_INDEXES={"sp500": ["MMM", "AOS", "ABT", "ABBV", "ACN", "ADBE", "AMD", "AES", "AFL", "A", "APD", "ABNB", "AKAM", "ALB", "ARE", "ALGN", "ALLE", "LNT", "ALL", "GOOGL", "GOOG", "MO", "AMZN", "AMCR", "AEE", "AEP", "AXP", "AIG", "AMT", "AWK", "AMP", "AME", "AMGN", "APH", "ADI", "AON", "APA", "APO", "AAPL", "AMAT", "APP", "APTV", "ACGL", "ADM", "ARES", "ANET", "AJG", "AIZ", "T", "ATO", "ADSK", "ADP", "AZO", "AVY", "AXON", "BKR", "BALL", "BAC", "BAX", "BDX", "BRK.B", "BBY", "TECH", "BIIB", "BLK", "BX", "XYZ", "BE", "BNY", "BA", "BKNG", "BSX", "BMY", "AVGO", "BR", "BRO", "BF.B", "BG", "BXP", "CHRW", "CDNS", "CPT", "COF", "CAH", "CCL", "CARR", "CVNA", "CASY", "CAT", "CBOE", "CBRE", "CDW", "COR", "CNC", "CNP", "CF", "CRL", "SCHW", "CHTR", "CVX", "CMG", "CB", "CHD", "CIEN", "CI", "CINF", "CTAS", "CSCO", "C", "CFG", "CLX", "CME", "CMS", "KO", "CTSH", "COHR", "COIN", "CL", "CMCSA", "FIX", "COP", "ED", "STZ", "CEG", "COO", "CPRT", "GLW", "CPAY", "CTVA", "CSGP", "COST", "CRH", "CRWD", "CCI", "CSX", "CMI", "CVS", "DHR", "DRI", "DDOG", "DVA", "DECK", "DE", "DELL", "DAL", "DVN", "DXCM", "FANG", "DLR", "DG", "DLTR", "D", "DPZ", "DASH", "DOV", "DOW", "DHI", "DTE", "DUK", "DD", "ETN", "EBAY", "ECHO", "ECL", "EIX", "EW", "ELV", "EME", "EMR", "ETR", "EOG", "EQT", "EFX", "EQIX", "ERIE", "ESS", "EL", "EG", "EVRG", "P", "ES", "EXC", "EXE", "EXPE", "EXPD", "EXR", "XOM", "FFIV", "FDS", "FICO", "FAST", "FRT", "FDX", "FDXF", "FERG", "FIS", "FITB", "FSLR", "FE", "FISV", "FLEX", "F", "FTNT", "FTV", "FOXA", "FOX", "BEN", "FCX", "GRMN", "IT", "GE", "GEHC", "GEV", "GEN", "GNRC", "GD", "GIS", "GM", "GPC", "GILD", "GPN", "GL", "GDDY", "GS", "HAL", "HIG", "HAS", "HCA", "DOC", "HSIC", "HSY", "HPE", "HLT", "HD", "HONA", "HON", "HRL", "HST", "HWM", "HPQ", "HUBB", "HUM", "HBAN", "HII", "IBM", "IEX", "IDXX", "ITW", "ILMN", "INCY", "IR", "PODD", "INTC", "IBKR", "ICE", "IFF", "IP", "INTU", "ISRG", "IVZ", "INVH", "IQV", "IRM", "JBHT", "JBL", "JKHY", "J", "JNJ", "JCI", "JPM", "KVUE", "KDP", "KEY", "KEYS", "KMB", "KIM", "KMI", "KKR", "KLAC", "KHC", "KR", "LHX", "LH", "LRCX", "LVS", "LDOS", "LEN", "LII", "LLY", "LIN", "LYV", "LMT", "L", "LOW", "LULU", "LITE", "LYB", "MTB", "MPC", "MAR", "MRSH", "MLM", "MRVL", "MAS", "MA", "MKC", "MCD", "MCK", "MDT", "MRK", "META", "MET", "MTD", "MGM", "MCHP", "MU", "MSFT", "MAA", "MRNA", "MDLZ", "MPWR", "MNST", "MCO", "MS", "MOS", "MSI", "MSCI", "NDAQ", "NTAP", "NFLX", "NEM", "NWSA", "NWS", "NEE", "NKE", "NI", "NDSN", "NSC", "NTRS", "NOC", "NCLH", "NRG", "NUE", "NVDA", "NVR", "NXPI", "ORLY", "OXY", "ODFL", "OMC", "ON", "OKE", "ORCL", "OTIS", "PCAR", "PKG", "PLTR", "PANW", "PSKY", "PH", "PAYX", "PYPL", "PNR", "PEP", "PFE", "PCG", "PM", "PSX", "PNW", "PNC", "PPG", "PPL", "PFG", "PG", "PGR", "PLD", "PRU", "PEG", "PTC", "PSA", "PHM", "PWR", "QCOM", "DGX", "Q", "RL", "RJF", "RDDT", "RTX", "O", "REG", "REGN", "RF", "RSG", "RMD", "RVTY", "HOOD", "ROK", "ROL", "ROP", "ROST", "RCL", "SPGI", "CRM", "SNDK", "SBAC", "SLB", "STX", "SRE", "NOW", "SHW", "SPG", "SWKS", "SJM", "SW", "SNA", "SOLV", "SO", "LUV", "SWK", "SBUX", "STT", "STLD", "STE", "SYK", "SMCI", "SYF", "SNPS", "SYY", "TMUS", "TROW", "TTWO", "TPR", "TRGP", "TGT", "TEL", "TDY", "TER", "TSLA", "TXN", "TPL", "TXT", "TMO", "TJX", "TKO", "TSCO", "TT", "TDG", "TRV", "TRMB", "TFC", "TYL", "TSN", "USB", "UBER", "UDR", "ULTA", "UNP", "UAL", "UPS", "URI", "UNH", "UHS", "VLO", "VEEV", "VTR", "VLTO", "VRSN", "VRSK", "VZ", "VRTX", "VRT", "VTRS", "VICI", "V", "VST", "VMRK", "VMC", "WRB", "GWW", "WAB", "WMT", "DIS", "WBD", "WM", "WAT", "WEC", "WFC", "WELL", "WST", "WDC", "WY", "WSM", "WMB", "WTW", "WDAY", "WYNN", "XEL", "XYL", "YUM", "ZBRA", "ZBH", "ZTS"], "nasdaq100": ["NVDA", "AAPL", "MSFT", "AMZN", "GOOGL", "GOOG", "AVGO", "META", "TSLA", "WMT", "ASML", "COST", "MU", "NFLX", "PLTR", "AMD", "CSCO", "AMAT", "LRCX", "INTC", "LIN", "TMUS", "PEP", "KLAC", "AMGN", "TXN", "GILD", "ISRG", "ARM", "ADI", "SHOP", "PDD", "HON", "QCOM", "BKNG", "APP", "PANW", "INTU", "VRTX", "SBUX", "WDC", "CEG", "CMCSA", "CRWD", "ADBE", "STX", "MRVL", "MAR", "MELI", "REGN", "ADP", "CDNS", "ORLY", "CSX", "SNPS", "ABNB", "MDLZ", "MNST", "ROST", "AEP", "WBD", "CTAS", "DASH", "PCAR", "FTNT", "BKR", "MPWR", "FANG", "FAST", "EA", "ADSK", "NXPI", "EXC", "XEL", "FER", "IDXX", "ALNY", "MSTR", "DDOG", "ODFL", "PYPL", "CCEP", "TRI", "TTWO", "ROP", "MCHP", "INSM", "KDP", "AXON", "WDAY", "PAYX", "GEHC", "CPRT", "CTSH", "CHTR", "KHC", "VRSK", "DXCM", "ZS", "TEAM"], "russell2000": ["AAC", "AAMC", "AAOI", "AAON", "AAT", "AAVL", "AAWW", "ABAX", "ABCB", "ABCD", "ABCO", "ABCW", "ABEO", "ABG", "ABM", "ABMD", "ABY", "ACAD", "ACAT", "ACCO", "ACET", "ACHN", "ACIW", "ACLS", "ACOR", "ACRE", "ACTA", "ACTG", "ACW", "ACXM", "ADC", "ADMS", "ADPT", "ADRO", "ADTN", "ADUS", "ADXS", "AE", "AEGN", "AEGR", "AEIS", "AEL", "AEO", "AEPI", "AERI", "AF", "AFAM", "AFFX", "AFH", "AFMD", "AFOP", "AGEN", "AGII", "AGM", "AGRX", "AGTC", "AGX", "AGYS", "AHH", "AHP", "AHS", "AHT", "AI", "AIMC", "AIN", "AINC", "AIQ", "AIR", "AIRM", "AIT", "AJRD", "AJX", "AKBA", "AKR", "AKS", "ALCO", "ALDR", "ALE", "ALEX", "ALG", "ALGT", "ALIM", "ALJ", "ALOG", "ALX", "AMAG", "AMBA", "AMBC", "AMBR", "AMC", "AMCC", "AMD", "AMED", "AMKR", "AMNB", "AMOT", "AMPH", "AMRC", "AMRI", "AMSF", "AMSG", "AMSWA", "AMTG", "AMWD", "ANAC", "ANCX", "ANDE", "ANF", "ANGI", "ANGO", "ANH", "ANIK", "ANIP", "ANTH", "AOSL", "APEI", "APIC", "APOG", "APOL", "APPS", "APTS", "ARAY", "ARC", "ARCB", "ARDX", "AREX", "ARI", "ARIA", "ARII", "ARNA", "AROW", "ARPI", "ARR", "ARRY", "ARTNA", "ARWR", "ASC", "ASCMA", "ASEI", "ASGN", "ASMB", "ASNA", "ASPS", "AST", "ASTE", "AT", "ATEN", "ATLO", "ATNI", "ATRA", "ATRC", "ATRI", "ATRO", "ATRS", "ATSG", "ATU", "ATW", "AVA", "AVAV", "AVD", "AVG", "AVHI", "AVID", "AVX", "AWR", "AXAS", "AXDX", "AXE", "AXL", "AXLL", "AYR", "AZPN", "AZZ", "B", "BABY", "BANC", "BANF", "BANR", "BAS", "BBCN", "BBG", "BBOX", "BBRG", "BBSI", "BBW", "BBX", "BCC", "BCEI", "BCO", "BCOR", "BCOV", "BCPC", "BCRX", "BDC", "BDE", "BDGE", "BDSI", "BEAT", "BEBE", "BECN", "BEL", "BELFB", "BERY", "BFAM", "BFIN", "BFS", "BGC", "BGCP", "BGFV", "BGG", "BGS", "BH", "BHB", "BHBK", "BHE", "BHLB", "BID", "BIG", "BIOS", "BJRI", "BKE", "BKH", "BKMU", "BKS", "BLBD", "BLCM", "BLDR", "BLKB", "BLMN", "BLMT", "BLOX", "BLT", "BLX", "BMI", "BMRC", "BMTC", "BNCL", "BNCN", "BNFT", "BNK", "BOBE", "BOFI", "BOJA", "BOOT", "BOX", "BPFH", "BPI", "BPMC", "BRC", "BREW", "BRG", "BRKL", "BRKS", "BRS", "BRSS", "BSET", "BSF", "BSFT", "BSRR", "BSTC", "BTU", "BTX", "BURL", "BUSE", "BV", "BWINB", "BWLD", "BXS", "BYD", "BZH", "CAC", "CACB", "CACI", "CACQ", "CAKE", "CAL", "CALA", "CALD", "CALM", "CALX", "CAMP", "CARA", "CARB", "CASH", "CASS", "CASY", "CATM", "CATO", "CATY", "CAVM", "CBB", "CBF", "CBK", "CBM", "CBMG", "CBPX", "CBR", "CBRL", "CBU", "CBYL", "CBZ", "CCBG", "CCC", "CCF", "CCG", "CCMP", "CCNE", "CCOI", "CCRN", "CCS", "CCXI", "CDE", "CDI", "CDR", "CDRB", "CDTX", "CEB", "CECE", "CECO", "CEMP", "CENTA", "CENX", "CERS", "CETV", "CEVA", "CFFN", "CFI", "CFNL", "CGI", "CHCO", "CHDN", "CHE", "CHEF", "CHFC", "CHFN", "CHGG", "CHKE", "CHMT", "CHRS", "CHS", "CHSP", "CHUY", "CIA", "CIEN", "CIFC", "CIR", "CIVI", "CJES", "CKEC", "CKH", "CKP", "CLC", "CLCT", "CLD", "CLDT", "CLDX", "CLF", "CLFD", "CLI", "CLMS", "CLNE", "CLNY", "CLVS", "CLW", "CMC", "CMCO", "CMLS", "CMN", "CMO", "CMPR", "CMRX", "CMT", "CMTL", "CNBKA", "CNCE", "CNL", "CNMD", "CNO", "CNOB", "CNS", "CNSL", "CNXR", "COB", "COBZ", "COHR", "COHU", "COKE", "COLB", "COLL", "COLM", "CONE", "CONN", "COR", "CORE", "CORI", "CORR", "CORT", "COWN", "CPE", "CPF", "CPHD", "CPK", "CPLA", "CPRX", "CPS", "CPSI", "CRAI", "CRAY", "CRCM", "CRD.B", "CRIS", "CRMD", "CRMT", "CROX", "CRR", "CRS", "CRUS", "CRVL", "CRWN", "CRY", "CRZO", "CSBK", "CSCD", "CSFL", "CSGS", "CSH", "CSII", "CSLT", "CSOD", "CSS", "CSU", "CSV", "CTB", "CTBI", "CTCT", "CTIC", "CTLT", "CTO", "CTRE", "CTRL", "CTRN", "CTS", "CTT", "CTWS", "CUB", "CUBE", "CUBI", "CUDA", "CUNB", "CUTR", "CUZ", "CVBF", "CVCO", "CVEO", "CVG", "CVGI", "CVGW", "CVLT", "CVRS", "CVT", "CVTI", "CW", "CWCO", "CWEI", "CWST", "CWT", "CYNO", "CYS", "CYTK", "CYTR", "CZNC", "CZR", "DAKT", "DAN", "DAR", "DBD", "DCO", "DCOM", "DCT", "DEA", "DECK", "DEL", "DENN", "DEPO", "DERM", "DF", "DFRG", "DFT", "DGI", "DGICA", "DGII", "DHIL", "DHT", "DHX", "DIN", "DIOD", "DJCO", "DK", "DLX", "DMND", "DMRC", "DOC", "DOOR", "DORM", "DPLO", "DRH", "DRII", "DRNA", "DRRX", "DSPG", "DTLK", "DTSI", "DV", "DVAX", "DW", "DWA", "DWRE", "DX", "DXLG", "DXPE", "DY", "DYAX", "DYN", "EBF", "EBIX", "EBS", "EBSB", "EBTC", "ECHO", "ECOL", "ECOM", "ECPG", "ECR", "ECYT", "EDE", "EDR", "EE", "EEFT", "EFII", "EFSC", "EGBN", "EGHT", "EGL", "EGLE", "EGOV", "EGP", "EGRX", "EHTH", "EIG", "EIGI", "ELGX", "ELLI", "ELNK", "ELRC", "ELY", "EMCI", "EME", "EMKR", "ENOC", "ENPH", "ENS", "ENSG", "ENT", "ENTA", "ENTG", "ENTL", "ENV", "ENVA", "EPAM", "EPAY", "EPIQ", "EPM", "EPR", "EPZM", "EQY", "ERA", "ERI", "ERN", "EROS", "ESCA", "ESE", "ESGR", "ESL", "ESND", "ESNT", "ESPR", "ESTE", "ETH", "ETM", "ETSY", "EVC", "EVDY", "EVER", "EVLV", "EVR", "EVTC", "EXAC", "EXAM", "EXAR", "EXAS", "EXEL", "EXLS", "EXPO", "EXPR", "EXTR", "EXXI", "EYES", "EZPW", "FAF", "FARM", "FARO", "FBC", "FBIZ", "FBNC", "FBNK", "FBP", "FC", "FCB", "FCBC", "FCEL", "FCF", "FCFS", "FCH", "FCN", "FCNCA", "FCS", "FCSC", "FDEF", "FDML", "FDP", "FEIC", "FELE", "FENX", "FET", "FF", "FFBC", "FFG", "FFIC", "FFIN", "FFKT", "FGEN", "FGL", "FIBK", "FICO", "FINL", "FISI", "FIVE", "FIVN", "FIX", "FIZZ", "FLDM", "FLIC", "FLKS", "FLTX", "FLWS", "FLXN", "FLXS", "FMBI", "FMER", "FMI", "FMSA", "FN", "FNB", "FNBC", "FNFV", "FNGN", "FNHC", "FNLC", "FNSR", "FOE", "FOLD", "FOMX", "FOR", "FORM", "FORR", "FOXF", "FPO", "FPRX", "FR", "FRAN", "FRED", "FRGI", "FRM", "FRME", "FRO", "FRP", "FRPH", "FRPT", "FRSH", "FSAM", "FSB", "FSP", "FSS", "FSTR", "FTD", "FTK", "FUEL", "FUL", "FULT", "FVE", "FWM", "FWRD", "FXCB", "GABC", "GALE", "GB", "GBCI", "GBL", "GBLI", "GBNK", "GBX", "GCAP", "GCO", "GDOT", "GEF", "GEN", "GEO", "GEOS", "GERN", "GES", "GFF", "GHDX", "GHL", "GHM", "GIII", "GIMO", "GK", "GLDD", "GLF", "GLOB", "GLOG", "GLRE", "GLT", "GLUU", "GMED", "GNBC", "GNCA", "GNCMA", "GNE", "GNMK", "GNRC", "GOGL", "GOGO", "GOOD", "GOV", "GPI", "GPRE", "GPT", "GPX", "GRBK", "GRC", "GRUB", "GSAT", "GSBC", "GSIG", "GSM", "GST", "GTLS", "GTN", "GTS", "GTT", "GTY", "GUID", "GVA", "GWB", "GWRE", "HA", "HABT", "HAE", "HAFC", "HALL", "HALO", "HASI", "HAWK", "HAYN", "HBHC", "HBIO", "HBNC", "HCCI", "HCHC", "HCI", "HCKT", "HCOM", "HCSG", "HDP", "HEES", "HEI", "HEI.A", "HELE", "HEOP", "HF", "HFWA", "HGR", "HHS", "HI", "HIBB", "HIFR", "HIFS", "HIL", "HIVE", "HIW", "HK", "HL", "HLIT", "HLS", "HLTH", "HLX", "HMHC", "HMN", "HMPR", "HMST", "HMSY", "HMTV", "HNH", "HNI", "HNRG", "HOFT", "HOMB", "HOS", "HOV", "HPP", "HPY", "HQY", "HR", "HRG", "HRTG", "HRTX", "HSC", "HSII", "HSKA", "HSNI", "HSTM", "HT", "HTBI", "HTBK", "HTH", "HTLD", "HTLF", "HTS", "HTWR", "HUBG", "HUBS", "HURC", "HURN", "HVT", "HW", "HWAY", "HWKN", "HY", "HYH", "HZO", "I", "IART", "IBCP", "IBKC", "IBOC", "IBP", "IBTX", "ICD", "ICFI", "ICON", "ICUI", "IDA", "IDCC", "IDRA", "IDT", "IDTI", "IHC", "IIIN", "IILG", "IIVI", "IL", "IMAX", "IMDZ", "IMGN", "IMH", "IMKTA", "IMMR", "IMMU", "IMN", "IMPR", "IMPV", "INAP", "INCR", "INDB", "INFI", "INFN", "INGN", "ININ", "INN", "INO", "INSM", "INSY", "INTL", "INVN", "INWK", "IO", "IOSP", "IPAR", "IPCC", "IPHI", "IPHS", "IPI", "IPXL", "IQNT", "IRBT", "IRC", "IRDM", "IRET", "IRMD", "IRT", "IRWD", "ISBC", "ISCA", "ISIL", "ISLE", "ISRL", "ITCI", "ITG", "ITRI", "IVC", "IVR", "IXYS", "JACK", "JAKK", "JBSS", "JBT", "JCOM", "JGW", "JIVE", "JJSF", "JMBA", "JMG", "JNS", "JOE", "JONE", "JOUT", "JRVR", "KAI", "KALU", "KAMN", "KBAL", "KBH", "KCG", "KCLI", "KE", "KEG", "KELYA", "KERX", "KEYW", "KFRC", "KFY", "KIRK", "KITE", "KKD", "KLXI", "KMG", "KMPR", "KN", "KND", "KNL", "KNX", "KODK", "KONA", "KOP", "KOPN", "KPTI", "KRA", "KRG", "KRNY", "KRO", "KS", "KTOS", "KTWO", "KVHI", "KW", "KWR", "LABL", "LAD", "LADR", "LANC", "LAWS", "LBAI", "LBIO", "LBY", "LCI", "LCUT", "LDL", "LDR", "LDRH", "LE", "LFUS", "LG", "LGIH", "LGND", "LHCG", "LHO", "LIFE", "LION", "LIOX", "LJPC", "LKFN", "LL", "LLNW", "LMAT", "LMNR", "LMNX", "LMOS", "LNCE", "LNDC", "LNN", "LOCK", "LOCO", "LOGM", "LOPE", "LORL", "LOXO", "LPG", "LPSN", "LPX", "LQ", "LQDT", "LRN", "LSCC", "LTC", "LTRPA", "LTS", "LTXB", "LWAY", "LXFT", "LXP", "LXRX", "LXU", "LYTS", "LZB", "MACK", "MANH", "MANT", "MASI", "MATW", "MATX", "MBFI", "MBI", "MBUU", "MBVT", "MBWM", "MC", "MCF", "MCHX", "MCRI", "MCS", "MDAS", "MDC", "MDCA", "MDCO", "MDGN", "MDLY", "MDP", "MDR", "MDSO", "MDXG", "MED", "MEG", "MEI", "MENT", "METR", "MFLX", "MFRM", "MG", "MGEE", "MGI", "MGLN", "MGNX", "MGPI", "MGRC", "MHGC", "MHLD", "MHO", "MIFI", "MINI", "MITT", "MKSI", "MKTO", "MKTX", "MLAB", "MLHR", "MLI", "MLNK", "MLR", "MMI", "MMS", "MMSI", "MNKD", "MNR", "MNRO", "MNTA", "MOBL", "MOD", "MODN", "MOFG", "MOG.A", "MOH", "MORE", "MOV", "MPAA", "MPG", "MPW", "MPWR", "MPX", "MRC", "MRCY", "MRIN", "MRLN", "MRTN", "MRTX", "MSA", "MSCC", "MSEX", "MSFG", "MSTR", "MTDR", "MTG", "MTGE", "MTH", "MTN", "MTOR", "MTRN", "MTRX", "MTSC", "MTSI", "MTSN", "MTX", "MTZ", "MW", "MWA", "MWW", "MXL", "MXPT", "MYCC", "MYE", "MYGN", "MYRG", "NADL", "NANO", "NAO", "NAT", "NATL", "NATR", "NAV", "NAVB", "NAVG", "NBBC", "NBHC", "NBIX", "NBTB", "NC", "NCI", "NCMI", "NCOM", "NCS", "NDLS", "NEFF", "NEO", "NEOG", "NEWM", "NEWP", "NEWR", "NEWS", "NFBK", "NGHC", "NGS", "NGVC", "NHC", "NHI", "NHTC", "NILE", "NJR", "NKSH", "NKTR", "NL", "NLNK", "NLS", "NM", "NMBL", "NMIH", "NNA", "NNBR", "NNI", "NOG", "NP", "NPBC", "NPK", "NPO", "NPTN", "NR", "NRCIA", "NRZ", "NSA", "NSIT", "NSM", "NSP", "NSR", "NSTG", "NTCT", "NTGR", "NTK", "NTLS", "NTRI", "NUTR", "NUVA", "NVAX", "NVEC", "NVEE", "NVIV", "NVRO", "NVTA", "NWBI", "NWBO", "NWE", "NWHM", "NWLI", "NWN", "NWPX", "NX", "NXRT", "NXST", "NXTM", "NYLD", "NYMT", "NYNY", "NYRT", "NYT", "OAS", "OB", "OCAT", "OCFC", "OCLR", "OCN", "OCUL", "ODC", "OFG", "OFIX", "OFLX", "OGS", "OIS", "OKSB", "OLED", "OLN", "OLP", "OMAM", "OMCL", "OME", "OMED", "OMER", "OMI", "OMN", "ONB", "ONCE", "ONDK", "ONTY", "ONVO", "OPB", "OPHT", "OPWR", "OPY", "ORA", "ORBC", "ORC", "OREX", "ORIT", "ORN", "OSBC", "OSIR", "OSIS", "OSTK", "OSUR", "OTIC", "OTTR", "OUTR", "OVAS", "OVTI", "OXFD", "OXM", "OZRK", "PACB", "PAHC", "PARR", "PATK", "PAYC", "PB", "PBH", "PBPB", "PBY", "PCBK", "PCCC", "PCH", "PCO", "PCRX", "PCTY", "PCYG", "PDCE", "PDFS", "PDLI", "PDVW", "PE", "PEB", "PEBO", "PEGA", "PEGI", "PEI", "PEIX", "PENN", "PERY", "PES", "PETS", "PETX", "PFBC", "PFIS", "PFNX", "PFPT", "PFS", "PFSI", "PFSW", "PGC", "PGEM", "PGND", "PGNX", "PGTI", "PHH", "PHIIK", "PHX", "PICO", "PIR", "PJC", "PKD", "PKE", "PKOH", "PKY", "PLAB", "PLAY", "PLCE", "PLCM", "PLKI", "PLOW", "PLPC", "PLT", "PLUG", "PLUS", "PLXS", "PMC", "PMT", "PN", "PNFP", "PNK", "PNM", "PNY", "PODD", "POL", "POOL", "POR", "POST", "POWI", "POWL", "POWR", "POZN", "PPBI", "PPHM", "PRAA", "PRAH", "PRFT", "PRGS", "PRI", "PRIM", "PRK", "PRLB", "PRO", "PRSC", "PRTA", "PRTK", "PRTO", "PRTY", "PRXL", "PSB", "PSG", "PSIX", "PSMT", "PSTB", "PTCT", "PTLA", "PTSI", "PTX", "PVA", "PVTB", "PWOD", "PZN", "PZZA", "QADA", "QCRH", "QDEL", "QLGC", "QLIK", "QLYS", "QNST", "QSII", "QTM", "QTS", "QTWO", "QUAD", "RAIL", "RARE", "RAS", "RATE", "RAVN", "RBCAA", "RCAP", "RCII", "RDEN", "RDI", "RDN", "RDNT", "RDUS", "RECN", "REGI", "REI", "REIS", "RELY", "RENT", "RESI", "REV", "REX", "REXI", "REXR", "REXX", "RGEN", "RGLS", "RGR", "RGS", "RH", "RHP", "RIGL", "RJET", "RKDA", "RKUS", "RLD", "RLGT", "RLI", "RLJ", "RLYP", "RM", "RMAX", "RMBS", "RMTI", "RNET", "RNG", "RNST", "RNWK", "ROCK", "ROG", "ROIC", "ROLL", "ROVI", "ROX", "RP", "RPT", "RPTP", "RPXC", "RRGB", "RRTS", "RSE", "RSO", "RSPP", "RSTI", "RT", "RTEC", "RTIX", "RTK", "RTRX", "RUBI", "RUSHA", "RUTH", "RVNC", "RWT", "RXDX", "RXN", "RYAM", "RYI", "SAAS", "SAFM", "SAFT", "SAGE", "SAH", "SAIA", "SAIC", "SALE", "SALT", "SAM", "SANM", "SASR", "SB", "SBCF", "SBGI", "SBRA", "SBSI", "SBY", "SCAI", "SCHL", "SCHN", "SCL", "SCLN", "SCMP", "SCOR", "SCS", "SCSC", "SCSS", "SCVL", "SEAC", "SEAS", "SEB", "SEM", "SEMG", "SENEA", "SF", "SFBS", "SFE", "SFL", "SFLY", "SFNC", "SFS", "SFXE", "SGA", "SGBK", "SGC", "SGI", "SGM", "SGMO", "SGMS", "SGNT", "SGY", "SGYP", "SHAK", "SHEN", "SHLM", "SHO", "SHOO", "SHOR", "SIEN", "SIGI", "SIGM", "SIR", "SIXD", "SJI", "SJW", "SKUL", "SKYW", "SLAB", "SLCA", "SMCI", "SMP", "SMRT", "SMTC", "SN", "SNAK", "SNBC", "SNC", "SNCR", "SNHY", "SNMX", "SNOW", "SNR", "SNTA", "SNX", "SONC", "SONS", "SP", "SPA", "SPKE", "SPNC", "SPNS", "SPOK", "SPPI", "SPSC", "SPTN", "SPWH", "SQBG", "SQI", "SQNM", "SRCE", "SRDX", "SREV", "SRI", "SRNE", "SRPT", "SSB", "SSD", "SSE", "SSI", "SSNI", "SSP", "SSS", "SSTK", "SSYS", "STAA", "STAG", "STAR", "STBA", "STBZ", "STC", "STCK", "STE", "STFC", "STL", "STML", "STMP", "STNG", "STOR", "STRA", "STRP", "STRT", "SUI", "SUM", "SUP", "SUPN", "SVU", "SWC", "SWFT", "SWHC", "SWM", "SWX", "SXC", "SXI", "SXT", "SYA", "SYBT", "SYKE", "SYNA", "SYNT", "SYRG", "SYUT", "SYX", "SZMK", "SZYM", "TAL", "TASR", "TAST", "TAT", "TAX", "TBBK", "TBI", "TBK", "TBNK", "TBPH", "TBRA", "TCBI", "TCBK", "TCS", "TDW", "TDY", "TECD", "TEN", "TESO", "TFM", "TG", "TGH", "TGTX", "THFF", "THLD", "THR", "THRM", "THS", "TILE", "TIME", "TIPT", "TIS", "TISI", "TITN", "TIVO", "TKAI", "TLMR", "TLN", "TLYS", "TMH", "TMHC", "TMP", "TMST", "TNAV", "TNC", "TNDM", "TNET", "TNGO", "TNK", "TOWN", "TOWR", "TPC", "TPH", "TPLM", "TPRE", "TPUB", "TR", "TRC", "TREC", "TREE", "TREX", "TRK", "TRMK", "TRNO", "TROV", "TROX", "TRR", "TRS", "TRST", "TRUE", "TRUP", "TRVN", "TRXC", "TSC", "TSE", "TSQ", "TSRA", "TSRO", "TSYS", "TTEC", "TTEK", "TTGT", "TTI", "TTMI", "TTOO", "TTPH", "TTS", "TTWO", "TUBE", "TUES", "TUMI", "TVPT", "TWI", "TWIN", "TWOU", "TXMD", "TXRH", "TXTR", "TYL", "TYPE", "TZOO", "UACL", "UAM", "UBA", "UBNK", "UBNT", "UBSH", "UBSI", "UCBI", "UCFC", "UCTT", "UDF", "UE", "UEC", "UEIC", "UFCS", "UFI", "UFPI", "UHT", "UIHC", "UIS", "ULTR", "UMBF", "UMH", "UMPQ", "UNF", "UNFI", "UNIS", "UNT", "UNTD", "UPL", "USAK", "USCR", "USLM", "USNA", "USPH", "UTEK", "UTI", "UTIW", "UTL", "UTMD", "UUUU", "UVE", "UVSP", "UVV", "VA", "VAC", "VASC", "VCRA", "VCYT", "VDSI", "VEC", "VECO", "VG", "VGR", "VHC", "VHI", "VICR", "VIRT", "VISI", "VIVO", "VLGEA", "VLY", "VMEM", "VNCE", "VNDA", "VOXX", "VPG", "VRA", "VRNS", "VRNT", "VRTS", "VRTU", "VRTV", "VSAR", "VSAT", "VSEC", "VSH", "VSI", "VSLR", "VSTM", "VTAE", "VTL", "VVI", "VVUS", "W", "WABC", "WAC", "WAFD", "WAGE", "WAIR", "WAL", "WASH", "WBMD", "WBS", "WCG", "WCIC", "WD", "WDFC", "WERN", "WETF", "WEYS", "WGL", "WGO", "WHG", "WIBC", "WIFI", "WIN", "WINA", "WIRE", "WIX", "WK", "WLB", "WLH", "WMAR", "WMC", "WMGI", "WMK", "WMS", "WNC", "WNR", "WOR", "WPP", "WRE", "WRLD", "WSBC", "WSBF", "WSFS", "WSR", "WST", "WSTC", "WTBA", "WTFC", "WTI", "WTS", "WTW", "WWD", "WWE", "WWW", "XBIT", "XCO", "XCRA", "XENT", "XHR", "XLRN", "XNCR", "XNPT", "XOMA", "XONE", "XOXO", "XPO", "XRM", "XXIA", "YDKN", "YORW", "YRCW", "ZAGG", "ZAIS", "ZEN", "ZEUS", "ZFGN", "ZGNX", "ZINC", "ZIOP", "ZIXI", "ZLTQ", "ZOES", "ZUMZ"], "dow30": ["GS", "CAT", "MSFT", "AMGN", "HD", "SHW", "MCD", "AXP", "V", "JPM", "TRV", "UNH", "AAPL", "JNJ", "IBM", "HON", "AMZN", "CVX", "BA", "CRM", "NVDA", "MMM", "PG", "WMT", "MRK", "DIS", "CSCO", "KO", "VZ", "NKE"]};
+const IDX_LABEL={sp500:'S&P 500',nasdaq100:'Nasdaq-100',russell2000:'Russell 2000',dow30:'Dow 30'};
+function inIndex(sym){sym=(sym||'').toUpperCase();var r=[];for(var k in US_INDEXES){if(US_INDEXES[k].indexOf(sym)>-1)r.push(k);}return r;}
+
+/* ==== 🇹🇭 DR ไทยที่อ้างอิงหุ้นเมกา (โหลดครั้งเดียวจาก /dr_us.json) — แสดงในหน้าหุ้นเมกาเท่านั้น ==== */
+let DR_US={};
+function loadDrUs(){   // เรียกหลัง API ถูก define แล้ว (ดูท้ายสคริปต์)
+  if(DR_US && Object.keys(DR_US).length) return;      // โหลดครั้งเดียว
+  return fetch(API+'/dr_us.json?v=1').then(r=>r.json()).then(j=>{
+    DR_US=(j&&j.byTicker)||{};
+    if(typeof curPage!=='undefined' && curPage==='stocks' && currentMarket==='america'){ try{ renderView(); }catch(e){} }
+  }).catch(()=>{});
+}
+function drList(tk){ return DR_US[String(tk||'').toUpperCase()]||null; }
+function drIssuerShort(s){ return String(s||'').replace(/\s*\(.*\)\s*$/,''); }
+function drShort(tk){   // ป้ายย่อ: มี DR กี่ตัว + ค่ายไหน
+  const L=drList(tk); if(!L||!L.length) return '';
+  const iss=[...new Set(L.map(x=>drIssuerShort(x.i)))];
+  const tip=L.map((x,k)=>`${x.t} · ${x.i} · Vol ${Number(x.vol||0).toLocaleString()}`).join(' | ');
+  return `<span class="pill text-rose-300 border-rose-700/60" title="🇹🇭 ซื้อในไทยได้ผ่าน DR ${L.length} ตัว — ${tip}">🇹🇭 DR ${L.length} · ${iss.slice(0,3).join('/')}${iss.length>3?' +'+(iss.length-3):''}</span>`;
+}
+function drTableHTML(tk){   // ตารางเต็ม (ใน modal) เรียงตาม Vol มาก→น้อย
+  const L=drList(tk); if(!L||!L.length) return '';
+  const rows=L.map(x=>{
+    const v=Number(x.val), y=Number(x.ytd);
+    return `<tr class="border-b border-[#16202e]">
+      <td class="p-1.5 font-semibold text-rose-300">${x.t}</td>
+      <td class="p-1.5 text-slate-300">${x.i}</td>
+      <td class="p-1.5 text-right">${Number(x.vol||0).toLocaleString()}</td>
+      <td class="p-1.5 text-right text-slate-400">${Number.isFinite(v)?v.toFixed(1)+'M':'-'}</td>
+      <td class="p-1.5 text-right ${y>0?'text-emerald-400':(y<0?'text-rose-400':'text-slate-400')}">${Number.isFinite(y)?(y>0?'+':'')+y.toFixed(1)+'%':'-'}</td>
+    </tr>`;}).join('');
+  return `<div class="bg-[#0d1219] border border-[#1e2634] rounded-lg p-3">
+    <div class="text-xs font-bold text-rose-300 mb-1">🇹🇭 ซื้อหุ้นนี้ผ่าน DR ในตลาดไทยได้ — ${L.length} ตัว (เรียงตาม Volume มาก→น้อย)</div>
+    <div class="overflow-x-auto"><table class="w-full text-[11px]">
+      <thead><tr class="text-slate-400 border-b border-[#243044]"><th class="p-1.5 text-left text-[10px]">DR</th><th class="p-1.5 text-left text-[10px]">ค่ายผู้ออก</th><th class="p-1.5 text-right text-[10px]">Volume</th><th class="p-1.5 text-right text-[10px]">มูลค่าซื้อขาย</th><th class="p-1.5 text-right text-[10px]">YTD</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>
+    <div class="text-[10px] text-slate-500 mt-2">เลขท้ายชื่อ DR = ผู้ออก — 01 บัวหลวง · 03 พาย · 06 เกียรตินิภัทร · 11 กสิกรไทย · 13 KGI · 19 หยวนต้า · 23 InnovestX · 24 ฟินันเซีย · 80 กรุงไทย</div>
+  </div>`;
+}
+const API = '';
+let stockData = [], preloadedCharts = {}, activeModal = '', timerId = null;
+let stockDB = {thailand: [], america: []};   // cache scan ทั้ง 2 ตลาด — ใช้หา cap/logo/theme จากตลาดตรง
+let activeMarket = 'thailand';   // ตลาดของหุ้นที่กำลังเปิด modal (อาจไม่เท่า currentMarket)
+let moneyFlowData = null, flowTF = '1d';
+let VOL_TH = {}, CORR_BEST = {}, CORR_PAIRS = [];   // A1 ความผันผวน + A2 คู่ที่วิ่งพร้อมกัน (static /vol_th.json /corr_th.json)
+loadVolCorr();
+let themesData = null;
+let summaryData = null;
+let sortKey = null, sortAsc = false;
+let sortKey2 = null, sortAsc2 = false;   // คอลัมน์รอง (secondary) — shift+คลิก
+let perPage = 10;         // 10 ตัวต่อหน้า (บอสขอ.)
+let page = 1;             // หน้าปัจจุบัน (1-based)
+
+function sortCmp(a,b,key,asc){
+  let va=a[key], vb=b[key];
+  const na = va==null || (typeof va==='number'&&!isFinite(va));
+  const nb = vb==null || (typeof vb==='number'&&!isFinite(vb));
+  if(na&&nb) return 0; if(na) return 1; if(nb) return -1;
+  if(typeof va==='string') return asc?va.localeCompare(vb):vb.localeCompare(va);
+  return asc?va-vb:vb-va;
+}
+function setSortMain(key){
+  if(sortKey===key) sortAsc=!sortAsc; else { sortKey=key; sortAsc=(key==='ticker'); }
+  document.getElementById('sortMain').value=key;
+  updateSortDirBtn(); stockData.sort(sortNow); renderView();
+}
+function toggleSortDir(){ sortAsc=!sortAsc; updateSortDirBtn(); stockData.sort(sortNow); renderView(); }
+function updateSortDirBtn(){ const b=document.getElementById('sortDirBtn'); if(b) b.textContent = sortAsc?'↑':'↓'; }
+function sortNow(a,b){ let c=sortCmp(a,b,sortKey||'rs',sortAsc); if(c===0 && sortKey2 && sortKey2!==sortKey) c=sortCmp(a,b,sortKey2,sortAsc2); return c; }
+function sortTable(key, ev){
+  if(!stockData.length) return;
+  const shift = ev && ev.shiftKey;
+  if(shift){
+    // shift+คลิก = ตั้งเป็นคอลัมน์รอง (ถ้ากดซ้ำ กลับทิศ)
+    if(sortKey2===key) sortAsc2=!sortAsc2; else { sortKey2=key; sortAsc2=(key==='ticker'); }
+  } else {
+    // คลิกปกติ = คอลัมน์หลัก
+    if(sortKey===key) sortAsc=!sortAsc; else { sortKey=key; sortAsc=(key==='ticker'); }
+  }
+  const cmp=(a,b)=>{
+    let c=sortCmp(a,b,sortKey,sortAsc);
+    if(c===0 && sortKey2 && sortKey2!==sortKey) c=sortCmp(a,b,sortKey2,sortAsc2);
+    return c;
+  };
+  stockData.sort(cmp);
+    renderView();
+  }
+  // เลือกคอลัมน์รองผ่าน dropdown (มือถือ/สะดวก ไม่ต้อง Shift) — ใช้กับ multi-sort เดียวกัน
+  function setSortSecondary(key){
+    if(!key){ sortKey2=null; if(sortKey) renderView(); return; }
+    sortKey2 = key;
+    sortAsc2 = (key==='ticker');
+    if(!sortKey) { sortKey='rs'; sortAsc=false; }  // ถ้ายังไม่มีหลัก ตั้งเป็น RS
+    renderView();
+  }
+
+/* ===== สลับตลาด ไทย / US ===== */
+/* ปุ่ม A−/A+/↺ — ปรับขนาดตัวหนังสือทั่วเว็บ (scale wrapper = ลำดับตัวอักษร + ช่องว่างให้ใหญ่ตาม) */
+function fontZoom(delta){
+  const base=parseFloat(localStorage.getItem('rsd_zoom')||'1');
+  let z=delta===0?1:(delta>0?base+0.12:base-0.12);
+  z=Math.max(0.8, Math.min(1.5, +z.toFixed(2)));
+  localStorage.setItem('rsd_zoom', z);
+  applyFontZoom(z);
+}
+function applyFontZoom(z){
+  const w=document.querySelector('.max-w-7xl');
+  if(w) w.style.transformOrigin = 'top left';
+  if(w) w.style.transform = `scale(${z})`;
+  if(w) w.style.marginBottom = `${(z-1)*400}px`;  // ชดเชยพื้นที่ที่ scale ไม่กินเอง
+}
+document.addEventListener('DOMContentLoaded',()=>{ try{ applyFontZoom(parseFloat(localStorage.getItem('rsd_zoom')||'1')); }catch(e){} });
+
+let currentMarket = 'thailand';
+/* แยกหน้า: ภาพรวมตลาด (breadth/summary/flow/themes) vs หุ้น (cards/table) */
+let curPage = 'overview';
+function setPage(pg){
+  curPage = pg;
+  try{ localStorage.setItem('rsd_curPage', pg); }catch(e){}   // จำหน้าสุดท้ายไว้ (ข้อ ก บอส)
+  const ov = ['marketBriefPanel','indexBar','marketSummaryPanel','megatrendPanel','flowPanel','themesPanel','topglPanel'];
+  const st = ['searchBar','progressPanel','cardsView','tableView'];
+  ov.forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display = (pg==='overview') ? '' : 'none'; });
+  st.forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display = (pg==='stocks') ? '' : 'none'; });
+  const t20=document.getElementById('top20Panel'); if(t20) t20.style.display = (pg==='top20') ? '' : 'none';
+  const no=document.getElementById('navOverview'), ns=document.getElementById('navStocks'), nt=document.getElementById('navTop20');
+  if(no) no.classList.toggle('active', pg==='overview');
+  if(ns) ns.classList.toggle('active', pg==='stocks');
+  if(nt) nt.classList.toggle('active', pg==='top20');
+  if(pg==='stocks'){ const cv=document.getElementById('cardsView'); if(cv) window.requestAnimationFrame(renderView); }
+  if(pg==='top20'){ topSortKey='pYTD'; topSortDir=1;
+    const _t={tpSortYTD:'pYTD', tpSort1y:'p1y', tpSort2y:'p2y'};
+    Object.keys(_t).forEach(id=>{ const e=document.getElementById(id); if(e) e.classList.toggle('active', _t[id]===topSortKey); });
+    const _vt=document.getElementById('tpViewTable'), _vc=document.getElementById('tpViewCard');
+    if(_vt) _vt.classList.toggle('active', topView==='table');
+    if(_vc) _vc.classList.toggle('active', topView==='card');
+    loadTop20(); }   // default: เรียง YTD จากมาก→น้อย (#1..20)
+}
+// ---- 🏆 Top 20 ผลตอบแทน (YTD / 1 ปี / 2 ปี) แยกไทย/เมกา ----
+const TOP20_MK = ['thailand','america'];
+let topMk='thailand', topSortKey='pYTD', topSortDir=1, topRows=[], p2yCache={};   // dir=1 => เรียงจากมาก→น้อย (#1 มากสุด)
+let topView='table', topCharts={};   // topView = 'table' | 'card' ; topCharts = cache กราฟการ์ด
+let topUniverse='all', topAllData={}, topAllLoading={};   // 'all' | 'rs' | 'idx'  (default = หุ้นสามัญทั้งตลาด)
+let topRSEligible=new Set();   // เซ็ตหุ้นที่ "ผ่านเกณฑ์ RS หลัก" (Val + rs≥70) — ใช้ติดป้ายในโหมดทั้งหมด
+function setTopUniverse(u){
+  topUniverse = (u==='rs'||u==='idx') ? u : 'all';
+  const _idsU={all:'tpUniAll', rs:'tpUniRS', idx:'tpUniIdx'};
+  Object.keys(_idsU).forEach(k=>{ const e=document.getElementById(_idsU[k]); if(e) e.classList.toggle('active', k===topUniverse); });
+  loadTop20();
+}
+async function ensureTopAll(m){   // ดึงหุ้นสามัญทั้งตลาด (cache ต่อตลาด)
+  if(topAllData[m]) return topAllData[m];
+  if(topAllLoading[m]) return topAllLoading[m];
+  topAllLoading[m]=(async()=>{
+    try{
+      const r=await fetch(API+'/api/scan?market='+m+'&universe=all&v=2');
+      const j=await r.json();
+      topAllData[m]=(j&&j.data)||[];
+    }catch(e){ topAllData[m]=[]; }
+    delete topAllLoading[m];
+    return topAllData[m];
+  })();
+  return topAllLoading[m];
+}
+function setTopView(v){ topView = (v==='card')?'card':'table';
+  const a=document.getElementById('tpViewTable'), b=document.getElementById('tpViewCard');
+  if(a) a.classList.toggle('active', topView==='table');
+  if(b) b.classList.toggle('active', topView==='card');
+  renderTop20();
+}
+function setTopSort(k){ if(topSortKey===k){ topSortDir*=-1; } else { topSortKey=k; topSortDir=1; }
+  const ids={pYTD:'tpSortYTD', p1y:'tpSort1y', p2y:'tpSort2y'};
+  Object.keys(ids).forEach(kk=>{ const el=document.getElementById(ids[kk]); if(el) el.classList.toggle('active', kk===topSortKey); });
+  sortTop20Top(); renderTop20(); if(k==='p2y'){ loadP2yAll(topMk); }
+}
+function toggleTopDir(){ topSortDir*=-1; sortTop20Top(); renderTop20(); }
+function setTopMk(mk){
+  topMk=mk;
+  const a=document.getElementById('tpTh'), b=document.getElementById('tpUs');
+  if(a) a.classList.toggle('active', mk==='thailand');
+  if(b) b.classList.toggle('active', mk==='america');
+  loadTop20();
+}
+async function loadTop20(){
+  const _idsU={all:'tpUniAll', rs:'tpUniRS', idx:'tpUniIdx'};
+  Object.keys(_idsU).forEach(k=>{ const e=document.getElementById(_idsU[k]); if(e) e.classList.toggle('active', k===topUniverse); });
+  let list;
+  if(topUniverse==='rs'){
+    // "ผ่านเกณฑ์ RS หลัก" = ต้องผ่านทั้งเกณฑ์ RS (rs≥70) และเกณฑ์สภาพคล่อง/มูลค่าซื้อขาย (Val ตาม Dashboard) → ใช้ชุด clean ของ Dashboard
+    list=(stockDB[topMk]||[]).filter(s => s && !s.isDR && s.pYTD != null && (s.rs||0) >= RS_TOP_TH);
+  } else {
+    const all=await ensureTopAll(topMk);   // 'ทั้งหมด' / 'idx' = หุ้นสามัญทั้งตลาด (ไม่กรอง RS/Val)
+    list=(all||[]).filter(s => s && s.pYTD != null);
+  }
+  // เซ็ต "ผ่านเกณฑ์ RS หลัก" (มี Val + rs≥70) ใช้ติดป้ายในโหมดทั้งหมด/กลุ่ม index
+  topRSEligible = new Set((stockDB[topMk]||[]).filter(s => s && !s.isDR && (s.rs||0) >= RS_TOP_TH).map(s => s.ticker));
+  topRows=[...list]; sortTop20Top(); renderTop20();
+  topVisibleRows().filter(s => p2yCache[s.ticker]===undefined).forEach(s => fetchP2y(topMk, s));
+}
+function topVal(s,k){ return (k==='p2y') ? (p2yCache[s.ticker]!==undefined ? p2yCache[s.ticker] : -Infinity) : (s[k]||0); }
+function sortTop20Top(){ const k=topSortKey; topRows.sort((a,b)=>((topVal(b,k)-topVal(a,k))*topSortDir)); }
+function sortTop20(k){ if(topSortKey===k){ topSortDir*=-1; } else { topSortKey=k; topSortDir=-1; } sortTop20Top(); renderTop20(); if(k==='p2y'){ loadP2yAll(topMk); } }
+async function loadP2yAll(m){   // เรียง "2 ปี" — ดึง 2Y ของยูนิเวิร์สปัจจุบัน (จำกัด 300 อันดับแรกตามคะแนน กันยิงกราฟถล่มทั้งตลาด)
+  const list=(topRows||[]).slice(0, 300);
+  const todo=list.filter(s=>p2yCache[s.ticker]===undefined);
+  if(!todo.length) return;
+  for(let i=0;i<todo.length;i+=8){
+    await Promise.all(todo.slice(i,i+8).map(s=>fetchP2y(m,s)));
+    if(topSortKey==='p2y' && topMk===m) renderTop20();
+  }
+}
+function fmtPx(v){ const n=Number(v); return Number.isFinite(n) ? n.toLocaleString('en-US',{maximumFractionDigits:2}) : '-'; }
+const TOP20_N = 20;
+const RS_TOP_TH = 70;   // เกณฑ์ RS ของ Top20 (ตรงกับ default ของ Dashboard)
+// กลุ่มตาม index จริง: ไทย SET50/SET100/mai · US S&P500/Nasdaq-100/Dow30/Russell2000 (ไม่ใช่ mcap tier)
+const GROUP_ORDER = { thailand: ['SET50','SET100','mai/Small'], america: ['sp500','nasdaq100','dow30','russell2000','idx_other'] };
+const GROUP_LABEL = { 'SET50':'SET50','SET100':'SET100','mai/Small':'mai & Small','sp500':'S&P 500','nasdaq100':'Nasdaq-100','dow30':'Dow 30','russell2000':'Russell 2000','idx_other':'อื่นๆ (ไม่อยู่ใน index หลัก)' };
+const GROUP_COLOR = { 'SET50':'text-amber-300','SET100':'text-sky-300','mai/Small':'text-slate-300','sp500':'text-amber-300','nasdaq100':'text-sky-300','dow30':'text-emerald-400','russell2000':'text-yellow-300','idx_other':'text-slate-400' };
+function topGroupsOf(s){   // หุ้น 1 ตัวอยู่ได้หลาย index (โชว์ในทุกกลุ่มที่เป็นสมาชิก)
+  if(topMk==='america'){ const idx=inIndex(s.ticker); return idx.length?idx:['idx_other']; }
+  return [s.group||'mai/Small'];
+}
+function topGroupRows(g){ return topRows.filter(s=>topGroupsOf(s).indexOf(g)>-1); }
+function topVisibleRows(){   // แถวที่ต้องโหลด 2Y / วาดกราฟ ตาม universe ที่เลือก
+  if(topUniverse==='idx'){
+    const ord=GROUP_ORDER[topMk]||['mai/Small']; const out=[];
+    ord.forEach(g=>{ out.push(...topGroupRows(g).slice(0, TOP20_N)); });
+    return out;
+  }
+  return topRows.slice(0, TOP20_N);
+}
+function topRSHTML(s, forCard){   // ค่า RS ตัวเดียวใช้ทุกหน้า; โหมดทั้งหมด/กลุ่ม index → ตัวที่ "ไม่ผ่านเกณฑ์ RS หลัก" ติดป้ายให้เห็น
+  const rs=(s.rs!=null)?s.rs:'-';
+  const eligible = topRSEligible.size ? topRSEligible.has(s.ticker) : ((s.rs||0) >= RS_TOP_TH);
+  if(topUniverse!=='rs' && !eligible){
+    if(forCard) return '<span class="text-base font-extrabold text-slate-500" title="ไม่ผ่านเกณฑ์ RS หลัก (RS≥'+RS_TOP_TH+' และผ่านเกณฑ์มูลค่าซื้อขาย)">'+rs+'</span>';
+    return '<span class="text-slate-500" title="ไม่ผ่านเกณฑ์ RS หลัก (RS≥'+RS_TOP_TH+' และผ่านเกณฑ์มูลค่าซื้อขาย)">'+rs+'</span> <span class="pill text-slate-500 border-slate-600/60" title="ไม่ผ่านเกณฑ์ RS หลัก">ไม่ผ่านเกณฑ์</span>';
+  }
+  if(forCard) return '<span class="text-base font-extrabold '+rsColor(Number(s.rs))+'">'+rs+'</span>';
+  return '<span class="text-sky-300">'+rs+'</span>';
+}
+function topTableHTML(rows, m){
+  const head=(k,l)=>(`<th class="p-1 text-right cursor-pointer hover:text-white text-[10px]" onclick="sortTop20('${k}')">${l}${topSortKey===k?(topSortDir>0?' ▼':' ▲'):''}</th>`);
+  const body=rows.map((s,i)=>{
+    const rs=(s.rs!=null)?s.rs:'-';
+    const has2=(p2yCache[s.ticker]!==undefined);
+    return '<tr class="border-b border-[#16202e] hover:bg-[#111827] cursor-pointer" onclick="openModal(\''+s.ticker+'\',\''+(s.name||'').replace(/'/g,"\\'")+'\',\''+m+'\')">'+
+      '<td class="p-1 text-slate-500">'+(i+1)+'</td>'+
+      '<td class="p-1 font-semibold">'+s.ticker+'<span class="block text-[9px] text-slate-500 truncate max-w-[150px]">'+(s.name||'')+'</span></td>'+
+      '<td class="p-1 text-right">'+topRSHTML(s)+'</td>'+
+      '<td class="p-1 text-right">'+fPctExact(s.pYTD)+'</td>'+
+      '<td class="p-1 text-right">'+fPctExact(s.p1y)+'</td>'+
+      '<td class="p-1 text-right" id="p2y_'+m+'_'+s.ticker+'">'+(has2?fPctExact(p2yCache[s.ticker]):'<span class="text-slate-600">…</span>')+'</td>'+
+      '<td class="p-1 text-right">'+fmtPx(s.price)+'</td>'+
+      '<td class="p-1 text-left truncate max-w-[120px] text-slate-400">'+(s.industry||'')+'</td></tr>';
+  }).join('');
+  return '<div class="overflow-x-auto"><table class="w-full text-[11px]">'+
+    '<thead><tr class="text-slate-400 border-b border-[#243044]">'+
+    '<th class="p-1 text-left text-[10px]">#</th><th class="p-1 text-left text-[10px]">หุ้น</th>'+
+    '<th class="p-1 text-right text-[10px]">RS</th>'+head('pYTD','ปีนี้ YTD')+head('p1y','1 ปี')+head('p2y','2 ปี')+
+    '<th class="p-1 text-right text-[10px]">ราคา</th><th class="p-1 text-left text-[10px]">กลุ่ม</th></tr></thead><tbody>'+body+'</tbody></table></div>';
+}
+function topCardItems(rows, m){
+  return rows.map((s,i)=>{
+    const tk=s.ticker, cid='tchart_'+m+'_'+tk.replace(/[^a-z0-9]/gi,'_');
+    const has2=(p2yCache[tk]!==undefined);
+    const p2yHtml = has2 ? fPctExact(p2yCache[tk]) : '<span class="text-slate-600">…</span>';
+    const logo=`<img src="${logoUrlM(tk,m)}" alt="" loading="lazy" onerror="this.style.display='none'" class="w-4 h-4 rounded-full object-cover shrink-0" />`;
+    return `<div class="scard p-2.5">
+      <div class="flex items-start justify-between gap-1">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-[10px] font-bold text-slate-500">#${i+1}</span>
+          ${logo}
+          <button onclick="openModal('${tk}','${(s.name||'').replace(/'/g,"\\'")}','${m}')" class="text-[15px] font-bold hover:text-sky-400 truncate" title="${(s.name||'')}">${tk}</button>
+          <span class="tag-market" title="${m==='america'?'ตลาดสหรัฐฯ (US)':'ตลาดไทย'}">${m==='america'?'🇺🇸':'🇹🇭'}</span>
+          <span class="text-[10px] text-slate-500 truncate max-w-[120px]">${s.name||''}</span>
+        </div>
+        ${topRSHTML(s,true)}
+      </div>
+      <div class="mt-1 grid grid-cols-2 gap-x-2 gap-y-0.5 text-[11px]">
+        <div class="flex justify-between"><span class="text-slate-500">ปีนี้</span><span>${fPctExact(s.pYTD)}</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">1 ปี</span><span>${fPctExact(s.p1y)}</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">2 ปี</span><span>${p2yHtml}</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">ราคา</span><span class="text-white">${fmtPx(s.price)}</span></div>
+      </div>
+      <div class="text-[10px] text-slate-500 mt-0.5 truncate">${s.industry||''}</div>
+      <div class="relative mt-1"><div id="${cid}" class="chart" style="height:150px"></div></div>
+    </div>`;
+  }).join('');
+}
+function topCardsGrid(rows,m){ return '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-3">'+topCardItems(rows,m)+'</div>'; }
+function topUniverseNote(){
+  const mk = topMk==='america' ? 'US' : 'ไทย';
+  const dir = topSortDir>0 ? ' ▼' : ' ▲';
+  const cap = ' · 2 ปี: คำนวณจากกราฟ';
+  if(topUniverse==='rs') return 'Universe: หุ้นที่ผ่านเกณฑ์ RS หลัก ('+topRows.length+' ตัว) — ต้องผ่านทั้ง RS ≥ '+RS_TOP_TH+' และเกณฑ์มูลค่าซื้อขาย/สภาพคล่องตาม Dashboard · เรียง '+sortLabel(topSortKey)+dir+cap;
+  if(topUniverse==='all') return 'Universe: หุ้นสามัญทั้งตลาด'+mk+' ('+topRows.length+' ตัว) — ตัด DR/ใบสำคัญ/กองทุน/REIT และตัวไม่มีค่า RS · ตัวที่ไม่ผ่านเกณฑ์ RS หลักจะติดป้าย "ไม่ผ่านเกณฑ์" · เรียง '+sortLabel(topSortKey)+dir+cap;
+  return 'Universe: หุ้นสามัญทั้งตลาด จัดกลุ่มตาม index จริง — '+(topMk==='america'?'S&P 500 / Nasdaq-100 / Dow 30 / Russell 2000':'SET50 / SET100 / mai')+' · ตัวที่อยู่หลาย index จะโชว์ในทุกกลุ่ม · เรียง '+sortLabel(topSortKey)+dir+cap;
+}
+function renderTop20(){
+  const el=document.getElementById('top20Main'); if(!el) return;
+  const m=topMk;
+  const _ids={pYTD:'tpSortYTD', p1y:'tpSort1y', p2y:'tpSort2y'};
+  Object.keys(_ids).forEach(kk=>{ const e=document.getElementById(_ids[kk]); if(e) e.classList.toggle('active', kk===topSortKey); });
+  const note='<div class="text-[10px] text-slate-500 mt-1">'+topUniverseNote()+'</div>';
+  if(topUniverse==='idx'){
+    const ord=GROUP_ORDER[m]||['mai/Small'];
+    let html='';
+    ord.forEach(g=>{
+      const rows=topGroupRows(g).slice(0, TOP20_N);
+      if(!rows.length) return;
+      html+='<div class="mt-3 mb-1 text-xs font-bold '+(GROUP_COLOR[g]||'text-slate-300')+'">'+(GROUP_LABEL[g]||g)+' <span class="text-slate-500 font-normal">· Top '+rows.length+'</span></div>';
+      html += (topView==='card') ? topCardsGrid(rows,m) : topTableHTML(rows,m);
+    });
+    el.innerHTML = html + note;
+    if(topView==='card') loadTop20Charts(topVisibleRows(), m);
+    return;
+  }
+  const rows=topRows.slice(0, TOP20_N);
+  el.innerHTML = ((topView==='card') ? topCardsGrid(rows,m) : topTableHTML(rows,m)) + note;
+  if(topView==='card') loadTop20Charts(rows, m);
+}
+function sortLabel(k){ return k==='pYTD' ? 'ปีนี้ (YTD)' : (k==='p1y' ? '1 ปี' : '2 ปี'); }
+async function loadTop20Charts(rows, m){
+  const list=rows.slice();
+  for(let i=0;i<list.length;i+=8){          // batching 8 ต่อรอบ (โหมด idx อาจมีถึง 60 การ์ด)
+    await Promise.all(list.slice(i,i+8).map(async (s)=>{
+      await new Promise(res=>requestAnimationFrame(()=>requestAnimationFrame(()=>res())));
+      const el = document.getElementById('tchart_'+m+'_'+s.ticker.replace(/[^a-z0-9]/gi,'_'));
+      if(!el) return;
+      const key=m+'_'+s.ticker;
+      if(topCharts[key]){ drawWhenSized(el, topCharts[key]); return; }
+      try{
+        const r = await fetch(API+'/api/chart?market='+m+'&symbol='+s.ticker+'&interval=1d&range=1y');
+        const j = await r.json();
+        if(j.data && j.data.length){ topCharts[key]=j.data; drawWhenSized(el, j.data); }
+        else el.innerHTML='<div class="flex items-center justify-center h-full text-[11px] text-slate-500">ไม่มีกราฟ</div>';
+      }catch(e){ el.innerHTML='<div class="flex items-center justify-center h-full text-[11px] text-rose-400">โหลดไม่สำเร็จ</div>'; }
+    }));
+  }
+}
+async function fetchP2y(m, s){
+  const cell=document.getElementById('p2y_'+m+'_'+s.ticker);
+  let v=null;
+  try{
+    const r=await fetch(API+'/api/chart?market='+m+'&symbol='+s.ticker+'&interval=1d&range=5y');
+    const j=await r.json(); const bars=(j&&j.data)||[];
+    if(bars.length>300){
+      const last=bars[bars.length-1];
+      const target=new Date(last.time||last.datetime); target.setDate(target.getDate()-730);   // 2 ปีก่อน
+      const ts=target.toISOString().slice(0,10);
+      let c2=null;
+      for(let i=bars.length-1;i>=0;i--){ if((bars[i].time||bars[i].datetime)<=ts){ c2=bars[i].close; break; } }
+      if(last.close && c2) v=(last.close/c2-1)*100;   // เป็น % (เหมือน YTD/1Y → 226 = +226%)
+    }
+  }catch(e){}
+  p2yCache[s.ticker]=v;
+  if(cell) cell.innerHTML = (v===null||v===undefined) ? '<span class="text-slate-600">-</span>' : fPctExact(v);
+}
+  function fillGroupOptions(mk){
+    const sel=document.getElementById('groupFilter');
+    if(!sel) return;
+  const idx='<option value="IDX:sp500">S&amp;P 500</option><option value="IDX:nasdaq100">Nasdaq-100</option><option value="IDX:russell2000">Russell 2000</option><option value="IDX:dow30">Dow 30</option>';
+  const th='<option value="ALL">ทุกกลุ่ม</option><option value="SET50">SET50</option><option value="SET100">SET100</option><option value="mai/Small">mai &amp; Small</option>';
+  const us='<option value="ALL">ทุกกลุ่ม</option>'+idx+'';
+  sel.innerHTML = (mk==='america')
+    ? us+'<option value="MegaCap">Mega Cap</option><option value="LargeCap">Large Cap</option><option value="MidCap">Mid Cap</option><option value="SmallCap">Small Cap</option><option value="MicroCap">Micro Cap</option>'
+    : th;
+  sel.value='ALL';
+}
+function switchMarket(mk){
+  if(currentMarket === mk) return;
+  currentMarket = mk;
+  document.getElementById('tabTh').classList.toggle('active', mk==='thailand');
+  document.getElementById('tabUs').classList.toggle('active', mk==='america');
+  document.getElementById('marketBadge').textContent = mk==='america' ? 'RS Dashboard · หุ้นอเมริกา (US)' : 'RS Dashboard · หุ้นไทย';
+  document.getElementById('stockCount').textContent='…';
+  fillGroupOptions(mk);  // กลุ่มตามตลาด — ไทยไม่โชว์ S&P500
+    document.getElementById('groupFilter').value='ALL';
+    document.getElementById('rsFilter').value='70';   // default RS ≥ 70 (Card + Table)
+  page=1;
+  preloadedCharts = {};
+  runUpdate(false);   // เรียก scan แยกตลาด
+}
+
+/* โหลดกราฟของ N การ์ดในหน้าปัจจุบัน (จำกัดแค่ 10 — ไม่ระเบิด network) */
+/* วาดกราฟให้การ์ด — รอจน element มีขนาดจริง (>0) ก่อนสร้าง chart เหมือน modal */
+function drawWhenSized(el, data){
+  if(!el) return;
+  let tries=0;
+  function attempt(){
+    const w = el.clientWidth || el.parentElement?.clientWidth || 0;
+    if(w>10){
+      drawChart(el, data);           // w มีจริง -> วาด (autoSize ด้วย)
+    } else if(tries++ < 12){         // ยังไม่ laid out -> poll ใหม่ (สูงสุด ~1.2s)
+      setTimeout(attempt, 100);
+    } else {
+      el.innerHTML='<div class="flex items-center justify-center h-full text-[11px] text-slate-500">กราฟโหลดไม่สำเร็จ</div>';
+    }
+  }
+  attempt();
+}
+
+async function loadPageCharts(stocks){
+  const jobs = stocks.slice(0, perPage+3).map(async (x)=>{
+    // รอให้ renderView สร้าง DOM เสร็จในเฟรมนี้
+    await new Promise(res=>requestAnimationFrame(()=>requestAnimationFrame(()=>res())));
+    const el = document.getElementById('chart_'+x.ticker.replace(/[^a-z0-9]/gi,'_'));
+    if(!el) return;
+    if(preloadedCharts[x.ticker]){ drawWhenSized(el, preloadedCharts[x.ticker]); return; }
+    try{
+      const r = await fetch(API+'/api/chart?market='+currentMarket+'&symbol='+x.ticker+'&interval=1d&range=1y');
+      const j = await r.json();
+      if(j.data && j.data.length){ preloadedCharts[x.ticker]=j.data; drawWhenSized(el, j.data); }
+      else el.innerHTML='<div class="flex items-center justify-center h-full text-[11px] text-slate-500">ไม่มีกราฟ</div>';
+    }catch(e){
+      drawWhenSized(el, []); // fallback แสดงข้อความผ่าน drawChart เปล่า
+    }
+  });
+  await Promise.all(jobs);
+}
+
+/* ใช้ redraw การ์ดที่ถูก unload ไปแล้ว เมื่อเลื่อนกลับเห็น (virtual scroll) */
+function logoUrl(tk){
+  // LoadLogo: ticker ตรง US, ไทยต่อ .BK; fallback (onerror) จะซ่อน
+  const sym = currentMarket==='america' ? tk : tk+'.BK';
+  return 'https://img.loadlogo.com/ticker/'+encodeURIComponent(sym);
+}
+function logoUrlM(tk, mkt){
+  const sym = mkt==='america' ? tk : tk+'.BK';
+  return 'https://img.loadlogo.com/ticker/'+encodeURIComponent(sym);
+}
+function capBadge(grp){
+  if(!grp) return '';
+  // ไทย SET50/SET100 -> แสดงกลุ่ม · US Mega/Large/Mid/Small/Micro
+  const map = {
+    "MegaCap":"MEGA", "LargeCap":"LARGE", "MidCap":"MID",
+    "SmallCap":"SMALL", "MicroCap":"MICRO",
+  };
+  const t = map[grp] || grp;
+  const color = grp==="SET50"||grp==="MegaCap" ? "bg-amber-600/20 text-amber-300 border-amber-700/60"
+    : grp==="SET100"||grp==="LargeCap" ? "bg-sky-700/20 text-sky-300 border-sky-700/60"
+    : grp==="MidCap" ? "bg-emerald-700/20 text-emerald-300 border-emerald-700/60"
+    : "bg-slate-700/20 text-slate-400 border-slate-600/60";
+  return `<span class="pill ${color}" title="ขนาด Market Cap">${t}</span>`;
+}
+function buildCard(tk, nm, grp, ind, rs, px, ch, vol, val, p3, xn, rd, isDR, rv){
+  const cid='chart_'+tk.replace(/[^a-z0-9]/gi,'_');
+  const rdx = (rd===null||rd===undefined) ? '<span class="pill text-sky-300">NEW</span>' : (rd>0 ? '<span class="pill pos">▲ +'+rd+'</span>' : (rd<0 ? '<span class="pill neg">▼ '+Math.abs(rd)+'</span>' : '<span class="pill text-slate-500">—</span>'));
+  const ntag = xn ? '<span class="pill text-slate-300">#'+xn+'</span>' : '';
+  const cap = capBadge(grp);
+    const drBadge = isDR ? '<span class="pill text-amber-400 border-amber-700/60" title="Depositary Receipt — ตราสารอ้างอิงหุ้นนอก">DR</span>' : '';
+    const logo = `<img src="${logoUrl(tk)}" alt="" loading="lazy" onerror="this.style.display='none'" class="w-4 h-4 rounded-full object-cover shrink-0" />`;
+  return `
+  <div class="scard p-2.5">
+    <div class="flex items-start justify-between">
+      <div class="flex items-center gap-2 min-w-0">
+        ${logo}
+        <button onclick="openModal('${tk}','${(nm||'').replace(/'/g,"\\'")}','${currentMarket}')" class="text-[15px] font-bold hover:text-sky-400 truncate" title="${ind||''}${grp?(' · '+grp):''}">${tk}</button>
+        <span class="tag-market" title="${currentMarket==='america'?'ตลาดสหรัฐฯ (US)':(grp==='mai/Small'?'ตลาด mai':'ตลาด SET')}">${currentMarket==='america'?'🇺🇸':(grp==='mai/Small'?'🚩':'🇹🇭')}</span>
+        ${cap}
+        <span class="text-[10px] text-slate-500 truncate max-w-[130px]" title="${nm||''}">${nm||''}</span>
+      </div>
+      <div class="text-right shrink-0 flex items-center gap-1">
+        <span class="text-base font-extrabold ${rsColor(Number(rs))}" title="RS เปอร์เซ็นต์ไทล์ เทียบทั้งตลาด">${rs}</span>
+      </div>
+    </div>
+    <div class="text-xs mt-1 flex flex-wrap items-center gap-x-2">
+      <b id="price_${tk}" class="text-white">${fNum(px)}</b> <span id="chg_${tk}">${fPct(ch)}</span>
+      <span class="text-slate-400" title="มูลค่าซื้อขาย">${fBil(val||0)}</span>
+    </div>
+    <div class="flex items-center gap-1 mt-1 overflow-hidden flex-nowrap whitespace-nowrap">${volBadge(tk)}${ntag}${rdx}${drBadge}${fRVOL(rv)}</div>
+    ${currentMarket==='america' ? `<div class="mt-1 flex flex-wrap items-center gap-1">${drShort(tk)}</div>` : ''}
+    <div class="relative mt-1">
+          <div id="${cid}" class="chart"></div>
+      <div class="absolute bottom-1 left-2 flex gap-1" title="กดเพื่อสลับช่วงกราฟ">
+        <button class="tf-chip active" onclick="changeCardTF('${tk}','1d')">1y</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function fNum(n){ const v=Number(n); return Number.isFinite(v)?v.toFixed(2):'-'; }
+function fVal(n){ const v=Number(n); return Number.isFinite(v)?(v/1000000).toFixed(1)+'M':'-'; }
+function fPct(v){
+  const n=Number(v);
+  if(!Number.isFinite(n)) return '<span class="text-slate-500 font-bold">-</span>';
+  if(n>0) return '<span class="pos font-bold">+'+n.toFixed(2)+'%</span>';
+  if(n<0) return '<span class="neg font-bold">'+n.toFixed(2)+'%</span>';
+  return '<span class="text-slate-500 font-bold">0.00%</span>';
+}
+function fPct2(v){ const n=Number(v); if(!Number.isFinite(n)) return '-'; return (n>=0?'+':'')+n.toFixed(1)+'%'; }
+// Relative Volume — เทียบ volume ล่าสุด vs ค่าเฉลี่ย 10 วัน (TradingView relative_volume_10d_calc)
+function fRVOL(v){
+  const n=Number(v);
+  if(!Number.isFinite(n)) return '';
+  const cls = n>=3 ? 'text-fuchsia-300' : n>=2 ? 'text-emerald-400' : n>=1.5 ? 'text-yellow-300' : 'text-slate-400';
+  return `<span class="pill ${cls}" title="Relative Volume: ปริมาณวันนี้เทียบกับค่าเฉลี่ย 10 วัน (≥2 = แรงผิดปกติ มีแรงซื้อ/ขายจริง)">RVOL ${n>=99?Math.round(n):n.toFixed(1)}×</span>`;
+}
+// ตัวเลขตรง ไม่ปัด (ตามบอสสั่ง) — ราคา/เปลี่ยน/มูลค่า แสดงเต็มหน่วยชัดเจน
+function volBadge(tk){
+  const o = VOL_TH[tk]; if(!o) return '';
+  const cls = o.b==='riom' ? 'text-emerald-400 border-emerald-700/60'
+            : o.b==='norm' ? 'text-sky-300 border-sky-700/60'
+            : 'text-amber-400 border-amber-700/60';
+  const d = o.d==='up' ? ' ▲' : (o.d==='down' ? ' ▼' : '');
+  const lb = o.b==='riom' ? 'เงียบ' : o.b==='norm' ? 'ปกติ' : 'แกว่ง';
+  return `<span class="pill ${cls}" title="ความผันผวน 21 วันทำการ (annualized ${o.v}%)${o.vs!=null&&o.vs!==undefined?' · ก่อนหน้า '+o.vs+'%':''} — ใช้คุมขนาดไม้ ไม่ใช่สัญญาณซื้อ">${lb}${d}</span>`;
+}
+function crowdLine(tk){
+  const b = CORR_BEST[tk]; if(!b || !b[0]) return '';
+  return `<span class="pill text-amber-300 border-amber-700/60" title="วิ่งพร้อมกันสูง (correlation 6 เดือน > 0.70) — ซื้อพร้อมกัน = เดิมพันซ้ำ ลดขนาดไม้หรือเลือกตัวเดียว">⚠️ วิ่งคู่ ${b[0]} (corr ${Number(b[1]).toFixed(2)})</span>`;
+}
+function loadVolCorr(){
+  fetch(API+'/vol_th.json').then(r=>r.json()).then(j=>{ if(j&&j.tick) VOL_TH=j.tick; }).catch(()=>{});
+  fetch(API+'/corr_th.json').then(r=>r.json()).then(j=>{ if(j&&j.best){ CORR_PAIRS=j.pairs||[]; CORR_BEST=j.best; } }).catch(()=>{});
+}
+// ตัวเลขตรง ไม่ปัด (ตามบอสสั่ง) — ราคา/เปลี่ยน/มูลค่า แสดงเต็มหน่วยชัดเจน
+function fNumFull(n){ const v=Number(n); if(!Number.isFinite(v)) return '-'; return v>=1000?v.toLocaleString('en-US',{maximumFractionDigits:2}):v.toFixed(2); }
+function fPctExact(v){ const n=Number(v); if(!Number.isFinite(n)) return '<span class="text-slate-500">-</span>'; return (n>=0?'<b class="pos">+':'<b class="neg">-')+Math.abs(n).toFixed(2)+'%</b>'; }
+function fBilExact(n){ const v=Number(n); if(!Number.isFinite(v)) return '-'; return '฿'+ (v>=1e9?(v/1e9).toFixed(2)+'B':(v/1e6).toFixed(1)+'M'); }
+function rsColor(r){ return r>=80?'text-emerald-400':(r>=50?'text-yellow-400':'text-red-400'); }
+function rDhtml(x){
+  const d=x.rD;
+  if(d===null||d===undefined) return '<span class="pill text-sky-300">NEW</span>';
+  if(d>0) return '<span class="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/40">▲ +'+d+'</span>';
+  if(d<0) return '<span class="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/40">▼ '+Math.abs(d)+'</span>';
+  return '<span class="text-slate-500 text-xs">—</span>';
+}
+function setProgress(p,msg){
+  document.getElementById('progressBar').style.width=p+'%';
+  document.getElementById('progressPercent').textContent=p+'%';
+  document.getElementById('progressStatus').textContent=msg;
+}
+
+/* ===== (#Index) ดึง Index ไทยบนสุด (SET/SET50/SET100/mai) ===== */
+let indexList = [];
+function fIdx(v){ return v!=null ? Number(v).toFixed(2) : '-'; }
+async function loadIndex(){
+  const bar=document.getElementById('indexBar');
+  bar.innerHTML='<div class="col-span-full text-slate-500 text-xs">กำลังโหลด Index...</div>';
+  try{
+    const r=await fetch(API+'/api/index?market='+currentMarket+'&force=1');
+    const d=await r.json();
+    indexList = d.indexes || [];
+    if(!indexList.length){ bar.innerHTML='<div class="col-span-full text-slate-500 text-xs">ไม่สามารถดึง Index ได้</div>'; return; }
+    bar.innerHTML = indexList.map(x=>{
+      const up = x.changePct >= 0;
+      const c = up ? 'text-emerald-400' : 'text-rose-400';
+      const sign = up ? '+' : '';
+      return `<div class="bg-[#101724] border border-[#1e2634] rounded-lg p-2.5">
+        <div class="flex justify-between items-center">
+          <span class="text-[10px] font-bold text-slate-300">${x.label}
+            <span class="${x.live?'text-emerald-400':'text-slate-500'} normal-case font-semibold ml-1">${x.live?'● LIVE':'ปิด'}</span>
+          </span>
+          <span class="text-sm font-extrabold ${c}">${sign}${x.changePct.toFixed(2)}%</span>
+        </div>
+        <div class="text-base font-black text-white leading-tight">${fIdx(x.price)}</div>
+        <div class="text-[9px] text-slate-500 mt-1">เปิด <b>${fIdx(x.open)}</b> · ปิด <b class="${c}">${fIdx(x.close)}</b> · เปลี่ยน <span class="${c}">${sign}${fIdx(x.change)}</span></div>
+      </div>`;
+    }).join('');
+        renderMarketMode();
+      }catch(e){
+    bar.innerHTML='<div class="col-span-full text-rose-400 text-xs">Index error: '+e.message+'</div>';
+      }
+    }
+
+    /* A3: โหมดตลาด — SET อยู่เหนือ/ต่ำ เส้น SMA20 (20 วัน) = ขึ้น/ลง (ใช้คุมขนาดไม้ตามเปเปอร์) */
+    async function renderMarketMode(){
+      try{
+        const r=await fetch(API+'/api/chart?market=thailand&symbol=^SET.BK&interval=1d&range=1mo');
+        const d=await r.json(); const bars=d.data||[];
+        if(bars.length<25) return;
+        const closes=bars.map(b=>b.close);
+        const sma20 = closes.slice(-20).reduce((a,b)=>a+b,0)/20;
+        const last = closes[closes.length-1];
+        const drift = (last/sma20-1)*100;
+        const mode = drift>0.5?'up':(drift<-0.5?'down':'flat');
+        const txt = mode==='up'?'📈 ตลาดขาขึ้น':(mode==='down'?'📉 ตลาดขาลง':'➖ ตลาดนิ่ง');
+        const color = mode==='up'?'text-emerald-400 border-emerald-700/60':(mode==='down'?'text-rose-400 border-rose-700/60':'text-slate-300 border-slate-600/60');
+        const el=document.getElementById('indexBar');
+        if(el) el.insertAdjacentHTML('beforeend',
+          `<div class="bg-[#101724] border border-[#1e2634] rounded-lg p-2.5" title="วิธีอ่าน: SET เทียบเส้น SMA20 — อยู่เหนือ +0.5% = ขาขึ้น (เต็มอัตรา), ต่ำ -0.5% = ขาลง (ลดโพซิชัน); อิง rule ของเปเปอร์ (λ/θ ตามโหมดตลาด)">`+
+          `<div class="text-[10px] font-bold text-slate-300">โหมดตลาด (SET vs SMA20)</div>`+
+          `<div class="text-base font-black ${color}">${txt}</div>`+
+          `<div class="text-[9px] text-slate-500 mt-1">SET ${last.toFixed(2)} · SMA20 ${sma20.toFixed(2)} · ${drift>=0?'+':''}${drift.toFixed(2)}%</div></div>`);
+      }catch(e){ /* เงียบ — ไม่ขัดหน้าหลัก */ }
+    }
+
+    /* ===== (#สรุปตลาด) render จาก data.scan marketSummary ===== */
+/* 📰 Market Brief: Breadth Δเทียบวาน/สัปดาห์ + แนวโน้มเข้าใจง่าย (จาก /api/market-brief) */
+function deltaHtml(d, unit){
+  if(d==null) return '<span class="text-slate-500">–</span>';
+  const cls = d>0.4?'text-emerald-400':(d<-0.4?'text-rose-400':'text-slate-400');
+  const arrow = d>0.4?'▲':(d<-0.4?'▼':'·');
+  return `<span class="${cls} font-bold">${arrow} ${d>0&&d<=0.4?'':(d>0?'+':'')}${d}${unit||''}</span>`;
+}
+async function renderMarketBrief(){
+  const body=document.getElementById('marketBriefBody');
+  if(!body) return;
+  body.innerHTML='<div class="text-slate-400">โหลด...</div>';
+  try{
+    const r=await fetch(API+'/api/market-brief');
+    if(!r.ok) throw 0;
+    const j=await r.json(); const ms=(j.markets||[]).filter(x=>x.market===currentMarket);
+    if(!ms.length){ body.innerHTML='<div class="text-slate-500">ยังไม่มีข้อมูล</div>'; return; }
+    const cards = ms.map(m=>{
+      // แนวโน้มรวม: ใช้ MA50 เป็นหลัก + MA200 หนุน
+      const brief = [];
+      if(m.trend.ma50) brief.push('ระยะสั้น'+(m.trend.ma50.replace('▲/▽ ทรง',''))); else brief.push('ระยะสั้นทรง');
+      if(m.trend.ma200) brief.push('ระยะยาว'+(m.trend.ma200.replace('▲/▽ ทรง','')));
+      const w50 = m.d5.ma50;
+      let mood = 'ทิศทางนิ่ง';
+      if(m.ma50>=50 && m.ma200>=50) mood='หุ้นขึ้นกว้าง แรงส่งดี';
+      else if(m.ma50<35 && m.ma200>=50) mood='ขึ้นได้แคบางกลุ่ม ระยะสั้นอ่อน';
+      else if(m.ma50<35 && m.ma200<35) mood='อ่อนทั้งระยะสั้นและยาว';
+      else if(m.ma50>=35 && m.ma50<50) mood='ปานกลาง ยังไม่ชัดเจน';
+      return `
+        <div class="bg-[#0f1520] border border-[#1e2634] rounded-lg p-2.5 h-full">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-bold text-[14px]">${m.label}</span>
+            <span class="text-[12px] ${m.ma50>=35?'text-emerald-500/80':'text-rose-500/80'}">${mood}</span>
+          </div>
+          <div class="text-[13px] leading-relaxed text-slate-300">
+            เหนือ MA50 <b class="text-white">${m.ma50}%</b> ${deltaHtml(m.d1.ma50)} / ${deltaHtml(m.d5.ma50,'w')} ·
+            MA200 <b class="text-white">${m.ma200}%</b> ${deltaHtml(m.d1.ma200)} / ${deltaHtml(m.d5.ma200,'w')}
+          </div>
+          <div class="mt-1" style="height:5px;background:#0a0f16;border-radius:99px;overflow:hidden">
+            <div class="h-full ${m.ma50>=50?'bg-emerald-400':'bg-amber-400'}" style="width:${Math.max(2,m.ma50)}%"></div>
+          </div>
+          <div class="mt-1 text-[11px] text-slate-500">อันดับ 1D: ${m.d1.ma50>0.4?'▲':'·'} เทียบวาน · w=สัปดาห์</div>
+        </div>`;
+    }).join('');
+    // ==== คำแนะนำสรุป Thai เข้าใจง่าย ====
+    const th = ms.find(x=>x.market==='thailand');
+    const us = ms.find(x=>x.market==='america');
+    let advise = 'ข้อมูล Breadth ยังไม่พอสรุป';
+    if(th||us){
+      const mm = th||us;
+      const nm = mm.market==='thailand'?'ไทย':'อเมริกา';
+      let verdict;
+      if(mm.ma50>=50) verdict='หุ้นที่ราคาเหนือเส้นระยะสั้นมีถึงครึ่งกว่า ตลาดกว้าง แรงส่งดี';
+      else if(mm.ma50<35 && mm.ma200<35) verdict='หุ้นส่วนใหญ่ยังต่ำกว่าเส้นตลอด ระยะสั้นและยาวอ่อน ระวัง';
+      else if(mm.ma50<35) verdict='มีหุ้นขึ้นแค่บางตัว ระยะสั้นอ่อน ส่วนยาวยังพอมีแรงส่ง';
+      else verdict='หุ้นขึ้นพอสมควร ยังปานกลางรอทิศทางชัด';
+      advise = 'ภาพรวม '+nm+': '+verdict;
+    }
+    body.innerHTML = `
+          <div class="text-[12px] text-slate-300 mb-2 flex items-start gap-1.5"><span>💡</span><span>${advise}</span></div>
+          <div class="grid ${ms.length>1?'grid-cols-1 sm:grid-cols-2':'grid-cols-1'} gap-2">${cards}</div>`;
+  }catch(e){ body.innerHTML='<div class="text-slate-500">โหลด Market Brief ไม่ได้</div>'; }
+}
+/* ตาราง Market Breadth (ไทย/US ที่มี data จริง) — เหมือน benchmark */
+async function renderMarketBreadth(){
+  const box=document.getElementById('marketBreadthBox');
+  if(!box) return;
+  try{
+    const r=await fetch(API+'/api/market-breadth');
+    if(!r.ok) throw 0;
+    const j=await r.json(); const ms=(j.markets||[]).filter(x=>x.market===currentMarket);
+    if(!ms.length){ box.innerHTML='<div class="text-[10px] text-slate-500">ยังไม่มีข้อมูล</div>'; return; }
+    const cards=ms.map(m=>{
+      const bar=(v,c)=>`<div class="flex-1 h-2.5 rounded-full overflow-hidden bg-[#0a0f16]"><div class="h-full rounded-full ${c}" style="width:${Math.max(2,v)}%"></div></div>`;
+      return `
+        <div class="bg-[#0d1521] border border-[#1a2332] rounded-lg px-2 py-2 h-full">
+          <div class="flex items-center justify-between mb-1.5"><span class="text-[12px] font-bold text-slate-200">${m.label}</span><span class="text-[11px] text-slate-500">หุ้นที่ปิดเหนือเส้น MA</span></div>
+          <div class="text-[10px] text-slate-500 mb-1">ขึ้น ${m.up??'-'} ตัว · ลง ${m.down??'-'} ตัว (จาก ${m.total??'-'} ตัว ทั้งกระดาน)</div>
+          <div class="flex items-center gap-1.5 mb-0.5">
+            <span class="w-9 shrink-0 text-[11px] text-slate-500">MA50</span>
+            ${bar(m.ma50,'bg-gradient-to-r from-emerald-600 to-emerald-400')}
+            <span class="w-8 shrink-0 text-right text-[13px] font-black ${m.ma50>=50?'text-emerald-400':'text-amber-400'}">${m.ma50}%</span>
+          </div>
+          <div class="text-[11px] text-slate-500 pl-7 mb-1.5">Close > MA50 ${m.a50!=null?m.a50+'/'+m.total+' ตัว (ทั้งกระดาน)':'–'}</div>
+          <div class="flex items-center gap-1.5 mb-0.5">
+            <span class="w-9 shrink-0 text-[11px] text-slate-500">MA200</span>
+            ${bar(m.ma200,'bg-gradient-to-r from-sky-600 to-sky-400')}
+            <span class="w-8 shrink-0 text-right text-[13px] font-black ${m.ma200>=50?'text-sky-400':'text-rose-400'}">${m.ma200}%</span>
+          </div>
+          <div class="text-[11px] text-slate-500 pl-7">Close > MA200 ${m.a200!=null?m.a200+'/'+m.total+' ตัว (ทั้งกระดาน)':'–'}</div>
+        </div>`;
+    }).join('');
+    box.innerHTML='<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">'+cards+'</div>';
+  }catch(e){ box.innerHTML='<div class="text-[10px] text-slate-500">โหลด Breadth ไม่ได้</div>'; }
+}
+
+function renderSummary(sum){
+  const el=document.getElementById('marketSummaryBody');
+  if(!sum || (!sum.breadth && !sum.breadth_full)){ el.innerHTML='<div class="text-slate-500 text-xs">ยังไม่มีข้อมูล (กด Update/โหลดสรุป)</div>'; return; }
+  // ใช้ Breadth แท้ทั้งตลาด (stock ล้วน) ถ้ามี — ตาม CANSLIM M / research
+  const bfull = sum.breadth_full ? {up:sum.breadth_full.up, down:sum.breadth_full.down, upPct:sum.breadth_full.upPct, sampled:sum.breadth_full.total}
+      : {up:sum.breadth.up, down:sum.breadth.down, upPct:sum.breadth.upPct, sampled:sum.breadth.sampled};
+  const b=sum.breadth, m=sum.money1d;
+  const dir = sum.moneyDir==='เข้า';
+  const strong = sum.strongest || [], weak = sum.weakening||[];
+  const mk=(t)=>({t:'#15b8a6',v:'#f472b6'}[t])||'#fff';
+  el.innerHTML = `
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 items-stretch">
+      <div class="lg:col-span-1 space-y-2">
+        <div class="bg-[#101724] rounded-lg p-2">
+          <div class="text-[10px] font-bold text-sky-300 mb-1.5">🌍 Market Breadth — % เหนือ MA</div>
+          <div id="marketBreadthBox"><div class="text-[10px] text-slate-500">โหลด...</div></div>
+        </div>
+        <div class="bg-[#101724] rounded-lg p-2">
+          <div class="flex items-center justify-between text-[10px] text-slate-500 mb-1">
+            <span>💰 มูลค่าซื้อขาย 1D <span class="text-rose-400 font-bold">${sum.moneyDir==='ออก'?'ออก':'เข้า'} ${fBil(m.net)}</span></span>
+            <span class="text-[9px]">ขึ้น ${fBil(m.in)} · ลง ${fBil(m.out)}</span>
+          </div>
+          <div class="flex h-2.5 rounded-full overflow-hidden">
+            <div class="bg-gradient-to-r from-emerald-600 to-emerald-400" style="width:${(m.in/(m.in+m.out||1)*100).toFixed(0)}%"></div>
+            <div class="bg-gradient-to-r from-rose-600 to-rose-400" style="width:${(m.out/(m.in+m.out||1)*100).toFixed(0)}%"></div>
+          </div>
+          <div class="flex justify-between text-[8px] text-slate-500 mt-0.5">
+            <span>▲ ขึ้น ${(m.in/(m.in+m.out||1)*100).toFixed(0)}%</span>
+            <span>▼ ลง ${(m.out/(m.in+m.out||1)*100).toFixed(0)}%</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg:col-span-2 bg-[#101724] rounded-lg p-2" id="breadthHistWrap"><div class="text-[11px] font-bold text-sky-300 mb-1">📈 Breadth History — % เหนือ SMA50 / SMA200</div><div id="breadthHistChart" style="height:100%"></div></div>
+    </div>
+  ${ (strong.length || weak.length)?`
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
+    <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
+      <div class="text-[11px] font-bold text-emerald-400 mb-1">💪 ผู้นำ / สนใจ (RS≥90) — กำลังแข็งแกร่ง</div>
+      <div class="flex flex-wrap gap-1.5">${strong.map(s=>`<button onclick="openModal('${s.ticker}','${(s.name||'').replace(/'/g,"\\'")}','${currentMarket}')" class="pill hover:bg-emerald-900/30">${s.ticker} <b class="text-emerald-400">${s.rs}</b><span class="ml-1.5 text-[9px] text-emerald-400/70">${themeDisplay(s.industry)}</span></button>`).join('')}</div>
+      <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS สูง + อยู่ในธีมแข็งแกร่ง — แต่เช็ค Breadth/มูลค่าซื้อขาย + ไม่ไล่ซื้อตอน RS 99 นาน/ราคาไกลฐาน</div>
+    </div>
+    ${ weak.length?`
+    <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
+      <div class="text-[11px] font-bold text-rose-400 mb-1">⚠️ อ่อนตัว / ระวัง (RS&lt;50 + วันนี้ลง&gt;3%) — มีประเด็น</div>
+      <div class="flex flex-wrap gap-1.5">${weak.map(s=>`<button onclick="openModal('${s.ticker}','${(s.name||'').replace(/'/g,"\\'")}','${currentMarket}')" class="pill border-rose-800 text-rose-300">${s.ticker}${s.isDR?' <b class="text-amber-400">DR</b>':''} RS${s.rs} ${fPct(s.change)}<span class="ml-1.5 text-[9px] text-rose-300/70">${themeDisplay(s.industry)}</span></button>`).join('')}</div>
+    </div>`:''}
+    </div>`:''}
+  ${ (sum.upComing&&sum.upComing.length || sum.downComing&&sum.downComing.length)?`
+  <div class="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-2">
+  <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
+    <div class="text-[11px] font-bold text-yellow-300 mb-1">🚀 UPCOMING (กำลังขึ้น) — RS กลาง ยังไม่พีค มีโอกาส</div>
+    <div class="flex flex-wrap gap-1.5">${sum.upComing.map(s=>`<button onclick="openModal('${s.ticker}','${(s.name||'').replace(/'/g,"\\'")}','${currentMarket}')" class="pill border-yellow-700 text-yellow-200" title="${s.industry}: 1M ${fPct2(s.p1m)} · 1W ${fPct2(s.p1w)}">${s.ticker}${s.isDR?' <b class="text-amber-400">DR</b>':''} <b>${s.rs}</b> ${fPct2(s.p1m)}<span class="ml-1.5 text-[9px] text-yellow-200/70">${themeDisplay(s.industry)}</span></button>`).join('')}</div>
+    <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS 45-85 (ยังไม่พีค) + กำลังเร่ง 1M/1W >0 — จับตา breakout ยังทันลุ้น leader</div>
+  </div>
+  ${ sum.downComing&&sum.downComing.length?`
+  <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
+    <div class="text-[11px] font-bold text-rose-400 mb-1">📉 DOWNCOMING (กำลังอ่อนแรง) — เคยแรงแต่เริ่มลง</div>
+    <div class="flex flex-wrap gap-1.5">${sum.downComing.map(s=>`<button onclick="openModal('${s.ticker}','${(s.name||'').replace(/'/g,"\\'")}','${currentMarket}')" class="pill border-rose-800 text-rose-300" title="${s.industry}: 1M ${fPct2(s.p1m)} · 1W ${fPct2(s.p1w)}">${s.ticker}${s.isDR?' <b class="text-amber-400">DR</b>':''} <b>${s.rs}</b> ${fPct2(s.p1m)}<span class="ml-1.5 text-[9px] text-rose-300/70">${themeDisplay(s.industry)}</span></button>`).join('')}</div>
+    <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS ยังสูงแต่ 1M ลบ/แรงขายเริ่ม — กำลัง distribution ระวังถอย/ตรวจ 52w สูงพัง</div>
+      </div>
+      </div>`:''}
+      `:''}
+  ${ (sum.rank_up&&sum.rank_up.length || sum.rank_down&&sum.rank_down.length)?`
+  <div class="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-2">
+  <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
+    <div class="text-[11px] font-bold text-emerald-400 mb-1">⬆️ ขึ้นอันดับมากสุด (Rank Change สูงสุด)</div>
+    <div class="flex flex-wrap gap-1.5">${(sum.rank_up||[]).map(s=>`<button onclick="openModal('${s.ticker}','${(s.name||'').replace(/'/g,"\\'")}','${currentMarket}')" class="pill border-emerald-700 text-emerald-200" title="${s.name||''}: rank ${s.rT} · ขึ้น ${s.rD} อันดับ">${s.ticker} <b>${s.rD>0?'+'+s.rD:s.rD}</b> RS${s.rs} ${fPct(s.change)}</button>`).join('')}</div>
+    <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS ไต่ขึ้นเร็วจากเมื่อวาน - อันดับดีขึ้น ยังไม่พีค จับ tier พึ่งขึ้น</div>
+  </div>
+  <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
+    <div class="text-[11px] font-bold text-rose-400 mb-1">⬇️ ลงอันดับมากสุด (Rank Change ต่ำสุด)</div>
+    <div class="flex flex-wrap gap-1.5">${(sum.rank_down||[]).map(s=>`<button onclick="openModal('${s.ticker}','${(s.name||'').replace(/'/g,"\\'")}','${currentMarket}')" class="pill border-rose-800 text-rose-300" title="${s.name||''}: rank ${s.rT} · ลง ${s.rD} อันดับ">${s.ticker} <b>${s.rD}</b> RS${s.rs} ${fPct(s.change)}</button>`).join('')}</div>
+    <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS ร่วงเร็วจากเมื่อวาน - อันดับหล่น ระวังจุดอ่อน/เทขาย ตรวจสาเหตุ</div>
+  </div>
+  </div>`:''}
+
+
+  ${ sum.themes_top&&sum.themes_top.length?`
+  <div class="mt-3"><div class="text-[11px] font-bold text-sky-400 mb-1">🎯 กลุ่มที่ "หุ้นขึ้น" (มูลค่าซื้อขายมากสุด) 1D — กดดูหุ้นในกลุ่ม</div>
+    <div class="flex flex-wrap gap-1.5">${(sum.inflows1d||[]).map(n=>`<button onclick="openIndustry('${n.replace(/'/g,"\\'")}')" class="pill cursor-pointer hover:bg-emerald-900/30">${n}</button>`).join('')||'<span class="text-slate-500">-</span>'}</div></div>
+  <div class="mt-1"><div class="text-[11px] font-bold text-rose-400 mb-1">📉 กลุ่มที่ "หุ้นลง" (มูลค่าซื้อขายมากสุด) 1D — กดดูหุ้นในกลุ่ม</div>
+    <div class="flex flex-wrap gap-1.5">${(sum.outflows1d||[]).map(n=>`<button onclick="openIndustry('${n.replace(/'/g,"\\'")}')" class="pill cursor-pointer hover:bg-rose-900/30">${n}</button>`).join('')||'<span class="text-slate-500">-</span>'}</div></div>`:''}
+  <div class="text-[9px] text-slate-600 mt-2">* คำแนะนำอัตโนมัติจากตัวเลข ใช้ประกอบการตัดสินใจ ไม่ใช่การชี้ชวนซื้อขาย · ${(sum.generated_at||'').replace('T',' ').slice(0,16)}</div>
+    `;
+    loadBreadthChart();
+  }
+  /* Breadth History chart: % เหนือ SMA50 / SMA200 รายวัน (จาก Supabase snapshot) เหมือน benchmark */
+  async function loadBreadthChart(){
+    const wrap=document.getElementById('breadthHistWrap');
+    const el=document.getElementById('breadthHistChart');
+    if(!wrap || !el) return;
+    const n=currentMarket==='america'?'america':'thailand';
+        try{
+          const r=await fetch(API+'/api/breadth?market='+n+'&days=400');
+          if(!r.ok) throw 0;
+          const j=await r.json(); let hist=j.history||[];
+          // ตัดวันตลาดปิด (เสาร์-อาทิตย์) ออก — เทียบเฉพาะวันทำการ wider gap ถอย
+          hist = hist.filter(x=>{ const dd=new Date(String(x.date||'').slice(0,10)+'T00:00:00Z').getUTCDay(); return dd!==0 && dd!==6; });
+          if(hist.length<2){ el.innerHTML='<div class="text-[10px] text-slate-500 pt-4 text-center">ยังมีข้อมูลไม่พอ — จะสะสมจากที่บันทึกต่อวัน (เดี๋ยวมีกราฟขึ้น)</div>'; return; }
+          // ตรึงหน้าต่าง 1 ปีทำการย้อนหลัง + ไม่แสดงจุดล่าสุด (ตัวท้ายสุด) ตามที่บอสสั่ง
+          hist = hist.slice(-252);          // เอาแค่ 1 ปีทำการหลังสุด
+          const plot = hist.slice(0, -1);   // ตัดจุดล่าสุดออก (ไม่ plot ตัวท้ายสุด)
+          el.innerHTML='';
+          const chart=LightweightCharts.createChart(el,{width:el.clientWidth||320,height:Math.min(Math.max(360,el.clientHeight||360),360),layout:{background:{color:'transparent'},textColor:'#000000',fontSize:12,fontFamily:"'Space Mono','Kanit',monospace"},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:true,borderColor:'#000000'},timeScale:{borderVisible:true,borderColor:'#000000'}});
+          const mk=(x)=>({time:x.date, value:x.pctAboveMA50});
+                    const mk2=(x)=>({time:x.date, value:x.pctAboveMA200});
+                    chart.addLineSeries({color:'#0000FF',lineWidth:2,lastValueVisible:false,priceLineVisible:true,priceLineColor:'#0000FF'}).setData(plot.map(mk));
+                                                            chart.addLineSeries({color:'#FFA500',lineWidth:2,lastValueVisible:false,priceLineVisible:true,priceLineColor:'#FFA500'}).setData(plot.map(mk2));
+                    // lock หน้าต่าง 1Y (ไม่เลื่อนตามข้อมูลใหม่) — คงมุมมองคงที่
+                    chart.timeScale().setVisibleLogicalRange({from:0, to:Math.max(plot.length-1,1)});
+                // legend อยู่บนกราฟ (ก่อน chart) ไม่ทับเส้น
+                const leg=document.createElement('div');
+                leg.className='flex gap-3 text-[13px] mb-1';
+                leg.innerHTML='<span><b class="text-sky-400">─</b> SMA50 <b class="text-sky-300">'+hist[hist.length-1].pctAboveMA50+'%</b></span><span><b class="text-amber-400">─</b> SMA200 <b class="text-amber-300">'+hist[hist.length-1].pctAboveMA200+'%</b></span>';
+                el.before(leg);
+    }catch(e){ if(el) el.innerHTML='<div class="text-[10px] text-slate-600 pt-4 text-center">โหลด Breadth History ไม่ได้</div>'; }
+  }
+  function loadSummary(){
+  document.getElementById('marketSummaryBody').innerHTML='<div class="text-slate-500 text-xs">โหลด...</div>';
+  runUpdate(false, {silent:true});
+}
+function startTimer(){
+  document.getElementById('progressPanel').classList.remove('hidden');
+  if(timerId)clearInterval(timerId);
+  document.getElementById('timerText').textContent='0.0s';
+  const t0=Date.now();
+  timerId=setInterval(()=>{ document.getElementById('timerText').textContent=((Date.now()-t0)/1000).toFixed(1)+'s'; },200);
+}
+function stopTimer(){ clearInterval(timerId); setTimeout(()=>document.getElementById('progressPanel').classList.add('hidden'),3000); }
+
+/* ===== Money Flow render (แยก in/out ต่อ TF) ===== */
+/* 🚀 TOP GAIN / LOSS แยก TH/US — logo+ชื่อ+val filter+เลือกกลุ่ม */
+let glMarket='thailand';
+// จำ filter แยกตลาด (ไทย/อเมกา มี group/val/count เป็นของตัวเองไม่ปนกัน)
+let glPref = { thailand:{grp:'ALL',val:'5',cnt:'10'}, america:{grp:'ALL',val:'5',cnt:'10'} };
+function applyGLPref(mk){
+  const p = glPref[mk]||{grp:'ALL',val:'5',cnt:'10'};
+  const g=document.getElementById('glGroup'), v=document.getElementById('glVal'), c=document.getElementById('glCount');
+  if(g && p.grp && g.value!==p.grp) g.value=p.grp;
+  if(v && p.val && v.value!==p.val) v.value=p.val;
+  if(c && p.cnt && c.value!==p.cnt) c.value=p.cnt;
+}
+function switchGLMarket(mk){
+  glMarket=mk;
+  document.getElementById('glmTh').classList.toggle('active', mk==='thailand');
+  document.getElementById('glmUs').classList.toggle('active', mk==='america');
+  applyGLPref(mk);
+  renderTopGL();
+}
+async function renderTopGL(){
+  const body=document.getElementById('glBody');
+  if(!body) return;
+  const grp=document.getElementById('glGroup').value;
+  const valMin=Number(document.getElementById('glVal').value||5)*1e6;
+  const topN=Number(document.getElementById('glCount').value||10);
+  glPref[glMarket]={grp:document.getElementById('glGroup').value, val:document.getElementById('glVal').value||'5', cnt:document.getElementById('glCount').value||'10'};
+  const isTh = glMarket==='thailand';
+  const mkLabel = isTh?'ไทย 🇹🇭':'อเมริกา 🇺🇸';
+  const cur = isTh?'฿':'$';
+  body.innerHTML='<div class="text-slate-400">โหลด...</div>';
+  try{
+    // fetch ทั้ง 2 ตลาดเก็บ cache (ก่อนหน้าไว้) — โชว์เฉพาะ glMarket แต่ modal รู้ cap/logo ครบทั้ง 2
+    let cur={data:[]};
+    try{
+      const [rTh,rUs]=await Promise.all([
+        fetch(API+'/api/scan?market=thailand').then(r=>r.json()).catch(()=>null),
+        fetch(API+'/api/scan?market=america').then(r=>r.json()).catch(()=>null),
+      ]);
+      if(rTh) stockDB.thailand=rTh.data||[];
+      if(rUs) stockDB.america=rUs.data||[];
+      cur = glMarket==='thailand'?(rTh||{data:[]}):(rUs||{data:[]});
+    }catch(_){}
+    const j=cur;
+    let arr=(j.data||[]).filter(s=>(grp==='ALL'||s.group===grp) && (s.val||0)>=valMin && s.change!==null && s.change!==undefined);
+    const gains = [...arr].sort((a,b)=>(b.change||0)-(a.change||0)).slice(0,topN);
+    const loss  = [...arr].sort((a,b)=>(a.change||0)-(b.change||0)).slice(0,topN);
+    const row=(s)=>{ const up=s.change>=0;
+      return `<div class="flex items-center justify-between py-1 border-b border-[#161d29] last:border-0">
+          <span class="flex items-center gap-1.5 min-w-0">
+            <img src="${logoUrlM(s.ticker,glMarket)}" alt="" loading="lazy" onerror="this.style.display='none'" class="w-4 h-4 rounded-full object-cover shrink-0" />
+            <button onclick="openModal('${(s.ticker||'').replace(/'/g,"\\'")}','${(s.name||'').replace(/'/g,"\\'")}','${glMarket}')" class="font-bold text-[11px] hover:text-sky-400">${s.ticker||''}</button>
+            <span class="text-[9px] text-slate-500 truncate max-w-[120px]" title="${s.name||''}">${s.name||''}</span>
+          </span>
+          <span class="text-[10px] font-bold ${up?'text-emerald-400':'text-rose-400'} shrink-0">${up?'+':''}${(s.change||0).toFixed(2)}%</span>
+        </div>`;
+    };
+    body.innerHTML=`<div class="mb-1.5 text-[11px] font-bold">${mkLabel} · val≥${valMin/1e6}M (${cur}) · ${grp==='ALL'?'ทุกกลุ่ม':grp}</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div class="bg-[#0f1520] border border-[#1e2634] rounded-lg p-2.5">
+          <div class="text-[11px] font-bold text-emerald-500/80 uppercase mb-0.5">▲ TOP GAIN (วันนี้)</div>
+          <div>${gains.map(row).join('')||'<div class="text-slate-500 text-[10px]">ไม่มีข้อมูล</div>'}</div>
+        </div>
+        <div class="bg-[#0f1520] border border-[#1e2634] rounded-lg p-2.5">
+          <div class="text-[11px] font-bold text-rose-500/80 uppercase mb-0.5">▼ TOP LOSS (วันนี้)</div>
+          <div>${loss.map(row).join('')||'<div class="text-slate-500 text-[10px]">ไม่มีข้อมูล</div>'}</div>
+        </div>
+      </div>`;
+  }catch(e){ body.innerHTML='<div class="text-slate-500">โหลด TOP GAIN/LOSS ไม่ได้</div>'; }
+}
+function fBil(n){ const v=Number(n); if(Math.abs(v)>=1e9)return (v/1e9).toFixed(1)+'B'; return (v/1e6).toFixed(1)+'M'; }
+function renderFlow(){
+  const sums=document.getElementById('flowSums'), bars=document.getElementById('flowBars');
+  if(!moneyFlowData || !moneyFlowData.sums || !moneyFlowData.byIndustry || !moneyFlowData.sums[flowTF]){
+    sums.innerHTML='<span class="text-slate-500">ยังไม่มีข้อมูล</span>'; bars.innerHTML=''; return;
+  }
+  const s=moneyFlowData.sums[flowTF];
+  const pctIn = (s.in+s.out)>0 ? Math.round(s.in/(s.in+s.out)*100) : 50;
+  sums.innerHTML=
+    `<div class="bg-[#0f1a12] border border-emerald-900/50 rounded-lg px-3 py-1.5"><b class="pos">▲ หุ้นขึ้น ${fBil(s.in)}</b> <span class="text-slate-400 ml-1">${pctIn}%</span><div class="text-[9px] text-emerald-600/70">มูลค่าซื้อขายของหุ้นที่ราคาขึ้น</div></div>`+
+    `<div class="bg-[#1a0f12] border border-rose-900/50 rounded-lg px-3 py-1.5"><b class="neg">▼ หุ้นลง ${fBil(s.out)}</b> <span class="text-slate-400 ml-1">${100-pctIn}%</span><div class="text-[9px] text-rose-600/70">มูลค่าซื้อขายของหุ้นที่ราคาลง</div></div>`+
+    `<div class="bg-[#101724] border border-[#243044] rounded-lg px-3 py-1.5"><b class="${s.net>=0?'text-emerald-300':'text-rose-300'}">ส่วนต่าง ${s.net>=0?'+':''}${fBil(s.net)}</b><div class="text-[9px] text-slate-500">(ขึ้น−ลง)</div></div>`;
+  const rows=moneyFlowData.byIndustry[flowTF].slice(0,12);
+  bars.innerHTML='';
+  // หุ้นตัวแทน (val สูงสุด) ของแต่ละกลุ่ม — แสดงในวงเล็บ
+  // หุ้น top N (val สูงสุด, มากสุด 5) ในแต่ละกลุ่ม — แสดงวงเล็บ ถ้าเกิน ใช้ ...
+  const topStocksOf = {};
+  (stockData||[]).forEach(s=>{
+    const k=(s.industry||s.sector||'Other');
+    if(!topStocksOf[k]) topStocksOf[k]=[];
+    topStocksOf[k].push(s);
+  });
+  Object.keys(topStocksOf).forEach(k=>{
+    topStocksOf[k].sort((a,b)=>(b.val||0)-(a.val||0));
+    topStocksOf[k]=topStocksOf[k].slice(0,5);
+  });
+  rows.forEach(r=>{
+    const leaders = topStocksOf[r.name] || [];
+    const max=Math.max(...rows.map(x=>Math.max(x.in,x.out)),1);
+    bars.innerHTML+=`
+      <button onclick="openIndustry('${(r.name||'').replace(/'/g,"\\'")}')" class="text-left block w-full hover:bg-[#101724] rounded px-1 transition-colors" title="คลิกดูหุ้นในกลุ่ม ${r.name}">
+        <div class="flex justify-between text-[11px] mb-0.5">
+          <span class="truncate pr-2"><span class="text-slate-300">${r.name}${leaders.length?` (${leaders.map(x=>x.ticker).join(", ")}${leaders.length>=5?", …":""})`:``}</span></span>
+          <span><b class="pos">▲ ${fBil(r.in)}</b> / <b class="neg">▼ ${fBil(r.out)}</b></span>
+        </div>
+        <div class="flex w-full h-2 rounded overflow-hidden bg-[#161d29]">
+          <div class="bg-emerald-500" style="width:${(r.in/max*100).toFixed(0)}%"></div>
+          <div class="bg-rose-500" style="width:${(r.out/max*100).toFixed(0)}%"></div>
+        </div>
+      </button>`;
+  });
+}
+function setFlowTF(tf){
+  flowTF=tf;
+  // highlight เฉพาะปุ่ม flow ที่มี data-flowtf (ไม่แตะปุ่ม 1y/30m/modal อื่น)
+  document.querySelectorAll('[data-flowtf]').forEach(b=>b.classList.toggle('active', b.dataset.flowtf===tf));
+  renderFlow();
+}
+
+/* ===== (#3) คลิก Industry ใน Money Flow → ดูหุ้นในกลุ่ม เรียง RS ===== */
+function openIndustry(indName){
+  const list = (stockData||[]).filter(s => (s.industry||s.sector||'Other') === indName)
+    .sort((a,b)=>b.rs-a.rs);
+  const grp = (stockData||[]).find(s=>(s.industry||s.sector||'Other')===indName);
+  const tagg = grp ? (grp.group||'') : '';
+  document.getElementById('groupModalTitle').innerHTML = `🏢 ${indName} <span class="text-xs text-slate-400 font-normal">${tagg} · ${list.length} ตัว</span>`;
+  document.getElementById('groupModalBody').innerHTML =
+    list.map(s=>{
+      // มูลค่าซื้อขาย(val) วันนี้ + ทิศราคา (change) — กำกับชัด ไม่ใช่ "เงินไหลสุทธิจริง"
+      const fval = s.val||0;
+      const up = (s.change??0) >= 0;
+      return `
+      <button onclick="openModal('${s.ticker}','${(s.name||'').replace(/'/g,"\\'")}','${currentMarket}');closeGroupModal()" class="w-full flex items-center justify-between bg-[#101724] hover:bg-[#161d29] border border-[#1e2634] rounded-lg px-3 py-2 text-left">
+        <span class="flex items-center gap-2"><b class="text-white">${s.ticker}</b><span class="text-[10px] text-slate-500 truncate max-w-[110px]">${s.name||''}</span></span>
+        <span class="flex items-center gap-3">
+          <span class="flex flex-col items-end leading-tight">
+            <span class="text-[8px] text-slate-500">ราคา</span><span class="text-xs font-bold text-white">${fNumFull(s.price)}</span>
+          </span>
+          <span class="flex flex-col items-end leading-tight">
+            <span class="text-[8px] text-slate-500">RS</span><span class="text-sm font-extrabold ${rsColor(Number(s.rs))}">${s.rs}</span>
+          </span>
+          <span class="flex flex-col items-end leading-tight">
+            <span class="text-[8px] text-slate-500">เปลี่ยน</span><span>${fPctExact(s.change)}</span>
+          </span>
+          <span class="flex flex-col items-end leading-tight">
+            <span class="text-[8px] text-slate-500">มูลค่า</span><span class="text-[10px]">${fBilExact(s.val)}</span>
+          </span>
+        </span>
+      </button>`;
+    }).join('') || '<div class="text-slate-500 text-sm">ไม่มีหุ้นในกลุ่มนี้</div>';
+      const _gm=document.getElementById('groupModal');
+      _gm.classList.remove('hidden');
+      _gm.classList.add('flex');
+      _gm.scrollTop=0;
+      const _gi=_gm.firstElementChild; if(_gi){ _gi.scrollTop=0; try{_gi.scrollIntoView({block:'center',behavior:'auto'});}catch(e){} }
+    }
+function closeGroupModal(){ document.getElementById('groupModal').classList.add('hidden'); document.getElementById('groupModal').classList.remove('flex'); }
+
+/* ===== (#2) Themes render ===== */
+/* ชื่อไทยของ Industry (รวมที่พบในไทย+US) — แสดงวงเล็บไทย กันงง */
+const MEGATREND = {
+  // ——— AI / เทค ———
+  "Semiconductors":"ชิป / เซมิคอนดักเตอร์","Semiconductor Equipment":"เครื่องผลิตชิป","Electronic Production Equipment":"อุปกรณ์อิเล็กทรอนิกส์",
+  "Electronic Equipment/Instruments":"เครื่องมืออิเล็กทรอนิกส์","Computer Peripherals":"AI ฮาร์ดแวร์ / อุปกรณ์ต่อพ่วง",
+  "Computer Processing Hardware":"CPU / GPU","Computer Communications":"เครือข่าย","Telecommunications Equipment":"อุปกรณ์โทรคมนาคม",
+  "Software":"ซอฟต์แวร์ / AI","Packaged Software":"ซอฟต์แวร์ / AI","Internet Software/Services":"อินเทอร์เน็ต / AI","Information Technology Services":"บริการไอที",
+  "Semiconductors.1":"ชิป / เซมิคอนดักเตอร์","Semiconductor":"ชิป / เซมิคอนดักเตอร์","Electronic Components":"ชิ้นส่วนอิเล็กทรอนิกส์",
+  // ——— Data Center / โลกกายภาพ ———
+  "Data Center":"ดาต้าเซ็นเตอร์","Data Centers":"ดาต้าเซ็นเตอร์","Cooling Systems":"ระบบทำความเย็น DC","Cable/Satellite TV":"สื่อ / บันเทิง",
+  "Electronics Distributors":"จัดจำหน่ายอิเล็กทรอนิกส์","Air Freight/Couriers":"โลจิสติกส์","Aerospace & Defense":"การบิน / ป้องกันประเทศ",
+  "Aerospace & Defense.1":"การบิน / ป้องกันประเทศ","Railroads":"รถไฟ","Trucking":"ขนส่งทางบก","Marine Shipping":"ขนส่งทางเรือ",
+  "Other Transportation":"ขนส่งอื่นๆ","Airlines":"สายการบิน","Industrial Machinery":"เครื่องจักรอุตสาหกรรม","Construction Machinery/Heavy Trucks":"เครื่องจักรก่อสร้าง",
+  "Robotics":"หุ่นยนต์","Electronic Technology":"เทค / อิเล็กทรอนิกส์",
+  // ——— พลังงาน / ไฟฟ้า ———
+  "Electric Utilities":"ไฟฟ้า / สาธารณูปโภค","Alternative Power Generation":"พลังงานสะอาด","Water Utilities":"ประปา / น้ำ",
+  "Gas Distributors":"ก๊าซธรรมชาติ","Integrated Oil":"น้ำมันครบวงจร","Oil & Gas Production":"น้ำมัน / ก๊าซ ต้นน้ำ","Oilfield Services/Equipment":"บริการน้ำมัน",
+  "Coal":"ถ่านหิน","Power":"ไฟฟ้า / พลังงาน","Nuclear":"นิวเคลียร์","Energy":"พลังงาน","Renewable Energy":"พลังงานสะอาด",
+  // ——— ทรัพยากร / วัสดุ ———
+  "Copper":"ทองแดง","Gold":"ทองคำ","Precious Metals":"โลหะมีค่า","Aluminum":"อะลูมิเนียม","Steel":"เหล็ก",
+  "Metal Fabrications":"โลหะ","Building Materials":"วัสดุก่อสร้าง","Chemicals: Specialty":"เคมีเฉพาะทาง","Chemicals: Major Diversified":"เคมี",
+  "Paper/Pulp":"กระดาษ / เยื่อ","Forest Products":"ไม้ / ป่าไม้","Textiles":"สิ่งทอ","Other Metals/Minerals":"เหมือง / แร่",
+  "Critical Materials":"วัสดุวิกฤต","Rare Earth":"แร่หายาก","Lithium":"ลิเธียม",
+  // ——— ดูแลสุขภาพ ———
+  "Biotechnology":"ไบโอเทค","Pharmaceuticals: Major":"ยา (รายใหญ่)","Pharmaceuticals: Other":"ยา","Medical Specialties":"เครื่องมือแพทย์",
+  "Medical Instruments":"เครื่องมือแพทย์","Medical Distributors":"จัดจำหน่ายการแพทย์","Healthcare Facilities":"สถานพยาบาล","Healthcare":"สาธารณสุข / การแพทย์",
+  "Medical/Nursing Services":"บริการการแพทย์","Health Technology":"เทคโนโลยีสุขภาพ",
+  // ——— การเงิน → Fintech/Bank ——
+  "Major Banks":"ธนาคารใหญ่","Regional Banks":"ธนาคารภูมิภาค","Finance/Rental/Leasing":"การเงิน / เช่าซื้อ",
+  "Investment Banks/Brokers":"วาณิชธนกิจ / โบรกเกอร์","Financial Conglomerates":"กลุ่มการเงิน","Savings Banks":"ธนาคารออมสิน","Banks":"ธนาคาร",
+  "Insurance Brokers/Services":"นายหน้าประกัน","Property/Casualty Insurance":"ประกันวินาศภัย","Life/Health Insurance":"ประกันชีวิต",
+  "FinTech":"ฟินเทค","Consumer Finance":"สินเชื่อรายย่อย","Financial Services":"บริการการเงิน", "Specialty Finance":"การเงินเฉพาะทาง",
+  // ——— Consumer / Retail ———
+  "Hotels/Resorts/Cruise Lines":"ท่องเที่ยว / รีสอร์ท","Movies/Entertainment":"บันเทิง / สื่อ","Broadcasting":"สื่อ / โฆษณา",
+  "Advertising/Marketing Services":"โฆษณา / การตลาด","Department Stores":"ห้างสรรพสินค้า","Specialty Stores":"ค้าปลีกเฉพาะทาง",
+  "Food: Meat/Fish/Dairy":"อาหาร (เนื้อ / ปลา / นม)","Food: Major Diversified":"อาหาร / CPG","Beverages: Non-Alcoholic":"เครื่องดื่ม",
+  "Leisure Products":"ไลฟ์สไตล์ / สันทนาการ","Recreational Products":"สินค้าสันทนาการ","Consumer Electronics":"เครื่องใช้ไฟฟ้า",
+  "Appliances":"เครื่องใช้ในบ้าน","Household/Personal Care":"ของใช้ส่วนตัว / CPG","Tobacco":"ยาสูบ","Apparel/Footwear":"เครื่องแต่งกาย",
+  "Footwear":"รองเท้า","Home Improvement Chains":"ปรับปรุงบ้าน","Home Furnishings":"เฟอร์นิเจอร์","Wholesale Distributors":"ค้าส่ง",
+  "Food Distributors":"จัดจำหน่ายอาหาร","Internet Retail":"ขายออนไลน์ / อีคอมเมิร์ซ","Retail - Apparel/Shoes":"ค้าปลีกเครื่องแต่งกาย",
+  "Retail - Catalog/Specialty":"ค้าปลีกเฉพาะทาง","Retail - Discount":"ค้าปลีกดิสเคาน์","Food Retail":"ค้าปลีกอาหาร",
+  "Motor Vehicles":"ยานยนต์ / EV","Auto Parts: OEM":"ชิ้นส่วนยานยนต์","Automotive Aftermarket":"หลังการขายยานยนต์",
+  "Consumer Durables":"สินค้าคงทน","Consumer Non-Durables":"สินค้าอุปโภค","Apparel/Footwear Retail":"ค้าปลีกเครื่องแต่งกาย",
+  "Miscellaneous Manufacturing":"การผลิตเบ็ดเตล็ด","Miscellaneous":"เบ็ดเตล็ด","Industrial Specialties":"อุตสาหกรรมเฉพาะ",
+  "Engineering & Construction":"ก่อสร้าง / โครงสร้างพื้นฐาน","Homebuilding":"ที่อยู่อาศัย","Heavy Construction":"งานก่อสร้างใหญ่",
+  "Commercial Services/Supplies":"บริการ / วัสดุพาณิชย์","Business Services":"บริการธุรกิจ","Rental & Leasing":"เช่า / ลีสซิ่ง",
+  "Real Estate Development":"อสังหาฯ / พัฒนาที่ดิน","Real Estate Investment Trusts":"REIT","Real Estate Management/Services":"บริการอสังหาฯ",
+  "Oil Refining/Marketing":"โรงกลั่น / จำหน่ายน้ำมัน","Integrated Oil & Gas":"น้ำมัน - ก๊าซครบวงจร","Food Processing":"แปรรูปอาหาร",
+  "Sugar/Confectionery":"น้ำตาล / ขนม","Fishing":"ประมง","Agriculture":"เกษตร","Transportation":"ขนส่ง / โลจิสติกส์",
+  "Personal Products":"สินค้าส่วนตัว","Containers/Packaging":"บรรจุภัณฑ์","Shipbuilding":"ต่อเรือ","Metal Processing":"แปรรูปโลหะ",
+  "Professional Services":"บริการมืออาชีพ","Education":"การศึกษา","IT Consulting":"ที่ปรึกษาไอที","Security Services":"รักษาความปลอดภัย",
+  "Packaged Software.1":"ซอฟต์แวร์ / AI","Software.1":"ซอฟต์แวร์ / AI",
+};
+// ===== สรุป Megatrend ประจำเดือน (จาก research — อัปเดตเดือนละครั้งตาม cron) =====
+// แยก US / ไทย — แต่ละรายการ: { mkt:'us'|'th'|'all', head, body }
+const MEGATREND_SUMMARY = {
+  version: "2026-10",
+  refs: "Morgan Stanley 2026 · BlackRock/iShares · Bank of Singapore · KGI / InnovestX / กสิกร",
+  items: [
+    { mkt:'us', head:"AI ฮาร์ดแวร์และชิป", body:"AI ผลักดันความต้องการชิป หน่วยความจำ และ GPU/ASIC ต่อเนื่อง — หุ้นเซมิคอนดักเตอร์และเครื่องผลิตชิปเป็นตัวนำ" },
+    { mkt:'us', head:"โครงสร้างพื้นฐาน AI / ดาต้าเซ็นเตอร์", body:"ชิปคิดเป็นสัดส่วนประมาณ 60% ของต้นทุนสร้างดาต้าเซ็นเตอร์ ตามด้วยไฟฟ้า ระบบทำความเย็น สายไฟ และโครงข่าย" },
+    { mkt:'us', head:"ไฟฟ้าและสาธารณูปโภค", body:"ดาต้าเซ็นเตอร์ใช้ไฟฟ้ามหาศาล จึงหนุนภาคไฟฟ้า นิวเคลียร์ ก๊าซธรรมชาติ และระบบกักเก็บพลังงานระยะยาว" },
+    { mkt:'us', head:"หุ่นยนต์และ Physical AI", body:"หุ่นยนต์ฮิวแมนนอยด์และรถไร้คนขับ (กว่า 30 เมือง) เป็นธีมใหม่ที่มาแรง" },
+    { mkt:'us', head:"วัสดุวิกฤต", body:"ทองแดง ลิเธียม และแร่หายาก เป็นวัตถุดิบป้อน AI รถยนต์ไฟฟ้า และพลังงานสะอาด" },
+    { mkt:'us', head:"ซอฟต์แวร์ / อินเทอร์เน็ต / ฟินเทค", body:"AI หนุนซอฟต์แวร์ (SaaS ไซเบอร์ กลาโหม) และการชำระเงินดิจิทัล" },
+    { mkt:'th', head:"AI และดาต้าเซ็นเตอร์", body:"KCE (PCB) / WHAUP (น้ำและระบบทำความเย็น) / GULF (ไฟฟ้าและก๊าซ) / WHA และ AMATA (นิคมที่ดิน) / STECON และ CK (ก่อสร้างดาต้าเซ็นเตอร์)" },
+    { mkt:'th', head:"การปรับขึ้นของกลุ่มธนาคาร", body:"BBL / KBANK / KTB — กำไรฟื้นตัวและอัตราดอกเบี้ยเอื้อต่อกำไรจากสินเชื่อ" },
+    { mkt:'th', head:"พลังงานสะอาดและไฟฟ้า", body:"GPSC / BGRIM / GUNKUL / SPCG — โรงไฟฟ้าพลังงานสะอาดได้ค่าไฟฟ้าเพิ่มขึ้น" },
+    { mkt:'th', head:"การบริโภคและค้าปลีก", body:"CPALL / CRC / CPN / GLOBAL / TRUE — ฟื้นตัวจากการท่องเที่ยวและการจับจ่ายในประเทศ" },
+    { mkt:'th', head:"ห่วงโซ่อุปทานเซมิคอนดักเตอร์ / PCB", body:"KCE / HANA / DELTA — มีส่วนได้ส่วนเสียจากความต้องการ AI ฮาร์ดแวร์ผ่านฐานการผลิตไทย" },
+    { mkt:'all', head:"หมายเหตุ", body:"ธีมเป็นเพียงไอเดียดูกลุ่มหุ้น เกณฑ์การคัดเข้าธีมยังคงเป็น RS ≥ 80 และอยู่ในกลุ่มเดียวกัน — ไม่ใช่การแนะนำให้ซื้อหุ้นตัวใดตัวหนึ่ง" },
+  ],
+};
+function renderMegatrend(){
+  const el=document.getElementById('megatrendBody');
+  const dt=document.getElementById('megatrendDate');
+  const mkt=currentMarket;
+  if(!el) return;
+  dt.textContent=MEGATREND_SUMMARY.version + ' · ' + MEGATREND_SUMMARY.refs;
+  const items=MEGATREND_SUMMARY.items.filter(x=>x.mkt==='all'||x.mkt===mkt||(mkt==='america'?x.mkt==='us':x.mkt==='th'));
+  el.innerHTML = items.map(x=>`
+    <div class="rounded-lg border border-[#1e2634] bg-[#101724] px-3 py-2.5">
+      <div class="font-semibold text-[12px] text-sky-300 mb-0.5 text-sm">${x.head}</div>
+      <div class="text-[11px] text-slate-400 leading-relaxed">${x.body}</div>
+    </div>`).join('');
+}
+// ชื่อธีม ที่แสดง = megatrend ไทยล้วนสั้น (ตัดชื่อ industry ยาว / ภาษาซ้ำออก) — ภาษาเดียว
+function themeDisplay(name){
+  if(!name) return '';
+  let mt=MEGATREND[name];
+  if(!mt){ const k=Object.keys(MEGATREND).find(x=>name.toLowerCase().includes(x.toLowerCase())); mt=k?MEGATREND[k]:null; }
+  // คืน megatrend ไทยล้วนสั้น (ชื่อเดียว ไม่ต่อ thName — กันภาษาซ้ำ); ไม่เจอ → ใช้ thName; ยังไม่เจอ → ชื่อเดิม
+  return mt || thName(name) || name;
+}
+const TH_INDUSTRY = {
+  "Computer Peripherals":"คอมพิวเตอร์ต่อพ่วง","Electrical Products":"ผลิตภัณฑ์ไฟฟ้า","Oil Refining/Marketing":"โรงกลั่น/การตลาดน้ำมัน",
+  "Computer Processing Hardware":"ฮาร์ดแวร์ประมวลผล","Hotels/Resorts/Cruise Lines":"โรงแรม/รีสอร์ท/เรือสำราญ",
+  "Medical/Nursing Services":"การแพทย์/พยาบาล","Personnel Services":"จัดหางาน/บุคคลากร","Semiconductors":"เซมิคอนดักเตอร์",
+  "Electronic Production Equipment":"อุปกรณ์ผลิตอิเล็กทรอนิกส์","Electronic Components":"ชิ้นส่วนอิเล็กทรอนิกส์",
+  "Semiconductor Equipment":"อุปกรณ์เซมิคอนดักเตอร์","Automotive Aftermarket":"หลังการขายยานยนต์","Aerospace & Defense":"การบิน/ป้องกันประเทศ",
+  "Aerospace & Defense.1":"การบิน/ป้องกันประเทศ","Software":"ซอฟต์แวร์","Packaged Software":"ซอฟต์แวร์",
+  "Internet Software/Services":"ซอฟต์แวร์/บริการอินเทอร์เน็ต","Information Technology Services":"บริการเทคโนโลยีสารสนเทศ",
+  "Computer Communications":"การสื่อสารคอมพิวเตอร์","Telecommunications Equipment":"อุปกรณ์โทรคมนาคม","Wireless Telecommunications":"โทรคมนาคมไร้สาย",
+  "Major Banks":"ธนาคารใหญ่","Regional Banks":"ธนาคารภูมิภาค","Finance/Rental/Leasing":"การเงิน/เช่าซื้อ/ลีสซิ่ง",
+  "Investment Banks/Brokers":"ธนาคารลงทุน/โบรกเกอร์","Financial Conglomerates":"กลุ่มธุรกิจการเงิน","Insurance Brokers/Services":"นายหน้าประกันภัย",
+  "Property/Casualty Insurance":"ประกันวินาศภัย","Life/Health Insurance":"ประกันชีวิต/สุขภาพ","Real Estate Development":"พัฒนาอสังหาริมทรัพย์",
+  "Real Estate Investment Trusts":"กองทรัสต์อสังหาฯ","Specialty Stores":"ร้านค้าเฉพาะทาง","Department Stores":"ห้างสรรพสินค้า",
+  "Food: Meat/Fish/Dairy":"อาหาร: เนื้อ/ปลา/นม","Food: Major Diversified":"อาหาร: หลากหลาย","Beverages: Non-Alcoholic":"เครื่องดื่มไม่มีแอลกอฮอล์",
+  "Movies/Entertainment":"ภาพยนตร์/บันเทิง","Broadcasting":"กระจายเสียง","Cable/Satellite TV":"เคเบิล/ดาวเทียม",
+  "Advertising/Marketing Services":"โฆษณา/การตลาด","Alternative Power Generation":"พลังงานทางเลือก","Electric Utilities":"สาธารณูปโภคไฟฟ้า",
+  "Water Utilities":"ประปา","Gas Distributors":"จัดจำหน่ายก๊าซ","Integrated Oil":"น้ำมันแบบครบวงจร",
+  "Oil & Gas Production":"ผลิตน้ำมัน/ก๊าซ","Oilfield Services/Equipment":"บริการ/อุปกรณ์น้ำมัน","Marine Shipping":"ขนส่งทางเรือ",
+  "Other Transportation":"ขนส่งอื่นๆ","Railroads":"รถไฟ","Airlines":"สายการบิน","Trucking":"ขนส่งทางรถบรรทุก",
+  "Chemicals: Specialty":"เคมีเฉพาะทาง","Chemicals: Major Diversified":"เคมีหลากหลาย","Pharmaceuticals: Major":"ยา: กลุ่มใหญ่",
+  "Pharmaceuticals: Other":"ยา: อื่นๆ","Biotechnology":"ไบโอเทค","Medical Specialties":"เครื่องมือแพทย์เฉพาะทาง",
+  "Medical Instruments":"เครื่องมือแพทย์","Medical Distributors":"จัดจำหน่ายการแพทย์","Healthcare Facilities":"สถานพยาบาล",
+  "Industrial Specialties":"อุตสาหกรรมเฉพาะทาง","Industrial Machinery":"เครื่องจักรอุตสาหกรรม","Construction Machinery/Heavy Trucks":"เครื่องจักรก่อสร้าง/รถบรรทุกหนัก",
+  "Engineering & Construction":"วิศวกรรม/ก่อสร้าง","Metal Fabrications":"ผลิตภัณฑ์โลหะ","Steel":"เหล็ก","Aluminum":"อะลูมิเนียม",
+  "Precious Metals":"โลหะมีค่า","Gold":"ทอง","Building Materials":"วัสดุก่อสร้าง","Paper/Pulp":"กระดาษ/เยื่อกระดาษ",
+  "Textiles":"สิ่งทอ","Apparel/Footwear":"เครื่องนุ่งห่ม/รองเท้า","Footwear":"รองเท้า","Miscellaneous Manufacturing":"การผลิตเบ็ดเตล็ด",
+  "Miscellaneous":"เบ็ดเตล็ด","Motor Vehicles":"ยานยนต์","Auto Parts: OEM":"ชิ้นส่วนยานยนต์ OEM",
+  "Consumer Electronics":"เครื่องใช้ไฟฟ้าอิเล็กทรอนิกส์","Appliances":"เครื่องใช้ในบ้าน","Household/Personal Care":"ของใช้ในครัวเรือน/ส่วนตัว",
+  "Tobacco":"ยาสูบ","Leisure Products":"สินค้าไลฟ์สไตล์/สันทนาการ","Recreational Products":"สินค้าสันทนาการ",
+  "Home Improvement Chains":"ห่วงโซ่ปรับปรุงบ้าน","Home Furnishings":"เฟอร์นิเจอร์บ้าน","Wholesale Distributors":"จัดจำหน่ายแบบส่ง",
+  "Food Distributors":"จัดจำหน่ายอาหาร","Computer Processing Hardware.1":"ฮาร์ดแวร์ประมวลผล",
+  "Savings Banks":"ธนาคารออมสิน","Real Estate Development.1":"พัฒนาอสังหาริมทรัพย์","Forest Products":"ผลิตภัณฑ์ป่าไม้",
+  "Coal":"ถ่านหิน","Copper":"ทองแดง","Other Metals/Minerals":"โลหะ/แร่อื่นๆ","Electronic Equipment/Instruments":"อุปกรณ์อิเล็กทรอนิกส์/เครื่องมือ",
+  "Process Industries":"อุตสาหกรรมกระบวนการ","Retail - Apparel/Shoes":"ค้าปลีกเครื่องนุ่งห่ม/รองเท้า","Retail - Catalog/Specialty":"ค้าปลีกเฉพาะทาง",
+  "Retail - Discount":"ค้าปลีกดิสเคาน์","Internet Retail":"ค้าปลีกออนไลน์","Food Retail":"ค้าปลีกอาหาร",
+  "Regional Banks.1":"ธนาคารภูมิภาค","Commercial Services/Supplies":"บริการ/วัสดุพาณิชย์",
+};
+function thName(en){
+  if(!en) return '';
+  let t=TH_INDUSTRY[en];
+  if(!t){ const k=Object.keys(TH_INDUSTRY).find(x=>en.toLowerCase().includes(x.toLowerCase())); t=k?TH_INDUSTRY[k]:null; }
+  return t ? ` (${t})` : '';
+}
+function renderThemes(){
+  const el=document.getElementById('themeList');
+  if(!themesData || !themesData.length){ el.innerHTML='<div class="text-slate-500 text-sm">ยังไม่มีข้อมูลธีม (รอ Update)</div>'; return; }
+  el.innerHTML = themesData.map(t=>`
+    <div onclick="openIndustry('${t.name.replace(/'/g,"\\'")}')" class="cursor-pointer bg-[#101724] hover:bg-[#161d29] border border-[#1e2634] rounded-lg p-2.5 transition-colors">
+      <div class="flex items-center justify-between mb-1">
+        <span class="font-bold text-[13px] truncate">#${t.rank} · ${themeDisplay(t.name)}</span>
+        <span class="text-[10px] text-slate-400 shrink-0 ml-2">RS <b class="text-emerald-400">${t.avgRS}</b> · ${t.count}</span>
+      </div>
+      <div class="flex flex-wrap gap-1">
+        ${t.stocks.map(s=>`<span class="pill">${s.ticker} <b class="text-emerald-400">${s.rs}</b></span>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+async function runUpdate(force){
+  const btn=document.getElementById('btnUpdate');
+  btn.disabled=true; startTimer(); setProgress(5,'⏳ เชื่อมต่อ...');
+  preloadedCharts = {};   // reset chart cache on fresh update
+  loadVolCorr();   // โหลดความผันผวน + คู่ที่วิ่งพร้อมกัน (static) → ป้ายใน card/modal
+  try{
+    setProgress(15,'🔍 สแกน '+(currentMarket==='america'?'ตลาดอเมริกา (US)':'ตลาดไทย')+' (TradingView)...');
+    const res=await fetch(API+'/api/scan?market='+currentMarket+(force?'&force=1':''));
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    setProgress(60,'🧮 คำนวณ RS / จัดกลุ่ม...');
+    const data=await res.json(); if(data.error) throw new Error(data.error);
+    stockData=data.data||[];
+    moneyFlowData=data.moneyFlow||null;
+    themesData=data.themes||null;
+    summaryData=data.marketSummary||null;
+    renderFlow();
+    renderThemes();
+    renderSummary(summaryData);
+            renderMarketBreadth();
+            renderMarketBrief();
+            renderTopGL();
+            renderMegatrend();
+        loadIndex();
+    const _tot=data.total_market??(raw_count>=0?raw_count:data.count); document.getElementById('stockCount').textContent=(data.count??0)+' ผ่านเกณฑ์ · '+(data.total_market??'')+' ทั้งกระดาน';
+    document.getElementById('lastUpdateText').textContent=new Date().toLocaleString('th-TH',{timeZone:'Asia/Bangkok'});
+    setProgress(80,'📈 กำลังโหลดกราฟ...');
+    renderView();
+    const top10=stockData.slice(0,10);
+    for(let i=0;i<top10.length;i++){
+      setProgress(80+Math.round((i+1)/top10.length*15),'📊 '+top10[i].ticker+' ('+(i+1)+'/'+top10.length+')');
+      try{ const c=await fetch(API+'/api/chart?market='+currentMarket+'&symbol='+top10[i].ticker+'&interval=1d&range=1y'); const j=await c.json(); if(j.data&&j.data.length) preloadedCharts[top10[i].ticker]=j.data; }catch(e){}
+    }
+    setProgress(100,'✅ เสร็จ'); stopTimer();
+  }catch(e){
+    setProgress(100,'❌ '+e.message); stopTimer(); console.error(e);
+  }finally{ btn.disabled=false; }
+}
+
+let autoRefreshTimer = null;
+function toggleAutoRefresh(){
+  const on = document.getElementById('autoRefresh').checked;
+  if(autoRefreshTimer){ clearInterval(autoRefreshTimer); autoRefreshTimer=null; }
+  if(on){
+    autoRefreshTimer = setInterval(()=>autoRefreshLight(), 180000);  // ทุก 3 นาที
+    autoRefreshLight(true);  // รอบแรกทันที
+  }
+}
+/* Auto-refresh แบบเบา: fetch /api/scan (ไม่ force → ได้ cache server) แล้วอัปเดต
+   ราคา/เปลี่ยน + สรุป แล้ว re-render เฉพาะเลข ไม่แตะกราฟ/ไม่ reset หน้า */
+async function autoRefreshLight(silent){
+  if(stockData && document.getElementById('lastUpdateText')){
+    // แสดงสถานะเนียนๆ โดยไม่กะพริบ progress หลัก (หา badge รองถ้ามี)
+    try{
+      const res=await fetch(API+'/api/scan?market='+currentMarket); // ไม่ force = ใช้แคช 300s
+      if(!res.ok) return;
+      const d=await res.json(); if(!d || !d.data) return;
+      // merge ราคาล่าสุดลง stockData (เก็บ RS กลุ่มเดิมไว้)
+      const freshById={}; d.data.forEach(x=>{ freshById[x.ticker]=x; });
+      stockData = stockData.map(s=>{
+        const f=freshById[s.ticker];
+        if(!f) return s;
+        return {...s, price:f.price, change:f.change, volume:f.volume, val:f.val};
+      });
+      if(d.marketSummary) summaryData=d.marketSummary;
+      if(d.moneyFlow) moneyFlowData=d.moneyFlow;
+      if(d.themes) themesData=d.themes;
+      renderSummary(summaryData);
+                  renderMarketBreadth();
+                  renderFlow();
+                  renderThemes();
+                  renderTopGL();
+                  renderMarketBrief();
+      renderMegatrend();
+      // อัปเดตการ์ด/ตารางที่แสดงอยู่ (ราคา) โดยไม่วาดกราฟใหม่
+      refreshVisiblePrices();
+      const lt=document.getElementById('lastUpdateText');
+      if(lt) lt.textContent=new Date().toLocaleString('th-TH',{timeZone:'Asia/Bangkok'})+(d.marketSummary? '':'');
+    }catch(e){ /* เงียบ — รอบหน้ามาใหม่ */ }
+  }
+}
+/* อัปเดตเฉพาะราคา/เปลี่ยนบนการ์ด+ตารางที่แสดง (ไม่ re-render กราฟ) */
+function refreshVisiblePrices(){
+  const mode=document.getElementById('viewMode').value;
+  const cv=document.getElementById('cardsView');
+  if(mode==='card' && cv){
+    // การ์ด: update .price-badge / .change-badge (ดู buildCard ตั้ง id ตาม ticker)
+    stockData.forEach(s=>{
+      const pb=document.getElementById('price_'+s.ticker);
+      if(pb && pb.dataset.dirty!=='1' && typeof s.price==='number'){
+        pb.textContent = (s.price>=1000)? s.price.toLocaleString('en-US',{maximumFractionDigits:1}) : (s.price>=10? s.price.toFixed(2): s.price.toFixed(3));
+      }
+      const cb=document.getElementById('chg_'+s.ticker);
+      if(cb && typeof s.change==='number'){
+        const v=s.change; const st=v>0?'text-emerald-400':v<0?'text-red-400':'text-slate-400';
+        cb.className='text-xs font-semibold '+st;
+        cb.textContent=(v>0?'+':'')+v.toFixed(2)+'%';
+      }
+    });
+  }
+  const tb=document.getElementById('tableBody');
+  if(mode==='table' && tb){
+    stockData.forEach(s=>{
+      const r=document.getElementById('row_'+s.ticker);
+      if(r && typeof s.price==='number'){
+        const c=r.querySelector('.tprice'); if(c) c.textContent=(s.price>=1000)?s.price.toLocaleString('en-US',{maximumFractionDigits:1}):(s.price>=10?s.price.toFixed(2):s.price.toFixed(3));
+        const cc=r.querySelector('.tchg'); if(cc && typeof s.change==='number'){ const v=s.change; cc.textContent=(v>0?'+':'')+v.toFixed(2)+'%'; cc.className='tchg text-xs '+(v>0?'text-emerald-400':v<0?'text-red-400':'text-slate-400'); }
+      }
+    });
+  }
+}
+/* ผู้ใช้เลือก จำนวนกราฟต่อแถว (1/2/3/4) — ปุ่มในแถวเลขหน้า ใช้ colsChoice (คงค่า) */
+let colsChoice = 3;
+function setCols(n){
+  colsChoice = (n>=1&&n<=4)? n : 2;
+  renderView();
+}
+function applyCols(){
+  const cv=document.getElementById('cardsView');
+  if(!cv) return;
+  const n = colsChoice || 2;
+  cv.style.gridTemplateColumns = 'repeat('+n+', minmax(0, 1fr))';
+  // เมื่อเลือก 1 คอลัมน์ ขยายกราฟให้ใหญ่ขึ้นชัดเจน
+  const ch = document.querySelectorAll('.chart');
+    const h = n===1 ? 220 : (n===2 ? (document.body.clientWidth<640?150:200) : (document.body.clientWidth<640?130:190));
+    ch.forEach(c=>{ c.style.height = h+'px'; });
+}
+function renderView(){
+  perPage = Number(document.getElementById('perPageSel').value||10) || 10;  // จำนวนต่อหน้า (10/20/30/50)
+  applyCols();  // ตั้ง จำนวนกราฟต่อแถว ตาม colSel
+  if(stockData.length && sortKey) stockData.sort(sortNow);
+  const q=document.getElementById('searchInput').value.toUpperCase();
+  const g=document.getElementById('groupFilter').value;
+  const mode=document.getElementById('viewMode').value;
+  const minRS=Number(document.getElementById('rsFilter').value||0);
+  let list=stockData.filter(x=>{
+    const ms=(x.ticker||'').toUpperCase().includes(q)||(x.name||'').toUpperCase().includes(q);
+    const mg=g==='ALL'||(g.startsWith('IDX:')?(currentMarket==='america'&&inIndex(x.ticker).indexOf(g.slice(4))>-1):x.group===g)||(g==='SET100'&&(x.group==='SET50'||x.group==='SET100'));
+    const mr=!minRS || (x.rs!=null && x.rs>=minRS);
+    return ms&&mg&&mr;
+  });
+  const cv=document.getElementById('cardsView'), tv=document.getElementById('tableView'), tb=document.getElementById('tableBody');
+  cv.innerHTML=''; tb.innerHTML='';
+  // unified pagination (ทั้ง card และ table)
+  const totalPages=Math.max(1, Math.ceil(list.length/perPage));
+  if(page>totalPages) page=totalPages;
+  if(page<1) page=1;
+  const start=(page-1)*perPage;
+  const visible=list.slice(start, start+perPage);
+  const pager=`<div class="col-span-full flex flex-wrap items-center justify-center gap-1.5 text-[11px] py-2">
+      <button onclick="page=Math.max(1,page-1);renderView()" class="tf-chip ${page>1?'':'opacity-40 pointer-events-none'}">◀ ก่อน</button>
+      ${Array.from({length:totalPages},(_,i)=>`<button onclick="page=${i+1};renderView()" class="tf-chip ${page===i+1?'active':''}">${i+1}</button>`).join('')}
+      <button onclick="page=Math.min(${totalPages},page+1);renderView()" class="tf-chip ${page<totalPages?'':'opacity-40 pointer-events-none'}">ถัดไป ▶</button>
+    </div>
+    <div class="col-span-full flex flex-wrap items-center justify-center gap-2 text-[10px] text-slate-500 py-1">
+      <span>แสดง ${start+1}-${Math.min(start+perPage,list.length)} จาก ${list.length} ตัว</span>
+      <span class="flex items-center gap-1 bg-[#101724] border border-[#243044] rounded-lg px-1.5 py-0.5">
+        <span class="text-slate-400">กราฟ</span>
+        ${[1,2,3,4].map(n=>`<button onclick="setCols(${n})" class="tf-chip ${colsChoice===n?'active':''}">${n}</button>`).join('')}
+      </span>
+    </div>`;
+    if(mode==='card'){
+    cv.classList.remove('hidden'); tv.classList.add('hidden');
+    cv.innerHTML+=pager;
+    visible.forEach(x=>{ cv.innerHTML += buildCard(x.ticker, x.name, x.group, x.industry, x.rs, x.price, x.change, x.volume, x.val, x.p3m, x.rT, x.rD, x.isDR, x.relVol); });
+    loadPageCharts(visible);
+  }else{
+    cv.classList.add('hidden'); tv.classList.remove('hidden');
+    // table ย่อยเหมือน card: ต่อ pager เข้ากับ table (อยู่ก่อน/หลังแถว)
+    tb.innerHTML=`
+      <tr class="border-b border-[#1e2634]"><td colspan="9" class="p-0"><div class="col-span-full w-full">${pager}</div></td></tr>`;
+          visible.forEach(x=>{
+      tb.innerHTML+=`<tr id="row_${x.ticker}" class="hover:bg-[#111827] border-b border-[#1e2634]">
+        <td class="p-4 text-left"><span class="text-base font-extrabold ${rsColor(x.rs)}">${x.rs}</span> <b class="ml-1 text-slate-300">#${x.rT}</b></td>
+        <td class="p-4 text-left"><button onclick="openModal('${x.ticker}','${(x.name||'').replace(/'/g,"\\'")}','${currentMarket}')" class="font-bold text-sky-400 hover:underline">${x.ticker}</button>${x.isDR?' <span class="text-[9px] font-bold text-amber-400 bg-amber-400/10 border border-amber-500/40 rounded px-1">DR</span>':''}${currentMarket==='america'?(' '+drShort(x.ticker)):''}</td>
+        <td class="p-4 font-bold tprice">${fNum(x.price)}</td>
+        <td class="p-4"><span class="tchg">${fPct(x.change)}</span></td>
+        <td class="p-4 text-slate-300">${x.val!=null?fVal(x.val):'-'}</td>
+        <td class="p-4">${Number.isFinite(Number(x.relVol))?x.relVol.toFixed(1)+'×':'-'}</td>
+        <td class="p-4">${fPct(x.p3m)}</td>
+        <td class="p-4">${rDhtml(x)}</td>
+        <td class="p-4 text-slate-400 text-xs" title="${x.industry||x.sector}">${themeDisplay(x.industry||x.sector)}</td>
+      </tr>`;
+    });
+  }
+}
+
+/* วาดกราฟให้การ์ด — รอจน element มีขนาดจริง (>0) ก่อนสร้าง chart แล้ววาดด้วย width เจาะจง (ไม่พึ่ง autoSize) เหมือน modal */
+function drawWhenSized(el, data){
+  if(!el) return;
+  let tries=0;
+  function attempt(){
+    const ew = el.clientWidth || el.offsetWidth;
+    const pw = el.parentElement?.clientWidth || el.parentElement?.offsetWidth || 0;
+    const w = ew || pw || 0;
+    if(w>10){
+      drawChartW(el, data, w);       // วาดด้วย width วัดจริง
+    } else if(tries++ < 15){         // ยังไม่ได้ layout -> poll ใหม่ (สูงสุด ~1.5s)
+      setTimeout(attempt, 100);
+    } else {
+      el.innerHTML='<div class="flex items-center justify-center h-full text-[11px] text-slate-500">กราฟโหลดไม่สำเร็จ</div>';
+    }
+  }
+  attempt();
+}
+
+// drawChart รับ width เจาะจง (ไม่ autoSize — กัน width=0 บนมือถือ)
+function drawChartW(el, raw, w){
+  if(!w) w = el.clientWidth || el.parentElement?.clientWidth || 320;
+  el.innerHTML='';
+  const data=[...raw].sort((a,b)=>typeof a.time==='number'?(a.time-b.time):String(a.time).localeCompare(String(b.time)));
+  // ความสูงอัตโนมัติตามความกว้าง (ไม่ fix 240) — กว้างมากก็สูงสุด 240, แคบ (3 คอลัมน์) จะสั้นตาม
+  const hgt = Math.max(150, Math.min(240, Math.round(w * 0.62)));
+  const chart=LightweightCharts.createChart(el,{width:w,height:hgt,layout:{background:{color:'transparent'},textColor:'#000000',fontSize:12,fontFamily:"'Space Mono','Kanit',monospace"},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:true,borderColor:'#000000'},timeScale:{borderVisible:true,borderColor:'#000000'}});
+  chart.addCandlestickSeries({upColor:'#008000',downColor:'#FF0000',borderVisible:false,wickUpColor:'#008000',wickDownColor:'#FF0000'}).setData(data);
+  const hasVol=data.some(d=>d.volume>0);
+  if(hasVol){
+    chart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol'}).setData(data.map(d=>({time:d.time,value:d.volume,color:d.close>=d.open?'rgba(0,128,0,.8)':'rgba(255,0,0,.8)'})));
+    chart.priceScale('vol').applyOptions({scaleMargins:{top:.82,bottom:0}});
+  }
+  const sma=(n,color)=>{ if(data.length<n)return; const o=[]; for(let i=n-1;i<data.length;i++){let s=0;for(let j=0;j<n;j++)s+=data[i-j].close;o.push({time:data[i].time,value:s/n});} chart.addLineSeries({color,lineWidth:1,crosshairMarkerVisible:false}).setData(o); };
+  sma(20,'#0000FF'); sma(50,'#FFA500');
+  const last=data[data.length-1];
+  if(last){
+    chart.addLineSeries({color:'#008000',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dotted,crosshairMarkerVisible:false}).setData([{time:last.time,value:last.close}]);
+  }
+  // ห่างขอบขวาให้เหมาะกับความกว้าง (3 คอลัมน์ = แคบต้องห่างเยอะขึ้น) + ให้แท่งล่าสุดไม่ชิดขวา
+    chart.timeScale().applyOptions({ rightOffset: w < 420 ? 18 : (w < 620 ? 14 : 12) });
+    chart.timeScale().fitContent();
+    return chart;
+  }
+
+function drawChart(el, raw){
+  return drawChartW(el, raw, el.clientWidth || el.parentElement?.clientWidth || 320);
+}
+async function changeCardTF(tk,iv){
+  const el=document.getElementById('chart_'+tk.replace(/[^a-z0-9]/gi,'_'));
+  if(!el)return;
+  el.innerHTML='<div class="flex items-center justify-center h-full text-[11px] text-sky-400 animate-pulse">โหลด '+iv+'...</div>';
+  try{ const r=await fetch(API+'/api/chart?market='+currentMarket+'&symbol='+tk+'&interval='+iv+'&range='+({['30m']:'1mo',['1wk']:'2y'}[iv]||'1y')); const j=await r.json(); drawChart(el,j.data||[]); }catch(e){ el.innerHTML='<div class="text-center text-rose-400 text-[11px]">โหลดไม่สำเร็จ</div>'; }
+}
+
+function openModal(tk,nm,mkt){
+  activeTicker=tk;
+  document.getElementById('modalTicker').textContent=tk;
+  document.getElementById('modalName').textContent=nm;
+  // ใช้ตลาดที่ caller ส่งตรงๆ (ถูกตลาดเสมอ); ถ้าไม่มี => เดาเดิมจาก cache
+  const mk = mkt || ((stockDB.america||[]).some(x=>x.ticker===tk) ? 'america' : 'thailand');
+  activeMarket = mk;
+  const found =
+    (mk==='america'?(stockDB.america||[]):(stockDB.thailand||[])).find(x=>x.ticker===tk)
+    || (stockData||[]).find(x=>x.ticker===tk);
+  const grp = found ? found.group : '';
+  const theme = found ? themeDisplay(found.industry||found.sector) : '';
+  document.getElementById('modalLogo').innerHTML = `<img src="${logoUrlM(tk,mk)}" alt="" loading="lazy" onerror="this.style.display='none'" class="w-7 h-7 rounded-full object-cover shrink-0" />`;
+  document.getElementById('modalCap').innerHTML = capBadge(grp);
+  document.getElementById('modalRVOL').innerHTML = fRVOL(found?.relVol);
+  document.getElementById('modalVol').innerHTML = volBadge(tk);
+  document.getElementById('modalCrowd').innerHTML = crowdLine(tk);
+    document.getElementById('modalRS').innerHTML = (found && found.rs!=null)
+      ? `<span class="text-xl font-black ml-1.5 ${rsColor(Number(found.rs))}" title="RS เปอร์เซ็นต์ไทล์ เทียบทั้งตลาด">RS ${found.rs}</span>` : '';
+  document.getElementById('modalTheme').innerHTML = theme ? `<span class="pill text-sky-300 border-sky-700/60">${theme}</span>` : '';
+  const _drEl=document.getElementById('modalDR');
+  if(_drEl) _drEl.innerHTML = (mk==='america') ? drTableHTML(tk) : '';   // 🇹🇭 DR ไทย (เฉพาะหุ้นเมกา)
+  document.getElementById('chartModal').classList.remove('hidden'); document.getElementById('chartModal').classList.add('flex'); fetchModal('1y');
+}
+function closeModal(){ document.getElementById('chartModal').classList.add('hidden'); document.getElementById('chartModal').classList.remove('flex'); activeTicker=''; }
+function changeModalTF(iv){ [...document.querySelectorAll('#chartModal .tf-chip')].forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); fetchModal(iv); }
+async function fetchModal(iv){
+  const el=document.getElementById('modalChart'); el.innerHTML='<div class="flex items-center justify-center h-full text-sky-400 animate-pulse text-sm">กำลังโหลด...</div>';
+  try{
+    const r=await fetch(API+'/api/chart?market='+activeMarket+'&symbol='+activeTicker+'&interval='+(iv==='1y'?'1d':iv)+'&range='+({['30m']:'1mo',['1mo']:'5y',['1wk']:'2y',['1y']:'1y'}[iv]||'1y'));
+    const j=await r.json(); const data=(j.data||[]).sort((a,b)=>typeof a.time==='number'?(a.time-b.time):String(a.time).localeCompare(String(b.time)));
+    if(!data.length) throw new Error('no data');
+    requestAnimationFrame(()=>{
+      const w=el.clientWidth||el.parentElement.clientWidth||700;
+      el.innerHTML='';
+      const ch=LightweightCharts.createChart(el,{width:w,height:420,autoSize:true,layout:{background:{color:'#ffffff'},textColor:'#000000',fontSize:12,fontFamily:"'Space Mono','Kanit',monospace"},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:true,borderColor:'#000000'},timeScale:{borderVisible:true,borderColor:'#000000'}});
+      ch.addCandlestickSeries({upColor:'#008000',downColor:'#FF0000',borderVisible:false,wickUpColor:'#008000',wickDownColor:'#FF0000'}).setData(data);
+      const hasVol=data.some(d=>d.volume>0);
+      if(hasVol){
+        ch.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol'}).setData(data.map(d=>({time:d.time,value:d.volume,color:d.close>=d.open?'rgba(0,128,0,.8)':'rgba(255,0,0,.8)'})));
+        ch.priceScale('vol').applyOptions({scaleMargins:{top:.8,bottom:0}});
+      }
+      const sma=(n,color)=>{ if(data.length<n)return; const o=[]; for(let i=n-1;i<data.length;i++){let s=0;for(let j=0;j<n;j++)s+=data[i-j].close;o.push({time:data[i].time,value:s/n});} ch.addLineSeries({color,lineWidth:1,crosshairMarkerVisible:false}).setData(o); };
+      sma(20,'#0000FF'); sma(50,'#FFA500'); ch.timeScale().fitContent(); ch.timeScale().applyOptions({ rightOffset: 12 });
+    });
+  }catch(e){ el.innerHTML='<div class="text-center text-rose-400 text-sm">โหลดไม่สำเร็จ</div>'; }
+}
+
+document.getElementById('searchInput').addEventListener('input',function(){ page=1; renderView(); });
+document.getElementById('groupFilter').addEventListener('change',function(){ page=1; renderView(); });
+document.getElementById('rsFilter').addEventListener('change',function(){ page=1; renderView(); });
+document.getElementById('perPageSel').addEventListener('change',function(){ page=1; renderView(); });
+document.getElementById('viewMode').addEventListener('change',renderView);
+// Tooltip แตะเปิด/ปิดบนมือถือ (hover ไม่มี) — จัดการทุก .tip
+document.querySelectorAll('.tip').forEach(t=>{
+  t.addEventListener('click',(e)=>{
+    e.preventDefault(); e.stopPropagation();
+    const was=t.classList.contains('tap');
+    document.querySelectorAll('.tip.tap').forEach(x=>x.classList.remove('tap'));
+    if(!was) t.classList.add('tap');
+  });
+});
+document.addEventListener('click',()=>document.querySelectorAll('.tip.tap').forEach(x=>x.classList.remove('tap')));
+document.addEventListener('DOMContentLoaded',()=>{ try{
+  fillGroupOptions(currentMarket);
+  try{ localStorage.removeItem('rsd_curPage'); }catch(e){}
+  loadDrUs();   // โหลดข้อมูล DR ไทยที่อ้างอิงหุ้นเมกา (แสดงเฉพาะหน้าหุ้นเมกา)
+  setPage('overview');   // หน้าแรก = ภาพรวมตลาด (บอสสั่ง)
+  runUpdate(true);   // ทุกครั้งเข้าเว็บ: บังคับ Update ข้อมูลสดเสมอ (ข้าม cache)
+}catch(e){} });
+</script>
+</body>
+</html>

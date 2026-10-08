@@ -1,0 +1,123 @@
+[
+  {
+    "date": "2026-10-04",
+    "regime": {
+      "label": "BEAR",
+      "pct": 33,
+      "multiplier": 0.25
+    },
+    "shortlist": [
+      {
+        "ticker": "SSP",
+        "rs": 98,
+        "weight": 7,
+        "compositeScore": 80.2
+      },
+      {
+        "ticker": "SPRC",
+        "rs": 98,
+        "weight": 7,
+        "compositeScore": 78.7
+      },
+      {
+        "ticker": "PLANB",
+        "rs": 97,
+        "weight": 6.9,
+        "compositeScore": 78.6
+      },
+      {
+        "ticker": "SMT",
+        "rs": 99,
+        "weight": 7,
+        "compositeScore": 77.4
+      },
+      {
+        "ticker": "KCE",
+        "rs": 99,
+        "weight": 7,
+        "compositeScore": 76.5
+      },
+      {
+        "ticker": "NAT",
+        "rs": 82,
+        "weight": 5.8,
+        "compositeScore": 75.8
+      },
+      {
+        "ticker": "TSE",
+        "rs": 97,
+        "weight": 6.9,
+        "compositeScore": 75.2
+      },
+      {
+        "ticker": "PTTGC",
+        "rs": 95,
+        "weight": 6.7,
+        "compositeScore": 75
+      },
+      {
+        "ticker": "IRPC",
+        "rs": 98,
+        "weight": 7,
+        "compositeScore": 73.7
+      },
+      {
+        "ticker": "TOP",
+        "rs": 96,
+        "weight": 6.8,
+        "compositeScore": 73.7
+      },
+      {
+        "ticker": "NEO",
+        "rs": 86,
+        "weight": 6.1,
+        "compositeScore": 73.6
+      },
+      {
+        "ticker": "HANA",
+        "rs": 97,
+        "weight": 6.9,
+        "compositeScore": 73.5
+      },
+      {
+        "ticker": "SPCG",
+        "rs": 91,
+        "weight": 6.5,
+        "compositeScore": 71.4
+      },
+      {
+        "ticker": "GFPT",
+        "rs": 81,
+        "weight": 5.7,
+        "compositeScore": 70.8
+      },
+      {
+        "ticker": "RCL",
+        "rs": 95,
+        "weight": 6.7,
+        "compositeScore": 70.6
+      }
+    ],
+    "changes": {
+      "new": [
+        "SSP",
+        "SPRC",
+        "PLANB",
+        "SMT",
+        "KCE",
+        "NAT",
+        "TSE",
+        "PTTGC",
+        "IRPC",
+        "TOP",
+        "NEO",
+        "HANA",
+        "SPCG",
+        "GFPT",
+        "RCL"
+      ],
+      "dropped": [],
+      "held": []
+    }
+  }
+]
