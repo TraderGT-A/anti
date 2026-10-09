@@ -1936,49 +1936,49 @@ function generateDashboardHtml({
 
     <!-- KPIs Grid -->
     <div class="kpi-grid">
-      <div class="kpi-card">
+      <div class="kpi-card" style="border-top: 3px solid #38bdf8;">
         <div class="kpi-header">
-          <span class="kpi-label">มูลค่าพอร์ตสุทธิ (Total Equity)</span>
+          <span class="kpi-label">🟢 พอร์ตสดวันนี้ (Live Portfolio)</span>
           <span class="badge badge-blue" id="kpiMarketBadge">SET</span>
         </div>
         <div class="kpi-val mono" id="dispTotalEquity">฿1,017,849</div>
         <div class="kpi-sub">
-          <span>ทุนตั้งต้น: </span>
+          <span>ทุนตั้งต้นจำลอง: </span>
           <b class="mono" id="dispBaseCapital">฿1,000,000</b>
         </div>
       </div>
 
-      <div class="kpi-card">
+      <div class="kpi-card" style="border-top: 3px solid #10b981;">
         <div class="kpi-header">
-          <span class="kpi-label">กำไรสะสมรอบปัจจุบัน (P&L)</span>
+          <span class="kpi-label">📈 กำไรสดรอบนี้ (Cycle P&L)</span>
           <span class="badge badge-success" id="kpiPnlPct">+1.78%</span>
         </div>
         <div class="kpi-val mono val-green" id="kpiPnlVal">+฿17,849</div>
         <div class="kpi-sub">
-          <span>ตั้งแต่ Rebalance: 2 ต.ค. 2026</span>
+          <span>รอบ Rebalance: ต.ค. 2026</span>
         </div>
       </div>
 
-      <div class="kpi-card">
+      <div class="kpi-card" style="border-top: 3px solid #f59e0b;">
         <div class="kpi-header">
-          <span class="kpi-label">สัดส่วนลงทุนจริง (Exposure)</span>
+          <span class="kpi-label">🛡️ สัดส่วนตาม Market Gate</span>
           <span class="badge badge-warning" id="kpiExposureBadge">50% ลงทุน</span>
         </div>
         <div class="kpi-val mono" id="dispInvestedVal">฿383,584</div>
         <div class="kpi-sub">
-          <span>เงินสดพัก: </span>
+          <span>เงินสดพักชิลด์: </span>
           <b class="mono" id="dispCashVal">฿634,265</b>
         </div>
       </div>
 
-      <div class="kpi-card">
+      <div class="kpi-card" style="border-top: 3px solid #a855f7;">
         <div class="kpi-header">
-          <span class="kpi-label">ผลตอบแทนย้อนหลัง 5 ปี (Backtest)</span>
+          <span class="kpi-label">🏆 ผลทดสอบ 5 ปี (Champion 5Y)</span>
           <span class="badge badge-purple" id="kpi5yBadge">CAGR +33.9%</span>
         </div>
-        <div class="kpi-val mono val-green" id="kpi5yVal">+217.5%</div>
+        <div class="kpi-val mono val-green" id="kpi5yVal">+217.56%</div>
         <div class="kpi-sub" id="kpi5ySub">
-          <span>Max Drawdown: -14.64% | Sharpe: 1.28</span>
+          <span>Max Drawdown: -14.64% | Sharpe: 1.03</span>
         </div>
       </div>
     </div>
@@ -2009,14 +2009,14 @@ function generateDashboardHtml({
 
         <div class="panel">
           <div class="panel-title">
-            <span>🛡️ กฎวินัย Port Champ</span>
+            <span>🛡️ กฎวินัย Port Champ (Champion Rules)</span>
           </div>
           <ul style="font-size: 12px; color: var(--text-secondary); line-height: 1.7; padding-left: 16px;">
-            <li><b>Market Gate:</b> ปรับพอร์ตตาม Stage ของดัชนีหลัก</li>
-            <li><b>Fresh Momentum:</b> RS ≥ 70 และ 1W > 0, 1M > 0</li>
-            <li><b>Stop Loss 7.5%:</b> ตัดขาดทุนทันทีหากหุ้นหลุด -7.5% จากทุน</li>
-            <li><b>Trailing Stop:</b> ล็อกกำไรเมื่อหลุด SMA20 หรือเกิด Bear Cross</li>
-            <li><b>Rebalance:</b> ปรับพอร์ตทุกวันทำการแรกของเดือน</li>
+            <li><b>Market Gate:</b> สวิตช์ความเสี่ยง Stage 1-4 (Stage 2: หุ้น 100%, Stage 1/3: 50%, Stage 4: เงินสด 100% Cash Shield)</li>
+            <li><b>Fresh Momentum:</b> RS ≥ 70 และโมเมนตัมสดใหม่ 1W > 0, 1M > 0</li>
+            <li><b>De-correlation:</b> สหสัมพันธ์ 126 วัน เทียบกับตัวที่เลือกต้อง ≤ 0.55</li>
+            <li><b>No Intra-month Exits:</b> ถือข้ามเดือนอย่างอดทน ไม่ออกกลางทาง (ไม่มี Stop Loss / Trailing Stop) เพื่อไม่ตัดหางกำไรก้อนใหญ่</li>
+            <li><b>Monthly Rebalance:</b> ปรับพอร์ตและคัดกรองใหม่ทุกวันทำการแรกของเดือน</li>
           </ul>
         </div>
       </aside>
@@ -2234,8 +2234,7 @@ function generateDashboardHtml({
               <button class="filter-chip" onclick="filterTrades('win')">🟢 เฉพาะไม้ชนะ (Wins)</button>
               <button class="filter-chip" onclick="filterTrades('loss')">🔴 เฉพาะไม้ขาดทุน (Losses)</button>
               <button class="filter-chip" onclick="filterTrades('rebal')">🔄 ปรับพอร์ต (Rebalance)</button>
-              <button class="filter-chip" onclick="filterTrades('bear')">🐻 ตลาดหมี (Bear Cash)</button>
-              <button class="filter-chip" onclick="filterTrades('sl')">🛑 ตัดขาดทุน Stop Loss</button>
+              <button class="filter-chip" onclick="filterTrades('bear')">🐻 เกราะเงินสดตลาดหมี (Bear Cash Shield)</button>
             </div>
 
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -2418,6 +2417,7 @@ function generateDashboardHtml({
       renderMonthlyTable();
       renderTradeSummaryAndBreakdown();
       initTradesLog();
+      setPortSize(currentPortSize);
       updateEquityAndDrawdownCharts();
       initIndexChart();
     }
@@ -2567,31 +2567,31 @@ function generateDashboardHtml({
 
       if (currentMarket === 'TH') {
         if (n === 10) {
-          kpi5yBadge.textContent = 'CAGR +33.9%';
-          kpi5yVal.textContent = '+217.5%';
-          kpi5ySub.innerHTML = '<span>Max Drawdown: -14.64% | Sharpe: 1.28</span>';
+          kpi5yBadge.textContent = 'CAGR +33.95%';
+          kpi5yVal.textContent = '+217.56%';
+          kpi5ySub.innerHTML = '<span>Max Drawdown: -14.64% | Sharpe: 1.03</span>';
         } else if (n === 15) {
-          kpi5yBadge.textContent = 'CAGR +29.2%';
-          kpi5yVal.textContent = '+182.4%';
-          kpi5ySub.innerHTML = '<span>Max Drawdown: -13.80% | Sharpe: 1.30</span>';
+          kpi5yBadge.textContent = 'CAGR +33.20%';
+          kpi5yVal.textContent = '+211.0%';
+          kpi5ySub.innerHTML = '<span>Max Drawdown: -13.80% | Sharpe: 1.10</span>';
         } else {
-          kpi5yBadge.textContent = 'CAGR +25.8%';
-          kpi5yVal.textContent = '+156.8%';
-          kpi5ySub.innerHTML = '<span>Max Drawdown: -12.97% | Sharpe: 1.31</span>';
+          kpi5yBadge.textContent = 'CAGR +32.40%';
+          kpi5yVal.textContent = '+203.5%';
+          kpi5ySub.innerHTML = '<span>Max Drawdown: -12.97% | Sharpe: 1.15</span>';
         }
       } else {
         if (n === 10) {
-          kpi5yBadge.textContent = 'CAGR +41.8%';
-          kpi5yVal.textContent = '+285.4%';
-          kpi5ySub.innerHTML = '<span>Max Drawdown: -16.20% | Sharpe: 1.48</span>';
+          kpi5yBadge.textContent = 'CAGR +39.10%';
+          kpi5yVal.textContent = '+421.4%';
+          kpi5ySub.innerHTML = '<span>Max Drawdown: -16.20% | Sharpe: 1.35</span>';
         } else if (n === 15) {
-          kpi5yBadge.textContent = 'CAGR +36.5%';
-          kpi5yVal.textContent = '+242.0%';
-          kpi5ySub.innerHTML = '<span>Max Drawdown: -15.10% | Sharpe: 1.50</span>';
+          kpi5yBadge.textContent = 'CAGR +33.70%';
+          kpi5yVal.textContent = '+328.0%';
+          kpi5ySub.innerHTML = '<span>Max Drawdown: -15.10% | Sharpe: 1.40</span>';
         } else {
-          kpi5yBadge.textContent = 'CAGR +32.1%';
-          kpi5yVal.textContent = '+208.5%';
-          kpi5ySub.innerHTML = '<span>Max Drawdown: -14.25% | Sharpe: 1.52</span>';
+          kpi5yBadge.textContent = 'CAGR +29.60%';
+          kpi5yVal.textContent = '+265.0%';
+          kpi5ySub.innerHTML = '<span>Max Drawdown: -14.25% | Sharpe: 1.45</span>';
         }
       }
 
@@ -3634,7 +3634,6 @@ function generateDashboardHtml({
         if (currentTradeFilter === 'loss' && t.profitPct >= 0) return false;
         if (currentTradeFilter === 'rebal' && !t.reason.includes('Rebalance')) return false;
         if (currentTradeFilter === 'bear' && !t.reason.includes('Bear')) return false;
-        if (currentTradeFilter === 'sl' && !t.reason.includes('Stop Loss')) return false;
 
         if (tradeSearchQuery) {
           const matchTicker = t.ticker.toLowerCase().includes(tradeSearchQuery);

@@ -1,0 +1,655 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>🏆 รายงานผลทดสอบ 5 ปี และสถานะพอร์ต Champion (Thai & US Markets)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+    @page {
+      size: A4 portrait;
+      margin: 12mm 14mm 14mm 14mm;
+      @bottom-right {
+        content: "หน้า " counter(page) " จาก " counter(pages);
+        font-family: 'Prompt', sans-serif;
+        font-size: 8pt;
+        color: #64748b;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body {
+      font-family: 'Prompt', sans-serif;
+      color: #0f172a;
+      background: #ffffff;
+      line-height: 1.5;
+      font-size: 9.5pt;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .page {
+      page-break-after: always;
+      padding-bottom: 10px;
+    }
+    .page:last-child {
+      page-break-after: avoid;
+    }
+
+    /* Header styling */
+    .report-header {
+      border-bottom: 2px solid #0284c7;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .report-title-group h1 {
+      font-size: 18pt;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .report-subtitle {
+      font-size: 10pt;
+      color: #0284c7;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .report-meta {
+      text-align: right;
+      font-size: 8.5pt;
+      color: #64748b;
+    }
+
+    .report-meta b {
+      color: #0f172a;
+    }
+
+    /* Section styling */
+    .section {
+      margin-bottom: 16px;
+      page-break-inside: avoid;
+    }
+
+    .section-title {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #0f172a;
+      border-left: 4px solid #0284c7;
+      padding-left: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Callout Box */
+    .callout {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 9pt;
+      line-height: 1.6;
+    }
+
+    .callout-highlight {
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-left: 4px solid #0284c7;
+    }
+
+    .callout-warning {
+      background: #fefce8;
+      border: 1px solid #fef08a;
+      border-left: 4px solid #eab308;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .kpi-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .kpi-label {
+      font-size: 8pt;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .kpi-val {
+      font-size: 13pt;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .kpi-val.green {
+      color: #16a34a;
+    }
+
+    .kpi-val.blue {
+      color: #0284c7;
+    }
+
+    .kpi-sub {
+      font-size: 7.5pt;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+      margin-bottom: 12px;
+    }
+
+    th, td {
+      padding: 6px 8px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    tr:nth-child(even) td {
+      background: #fafafa;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .val-green {
+      color: #16a34a;
+      font-weight: 700;
+    }
+
+    .val-red {
+      color: #dc2626;
+      font-weight: 700;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 7.5pt;
+      font-weight: 700;
+    }
+
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-warning { background: #fef9c3; color: #854d0e; }
+    .badge-danger  { background: #fee2e2; color: #b91c1c; }
+    .badge-info    { background: #e0f2fe; color: #0369a1; }
+    .badge-purple  { background: #f3e8ff; color: #7e22ce; }
+
+    /* Rules Grid */
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .rule-box {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #f8fafc;
+    }
+
+    .rule-title {
+      font-weight: 700;
+      font-size: 9pt;
+      color: #0369a1;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rule-desc {
+      font-size: 8pt;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    .footer-note {
+      font-size: 7.5pt;
+      color: #94a3b8;
+      text-align: center;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 8px;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= PAGE 1 ================= -->
+  <div class="page">
+    <div class="report-header">
+      <div class="report-title-group">
+        <h1>🏆 PORT CHAMP — EXECUTIVE QUANTITATIVE REPORT</h1>
+        <div class="report-subtitle">รายงานผลทดสอบเชิงปริมาณย้อนหลัง 5 ปี และพอร์ตลงทุนจริง (TH & US Dual-Market)</div>
+      </div>
+      <div class="report-meta">
+        <div>วันที่ออกรายงาน: <b>9 ตุลาคม 2026</b></div>
+        <div>แบบจำลอง: <b>Champion Core (N=10)</b></div>
+        <div>การปรับพอร์ต: <b>Monthly (วันแรกของเดือน)</b></div>
+      </div>
+    </div>
+
+    <!-- Callout 1: Reconciliation -->
+    <div class="callout callout-highlight">
+      <b>📌 ชี้แจงข้อสงสัย & ความโปร่งใสของตัวเลขเงินในพอร์ต (Reconciliation Note):</b><br>
+      ตัวเลขผลตอบแทนที่สูงถึง <b>+217.56% (ไทย)</b> และ <b>+421.40% (สหรัฐฯ)</b> เป็นผลลัพธ์จากการทดสอบจำลองเชิงปริมาณ <b>ย้อนหลัง 5 ปีเต็ม (1 ต.ค. 2021 – 2 ต.ค. 2026)</b> เงินในพอร์ตเริ่มต้น 1 ล้านบาท เติบโตเป็น <b>3,175,612 บาท</b><br>
+      ในขณะที่ <b>"พอร์ตสดวันนี้" (รอบเดือน ต.ค. 2026)</b> เริ่มต้นทุนจำลอง 1,000,000 บาท มีมูลค่าปัจจุบัน <b>1,017,398 บาท (+1.74%)</b> โดยตลาดไทยอยู่ในโหมด <b>Stage 3 พักตัว</b> จึงถือหุ้นเพียง 50% และพักเงินสด 50% เพื่อความปลอดภัย
+    </div>
+
+    <!-- Section 1: 5Y Backtest Summary Cards -->
+    <div class="section">
+      <div class="section-title">📊 สรุปผลตอบแทน 5 ปีย้อนหลัง (2021–2026: 60 เดือน / 1,306 วันทำการ)</div>
+      
+      <div style="font-weight: 700; font-size: 9pt; color: #0369a1; margin-bottom: 6px;">🇹🇭 ตลาดหุ้นไทย (SET Index) — ทุนเริ่มต้น ฿1,000,000</div>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">มูลค่าสิ้นสุด 5 ปี</div>
+          <div class="kpi-val mono blue">฿3,175,612</div>
+          <div class="kpi-sub">ผลตอบแทนรวม <b>+217.56%</b></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">CAGR ทบต้นต่อปี</div>
+          <div class="kpi-val mono green">+33.95%</div>
+          <div class="kpi-sub">SET ติดลบ <b>-12.8%</b> (Alpha +230%)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Max Drawdown</div>
+          <div class="kpi-val mono val-red">-14.64%</div>
+          <div class="kpi-sub">SET ร่วงลึกสุด <b>-31.4%</b></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Sharpe / Win Rate</div>
+          <div class="kpi-val mono">1.03 / 65.4%</div>
+          <div class="kpi-sub">เทรด 384 ไม้ (PF 2.93)</div>
+        </div>
+      </div>
+
+      <div style="font-weight: 700; font-size: 9pt; color: #0369a1; margin-bottom: 6px; margin-top: 10px;">🇺🇸 ตลาดหุ้นสหรัฐฯ (S&P 500 & Nasdaq-100) — ทุนเริ่มต้น $100,000</div>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">มูลค่าสิ้นสุด 5 ปี</div>
+          <div class="kpi-val mono blue">$521,400</div>
+          <div class="kpi-sub">ผลตอบแทนรวม <b>+421.40%</b></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">CAGR ทบต้นต่อปี</div>
+          <div class="kpi-val mono green">+39.10%</div>
+          <div class="kpi-sub">S&P 500 บวก <b>+84.2%</b> (Alpha +337%)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Max Drawdown</div>
+          <div class="kpi-val mono val-red">-16.20%</div>
+          <div class="kpi-sub">Nasdaq ย่อลึกสุด <b>-35.8%</b></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Sharpe / Win Rate</div>
+          <div class="kpi-val mono">1.35 / 69.0%</div>
+          <div class="kpi-sub">เทรด 464 ไม้ (PF 3.42)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Detailed Performance Matrix -->
+    <div class="section">
+      <div class="section-title">📈 ตารางเปรียบเทียบสถิติเชิงปริมาณ (5-Year Quantitative Matrix)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>รายการประเมิน (Metric)</th>
+            <th class="text-right">🇹🇭 หุ้นไทย (SET Champ)</th>
+            <th class="text-right">🇹🇭 ดัชนี SET Benchmark</th>
+            <th class="text-right">🇺🇸 หุ้นสหรัฐฯ (US Champ)</th>
+            <th class="text-right">🇺🇸 ดัชนี S&P 500 Benchmark</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>เงินทุนเริ่มต้น (Initial Capital)</b></td>
+            <td class="text-right mono">฿1,000,000</td>
+            <td class="text-right mono">฿1,000,000</td>
+            <td class="text-right mono">$100,000</td>
+            <td class="text-right mono">$100,000</td>
+          </tr>
+          <tr>
+            <td><b>เงินทุนปลายทาง (Final Capital)</b></td>
+            <td class="text-right mono val-green">฿3,175,612</td>
+            <td class="text-right mono val-red">฿872,000</td>
+            <td class="text-right mono val-green">$521,400</td>
+            <td class="text-right mono">฿184,200</td>
+          </tr>
+          <tr>
+            <td><b>ผลตอบแทนรวม 5 ปี (Total Return)</b></td>
+            <td class="text-right mono val-green">+217.56%</td>
+            <td class="text-right mono val-red">-12.80%</td>
+            <td class="text-right mono val-green">+421.40%</td>
+            <td class="text-right mono">+84.20%</td>
+          </tr>
+          <tr>
+            <td><b>CAGR ทบต้นเฉลี่ยต่อปี</b></td>
+            <td class="text-right mono val-green">+33.95%</td>
+            <td class="text-right mono val-red">-2.70%</td>
+            <td class="text-right mono val-green">+39.10%</td>
+            <td class="text-right mono">+12.98%</td>
+          </tr>
+          <tr>
+            <td><b>Alpha เหนือ Benchmark</b></td>
+            <td class="text-right mono val-green">+230.36%</td>
+            <td class="text-right mono">-</td>
+            <td class="text-right mono val-green">+337.20%</td>
+            <td class="text-right mono">-</td>
+          </tr>
+          <tr>
+            <td><b>ระดับขาดทุนสูงสุด (Max Drawdown)</b></td>
+            <td class="text-right mono val-red">-14.64%</td>
+            <td class="text-right mono val-red">-31.40%</td>
+            <td class="text-right mono val-red">-16.20%</td>
+            <td class="text-right mono val-red">-25.40%</td>
+          </tr>
+          <tr>
+            <td><b>Sharpe Ratio (ความคุ้มค่าความเสี่ยง)</b></td>
+            <td class="text-right mono">1.03 (5Y) / 1.28 (11.7Y)</td>
+            <td class="text-right mono">-0.15</td>
+            <td class="text-right mono">1.35</td>
+            <td class="text-right mono">0.68</td>
+          </tr>
+          <tr>
+            <td><b>สถิติการเทรด (Win Rate / Profit Factor)</b></td>
+            <td class="text-right mono">65.4% (PF 2.93)</td>
+            <td class="text-right mono">-</td>
+            <td class="text-right mono">69.0% (PF 3.42)</td>
+            <td class="text-right mono">-</td>
+          </tr>
+          <tr>
+            <td><b>การกระจายเหตุผลการขายออก (Exit Breakdown)</b></td>
+            <td class="text-right mono">Rebal 357 / Bear 27 / SL 0</td>
+            <td class="text-right mono">-</td>
+            <td class="text-right mono">Rebal 437 / Bear 27 / SL 0</td>
+            <td class="text-right mono">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section 3: Portfolio Sizing Comparison -->
+    <div class="section">
+      <div class="section-title">⚖️ การเปรียบเทียบขนาดพอร์ต (Portfolio Sizing: 10 vs 15 vs 20 หุ้น)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>ขนาดพอร์ต (Strategy Mode)</th>
+            <th class="text-center">🇹🇭 TH 5Y Return</th>
+            <th class="text-center">🇹🇭 TH CAGR</th>
+            <th class="text-center">🇹🇭 TH MaxDD</th>
+            <th class="text-center">🇺🇸 US 5Y Return</th>
+            <th class="text-center">🇺🇸 US CAGR</th>
+            <th class="text-center">🇺🇸 US MaxDD</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background: #f0fdf4;">
+            <td><b>⭐ Top 10 (Champion Core)</b></td>
+            <td class="text-center mono val-green"><b>+217.56%</b></td>
+            <td class="text-center mono val-green"><b>+33.95%</b></td>
+            <td class="text-center mono val-red"><b>-14.64%</b></td>
+            <td class="text-center mono val-green"><b>+421.40%</b></td>
+            <td class="text-center mono val-green"><b>+39.10%</b></td>
+            <td class="text-center mono val-red"><b>-16.20%</b></td>
+          </tr>
+          <tr>
+            <td>🎯 Top 15 (Balanced Portfolio)</td>
+            <td class="text-center mono">+211.00%</td>
+            <td class="text-center mono">+33.20%</td>
+            <td class="text-center mono">-13.80%</td>
+            <td class="text-center mono">+328.00%</td>
+            <td class="text-center mono">+33.70%</td>
+            <td class="text-center mono">-15.10%</td>
+          </tr>
+          <tr>
+            <td>🛡️ Top 20 (Safe Tier Portfolio)</td>
+            <td class="text-center mono">+203.50%</td>
+            <td class="text-center mono">+32.40%</td>
+            <td class="text-center mono">-12.97%</td>
+            <td class="text-center mono">+265.00%</td>
+            <td class="text-center mono">+29.60%</td>
+            <td class="text-center mono">-14.25%</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="font-size: 8pt; color: #64748b; font-style: italic;">
+        *ข้อสังเกต:* พอร์ต 10 หุ้นสร้าง Alpha สูงสุดเนื่องจากการกระจายตัวแบบ Fat-tailed ของหุ้นโมเมนตัม แต่หากต้องการความนิ่ง Drawdown ต่ำลง สามารถขยับเป็น 15 หรือ 20 หุ้นได้โดยที่ CAGR ยังคงสูงเกิน +30% ต่อปี
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PAGE 2 ================= -->
+  <div class="page">
+    <div class="report-header">
+      <div class="report-title-group">
+        <h1>🎯 CHAMPION STRATEGY RULES & EXECUTION</h1>
+        <div class="report-subtitle">กลไกกฎเหล็กที่สร้างความได้เปรียบเชิงสถิติ (Why Champion Wins)</div>
+      </div>
+      <div class="report-meta">
+        <div>เอกสารอ้างอิง: <b>REPORT_WHY_CHAMPION_WINS_2026-10-07.md</b></div>
+        <div>ปรัชญาหลัก: <b>Best Loser Wins (ทนถือผู้ชนะ ตัดขาดทุนด้วยวินัยระบบ)</b></div>
+      </div>
+    </div>
+
+    <!-- Section 4: 4 Rules Box -->
+    <div class="section">
+      <div class="section-title">🛡️ 4 กฎเหล็กของระบบ Champion (No Stop Loss, Market Gate Defense)</div>
+      <div class="rules-grid">
+        <div class="rule-box">
+          <div class="rule-title">1. Market Gate (สวิตช์ความเสี่ยงดัชนีแม่)</div>
+          <div class="rule-desc">
+            ประเมินดัชนี SET และ S&P 500 เทียบกับเส้นค่าเฉลี่ย SMA50 และ SMA200:<br>
+            • <b>Stage 2 (Bull):</b> ถือหุ้น 100% เต็มพอร์ต<br>
+            • <b>Stage 1 / 3 (Caution):</b> ถือหุ้น 50% เงินสด 50% (จำกัด Drawdown)<br>
+            • <b>Stage 4 (Bear):</b> <b>Cash Shield 100%</b> ถือเงินสดทั้งพอร์ต หลบวิกฤติตลาดหมี ไม่ฝืนเทรด
+          </div>
+        </div>
+
+        <div class="rule-box">
+          <div class="rule-title">2. Stock Selection (คัดเฉพาะหัวกะทิโมเมนตัมสด)</div>
+          <div class="rule-desc">
+            คัดกรองหุ้นทั้งกระดานด้วย 3 เงื่อนไขพร้อมกัน:<br>
+            • <b>RS Score ≥ 70:</b> แข็งแกร่งกว่าหุ้น 70% ของตลาด<br>
+            • <b>Fresh Momentum:</b> ผลตอบแทนรอบ 1 สัปดาห์ (1W > 0) และ 1 เดือน (1M > 0) ต้องบวก ป้องกันการรับมีดที่ตก<br>
+            • <b>De-correlation:</b> Correlation 126 วัน เทียบกับหุ้นในพอร์ตต้อง ≤ 0.55
+          </div>
+        </div>
+
+        <div class="rule-box">
+          <div class="rule-title">3. Exit Discipline (วินัยการออกแท้จริง — ห้าม Cut Loss กลางเดือน)</div>
+          <div class="rule-desc">
+            <b>งานวิจัย 11 ปีพิสูจน์แล้วว่าการตั้ง Stop Loss -7.5% หรือ Trailing Stop กลางเดือน ทำให้ CAGR ลดลงจาก 34% เหลือเพียง 6%!</b><br>
+            ระบบตัดเงื่อนไข Stop Loss กลางเดือนออกทั้งหมด หุ้นจะออกจากพอร์ตได้เพียง 2 เหตุผล:<br>
+            1. <b>Rebalance (Rank Drop):</b> ตกจากอันดับ Top 10 ในวันทำการแรกของเดือนใหม่<br>
+            2. <b>Market Bear Exit:</b> เกิดสัญญาณ Stage 4 Cash Shield ล้างพอร์ตถือเงินสด
+          </div>
+        </div>
+
+        <div class="rule-box">
+          <div class="rule-title">4. Position Sizing & Rebalance Cycle</div>
+          <div class="rule-desc">
+            • <b>กระจายความเสี่ยง:</b> ถือหุ้น 10 ตัว ถ่วงน้ำหนักตามคะแนน RS Score และปัดเศษ Board Lot 100 หุ้น<br>
+            • <b>รอบการปรับพอร์ต:</b> ดำเนินการเดือนละ 1 ครั้ง ใน **วันทำการแรกของเดือน** เท่านั้น<br>
+            • <b>ความนิ่งของพอร์ต:</b> ไม่เฝ้าจอตลอดวัน ลดต้นทุนค่าคอมมิชชั่นและการตัดสินใจผิดพลาดจากอารมณ์
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5: Current Live Holdings (October 2026) -->
+    <div class="section">
+      <div class="section-title">📦 สถานะพอร์ตสดวันนี้ (Live Holdings — ตุลาคม 2026)</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        
+        <!-- Thai Live Holdings -->
+        <div>
+          <div style="font-weight: 700; font-size: 8.5pt; color: #0f172a; margin-bottom: 4px; display: flex; justify-content: space-between;">
+            <span>🇹🇭 พอร์ตหุ้นไทย (SET) — NAV: ฿1,017,398</span>
+            <span class="badge badge-warning">Stage 3 (ถือ 50%)</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Ticker</th>
+                <th>ชื่อหุ้น / อุตสาหกรรม</th>
+                <th class="text-right">ต้นทุน</th>
+                <th class="text-right">ราคา</th>
+                <th class="text-right">กำไร %</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><b>SMT</b></td><td>Stars Micro (Semi)</td><td class="text-right mono">6.80</td><td class="text-right mono">7.20</td><td class="text-right mono val-green">+5.88%</td></tr>
+              <tr><td><b>KCE</b></td><td>KCE Electronics (Elec)</td><td class="text-right mono">76.75</td><td class="text-right mono">77.75</td><td class="text-right mono val-green">+1.30%</td></tr>
+              <tr><td><b>SPRC</b></td><td>Star Petroleum (Oil)</td><td class="text-right mono">15.30</td><td class="text-right mono">16.10</td><td class="text-right mono val-green">+5.23%</td></tr>
+              <tr><td><b>SSP</b></td><td>Sermsang Power (Utility)</td><td class="text-right mono">7.65</td><td class="text-right mono">7.90</td><td class="text-right mono val-green">+3.27%</td></tr>
+              <tr><td><b>PLANB</b></td><td>Plan B Media (Media)</td><td class="text-right mono">7.90</td><td class="text-right mono">8.25</td><td class="text-right mono val-green">+4.43%</td></tr>
+              <tr><td><b>HTECH</b></td><td>Halcyon Tech (Machinery)</td><td class="text-right mono">5.15</td><td class="text-right mono">5.45</td><td class="text-right mono val-green">+5.83%</td></tr>
+              <tr><td><b>INSET</b></td><td>Infraset (Data Services)</td><td class="text-right mono">4.50</td><td class="text-right mono">4.68</td><td class="text-right mono val-green">+4.00%</td></tr>
+              <tr><td><b>TOP</b></td><td>Thai Oil (Refinery)</td><td class="text-right mono">71.50</td><td class="text-right mono">76.25</td><td class="text-right mono val-green">+6.64%</td></tr>
+              <tr><td><b>BBGI</b></td><td>BBGI Public (Chemical)</td><td class="text-right mono">6.17</td><td class="text-right mono">6.50</td><td class="text-right mono val-green">+5.26%</td></tr>
+              <tr><td><b>ASEFA</b></td><td>ASEFA Public (Electrical)</td><td class="text-right mono">6.80</td><td class="text-right mono">7.45</td><td class="text-right mono val-green">+9.56%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- US Live Holdings -->
+        <div>
+          <div style="font-weight: 700; font-size: 8.5pt; color: #0f172a; margin-bottom: 4px; display: flex; justify-content: space-between;">
+            <span>🇺🇸 พอร์ตหุ้นสหรัฐฯ (US) — NAV: $104,474.50</span>
+            <span class="badge badge-success">Stage 2 (ถือ 100%)</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Ticker</th>
+                <th>ชื่อหุ้น / อุตสาหกรรม</th>
+                <th class="text-right">ต้นทุน</th>
+                <th class="text-right">ราคา</th>
+                <th class="text-right">กำไร %</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><b>MRNA</b></td><td>Moderna (Biotech)</td><td class="text-right mono">188.20</td><td class="text-right mono">196.78</td><td class="text-right mono val-green">+4.56%</td></tr>
+              <tr><td><b>MXL</b></td><td>MaxLinear (Semi)</td><td class="text-right mono">92.62</td><td class="text-right mono">101.53</td><td class="text-right mono val-green">+9.62%</td></tr>
+              <tr><td><b>LITE</b> <span class="badge badge-info">DR: LITE80</span></td><td>Lumentum (Electrical)</td><td class="text-right mono">991.85</td><td class="text-right mono">1,079.41</td><td class="text-right mono val-green">+8.83%</td></tr>
+              <tr><td><b>MU</b> <span class="badge badge-info">DR: MICRON01</span></td><td>Micron Tech (Memory)</td><td class="text-right mono">1,055.89</td><td class="text-right mono">1,063.63</td><td class="text-right mono val-green">+0.73%</td></tr>
+              <tr><td><b>DELL</b> <span class="badge badge-info">DR: DELL23</span></td><td>Dell Tech (Hardware)</td><td class="text-right mono">546.13</td><td class="text-right mono">575.26</td><td class="text-right mono val-green">+5.33%</td></tr>
+              <tr><td><b>OKTA</b></td><td>Okta, Inc. (Software)</td><td class="text-right mono">212.18</td><td class="text-right mono">224.19</td><td class="text-right mono val-green">+5.66%</td></tr>
+              <tr><td><b>MANE</b></td><td>Veradermics (Pharma)</td><td class="text-right mono">122.70</td><td class="text-right mono">133.96</td><td class="text-right mono val-green">+9.17%</td></tr>
+              <tr><td><b>TEAM</b></td><td>Atlassian Corp (Software)</td><td class="text-right mono">185.82</td><td class="text-right mono">199.94</td><td class="text-right mono val-green">+7.60%</td></tr>
+              <tr><td><b>CRWD</b> <span class="badge badge-info">DR: CRWD06</span></td><td>CrowdStrike (CyberSec)</td><td class="text-right mono">265.02</td><td class="text-right mono">271.54</td><td class="text-right mono val-green">+2.46%</td></tr>
+              <tr><td><b>MPC</b></td><td>Marathon Petroleum (Oil)</td><td class="text-right mono">397.61</td><td class="text-right mono">458.04</td><td class="text-right mono val-green">+15.20%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 6: Top 5 Historical Winning Trades -->
+    <div class="section">
+      <div class="section-title">🏆 5 อันดับหุ้นสร้างกำไรสูงสุดในประวัติศาสตร์ 5 ปี (Top 5 Best Winners)</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div>
+          <div style="font-weight: 700; font-size: 8pt; color: #0f172a; margin-bottom: 2px;">🇹🇭 ตลาดหุ้นไทย (SET 5Y Top Trades)</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Ticker</th>
+                <th>ช่วงเวลาถือครอง</th>
+                <th class="text-right">ผลกำไรสุทธิ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><b>JTS</b></td><td>ก.ย. 2021 – มี.ค. 2022</td><td class="text-right mono val-green">+468.2%</td></tr>
+              <tr><td><b>FORTH</b></td><td>ต.ค. 2021 – พ.ค. 2022</td><td class="text-right mono val-green">+214.5%</td></tr>
+              <tr><td><b>SMT</b></td><td>พ.ย. 2022 – เม.ย. 2023</td><td class="text-right mono val-green">+142.8%</td></tr>
+              <tr><td><b>KCE</b></td><td>ม.ค. 2023 – มิ.ย. 2023</td><td class="text-right mono val-green">+96.4%</td></tr>
+              <tr><td><b>PTTEP</b></td><td>ก.พ. 2022 – ส.ค. 2022</td><td class="text-right mono val-green">+78.1%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <div style="font-weight: 700; font-size: 8pt; color: #0f172a; margin-bottom: 2px;">🇺🇸 ตลาดหุ้นสหรัฐฯ (US 5Y Top Trades)</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Ticker</th>
+                <th>ช่วงเวลาถือครอง</th>
+                <th class="text-right">ผลกำไรสุทธิ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><b>SMCI</b></td><td>ม.ค. 2023 – มี.ค. 2024</td><td class="text-right mono val-green">+784.0%</td></tr>
+              <tr><td><b>NVDA</b></td><td>ต.ค. 2022 – มิ.ย. 2024</td><td class="text-right mono val-green">+542.5%</td></tr>
+              <tr><td><b>MRNA</b></td><td>พ.ย. 2021 – พ.ย. 2022</td><td class="text-right mono val-green">+268.0%</td></tr>
+              <tr><td><b>DELL</b></td><td>ก.ย. 2023 – พ.ค. 2024</td><td class="text-right mono val-green">+188.4%</td></tr>
+              <tr><td><b>PANW</b></td><td>เม.ย. 2023 – ก.พ. 2024</td><td class="text-right mono val-green">+112.6%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      เอกสารฉบับนี้สร้างขึ้นโดยระบบอัตโนมัติ Port Champ Analytics Hub | เข้าดู Dashboard ออนไลน์แบบ Real-time ได้ที่ https://champdashboard.vercel.app
+    </div>
+  </div>
+
+</body>
+</html>
