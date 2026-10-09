@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>
+    if (window.location.hostname.includes('champdashboard') || window.location.hostname.includes('champ-dashboard')) {
+      window.location.replace('/champ_dashboard.html' + window.location.search);
+    }
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Sovereign Traveller</title>
   <style>
