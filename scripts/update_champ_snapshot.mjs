@@ -184,10 +184,11 @@ async function getThaiMarketCandidates() {
     const turnover = rawVal >= 1000000 ? (rawVal / 1000000) : rawVal;
     if (turnover < 5) continue; // Turnover >= 5 MB
 
+    const p1m = Number(s.p1m || 0);
     const p3m = Number(s.p3m || 0);
     const p6m = Number(s.p6m || s.p3m || 0);
     const p1y = Number(s.p1y || 0);
-    const champScore = (0.4 * p3m) + (0.3 * p6m) + (0.3 * p1y);
+    const champScore = s.score != null ? Number(s.score) : ((0.3 * p1m) + (0.3 * p3m) + (0.2 * p6m) + (0.2 * p1y));
 
     candidates.push({
       ticker: s.ticker,
@@ -255,28 +256,28 @@ async function getThaiMarketCandidates() {
   };
 }
 
-function getActiveThaiPortfolio(selectedPicks, marketGate) {
+function getActiveThaiPortfolio(selectedPicks, marketGate, chartsTH = {}) {
   console.log('3. Updating Thailand Active Portfolio State...');
   const todayStr = '2026-10-08';
-  const rebalanceDateStr = '2026-10-02';
+  const rebalanceDateStr = '2026-10-01'; // 1st trading day of October 2026 (ATC close)
 
-  const basePrices = {
-    'SMT': 6.80, 'KCE': 76.75, 'SPRC': 15.30, 'SSP': 7.65,
-    'TEAM': 6.20, 'HANA': 52.25, 'PLANB': 7.90, 'TOP': 71.50,
-    'PTTGC': 50.25, 'CRC': 30.25, 'ASEFA': 6.80, 'SGC': 1.65,
-    'HTECH': 5.15, 'INSET': 4.50, 'EPG': 6.10, 'SINGER': 10.90,
-    'NER': 5.20, 'BA': 23.40, 'MTC': 48.50, 'ICHI': 16.20
-  };
-
-  const totalScore20 = selectedPicks.reduce((acc, s) => acc + (s.score || 100), 0);
   const capital = DEFAULT_CAPITAL_TH;
   const investedCapital = capital * marketGate.exposure;
+  const top10Picks = selectedPicks.slice(0, 10);
+  const totalScore10 = top10Picks.reduce((acc, s) => acc + (s.score || 100), 0);
+  const totalScore20 = selectedPicks.reduce((acc, s) => acc + (s.score || 100), 0);
 
   const holdingsAll = selectedPicks.map((stock, idx) => {
-    const entryPrice = basePrices[stock.ticker] || (stock.price * 0.95);
-    const curPrice = stock.price;
+    const candles = chartsTH[stock.ticker] || [];
+    const oct1Candle = candles.find(c => c.time === '2026-10-01') || candles.find(c => c.time >= '2026-10-01') || candles[candles.length - 1];
+    const latestCandle = candles[candles.length - 1];
+
+    const entryPrice = oct1Candle ? oct1Candle.close : stock.price;
+    const curPrice = latestCandle ? latestCandle.close : stock.price;
     const unPnlPct = ((curPrice / entryPrice) - 1) * 100;
-    const scoreWeight = (stock.score || 100) / totalScore20;
+
+    // Normalize weights for top 10 so full capital is deployed
+    const scoreWeight = idx < 10 ? ((stock.score || 100) / totalScore10) : ((stock.score || 100) / totalScore20);
     const targetVal = investedCapital * scoreWeight;
     const shares = Math.max(100, Math.floor(targetVal / (entryPrice * 100)) * 100);
     const costValue = shares * entryPrice;
@@ -479,10 +480,11 @@ async function getUsMarketCandidates(drMap) {
     if (turnover < 20) continue; // Liquidity >= $20M
     if (s.price < 2) continue;
 
+    const p1m = Number(s.p1m || 0);
     const p3m = Number(s.p3m || 0);
     const p6m = Number(s.p6m || s.p3m || 0);
     const p1y = Number(s.p1y || 0);
-    const score = (0.4 * p3m) + (0.3 * p6m) + (0.3 * p1y);
+    const score = s.score != null ? Number(s.score) : ((0.3 * p1m) + (0.3 * p3m) + (0.2 * p6m) + (0.2 * p1y));
 
     const drList = drMap[s.ticker] || [];
     const hasDr = drList.length > 0;
@@ -540,21 +542,28 @@ async function getUsMarketCandidates(drMap) {
   };
 }
 
-function getActiveUsPortfolio(selectedPicks, marketGate) {
+function getActiveUsPortfolio(selectedPicks, marketGate, chartsUS = {}) {
   console.log('6. Updating US Active Portfolio State...');
   const todayStr = '2026-10-08';
-  const rebalanceDateStr = '2026-10-02';
+  const rebalanceDateStr = '2026-10-01'; // 1st trading day of October 2026 (ATC close)
 
   const capital = DEFAULT_CAPITAL_US;
   const investedCapital = capital * marketGate.exposure;
+  const top10Picks = selectedPicks.slice(0, 10);
+  const totalScore10 = top10Picks.reduce((acc, s) => acc + (s.score || 100), 0);
   const totalScore20 = selectedPicks.reduce((acc, s) => acc + (s.score || 100), 0);
 
   const holdingsAll = selectedPicks.map((stock, idx) => {
-    const entryPrice = Math.round((stock.price * (1 - ((stock.p1w || 2.5) * 0.008))) * 100) / 100;
-    const curPrice = stock.price;
+    const candles = chartsUS[stock.ticker] || [];
+    const oct1Candle = candles.find(c => c.time === '2026-10-01') || candles.find(c => c.time >= '2026-10-01') || candles[candles.length - 1];
+    const latestCandle = candles[candles.length - 1];
+
+    const entryPrice = oct1Candle ? oct1Candle.close : stock.price;
+    const curPrice = latestCandle ? latestCandle.close : stock.price;
     const unPnlPct = ((curPrice / entryPrice) - 1) * 100;
 
-    const scoreWeight = (stock.score || 100) / totalScore20;
+    // Normalize weights for top 10 so full capital is deployed
+    const scoreWeight = idx < 10 ? ((stock.score || 100) / totalScore10) : ((stock.score || 100) / totalScore20);
     const targetVal = investedCapital * scoreWeight;
     const shares = Math.max(1, Math.floor(targetVal / entryPrice));
     const costValue = shares * entryPrice;
@@ -1986,20 +1995,21 @@ function generateDashboardHtml({
           <span class="badge badge-warning" id="kpiExposureBadge">50% ลงทุน</span>
         </div>
         <div class="kpi-val mono" id="dispInvestedVal">฿383,584</div>
-        <div class="kpi-sub">
-          <span>เงินสดพักชิลด์: </span>
-          <b class="mono" id="dispCashVal">฿634,265</b>
+        <div class="kpi-sub" id="dispInvestedSub">
+          <span>มูลค่าตลาด: </span><b class="mono val-green" id="dispMarketVal">฿383,584</b>
+          <span style="margin: 0 4px;">•</span>
+          <span>เงินสด: </span><b class="mono" id="dispCashVal">฿634,265</b>
         </div>
       </div>
 
       <div class="kpi-card" style="border-top: 3px solid #a855f7;">
         <div class="kpi-header">
           <span class="kpi-label">🏆 ผลทดสอบ 5 ปี (Champion 5Y)</span>
-          <span class="badge badge-purple" id="kpi5yBadge">CAGR +33.9%</span>
+          <span class="badge badge-purple" id="kpi5yBadge">CAGR +34.14%</span>
         </div>
-        <div class="kpi-val mono val-green" id="kpi5yVal">+217.56%</div>
+        <div class="kpi-val mono val-green" id="kpi5yVal">+222.75%</div>
         <div class="kpi-sub" id="kpi5ySub">
-          <span>Max Drawdown: -14.64% | Sharpe: 1.03</span>
+          <span>Max Drawdown: -15.82% | Sharpe: 1.30</span>
         </div>
       </div>
     </div>
@@ -2335,6 +2345,9 @@ function generateDashboardHtml({
         <button class="modal-close-btn" onclick="closeChartModal()">&times;</button>
       </div>
 
+      <!-- Trade / Holding Context Banner -->
+      <div id="modalTradeBanner" style="display:none; margin: 0 20px 10px 20px; padding: 10px 14px; background: rgba(16, 24, 38, 0.95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; font-size: 12px;"></div>
+
       <div class="modal-tf-bar">
         <div class="tf-btn-group">
           <button class="tf-btn" onclick="switchModalTimeframe('30m')">30 นาที</button>
@@ -2410,6 +2423,10 @@ function generateDashboardHtml({
 
     let currentHoldingsDrFilter = 'all';
     let currentWatchlistDrFilter = 'all';
+
+    let currentRecalcHoldings = [];
+    let currentTotalCost = 0;
+    let currentCashBalance = 0;
 
     function getActiveData() {
       return currentMarket === 'TH' ? DATA_TH : DATA_US;
@@ -2624,9 +2641,9 @@ function generateDashboardHtml({
 
       if (currentMarket === 'TH') {
         if (n === 10) {
-          kpi5yBadge.textContent = 'CAGR +33.95%';
-          kpi5yVal.textContent = '+217.56%';
-          kpi5ySub.innerHTML = '<span>Max Drawdown: -14.64% | Sharpe: 1.03</span>';
+          kpi5yBadge.textContent = 'CAGR +34.14%';
+          kpi5yVal.textContent = '+222.75%';
+          kpi5ySub.innerHTML = '<span>Max Drawdown: -15.82% | Sharpe: 1.30</span>';
         } else if (n === 15) {
           kpi5yBadge.textContent = 'CAGR +33.20%';
           kpi5yVal.textContent = '+211.0%';
@@ -2732,9 +2749,15 @@ function generateDashboardHtml({
       const totalPnl = totalEquity - currentCapital;
       const totalPnlPct = (totalPnl / currentCapital) * 100;
 
+      currentRecalcHoldings = recalcHoldings;
+      currentTotalCost = totalCostValue;
+      currentCashBalance = cashBalance;
+
       document.getElementById('dispTotalEquity').textContent = fmtCurrency(totalEquity);
       document.getElementById('dispBaseCapital').textContent = fmtCurrency(currentCapital);
-      document.getElementById('dispInvestedVal').textContent = fmtCurrency(totalCurrentValue);
+      document.getElementById('dispInvestedVal').textContent = fmtCurrency(totalCostValue);
+      const mValElem = document.getElementById('dispMarketVal');
+      if (mValElem) mValElem.textContent = fmtCurrency(totalCurrentValue);
       document.getElementById('dispCashVal').textContent = fmtCurrency(cashBalance);
 
       const pnlValElem = document.getElementById('kpiPnlVal');
@@ -3202,7 +3225,85 @@ function generateDashboardHtml({
       }
     }
 
-    function openChartModal(ticker, name, group, rs, price) {
+    let modalTradeContext = null;
+
+    function renderTradeBanner() {
+      const banner = document.getElementById('modalTradeBanner');
+      if (!banner) return;
+      if (!modalTradeContext) {
+        banner.style.display = 'none';
+        banner.innerHTML = '';
+        return;
+      }
+
+      const cur = getActiveData().currency;
+      banner.style.display = 'flex';
+      banner.style.alignItems = 'center';
+      banner.style.justifyContent = 'space-between';
+      banner.style.flexWrap = 'wrap';
+      banner.style.gap = '8px';
+
+      if (modalTradeContext.type === 'trade') {
+        const t = modalTradeContext;
+        const isWin = (t.profitPct || 0) >= 0;
+        const pnlCls = isWin ? 'badge-success' : 'badge-danger';
+        banner.innerHTML = \`
+          <div style="display:flex; align-items:center; gap: 12px; flex-wrap: wrap;">
+            <span style="display:inline-flex; align-items:center; gap: 4px; color: #10b981; font-weight: 600;">
+              <span style="font-size: 14px;">🟢</span> เข้าซื้อ (BUY): <b>\${cur}\${fmtDec(t.entryPrice)}</b> (\${t.entryDate})
+            </span>
+            <span style="color: #475569;">➔</span>
+            <span style="display:inline-flex; align-items:center; gap: 4px; color: \${isWin ? '#38bdf8' : '#f43f5e'}; font-weight: 600;">
+              <span style="font-size: 14px;">\${isWin ? '🎯' : '🔻'}</span> ขายออก (SELL): <b>\${cur}\${fmtDec(t.exitPrice)}</b> (\${t.exitDate})
+            </span>
+            <span style="color: #64748b; font-size: 11px;">เหตุผล: \${t.reason || '-'}</span>
+          </div>
+          <div>
+            <span class="badge \${pnlCls}" style="font-size: 12px; padding: 4px 10px; font-weight: 700;">
+              \${isWin ? 'WIN 🏆 +' : 'LOSS 🔻 '}\${fmtDec(t.profitPct)}%
+            </span>
+          </div>
+        \`;
+      } else if (modalTradeContext.type === 'holding') {
+        const h = modalTradeContext;
+        const isWin = (h.profitPct || 0) >= 0;
+        const pnlCls = isWin ? 'badge-success' : 'badge-danger';
+        banner.innerHTML = \`
+          <div style="display:flex; align-items:center; gap: 12px; flex-wrap: wrap;">
+            <span style="display:inline-flex; align-items:center; gap: 4px; color: #10b981; font-weight: 600;">
+              <span style="font-size: 14px;">🟢</span> ราคาทุนเข้าพอร์ต (BUY): <b>\${cur}\${fmtDec(h.entryPrice)}</b> (\${h.entryDate})
+            </span>
+            <span style="color: #475569;">➔</span>
+            <span style="display:inline-flex; align-items:center; gap: 4px; color: #fff; font-weight: 600;">
+              ราคาล่าสุด: <b>\${cur}\${fmtDec(h.currentPrice)}</b>
+            </span>
+            <span style="color: #64748b; font-size: 11px;">สถานะ: \${h.status || 'ถือครองตามรอบ'}</span>
+          </div>
+          <div>
+            <span class="badge \${pnlCls}" style="font-size: 12px; padding: 4px 10px; font-weight: 700;">
+              \${isWin ? 'กำไร +' : 'ขาดทุน '}\${fmtDec(h.profitPct)}%
+            </span>
+          </div>
+        \`;
+      }
+    }
+
+    function openTradeByIndex(idx) {
+      const t = filteredTrades[idx];
+      if (!t) return;
+      const ctx = {
+        type: 'trade',
+        entryDate: t.entryDate,
+        entryPrice: t.entryPrice,
+        exitDate: t.exitDate,
+        exitPrice: t.exitPrice,
+        profitPct: t.profitPct,
+        reason: t.reason
+      };
+      openChartModal(t.ticker, t.ticker, currentMarket === 'TH' ? 'SET' : 'US', null, t.exitPrice, ctx);
+    }
+
+    function openChartModal(ticker, name, group, rs, price, customTradeContext) {
       activeModalTicker = ticker;
       document.getElementById('modalTicker').textContent = ticker;
       document.getElementById('modalName').textContent = name || '';
@@ -3236,12 +3337,36 @@ function generateDashboardHtml({
         drEl.style.display = 'none';
       }
 
+      // Check trade context: custom passed in, or auto-detect if holding
+      if (customTradeContext) {
+        modalTradeContext = customTradeContext;
+      } else {
+        const holding = (data.portfolio.holdings_all || []).find(s => s.ticker === ticker);
+        if (holding && holding.entry_date && holding.entry_price) {
+          modalTradeContext = {
+            type: 'holding',
+            entryDate: holding.entry_date,
+            entryPrice: holding.entry_price,
+            currentPrice: holding.current_price,
+            profitPct: holding.unrealized_pnl_pct,
+            status: holding.status
+          };
+        } else {
+          modalTradeContext = null;
+        }
+      }
+
+      renderTradeBanner();
+
       document.getElementById('chartModal').classList.add('active');
       loadModalChart('1d');
     }
 
     function closeChartModal() {
       document.getElementById('chartModal').classList.remove('active');
+      modalTradeContext = null;
+      const banner = document.getElementById('modalTradeBanner');
+      if (banner) { banner.style.display = 'none'; banner.innerHTML = ''; }
       if (modalChartInstance) {
         try { modalChartInstance.remove(); } catch(e){}
         modalChartInstance = null;
@@ -3270,7 +3395,9 @@ function generateDashboardHtml({
       el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#38bdf8;font-size:14px;">กำลังโหลดกราฟ ' + activeModalTicker + ' (' + iv + ')...</div>';
 
       const chartsCache = getActiveData().charts;
-      if ((iv === '1d' || iv === '1y') && chartsCache[activeModalTicker] && chartsCache[activeModalTicker].length > 0) {
+      const isHistoricalTrade = modalTradeContext && modalTradeContext.entryDate && (modalTradeContext.entryDate < new Date(Date.now() - 300*86400000).toISOString().slice(0, 10));
+
+      if (!isHistoricalTrade && (iv === '1d' || iv === '1y') && chartsCache[activeModalTicker] && chartsCache[activeModalTicker].length > 0) {
         renderModalCanvas(chartsCache[activeModalTicker]);
         statusMsg.textContent = '⚡ Preloaded Ready (' + chartsCache[activeModalTicker].length + ' แท่ง)';
         return;
@@ -3278,7 +3405,10 @@ function generateDashboardHtml({
 
       try {
         const mktParam = currentMarket === 'TH' ? 'thailand' : 'america';
-        const rng = { '30m': '1mo', '1mo': '5y', '1wk': '2y', '1y': '1y', '1d': '1y' }[iv] || '1y';
+        let rng = { '30m': '1mo', '1mo': '5y', '1wk': '2y', '1y': '1y', '1d': '1y' }[iv] || '1y';
+        if (isHistoricalTrade && (iv === '1d' || iv === '1y')) {
+          rng = '5y';
+        }
         const interval = (iv === '1y' ? '1d' : iv);
         const res = await fetch('https://rsdashclean.vercel.app/api/chart?market=' + mktParam + '&symbol=' + encodeURIComponent(activeModalTicker) + '&interval=' + interval + '&range=' + rng);
         const json = await res.json();
@@ -3346,7 +3476,124 @@ function generateDashboardHtml({
       sma20.setData(calcSMA(data, 20));
       sma50.setData(calcSMA(data, 50));
 
-      modalChartInstance.timeScale().fitContent();
+      function findClosestCandle(candles, dateStr) {
+        if (!candles || !candles.length || !dateStr) return null;
+        const target = String(dateStr).slice(0, 10);
+        const exact = candles.find(c => {
+          const ct = typeof c.time === 'string' ? c.time : new Date(c.time * 1000).toISOString().slice(0, 10);
+          return ct === target;
+        });
+        if (exact) return exact;
+
+        for (let i = 0; i < candles.length; i++) {
+          const ct = typeof candles[i].time === 'string' ? candles[i].time : new Date(candles[i].time * 1000).toISOString().slice(0, 10);
+          if (ct >= target) return candles[i];
+        }
+        return candles[candles.length - 1];
+      }
+
+      // 📍 TRADE & HOLDING MARKERS & PRICE LINES:
+      if (modalTradeContext) {
+        const cur = getActiveData().currency;
+        const markers = [];
+
+        // 1. ENTRY POINT (BUY)
+        if (modalTradeContext.entryDate) {
+          const entryCandle = findClosestCandle(data, modalTradeContext.entryDate);
+          if (entryCandle) {
+            markers.push({
+              time: entryCandle.time,
+              position: 'belowBar',
+              color: '#10b981',
+              shape: 'arrowUp',
+              text: 'BUY @ ' + cur + fmtDec(modalTradeContext.entryPrice),
+              size: 2
+            });
+          }
+          if (modalTradeContext.entryPrice) {
+            candleSeries.createPriceLine({
+              price: modalTradeContext.entryPrice,
+              color: '#10b981',
+              lineWidth: 2,
+              lineStyle: LightweightCharts.LineStyle.Dashed,
+              axisLabelVisible: true,
+              title: 'ENTRY: ' + cur + fmtDec(modalTradeContext.entryPrice)
+            });
+          }
+        }
+
+        // 2. EXIT POINT (SELL)
+        if (modalTradeContext.exitDate) {
+          const exitCandle = findClosestCandle(data, modalTradeContext.exitDate);
+          if (exitCandle) {
+            const isWin = (modalTradeContext.profitPct || 0) >= 0;
+            const exitCol = isWin ? '#38bdf8' : '#f43f5e';
+            markers.push({
+              time: exitCandle.time,
+              position: 'aboveBar',
+              color: exitCol,
+              shape: 'arrowDown',
+              text: 'SELL @ ' + cur + fmtDec(modalTradeContext.exitPrice) + ' (' + (isWin ? '+' : '') + fmtDec(modalTradeContext.profitPct) + '%)',
+              size: 2
+            });
+          }
+          if (modalTradeContext.exitPrice) {
+            const isWin = (modalTradeContext.profitPct || 0) >= 0;
+            const exitCol = isWin ? '#38bdf8' : '#f43f5e';
+            candleSeries.createPriceLine({
+              price: modalTradeContext.exitPrice,
+              color: exitCol,
+              lineWidth: 2,
+              lineStyle: LightweightCharts.LineStyle.Dashed,
+              axisLabelVisible: true,
+              title: 'EXIT: ' + cur + fmtDec(modalTradeContext.exitPrice)
+            });
+          }
+        }
+
+        markers.sort((a, b) => String(a.time).localeCompare(String(b.time)));
+        if (markers.length > 0) {
+          candleSeries.setMarkers(markers);
+        }
+
+        // 🎯 AUTO-ZOOM / FOCUS on the trade period:
+        if (modalTradeContext.entryDate) {
+          const entryTarget = String(modalTradeContext.entryDate).slice(0, 10);
+          const entryIdx = data.findIndex(c => {
+            const ct = typeof c.time === 'string' ? c.time : new Date(c.time * 1000).toISOString().slice(0, 10);
+            return ct >= entryTarget;
+          });
+
+          if (entryIdx !== -1) {
+            let exitIdx = entryIdx;
+            if (modalTradeContext.exitDate) {
+              const exitTarget = String(modalTradeContext.exitDate).slice(0, 10);
+              const eIdx = data.findIndex(c => {
+                const ct = typeof c.time === 'string' ? c.time : new Date(c.time * 1000).toISOString().slice(0, 10);
+                return ct >= exitTarget;
+              });
+              if (eIdx !== -1) exitIdx = eIdx;
+            } else {
+              exitIdx = data.length - 1;
+            }
+
+            const pad = 12;
+            const fromLogical = Math.max(0, entryIdx - pad);
+            const toLogical = Math.min(data.length - 1, exitIdx + pad);
+            setTimeout(() => {
+              try {
+                modalChartInstance.timeScale().setVisibleLogicalRange({ from: fromLogical, to: toLogical });
+              } catch (e) {}
+            }, 60);
+          } else {
+            modalChartInstance.timeScale().fitContent();
+          }
+        } else {
+          modalChartInstance.timeScale().fitContent();
+        }
+      } else {
+        modalChartInstance.timeScale().fitContent();
+      }
     }
 
     // ==========================================
@@ -3822,10 +4069,10 @@ function generateDashboardHtml({
         const cur = getActiveData().currency;
 
         return \`
-          <tr>
+          <tr style="cursor: pointer;" onclick="openTradeByIndex(\${start + idx})" title="คลิกเพื่อดูกราฟจุดเข้าและจุดออกของ \${t.ticker}">
             <td>\${start + idx + 1}</td>
             <td>
-              <button class="ticker-btn" onclick="openChartModal('\${t.ticker}', '\${t.ticker}')">
+              <button class="ticker-btn" onclick="event.stopPropagation(); openTradeByIndex(\${start + idx})">
                 \${t.ticker} 🔍
               </button>
             </td>
@@ -3886,19 +4133,26 @@ function generateDashboardHtml({
       const action = data.portfolio.action.title;
       let text = \`=== PORT CHAMP ORDER TICKET [\${data.market}] (\${date}) [N=\${currentPortSize}] ===\\n\`;
       text += \`สถานะ: \${action}\\n\`;
-      text += \`เงินทุนพอร์ต: \${fmtCurrency(currentCapital)}\\n\\n\`;
+      text += \`เงินทุนพอร์ต: \${fmtCurrency(currentCapital)}\\n\`;
+      text += \`ต้นทุนจัดสรร: \${fmtCurrency(currentTotalCost || currentCapital)} | เงินสดคงเหลือ: \${fmtCurrency(currentCashBalance || 0)}\\n\\n\`;
       text += \`Ticker | Action | Shares | Lots/Units | Price | Est.Value\\n\`;
       text += \`---------------------------------------------------------------\\n\`;
 
-      const activeHoldings = (data.portfolio.holdings_all || data.portfolio.holdings).slice(0, currentPortSize);
-      activeHoldings.forEach(h => {
+      const listToCopy = (currentRecalcHoldings && currentRecalcHoldings.length > 0)
+        ? currentRecalcHoldings
+        : (data.portfolio.holdings_all || data.portfolio.holdings).slice(0, currentPortSize);
+
+      listToCopy.forEach(h => {
         const act = data.portfolio.action.code === 'SELL_ALL' ? 'SELL' : 'HOLD';
         const lotText = currentMarket === 'TH' ? Math.floor(h.shares / 100).toString().padStart(4) : h.shares.toString().padStart(4);
         text += \`\${h.ticker.padEnd(6)} | \${act.padEnd(6)} | \${h.shares.toString().padStart(6)} | \${lotText} | \${fmtDec(h.current_price).padStart(8)} | \${fmtCurrency(h.market_value)}\\n\`;
       });
+      text += \`---------------------------------------------------------------\\n\`;
+      const totMarketVal = listToCopy.reduce((s, h) => s + h.market_value, 0);
+      text += \`มูลค่ารวมพอร์ตหุ้น: \${fmtCurrency(totMarketVal)}\\n\`;
 
       navigator.clipboard.writeText(text).then(() => {
-        alert('คัดลอกตั๋วคำสั่ง (' + data.market + ' N=' + currentPortSize + ' หุ้น) เรียบร้อยแล้ว! สามารถนำไปตรวจสอบหรือส่งคำสั่งได้ทันที');
+        alert('คัดลอกตั๋วคำสั่ง (' + data.market + ' N=' + currentPortSize + ' หุ้น) เรียบร้อยแล้ว! ข้อมูลซิงค์ตรงกับหน้าจอ 100%');
       }).catch(err => {
         console.error('Clipboard copy failed:', err);
       });
@@ -3939,7 +4193,15 @@ async function main() {
     console.log(`✓ Thai Market Gate Stage: ${thaiMarketGate.stageName} (Exposure: ${thaiMarketGate.exposure * 100}%)`);
 
     const thaiCandidates = await getThaiMarketCandidates();
-    const portfolioTH = getActiveThaiPortfolio(thaiCandidates.selectedPicks, thaiMarketGate);
+    console.log('3. Pre-fetching Chart Packages for Thai Stocks...');
+    const thaiTickers = thaiCandidates.selectedPicks.map(h => h.ticker);
+    const chartsTH = await preloadStockCharts(thaiTickers, 'thailand');
+    for (const h of thaiCandidates.selectedPicks) {
+      if (!chartsTH[h.ticker] || chartsTH[h.ticker].length === 0) {
+        chartsTH[h.ticker] = generateFallbackCandles(h.price, 60);
+      }
+    }
+    const portfolioTH = getActiveThaiPortfolio(thaiCandidates.selectedPicks, thaiMarketGate, chartsTH);
     const backtestTH = getBacktestData(BACKTEST_TH_FILE);
 
     // 2. US Pipeline
@@ -3947,27 +4209,16 @@ async function main() {
     console.log(`✓ US Market Gate Stage: ${usMarketGate.stageName} (Exposure: ${usMarketGate.exposure * 100}%)`);
 
     const usCandidates = await getUsMarketCandidates(drMap);
-    const portfolioUS = getActiveUsPortfolio(usCandidates.selectedPicks, usMarketGate);
-    const backtestUS = getBacktestData(BACKTEST_US_FILE);
-
-    // 3. Preload Charts for All 20 TH and 20 US stocks
-    console.log('6. Pre-fetching Chart Packages for Thai & US Stocks...');
-    const thaiTickers = portfolioTH.holdings_all.map(h => h.ticker);
-    const usTickers = portfolioUS.holdings_all.map(h => h.ticker);
-
-    const chartsTH = await preloadStockCharts(thaiTickers, 'thailand');
+    console.log('5. Pre-fetching Chart Packages for US Stocks...');
+    const usTickers = usCandidates.selectedPicks.map(h => h.ticker);
     const chartsUS = await preloadStockCharts(usTickers, 'america');
-
-    for (const h of portfolioTH.holdings_all) {
-      if (!chartsTH[h.ticker] || chartsTH[h.ticker].length === 0) {
-        chartsTH[h.ticker] = generateFallbackCandles(h.current_price, 60);
-      }
-    }
-    for (const h of portfolioUS.holdings_all) {
+    for (const h of usCandidates.selectedPicks) {
       if (!chartsUS[h.ticker] || chartsUS[h.ticker].length === 0) {
-        chartsUS[h.ticker] = generateFallbackCandles(h.current_price, 60);
+        chartsUS[h.ticker] = generateFallbackCandles(h.price, 60);
       }
     }
+    const portfolioUS = getActiveUsPortfolio(usCandidates.selectedPicks, usMarketGate, chartsUS);
+    const backtestUS = getBacktestData(BACKTEST_US_FILE);
     console.log(`✓ Preloaded charts: ${Object.keys(chartsTH).length} TH stocks, ${Object.keys(chartsUS).length} US stocks.`);
 
     // 4. Index Candlesticks
