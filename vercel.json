@@ -5,6 +5,6 @@
   ],
   "rewrites": [
     { "source": "/pdf", "destination": "/reports/CHAMPION_STRATEGY_5Y_BACKTEST_REPORT.pdf" },
-    { "source": "/report", "destination": "/reports/CHAMPION_STRATEGY_5Y_BACKTEST_REPORT.html" }
+    { "source": "/report", "destination": "/reports/CHAMPION_STRATEGY_5Y_BACKTEST_REPORT" }
   ]
 }
