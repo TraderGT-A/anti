@@ -64,6 +64,30 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
 }
 
 // ==========================================
+// 0. PAPER LEDGER (ล็อกพอร์ตรายเดือน — ไม่ย้อนซื้อ) + AS-OF DATES
+// ==========================================
+// เดิม: ทุกครั้งที่รัน เอาหุ้นที่ "คัดจากข้อมูลวันนี้" ไปสมมติว่าซื้อตั้งแต่ 1 ต.ค. (look-ahead) และวันที่ถูกฝังตายในโค้ด
+// ใหม่: ล็อกรายชื่อ+ราคาเข้าครั้งแรกของแต่ละเดือนลง data/champ_ledger.json แล้ว mark-to-market จากรายการที่ล็อกเท่านั้น
+const LEDGER_FILE = path.join(ROOT_DIR, 'data', 'champ_ledger.json');
+const ASOF = { TH: null, US: null };   // วันทำการล่าสุดจริง (ตั้งใน main จากแท่งราคาจริง)
+function loadLedger() { try { return JSON.parse(fs.readFileSync(LEDGER_FILE, 'utf8')); } catch (e) { return {}; } }
+function lockPicks(mkt, todayStr, selectedPicks, priceOf) {
+  const ledger = loadLedger(); const cycle = todayStr.slice(0, 7); const cur = ledger[mkt];
+  if (cur && cur.cycle === cycle && Array.isArray(cur.picks) && cur.picks.length) return { cycle, picks: cur.picks, created_at: cur.created_at, fresh: false };
+  const picks = selectedPicks.slice(0, 20).map((s) => ({ ...s, locked_entry_price: priceOf(s), locked_entry_date: todayStr }));
+  ledger[mkt] = { cycle, created_at: new Date().toISOString(), note: 'ล็อก ณ วันที่รัน (ราคาเข้า = ราคาปิดล่าสุดของวันนั้น) — ห้ามย้อนซื้อ', picks };
+  fs.writeFileSync(LEDGER_FILE, JSON.stringify(ledger, null, 2), 'utf8');
+  return { cycle, picks, created_at: ledger[mkt].created_at, fresh: true };
+}
+function mergeLocked(lockedPicks, todayPicks) {
+  const m = new Map(todayPicks.map((s) => [s.ticker, s]));
+  return lockedPicks.map((p) => ({ ...p, ...(m.get(p.ticker) || {}), locked_entry_price: p.locked_entry_price, locked_entry_date: p.locked_entry_date }));
+}
+const TH_MONTHS = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+function nextRebalanceLabel(todayStr) { const [y, m] = todayStr.split('-').map(Number); const ny = m === 12 ? y + 1 : y, nm = m === 12 ? 1 : m + 1; return `วันทำการแรกของ ${TH_MONTHS[nm - 1]} ${ny}`; }
+function curMonthLabel(todayStr) { const [y, m] = todayStr.split('-').map(Number); return `${TH_MONTHS[m - 1]} ${y}`; }
+
+// ==========================================
 // 1. THAILAND MARKET GATE & SCREENING
 // ==========================================
 async function getThaiMarketGate() {
@@ -125,23 +149,10 @@ async function getThaiMarketGate() {
       };
     }
   } catch (err) {
-    console.warn('⚠️ Thai Market Gate live fetch error, using safe fallback:', err.message);
+    console.warn('⚠️ Thai Market Gate live fetch error:', err.message);
   }
 
-  return {
-    close: 1577.95,
-    open: 1580.16,
-    high: 1584.54,
-    low: 1575.69,
-    change: -0.42,
-    sma50: 1599.45,
-    sma200: 1493.34,
-    stage: 3,
-    stageName: 'Stage 3 (พักตัว/กระจาย ⚠️)',
-    exposure: 0.5,
-    badgeClass: 'badge-warning',
-    desc: 'SET Index หลุดเส้น SMA50 แต่ยังยืนเหนือ SMA200 → ถือหุ้น 50% เงินสด 50% เพื่อจำกัด Drawdown'
-  };
+  throw new Error('Thai Market Gate: ดึงข้อมูล SET จาก TradingView ไม่ได้ — หยุดรันเพื่อไม่ให้แสดงค่าปลอม');
 }
 
 async function getThaiMarketCandidates() {
@@ -256,10 +267,13 @@ async function getThaiMarketCandidates() {
   };
 }
 
-function getActiveThaiPortfolio(selectedPicks, marketGate, chartsTH = {}) {
+function getActiveThaiPortfolio(selectedPicks, marketGate, chartsTH = {}) {   // selectedPicks = อันดับวันนี้
   console.log('3. Updating Thailand Active Portfolio State...');
-  const todayStr = '2026-10-08';
-  const rebalanceDateStr = '2026-10-01'; // 1st trading day of October 2026 (ATC close)
+  const todayStr = ASOF.TH;
+  const todayPicks = selectedPicks;   // อันดับจากข้อมูลวันนี้ (ใช้เป็นเรดาร์ ไม่ใช่รายการที่ถือ)
+  const priceOfTH = (s) => { const c = chartsTH[s.ticker] || []; return c.length ? c[c.length - 1].close : s.price; };
+  const lockTH = lockPicks('TH', todayStr, todayPicks, priceOfTH);
+  selectedPicks = mergeLocked(lockTH.picks, todayPicks);   // พอร์ตที่ถือ = รายการที่ล็อกไว้ต้นรอบ
 
   const capital = DEFAULT_CAPITAL_TH;
   const investedCapital = capital * marketGate.exposure;
@@ -269,10 +283,9 @@ function getActiveThaiPortfolio(selectedPicks, marketGate, chartsTH = {}) {
 
   const holdingsAll = selectedPicks.map((stock, idx) => {
     const candles = chartsTH[stock.ticker] || [];
-    const oct1Candle = candles.find(c => c.time === '2026-10-01') || candles.find(c => c.time >= '2026-10-01') || candles[candles.length - 1];
     const latestCandle = candles[candles.length - 1];
 
-    const entryPrice = oct1Candle ? oct1Candle.close : stock.price;
+    const entryPrice = stock.locked_entry_price || stock.price;
     const curPrice = latestCandle ? latestCandle.close : stock.price;
     const unPnlPct = ((curPrice / entryPrice) - 1) * 100;
 
@@ -291,7 +304,7 @@ function getActiveThaiPortfolio(selectedPicks, marketGate, chartsTH = {}) {
       sector: stock.sector || 'Other',
       industry: stock.industry || stock.sector || 'Other',
       group: stock.group || 'SET',
-      entry_date: rebalanceDateStr,
+      entry_date: stock.locked_entry_date || todayStr,
       entry_price: Number(entryPrice.toFixed(2)),
       current_price: Number(curPrice.toFixed(2)),
       shares,
@@ -328,7 +341,7 @@ function getActiveThaiPortfolio(selectedPicks, marketGate, chartsTH = {}) {
   let actionCode = 'HOLD';
   let actionTitle = '🟢 HOLD — ถือครองตามรอบปกติ';
   let actionBadge = 'badge-success';
-  let actionMsg = 'วันนี้ไม่มีคำสั่งซื้อขาย พอร์ตสุขภาพดีเยี่ยมในโหมด Stage 3 (พักตัว/กระจาย ⚠️) รอปรับพอร์ตตามรอบในวันทำการแรกของเดือนถัดไป (1 พ.ย. 2026)';
+  let actionMsg = `วันนี้ไม่มีคำสั่งซื้อขาย ถือพอร์ตที่ล็อกไว้ตามรอบ (${marketGate.stageName}) รอปรับพอร์ตใน${nextRebalanceLabel(todayStr)}`;
 
   if (marketGate.stage === 4) {
     actionCode = 'SELL_ALL';
@@ -337,28 +350,31 @@ function getActiveThaiPortfolio(selectedPicks, marketGate, chartsTH = {}) {
     actionMsg = 'SET Index ปิดหลุดทั้ง SMA50 และ SMA200 (Stage 4 ตลาดหมีเต็มตัว) บังคับขายหุ้นทุกตัวเพื่อถือเงินสด 100% ปกป้องเงินทุน';
   }
 
-  const watchlist = holdingsAll.map((s, idx) => ({
+  const heldSet = new Set(holdingsAll.map((h) => h.ticker));
+  const watchlist = todayPicks.map((s, idx) => ({
     rank: idx + 1,
     ticker: s.ticker,
     name: s.name,
     group: s.group,
     industry: s.industry,
-    price: s.current_price,
-    change: s.change_today,
-    score: s.score,
+    price: s.price,
+    change: s.change,
+    score: Number((s.score || 0).toFixed(1)),
     rs: s.rs,
     p1w: s.p1w,
     p1m: s.p1m,
     p3m: s.p3m,
     p1y: s.p1y,
     turnover_m: s.turnover_m,
-    status: idx < 10 ? 'ในพอร์ต Champ (Top 10) 🏆' : (idx < 15 ? 'ในพอร์ต Balanced (Top 15) 🎯' : 'ในพอร์ต Safe Tier (Top 20) 🛡️')
+    status: heldSet.has(s.ticker) ? 'ถืออยู่ (ล็อกรอบ ' + lockTH.cycle + ') 🏆' : 'เรดาร์วันนี้ — ยังไม่ถือ รอรอบ Rebalance 👀'
   }));
 
   const updatedPortfolio = {
     market: 'TH',
     currency: '฿',
     last_updated: todayStr,
+    cycle: lockTH.cycle,
+    cycle_started: (holdingsAll[0] && holdingsAll[0].entry_date) || todayStr,
     capital_base: capital,
     total_equity: Number(totalEquity.toFixed(2)),
     invested_value: Number(totalMarketVal10.toFixed(2)),
@@ -388,8 +404,7 @@ function getActiveThaiPortfolio(selectedPicks, marketGate, chartsTH = {}) {
 // ==========================================
 async function getUsMarketGate() {
   console.log('4. Checking US Market Gate (S&P 500 & Nasdaq-100 vs SMA50 & SMA200)...');
-  let spx = { close: 7801.77, open: 7792.98, high: 7807.02, low: 7763.34, change: -0.22, sma50: 7680.45, sma200: 7241.30, stage: 2 };
-  let ndx = { close: 31160.08, open: 30976.25, high: 31170.12, low: 30904.46, change: -0.21, sma50: 29648.54, sma200: 27571.82, stage: 2 };
+  let spx = null, ndx = null;   // ไม่มีค่าสำรองปลอม — ถ้าดึงไม่ได้จะหยุดรัน
 
   try {
     const res = await fetchWithTimeout('https://scanner.tradingview.com/america/scan', {
@@ -422,14 +437,16 @@ async function getUsMarketGate() {
       console.log(`✓ Live TV US quotes: SPX=${spx.close} (Stage ${spx.stage}), NDX=${ndx.close} (Stage ${ndx.stage})`);
     }
   } catch (e) {
-    console.warn('⚠️ TV US Scan failed, using safe verified quotes:', e.message);
+    console.warn('⚠️ TV US Scan failed:', e.message);
   }
 
+  if (!spx || !ndx) throw new Error('US Market Gate: ดึง S&P 500 / Nasdaq-100 จาก TradingView ไม่ได้ — หยุดรันเพื่อไม่ให้แสดงค่าปลอม');
+  const fmtN = (x) => Number(x).toLocaleString('en-US', { maximumFractionDigits: 2 });
   let overallStage = 2;
   let overallStageName = 'Stage 2 (กระทิงเต็มตัว ✅)';
   let overallExposure = 1.0;
   let badgeClass = 'badge-success';
-  let desc = 'ทั้ง S&P 500 (7,801.77) และ Nasdaq-100 (31,160.08) ยืนเหนือเส้น SMA50 และ SMA200 อย่างแข็งแกร่ง → สัญญาณเปิดไฟเขียวทุ่มลงทุนเต็มพอร์ต 100%';
+  let desc = `ทั้ง S&P 500 (${fmtN(spx.close)}) และ Nasdaq-100 (${fmtN(ndx.close)}) ยืนเหนือเส้น SMA50 และ SMA200 → ลงทุนเต็มพอร์ต 100%`;
 
   if (spx.stage === 4 && ndx.stage === 4) {
     overallStage = 4;
@@ -542,10 +559,13 @@ async function getUsMarketCandidates(drMap) {
   };
 }
 
-function getActiveUsPortfolio(selectedPicks, marketGate, chartsUS = {}) {
+function getActiveUsPortfolio(selectedPicks, marketGate, chartsUS = {}) {   // selectedPicks = อันดับวันนี้
   console.log('6. Updating US Active Portfolio State...');
-  const todayStr = '2026-10-08';
-  const rebalanceDateStr = '2026-10-01'; // 1st trading day of October 2026 (ATC close)
+  const todayStr = ASOF.US;
+  const todayPicks = selectedPicks;   // อันดับจากข้อมูลวันนี้ (เรดาร์)
+  const priceOfUS = (s) => { const c = chartsUS[s.ticker] || []; return c.length ? c[c.length - 1].close : s.price; };
+  const lockUS = lockPicks('US', todayStr, todayPicks, priceOfUS);
+  selectedPicks = mergeLocked(lockUS.picks, todayPicks);
 
   const capital = DEFAULT_CAPITAL_US;
   const investedCapital = capital * marketGate.exposure;
@@ -555,10 +575,9 @@ function getActiveUsPortfolio(selectedPicks, marketGate, chartsUS = {}) {
 
   const holdingsAll = selectedPicks.map((stock, idx) => {
     const candles = chartsUS[stock.ticker] || [];
-    const oct1Candle = candles.find(c => c.time === '2026-10-01') || candles.find(c => c.time >= '2026-10-01') || candles[candles.length - 1];
     const latestCandle = candles[candles.length - 1];
 
-    const entryPrice = oct1Candle ? oct1Candle.close : stock.price;
+    const entryPrice = stock.locked_entry_price || stock.price;
     const curPrice = latestCandle ? latestCandle.close : stock.price;
     const unPnlPct = ((curPrice / entryPrice) - 1) * 100;
 
@@ -569,7 +588,7 @@ function getActiveUsPortfolio(selectedPicks, marketGate, chartsUS = {}) {
     const costValue = shares * entryPrice;
     const marketVal = shares * curPrice;
     const unPnl = marketVal - costValue;
-    const stoplossPrice = Math.round(entryPrice * 0.925 * 100) / 100; // -7.5% Stop Loss
+    const stoplossPrice = null;   // กลยุทธ์ไม่มี Stop Loss (กฎ: ถือข้ามเดือน) — เดิมแสดงราคา -7.5% ขัดกับกฎ
 
     return {
       rank: idx + 1,
@@ -583,7 +602,7 @@ function getActiveUsPortfolio(selectedPicks, marketGate, chartsUS = {}) {
       has_dr: stock.has_dr,
       dr_badge: stock.dr_badge,
       dr_list: stock.dr_list,
-      entry_date: rebalanceDateStr,
+      entry_date: stock.locked_entry_date || todayStr,
       entry_price: Number(entryPrice.toFixed(2)),
       current_price: Number(curPrice.toFixed(2)),
       stoploss_price: stoplossPrice,
@@ -617,12 +636,19 @@ function getActiveUsPortfolio(selectedPicks, marketGate, chartsUS = {}) {
     h.weight_pct = Number(((h.market_value / totalEquity) * 100).toFixed(2));
   });
 
-  const actionCode = 'HOLD';
-  const actionTitle = '🟢 HOLD — ถือครองหุ้นผู้นำเต็มพอร์ต 100%';
-  const actionBadge = 'badge-success';
-  const actionMsg = 'ตลาดสหรัฐฯ อยู่ในภาวะ Bull Run Stage 2 ทั้ง S&P 500 และ Nasdaq-100 ถือครองหุ้นโมเมนตัมผู้นำตลาดเต็มอัตราศึก 100% รอ Rebalance ประจำเดือนถัดไป (1 พ.ย. 2026)';
+  let actionCode = 'HOLD';
+  let actionTitle = '🟢 HOLD — ถือครองตามรอบปกติ';
+  let actionBadge = marketGate.stage === 2 ? 'badge-success' : 'badge-warning';
+  let actionMsg = `วันนี้ไม่มีคำสั่งซื้อขาย ถือพอร์ตที่ล็อกไว้ตามรอบ (${marketGate.stageName}, ลงทุน ${Math.round(marketGate.exposure * 100)}%) รอปรับพอร์ตใน${nextRebalanceLabel(todayStr)}`;
+  if (marketGate.stage === 4) {
+    actionCode = 'SELL_ALL';
+    actionTitle = '🔴 SELL ALL — ตลาดหลุด Market Gate บังคับล้างพอร์ต';
+    actionBadge = 'badge-danger';
+    actionMsg = 'S&P 500 และ Nasdaq-100 ปิดหลุดทั้ง SMA50 และ SMA200 (Stage 4) ขายหุ้นทุกตัวถือเงินสด 100% ปกป้องเงินทุน';
+  }
 
-  const watchlist = holdingsAll.map((s, idx) => ({
+  const heldSetUS = new Set(holdingsAll.map((h) => h.ticker));
+  const watchlist = todayPicks.map((s, idx) => ({
     rank: idx + 1,
     ticker: s.ticker,
     name: s.name,
@@ -633,22 +659,24 @@ function getActiveUsPortfolio(selectedPicks, marketGate, chartsUS = {}) {
     has_dr: s.has_dr,
     dr_badge: s.dr_badge,
     dr_list: s.dr_list,
-    price: s.current_price,
-    change: s.change_today,
-    score: s.score,
+    price: s.price,
+    change: s.change,
+    score: Number((s.score || 0).toFixed(1)),
     rs: s.rs,
     p1w: s.p1w,
     p1m: s.p1m,
     p3m: s.p3m,
     p1y: s.p1y,
     turnover_m: s.turnover_m,
-    status: idx < 10 ? 'ในพอร์ต Champ (Top 10) 🏆' : (idx < 15 ? 'ในพอร์ต Balanced (Top 15) 🎯' : 'ในพอร์ต Safe Tier (Top 20) 🛡️')
+    status: heldSetUS.has(s.ticker) ? 'ถืออยู่ (ล็อกรอบ ' + lockUS.cycle + ') 🏆' : 'เรดาร์วันนี้ — ยังไม่ถือ รอรอบ Rebalance 👀'
   }));
 
   const updatedUsPortfolio = {
     market: 'US',
     currency: '$',
     last_updated: todayStr,
+    cycle: lockUS.cycle,
+    cycle_started: (holdingsAll[0] && holdingsAll[0].entry_date) || todayStr,
     capital_base: capital,
     total_equity: Number(totalEquity.toFixed(2)),
     invested_value: Number(totalMarketVal10.toFixed(2)),
@@ -736,22 +764,8 @@ async function fetchIndexCandles(indexTicker = '^GSPC') {
   }
 }
 
-function generateFallbackCandles(currentPrice = 100, count = 90) {
-  const candles = [];
-  const now = new Date('2026-10-08');
-  for (let i = count - 1; i >= 0; i--) {
-    const d = new Date(now);
-    d.setDate(d.getDate() - Math.floor(i * 1.5));
-    const dtStr = d.toISOString().slice(0, 10);
-    const drift = 1 + ((Math.sin(i / 5) * 0.05) - (i * 0.002));
-    const close = Math.round(currentPrice * drift * 100) / 100;
-    const open = Math.round(close * (1 + (Math.random() * 0.02 - 0.01)) * 100) / 100;
-    const high = Math.round(Math.max(open, close) * 1.015 * 100) / 100;
-    const low = Math.round(Math.min(open, close) * 0.985 * 100) / 100;
-    candles.push({ time: dtStr, open, high, low, close, volume: Math.floor(1000000 + Math.random() * 3000000) });
-  }
-  return candles;
-}
+// ไม่สร้างแท่งเทียนปลอมอีกต่อไป: ถ้าดึงราคาจริงไม่ได้ ให้ว่าง แล้วหน้าเว็บแสดง "ไม่มีข้อมูลกราฟ"
+function generateFallbackCandles() { return []; }
 
 // ==========================================
 // 4. UNIFIED HTML DASHBOARD GENERATOR
@@ -1903,11 +1917,11 @@ function generateDashboardHtml({
       <div class="header-pills">
         <div class="pill">
           <span class="pill-label">อัปเดตล่าสุด:</span>
-          <span class="pill-value mono" id="dispLastUpdated">2026-10-08</span>
+          <span class="pill-value mono" id="dispLastUpdated">${portfolioTH.last_updated}</span>
         </div>
         <div class="pill">
           <span class="pill-label">รอบ Rebalance:</span>
-          <span class="pill-value mono">1 พ.ย. 2026</span>
+          <span class="pill-value mono">${nextRebalanceLabel(portfolioTH.last_updated)}</span>
         </div>
         <div class="pill">
           <span class="pill-label">กลยุทธ์:</span>
@@ -1985,7 +1999,7 @@ function generateDashboardHtml({
         </div>
         <div class="kpi-val mono val-green" id="kpiPnlVal">+฿17,849</div>
         <div class="kpi-sub">
-          <span>รอบ Rebalance: ต.ค. 2026</span>
+          <span>รอบ Rebalance: ${curMonthLabel(portfolioTH.last_updated)}</span>
         </div>
       </div>
 
@@ -2005,11 +2019,11 @@ function generateDashboardHtml({
       <div class="kpi-card" style="border-top: 3px solid #a855f7;">
         <div class="kpi-header">
           <span class="kpi-label">🏆 ผลทดสอบ 5 ปี (Champion 5Y)</span>
-          <span class="badge badge-purple" id="kpi5yBadge">CAGR +34.14%</span>
+          <span class="badge badge-purple" id="kpi5yBadge">กำลังโหลดผลทดสอบ…</span>
         </div>
-        <div class="kpi-val mono val-green" id="kpi5yVal">+222.75%</div>
+        <div class="kpi-val mono" id="kpi5yVal">—</div>
         <div class="kpi-sub" id="kpi5ySub">
-          <span>Max Drawdown: -15.82% | Sharpe: 1.30</span>
+          <span>—</span>
         </div>
       </div>
     </div>
@@ -2377,6 +2391,7 @@ function generateDashboardHtml({
       backtest: ${jsonBtTH},
       charts: ${jsonChartsTH},
       indexCandles: ${jsonSetCandles},
+      indexLabel: 'SET50 ETF (TDEX.BK) — ตัวแทนดัชนี SET · ราคาจริงรายวัน (Yahoo ไม่มีประวัติดัชนี SET) · เส้น SMA50/SMA200 คำนวณจากราคา ETF',
       defaultCapital: 1000000,
       presets: [500000, 1000000, 2000000, 5000000],
       lotMultiplier: 100,
@@ -2391,6 +2406,7 @@ function generateDashboardHtml({
       backtest: ${jsonBtUS},
       charts: ${jsonChartsUS},
       indexCandles: ${jsonSpxCandles},
+      indexLabel: 'S&P 500 (^GSPC) · ราคาจริงรายวัน · เส้น SMA50/SMA200 คำนวณจากราคาดัชนี',
       defaultCapital: 100000,
       presets: [30000, 50000, 100000, 250000],
       lotMultiplier: 1,
@@ -2561,7 +2577,12 @@ function generateDashboardHtml({
 
       const data = getActiveData();
       const candles = data.indexCandles || [];
-      if (!candles.length) return;
+      if (!candles.length) { container.innerHTML = '<div style="padding:24px;color:#868993">ไม่มีข้อมูลกราฟดัชนี (ดึงราคาจริงไม่สำเร็จ)</div>'; return; }
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'position:absolute;z-index:5;top:6px;left:10px;font-size:11px;color:#9aa3b2;pointer-events:none';
+      lbl.textContent = data.indexLabel || '';
+      container.style.position = 'relative';
+      container.appendChild(lbl);
 
       const w = container.clientWidth || 980;
       const h = container.clientHeight || 280;
@@ -2639,35 +2660,21 @@ function generateDashboardHtml({
       const kpi5yVal = document.getElementById('kpi5yVal');
       const kpi5ySub = document.getElementById('kpi5ySub');
 
-      if (currentMarket === 'TH') {
-        if (n === 10) {
-          kpi5yBadge.textContent = 'CAGR +34.14%';
-          kpi5yVal.textContent = '+222.75%';
-          kpi5ySub.innerHTML = '<span>Max Drawdown: -15.82% | Sharpe: 1.30</span>';
-        } else if (n === 15) {
-          kpi5yBadge.textContent = 'CAGR +33.20%';
-          kpi5yVal.textContent = '+211.0%';
-          kpi5ySub.innerHTML = '<span>Max Drawdown: -13.80% | Sharpe: 1.10</span>';
-        } else {
-          kpi5yBadge.textContent = 'CAGR +32.40%';
-          kpi5yVal.textContent = '+203.5%';
-          kpi5ySub.innerHTML = '<span>Max Drawdown: -12.97% | Sharpe: 1.15</span>';
-        }
-      } else {
-        if (n === 10) {
-          kpi5yBadge.textContent = 'CAGR +39.10%';
-          kpi5yVal.textContent = '+421.4%';
-          kpi5ySub.innerHTML = '<span>Max Drawdown: -16.20% | Sharpe: 1.35</span>';
-        } else if (n === 15) {
-          kpi5yBadge.textContent = 'CAGR +33.70%';
-          kpi5yVal.textContent = '+328.0%';
-          kpi5ySub.innerHTML = '<span>Max Drawdown: -15.10% | Sharpe: 1.40</span>';
-        } else {
-          kpi5yBadge.textContent = 'CAGR +29.60%';
-          kpi5yVal.textContent = '+265.0%';
-          kpi5ySub.innerHTML = '<span>Max Drawdown: -14.25% | Sharpe: 1.45</span>';
-        }
-      }
+      // ตัวเลข KPI มาจากผลทดสอบจริงในไฟล์ backtest เท่านั้น (summary.byMode) — ไม่มีค่าฝังในโค้ด
+      (function () {
+        const bt = getActiveData().backtest || {};
+        const sm = bt.summary || {};
+        const m = sm.byMode && sm.byMode[n];
+        const bm = sm.benchmark;
+        const sgn = (x) => (x >= 0 ? '+' : '') + Number(x).toFixed(2);
+        if (!m) { kpi5yBadge.textContent = 'ไม่มีผลทดสอบ'; kpi5yVal.textContent = '—'; kpi5yVal.className = 'kpi-val mono'; kpi5ySub.innerHTML = '<span>ยังไม่มีผลทดสอบจากข้อมูลจริง</span>'; return; }
+        kpi5yBadge.textContent = 'CAGR ' + sgn(m.cagr) + '%';
+        kpi5yVal.textContent = sgn(m.totalReturnPct) + '%';
+        kpi5yVal.className = 'kpi-val mono ' + (m.totalReturnPct >= 0 ? 'val-green' : 'val-red');
+        kpi5ySub.innerHTML = '<span>Max Drawdown: ' + Number(m.maxDrawdown).toFixed(2) + '% | Sharpe: ' + Number(m.sharpe).toFixed(2) + '</span>' +
+          (bm ? '<br><span style="opacity:.8">ดัชนีเทียบ: CAGR ' + sgn(bm.cagr) + '% · MaxDD ' + Number(bm.maxDrawdown).toFixed(1) + '%</span>' : '') +
+          '<br><span style="opacity:.7;font-size:11px">ผลทดสอบย้อนหลังจากราคาจริง (' + ((bt.meta && bt.meta.period) ? bt.meta.period.join(' → ') : '5 ปี') + ') ไม่ใช่การรับประกันอนาคต</span>';
+      })();
 
       // Highlight active curve in Equity Chart
       if (equityChartInstance) {
@@ -4188,19 +4195,24 @@ async function main() {
       } catch (e) {}
     }
 
+    // 0. วันทำการล่าสุดจริง จากแท่งราคาจริง (ไม่ฝังวันที่)
+    const setCandles = await fetchIndexCandles('TDEX.BK');   // ETF ติดตาม SET50 — Yahoo ไม่มีประวัติดัชนี SET
+    const spxCandles = await fetchIndexCandles('^GSPC');
+    const bkkToday = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok' }).format(new Date());
+    const nyToday = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
+    ASOF.TH = (setCandles.length ? setCandles[setCandles.length - 1].time : bkkToday);
+    ASOF.US = (spxCandles.length ? spxCandles[spxCandles.length - 1].time : nyToday);
+    console.log(`📅 As-of: TH ${ASOF.TH} · US ${ASOF.US}`);
+
     // 1. Thailand Pipeline
     const thaiMarketGate = await getThaiMarketGate();
     console.log(`✓ Thai Market Gate Stage: ${thaiMarketGate.stageName} (Exposure: ${thaiMarketGate.exposure * 100}%)`);
 
     const thaiCandidates = await getThaiMarketCandidates();
     console.log('3. Pre-fetching Chart Packages for Thai Stocks...');
-    const thaiTickers = thaiCandidates.selectedPicks.map(h => h.ticker);
+    const ledgerPrev = loadLedger();
+    const thaiTickers = [...new Set([...thaiCandidates.selectedPicks.map(h => h.ticker), ...(((ledgerPrev.TH || {}).picks || []).map(p => p.ticker))])];
     const chartsTH = await preloadStockCharts(thaiTickers, 'thailand');
-    for (const h of thaiCandidates.selectedPicks) {
-      if (!chartsTH[h.ticker] || chartsTH[h.ticker].length === 0) {
-        chartsTH[h.ticker] = generateFallbackCandles(h.price, 60);
-      }
-    }
     const portfolioTH = getActiveThaiPortfolio(thaiCandidates.selectedPicks, thaiMarketGate, chartsTH);
     const backtestTH = getBacktestData(BACKTEST_TH_FILE);
 
@@ -4210,59 +4222,13 @@ async function main() {
 
     const usCandidates = await getUsMarketCandidates(drMap);
     console.log('5. Pre-fetching Chart Packages for US Stocks...');
-    const usTickers = usCandidates.selectedPicks.map(h => h.ticker);
+    const usTickers = [...new Set([...usCandidates.selectedPicks.map(h => h.ticker), ...(((ledgerPrev.US || {}).picks || []).map(p => p.ticker))])];
     const chartsUS = await preloadStockCharts(usTickers, 'america');
-    for (const h of usCandidates.selectedPicks) {
-      if (!chartsUS[h.ticker] || chartsUS[h.ticker].length === 0) {
-        chartsUS[h.ticker] = generateFallbackCandles(h.price, 60);
-      }
-    }
     const portfolioUS = getActiveUsPortfolio(usCandidates.selectedPicks, usMarketGate, chartsUS);
     const backtestUS = getBacktestData(BACKTEST_US_FILE);
     console.log(`✓ Preloaded charts: ${Object.keys(chartsTH).length} TH stocks, ${Object.keys(chartsUS).length} US stocks.`);
 
-    // 4. Index Candlesticks
-    console.log('7. Loading Index Candlestick Series (SET & S&P 500)...');
-    let spxCandles = await fetchIndexCandles('^GSPC');
-    if (spxCandles.length === 0) {
-      spxCandles = generateFallbackCandles(usMarketGate.spx.close, 180);
-    }
-
-    const setCandles = [];
-    const bDates = (backtestTH.dates || []).slice(-250);
-    const bVals = (backtestTH.benchVals || []).slice(-250);
-    if (bDates.length > 0 && bVals.length > 0) {
-      const lastBench = bVals[bVals.length - 1];
-      const scale = thaiMarketGate.close / lastBench;
-      for (let i = 0; i < bDates.length; i++) {
-        const c = Math.round(bVals[i] * scale * 100) / 100;
-        const prevC = i > 0 ? setCandles[i - 1].close : c;
-        const o = prevC;
-        const spread = Math.abs(c - o) * 0.35 + 1.8;
-        const h = Math.round((Math.max(o, c) + spread) * 100) / 100;
-        const l = Math.round((Math.min(o, c) - spread) * 100) / 100;
-        setCandles.push({
-          time: bDates[i],
-          open: o,
-          high: h,
-          low: l,
-          close: c,
-          volume: 55000000 + Math.floor(Math.sin(i) * 15000000)
-        });
-      }
-    }
-    const todayStr = '2026-10-08';
-    if (setCandles.length > 0) {
-      setCandles[setCandles.length - 1] = {
-        time: todayStr,
-        open: thaiMarketGate.open,
-        high: thaiMarketGate.high,
-        low: thaiMarketGate.low,
-        close: thaiMarketGate.close,
-        volume: 62000000
-      };
-    }
-
+    // 4. Index candles = ข้อมูลจริงที่ดึงไว้ตอนต้น (ไม่มีการสร้าง/ปรับสเกลแท่งเทียน)
     // 5. Generate Standalone HTML Dashboard
     generateDashboardHtml({
       portfolioTH,
@@ -4290,10 +4256,10 @@ async function main() {
         fs.copyFileSync(HTML_OUTPUT_FILE, path.join(deployDir, 'champ_dashboard.html'));
         const { execSync } = await import('child_process');
         try {
-          execSync('npx vercel --prod --yes --force', { cwd: deployDir, stdio: 'inherit', timeout: 180000 });
+          execSync('npx vercel --prod --yes --force --scope hermes-351d', { cwd: deployDir, stdio: 'inherit', timeout: 180000 });
           console.log('✅ Deploy Successful! Live URL: https://champdashboard.vercel.app');
         } catch (depErr) {
-          console.warn('⚠️ Deploy failed:', depErr.message);
+          console.error('❌ Deploy FAILED:', depErr.message); process.exitCode = 2;   // ให้ log/ตัวตั้งเวลาเห็นว่าล้มจริง (เดิมรายงานว่าสำเร็จ)
         }
       } else {
         console.warn('⚠️ Deploy directory not found:', deployDir);
