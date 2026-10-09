@@ -1085,6 +1085,22 @@ function generateDashboardHtml({
       overflow: hidden;
     }
 
+    .sortable-th {
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.15s, background-color 0.15s;
+    }
+    .sortable-th:hover {
+      color: #38bdf8 !important;
+      background-color: rgba(56, 189, 248, 0.08);
+    }
+    .sort-icon {
+      font-size: 10px;
+      margin-left: 4px;
+      color: #38bdf8;
+      display: inline-block;
+    }
+
     /* Action Banner */
     .action-banner {
       background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(56, 189, 248, 0.05) 100%);
@@ -1908,11 +1924,11 @@ function generateDashboardHtml({
         </div>
 
         <button id="btnToggleIndexChart" class="btn-toggle-chart" onclick="toggleIndexChart()">
-          📈 ซ่อน/แสดง กราฟดัชนี (1D Canvas)
+          📈 แสดงกราฟดัชนี (1D Canvas)
         </button>
       </div>
 
-      <div id="indexChartWrapper">
+      <div id="indexChartWrapper" style="display: none;">
         <div id="indexChartCanvas"></div>
       </div>
     </div>
@@ -2228,17 +2244,28 @@ function generateDashboardHtml({
           </div>
 
           <!-- 3. Filter Chips & Search Bar -->
-          <div class="filter-chips-bar">
-            <div class="chips-group">
-              <button class="filter-chip active" onclick="filterTrades('all')">🔘 ทั้งหมด</button>
-              <button class="filter-chip" onclick="filterTrades('win')">🟢 เฉพาะไม้ชนะ (Wins)</button>
-              <button class="filter-chip" onclick="filterTrades('loss')">🔴 เฉพาะไม้ขาดทุน (Losses)</button>
-              <button class="filter-chip" onclick="filterTrades('rebal')">🔄 ปรับพอร์ต (Rebalance)</button>
-              <button class="filter-chip" onclick="filterTrades('bear')">🐻 เกราะเงินสดตลาดหมี (Bear Cash Shield)</button>
+          <div class="filter-chips-bar" style="flex-direction: column; align-items: stretch; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <div class="chips-group">
+                <button class="filter-chip active" onclick="filterTrades('all')">🔘 ทั้งหมด</button>
+                <button class="filter-chip" onclick="filterTrades('win')">🟢 เฉพาะไม้ชนะ (Wins)</button>
+                <button class="filter-chip" onclick="filterTrades('loss')">🔴 เฉพาะไม้ขาดทุน (Losses)</button>
+                <button class="filter-chip" onclick="filterTrades('rebal')">🔄 ปรับพอร์ต (Rebalance)</button>
+                <button class="filter-chip" onclick="filterTrades('bear')">🐻 ตลาดหมี (Bear Cash)</button>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="text" id="tradeSearchInput" placeholder="🔍 ค้นหา Ticker หรือเหตุผล..." oninput="onSearchTrades()" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; min-width: 200px;">
+              </div>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <input type="text" id="tradeSearchInput" placeholder="🔍 ค้นหา Ticker หรือเหตุผล..." oninput="onSearchTrades()" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; min-width: 200px;">
+            <!-- Quick Sort Bar -->
+            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.08);">
+              <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">⚡ เรียงด่วน:</span>
+              <button class="preset-chip" id="qsort_date" onclick="setQuickSort('exitDate', 'desc')">📅 วันที่ขายล่าสุด 🔽</button>
+              <button class="preset-chip" id="qsort_profit" onclick="setQuickSort('profitPct', 'desc')">🚀 กำไรสูงสุด 🔽</button>
+              <button class="preset-chip" id="qsort_loss" onclick="setQuickSort('profitPct', 'asc')">🔻 ขาดทุนสูงสุด 🔼</button>
+              <button class="preset-chip" id="qsort_ticker" onclick="setQuickSort('ticker', 'asc')">🔤 ชื่อหุ้น A-Z</button>
             </div>
           </div>
 
@@ -2247,14 +2274,26 @@ function generateDashboardHtml({
             <table>
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Ticker</th>
-                  <th>วันที่เข้าซื้อ</th>
-                  <th class="text-right">ราคาเข้า</th>
-                  <th>วันที่ขาย</th>
-                  <th class="text-right">ราคาขาย</th>
+                  <th style="width: 45px;">#</th>
+                  <th class="sortable-th" onclick="sortByColumn('ticker')" title="คลิกเพื่อเรียงลำดับ">
+                    Ticker <span id="sortIcon_ticker" class="sort-icon">⇅</span>
+                  </th>
+                  <th class="sortable-th" onclick="sortByColumn('entryDate')" title="คลิกเพื่อเรียงลำดับ">
+                    วันที่เข้าซื้อ <span id="sortIcon_entryDate" class="sort-icon">⇅</span>
+                  </th>
+                  <th class="sortable-th text-right" onclick="sortByColumn('entryPrice')" title="คลิกเพื่อเรียงลำดับ">
+                    ราคาเข้า <span id="sortIcon_entryPrice" class="sort-icon">⇅</span>
+                  </th>
+                  <th class="sortable-th" onclick="sortByColumn('exitDate')" title="คลิกเพื่อเรียงลำดับ">
+                    วันที่ขาย <span id="sortIcon_exitDate" class="sort-icon">⇅</span>
+                  </th>
+                  <th class="sortable-th text-right" onclick="sortByColumn('exitPrice')" title="คลิกเพื่อเรียงลำดับ">
+                    ราคาขาย <span id="sortIcon_exitPrice" class="sort-icon">⇅</span>
+                  </th>
                   <th>เหตุผลการขาย</th>
-                  <th class="text-right">กำไร/ขาดทุน (%)</th>
+                  <th class="sortable-th text-right" onclick="sortByColumn('profitPct')" title="คลิกเพื่อเรียงลำดับ">
+                    กำไร/ขาดทุน (%) <span id="sortIcon_profitPct" class="sort-icon">⇅</span>
+                  </th>
                   <th class="text-center">ผลลัพธ์</th>
                 </tr>
               </thead>
@@ -2360,6 +2399,8 @@ function generateDashboardHtml({
     let currentTradeFilter = 'all';
     let tradeSearchQuery = '';
     let filteredTrades = [];
+    let tradeSortColumn = 'exitDate';
+    let tradeSortDir = 'desc';
 
     let currentHoldingsDrFilter = 'all';
     let currentWatchlistDrFilter = 'all';
@@ -2483,6 +2524,9 @@ function generateDashboardHtml({
     }
 
     function initIndexChart() {
+      const wrapper = document.getElementById('indexChartWrapper');
+      if (!wrapper || wrapper.style.display === 'none') return;
+
       const container = document.getElementById('indexChartCanvas');
       if (!container) return;
       container.innerHTML = '';
@@ -2539,7 +2583,7 @@ function generateDashboardHtml({
       indexChartInstance.timeScale().fitContent();
 
       window.addEventListener('resize', () => {
-        if (indexChartInstance && container) {
+        if (indexChartInstance && container && container.clientWidth > 0) {
           indexChartInstance.applyOptions({ width: container.clientWidth });
         }
       });
@@ -2547,8 +2591,15 @@ function generateDashboardHtml({
 
     function toggleIndexChart() {
       const el = document.getElementById('indexChartWrapper');
-      el.style.display = (el.style.display === 'none' ? 'block' : 'none');
-      if (el.style.display === 'block') initIndexChart();
+      const isHidden = (el.style.display === 'none' || getComputedStyle(el).display === 'none');
+      el.style.display = isHidden ? 'block' : 'none';
+      const btn = document.getElementById('btnToggleIndexChart');
+      if (isHidden) {
+        if (btn) btn.textContent = '📉 ซ่อนกราฟดัชนี';
+        setTimeout(initIndexChart, 50);
+      } else {
+        if (btn) btn.textContent = '📈 แสดงกราฟดัชนี (1D Canvas)';
+      }
     }
 
     function setPortSize(n) {
@@ -3602,16 +3653,85 @@ function generateDashboardHtml({
       }
     }
 
+    function sortTradesArray(arr) {
+      return arr.slice().sort((a, b) => {
+        let valA = a[tradeSortColumn];
+        let valB = b[tradeSortColumn];
+
+        if (valA == null) valA = '';
+        if (valB == null) valB = '';
+
+        if (typeof valA === 'number' && typeof valB === 'number') {
+          return tradeSortDir === 'asc' ? valA - valB : valB - valA;
+        }
+
+        if (typeof valA === 'string' && typeof valB === 'string') {
+          const cmp = valA.localeCompare(valB);
+          return tradeSortDir === 'asc' ? cmp : -cmp;
+        }
+
+        if (valA < valB) return tradeSortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return tradeSortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    function sortByColumn(column) {
+      if (tradeSortColumn === column) {
+        tradeSortDir = (tradeSortDir === 'asc' ? 'desc' : 'asc');
+      } else {
+        tradeSortColumn = column;
+        tradeSortDir = (column === 'ticker' || column === 'entryDate') ? 'asc' : 'desc';
+      }
+      updateSortHeaderIcons();
+      currentTradePage = 1;
+      applyTradeFilters();
+    }
+
+    function setQuickSort(column, dir) {
+      tradeSortColumn = column;
+      tradeSortDir = dir;
+      updateSortHeaderIcons();
+      currentTradePage = 1;
+      applyTradeFilters();
+    }
+
+    function updateSortHeaderIcons() {
+      const cols = ['ticker', 'entryDate', 'entryPrice', 'exitDate', 'exitPrice', 'profitPct'];
+      cols.forEach(col => {
+        const icon = document.getElementById('sortIcon_' + col);
+        if (!icon) return;
+        if (tradeSortColumn === col) {
+          icon.textContent = tradeSortDir === 'asc' ? '▲' : '▼';
+          icon.style.color = '#38bdf8';
+        } else {
+          icon.textContent = '⇅';
+          icon.style.color = 'var(--text-muted)';
+        }
+      });
+
+      const qDate = document.getElementById('qsort_date');
+      const qProfit = document.getElementById('qsort_profit');
+      const qLoss = document.getElementById('qsort_loss');
+      const qTicker = document.getElementById('qsort_ticker');
+      if (qDate) qDate.classList.toggle('active', tradeSortColumn === 'exitDate' && tradeSortDir === 'desc');
+      if (qProfit) qProfit.classList.toggle('active', tradeSortColumn === 'profitPct' && tradeSortDir === 'desc');
+      if (qLoss) qLoss.classList.toggle('active', tradeSortColumn === 'profitPct' && tradeSortDir === 'asc');
+      if (qTicker) qTicker.classList.toggle('active', tradeSortColumn === 'ticker' && tradeSortDir === 'asc');
+    }
+
     function initTradesLog() {
-      filteredTrades = getActiveData().backtest.trades || [];
       currentTradeFilter = 'all';
       tradeSearchQuery = '';
       currentTradePage = 1;
+      tradeSortColumn = 'exitDate';
+      tradeSortDir = 'desc';
 
       document.querySelectorAll('.filter-chip').forEach((c, idx) => c.classList.toggle('active', idx === 0));
       const sInput = document.getElementById('tradeSearchInput');
       if (sInput) sInput.value = '';
 
+      updateSortHeaderIcons();
       applyTradeFilters();
     }
 
@@ -3619,17 +3739,19 @@ function generateDashboardHtml({
       currentTradeFilter = type;
       document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
       event.currentTarget.classList.add('active');
+      currentTradePage = 1;
       applyTradeFilters();
     }
 
     function onSearchTrades() {
       tradeSearchQuery = document.getElementById('tradeSearchInput').value.toLowerCase().trim();
+      currentTradePage = 1;
       applyTradeFilters();
     }
 
     function applyTradeFilters() {
       const all = getActiveData().backtest.trades || [];
-      filteredTrades = all.filter(t => {
+      const filtered = all.filter(t => {
         if (currentTradeFilter === 'win' && t.profitPct <= 0) return false;
         if (currentTradeFilter === 'loss' && t.profitPct >= 0) return false;
         if (currentTradeFilter === 'rebal' && !t.reason.includes('Rebalance')) return false;
@@ -3643,6 +3765,7 @@ function generateDashboardHtml({
         return true;
       });
 
+      filteredTrades = sortTradesArray(filtered);
       currentTradePage = 1;
       renderTradesTable();
     }
@@ -3715,6 +3838,9 @@ function generateDashboardHtml({
       if (tabId === 'trades') {
         renderTradeSummaryAndBreakdown();
         initTradesLog();
+      }
+      if (tabId === 'equity') {
+        setTimeout(updateEquityAndDrawdownCharts, 50);
       }
       if (tabId === 'holdings' && holdingsViewMode === 'card') {
         setTimeout(renderAllCardCharts, 50);
