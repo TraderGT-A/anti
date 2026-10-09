@@ -1,9 +1,9 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    { "source": "/", "destination": "/champ_dashboard", "permanent": false }
+  ],
   "rewrites": [
-    { "source": "/", "destination": "/champ_dashboard.html" },
-    { "source": "/index.html", "destination": "/champ_dashboard.html" },
-    { "source": "/champ", "destination": "/champ_dashboard.html" },
     { "source": "/pdf", "destination": "/reports/CHAMPION_STRATEGY_5Y_BACKTEST_REPORT.pdf" },
     { "source": "/report", "destination": "/reports/CHAMPION_STRATEGY_5Y_BACKTEST_REPORT.html" }
   ]
