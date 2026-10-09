@@ -670,8 +670,13 @@ function getActiveUsPortfolio(selectedPicks, marketGate) {
 function getBacktestData(filePath) {
   if (fs.existsSync(filePath)) {
     try {
-      return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    } catch (e) {}
+      const raw = fs.readFileSync(filePath, 'utf8').replace(/^\uFEFF/, '');
+      const parsed = JSON.parse(raw);
+      console.log(`✓ Loaded backtest data from ${filePath} (${parsed.dates ? parsed.dates.length : 0} dates, ${parsed.monthly ? parsed.monthly.length : 0} months, ${parsed.trades ? parsed.trades.length : 0} trades)`);
+      return parsed;
+    } catch (e) {
+      console.error(`⚠️ Failed to parse backtest file ${filePath}:`, e);
+    }
   }
   return { dates: [], stratVals: [], benchVals: [], stratDD: [], benchDD: [], trades: [], monthly: [], summary: {} };
 }
@@ -2135,14 +2140,17 @@ function generateDashboardHtml({
         <!-- Tab 4: 5-Year Equity Curve & Drawdown (Multi-Curve for 10, 15, 20) -->
         <div id="tab-equity" class="tab-content">
           <div class="panel" style="margin-bottom: 16px;">
-            <div class="panel-title">
-              <span>📈 กราฟการเติบโตของพอร์ตแยกตามโหมดการถือครอง (N=10 vs N=15 vs N=20 vs Benchmark)</span>
+            <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span>📈 กราฟการเติบโตของพอร์ตแยกตามโหมดการถือครอง (N=10 vs N=15 vs N=20 vs Benchmark)</span>
+                <span id="equityMarketBadge" class="badge badge-warning">SET Index</span>
+              </div>
               
               <div class="curve-toggle-bar">
                 <button id="btnCurveN10" class="curve-pill-btn pill-n10 active" onclick="toggleCurve(0)">🟣 N=10 แชมเปี้ยน</button>
                 <button id="btnCurveN15" class="curve-pill-btn pill-n15 active" onclick="toggleCurve(1)">🔵 N=15 สมดุล</button>
                 <button id="btnCurveN20" class="curve-pill-btn pill-n20 active" onclick="toggleCurve(2)">🟢 N=20 เซฟตี้</button>
-                <button id="btnCurveBench" class="curve-pill-btn pill-bench active" onclick="toggleCurve(3)">⚪ Benchmark</button>
+                <button id="btnCurveBench" class="curve-pill-btn pill-bench active" onclick="toggleCurve(3)">⚪ SET Index</button>
                 <button id="btnToggleScale" class="preset-chip" onclick="toggleLogScale()">สเกล: Linear</button>
               </div>
             </div>
@@ -2162,8 +2170,9 @@ function generateDashboardHtml({
 
           <!-- Monthly Table -->
           <div class="panel">
-            <div class="panel-title">
-              <span>📅 สถิติผลตอบแทนรายเดือน (Monthly Return Breakdown)</span>
+            <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <span id="monthlyPanelTitle">📅 สถิติผลตอบแทนรายเดือน — ตลาดหุ้นไทย (SET Index)</span>
+              <span id="monthlyMarketBadge" class="badge badge-warning">SET Index</span>
             </div>
             <div class="table-container">
               <table>
@@ -2171,9 +2180,9 @@ function generateDashboardHtml({
                   <tr>
                     <th>เดือน</th>
                     <th class="text-right">กลยุทธ์ (%)</th>
-                    <th class="text-right">Benchmark (%)</th>
+                    <th class="text-right" id="thMonthlyBench">SET Index (%)</th>
                     <th class="text-right">Alpha ส่วนต่าง (%)</th>
-                    <th class="text-right">มูลค่าพอร์ตสิ้นเดือน</th>
+                    <th class="text-right" id="thMonthlyCap">มูลค่าพอร์ตสิ้นเดือน (฿)</th>
                   </tr>
                 </thead>
                 <tbody id="monthlyTableBody"></tbody>
@@ -2184,15 +2193,12 @@ function generateDashboardHtml({
 
         <!-- Tab 5: Trade Log & Full Record Summary ("บันทึก") -->
         <div id="tab-trades" class="tab-content">
-          <!-- Market Header & Toggle Pills inside Trade Log -->
+          <!-- Market Header inside Trade Log -->
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
             <div style="font-size: 15px; font-weight: 700; color: #fff;" id="tradeLogTitle">
               📋 บันทึกประวัติการเทรด 5 ปีย้อนหลัง — ตลาดหุ้นไทย (SET)
             </div>
-            <div style="display: flex; gap: 6px;">
-              <button class="preset-chip active" id="btnTradeLogMktTH" onclick="switchMarket('TH')">🇹🇭 ไทย (SET)</button>
-              <button class="preset-chip" id="btnTradeLogMktUS" onclick="switchMarket('US')">🇺🇸 สหรัฐฯ (US)</button>
-            </div>
+            <span id="tradeLogMarketBadge" class="badge badge-warning">SET Index</span>
           </div>
 
           <!-- 1. KPI Summary Cards -->
@@ -3369,6 +3375,14 @@ function generateDashboardHtml({
       if (drawdownChartInstance) drawdownChartInstance.destroy();
 
       const benchLabel = currentMarket === 'TH' ? 'ดัชนี SET Index Benchmark' : 'ดัชนี S&P 500 Benchmark';
+      const eqBadge = document.getElementById('equityMarketBadge');
+      if (eqBadge) {
+        eqBadge.textContent = currentMarket === 'TH' ? '🇹🇭 SET Index' : '🇺🇸 S&P 500';
+      }
+      const btnBench = document.getElementById('btnCurveBench');
+      if (btnBench) {
+        btnBench.textContent = currentMarket === 'TH' ? '⚪ SET Index' : '⚪ S&P 500';
+      }
 
       equityChartInstance = new Chart(ctxEQ, {
         type: 'line',
@@ -3475,7 +3489,7 @@ function generateDashboardHtml({
               fill: (currentPortSize === 20)
             },
             {
-              label: 'Benchmark Drawdown',
+              label: (currentMarket === 'TH' ? 'SET Index' : 'S&P 500') + ' Drawdown',
               data: ddBench,
               borderColor: '#94a3b8',
               borderWidth: 1,
@@ -3523,6 +3537,23 @@ function generateDashboardHtml({
 
     // Monthly Returns Table
     function renderMonthlyTable() {
+      const pTitle = document.getElementById('monthlyPanelTitle');
+      if (pTitle) {
+        pTitle.textContent = '📅 สถิติผลตอบแทนรายเดือน — ' + (currentMarket === 'TH' ? 'ตลาดหุ้นไทย (SET Index)' : 'ตลาดหุ้นสหรัฐฯ (S&P 500)');
+      }
+      const mBadge = document.getElementById('monthlyMarketBadge');
+      if (mBadge) {
+        mBadge.textContent = currentMarket === 'TH' ? '🇹🇭 SET' : '🇺🇸 S&P 500';
+      }
+      const thBench = document.getElementById('thMonthlyBench');
+      if (thBench) {
+        thBench.textContent = currentMarket === 'TH' ? 'SET Index (%)' : 'S&P 500 (%)';
+      }
+      const thCap = document.getElementById('thMonthlyCap');
+      if (thCap) {
+        thCap.textContent = currentMarket === 'TH' ? 'มูลค่าพอร์ตสิ้นเดือน (฿)' : 'มูลค่าพอร์ตสิ้นเดือน ($)';
+      }
+
       const tbody = document.getElementById('monthlyTableBody');
       if (!tbody) return;
       const rows = getActiveData().backtest.monthly || [];
@@ -3556,11 +3587,9 @@ function generateDashboardHtml({
       if (titleEl) {
         titleEl.textContent = \`📋 บันทึกประวัติการเทรด 5 ปีย้อนหลัง — \${data.name} (\${s.totalTrades || 0} ไม้)\`;
       }
-      const bTH = document.getElementById('btnTradeLogMktTH');
-      const bUS = document.getElementById('btnTradeLogMktUS');
-      if (bTH && bUS) {
-        bTH.classList.toggle('active', currentMarket === 'TH');
-        bUS.classList.toggle('active', currentMarket === 'US');
+      const tlBadge = document.getElementById('tradeLogMarketBadge');
+      if (tlBadge) {
+        tlBadge.textContent = currentMarket === 'TH' ? '🇹🇭 ตลาดหุ้นไทย (SET)' : '🇺🇸 ตลาดหุ้นสหรัฐฯ (US Wall St)';
       }
 
       // 1. Render Summary KPI Cards (6 cards)
@@ -3840,6 +3869,7 @@ function generateDashboardHtml({
         initTradesLog();
       }
       if (tabId === 'equity') {
+        renderMonthlyTable();
         setTimeout(updateEquityAndDrawdownCharts, 50);
       }
       if (tabId === 'holdings' && holdingsViewMode === 'card') {
