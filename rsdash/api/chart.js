@@ -3,16 +3,22 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  const symbol0 = req.query.symbol || "";
-  const interval = req.query.interval || "1d";
-  const rng = req.query.range || "1y";
+  const symbol0 = String(req.query.symbol || "");
+  const interval = String(req.query.interval || "1d");
+  const rng = String(req.query.range || "1y");
   const market = req.query.market || "thailand";
   if (!symbol0) return res.status(400).json({ error: "Missing symbol" });
+  // allowlist — interval/range ถูกต่อเข้า URL ของ Yahoo ตรงๆ (กัน query injection / ยิงพารามิเตอร์แปลก)
+  if (!/^[A-Za-z0-9.^=&_\-]{1,20}$/.test(symbol0)) return res.status(400).json({ error: "Invalid symbol" });
+  if (!["1m", "5m", "15m", "30m", "60m", "1d", "1wk", "1mo"].includes(interval)) return res.status(400).json({ error: "Invalid interval" });
+  if (!["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"].includes(rng)) return res.status(400).json({ error: "Invalid range" });
+  res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
 
   // Thai stocks: append .BK automatically (Yahoo needs SET suffix). US = ไม่เติม (ใช้ symbol ตรงๆ)
   let symbol = symbol0;
   if (market === "america" || market === "us") {
-    // US: ไม่เติม suffix — Yahoo ใช้ ticker เปล่าแล้ว (เช่น NVDA)
+    // US: ไม่เติม suffix — Yahoo ใช้ ticker เปล่าแล้ว (เช่น NVDA); หุ้นหลายคลาสใช้ "-" แทน "." (BRK.B → BRK-B)
+    symbol = symbol0.replace(/\./g, "-");
   } else if (!/(\.BK|\.[A-Z]{2,3})$/.test(symbol0)) {
     symbol = symbol0 + ".BK";
   }
@@ -22,7 +28,7 @@ export default async function handler(req, res) {
     const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" } });
     const data = await r.json();
     const result = data?.chart?.result?.[0];
-    if (!result) return res.status(404).json({ error: `Cannot fetch chart for ${symbol}` });
+    if (!result) { res.setHeader("Cache-Control", "no-store"); return res.status(404).json({ error: `Cannot fetch chart for ${symbol}` }); }
 
     const ts = result.timestamp || [];
     const q = result.indicators?.quote?.[0] || {};

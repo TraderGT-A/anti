@@ -1,42 +1,46 @@
-// /api/market-brief — Market Brief: บอกการเปลี่ยนแปลง Breadth เทียบเมื่อวาน + เทียบสัปดาห์ แนวโน้มเข้าใจง่าย
+// /api/market-brief — Market Brief: บอกการเปลี่ยนแปลง Breadth เทียบวันทำการก่อนหน้า + เทียบ 5 วันทำการ
 import { supabase } from "./lib/supabase.js";
+import { getLiveBreadth } from "./lib/scan.js";
 
 const mkLabel = { thailand: "ไทย 🇹🇭", america: "อเมริกา 🇺🇸" };
 
-// อ่าน history จาก breadth_history ตรง (เหมือน /api/breadth) — ไม่พึ่ง snapshots-map
-async function loadHist(market){
-  try{
-    const db=supabase();
-    const {data,error}=await db.from("breadth_history")
+// อ่าน history จาก breadth_history ตรง (เหมือน /api/breadth) — เฉพาะวันทำการ (ตัดเสาร์-อาทิตย์)
+async function loadHist(market) {
+  try {
+    const db = supabase();
+    const { data, error } = await db.from("breadth_history")
       .select("date, pct_above_ma50, pct_above_ma200")
-      .eq("market",market).order("date",{ascending:true}).limit(400);
-    if(error) return [];
-        // ตัดวันตลาดปิด (เสาร์-อาทิตย์) ออก — ให้ Δ เทียบเฉพาะวันทำการก่อนหน้า (จันทร์เทียบศุกร์, เสาร์คงค่าเดิม)
-        const wk = (data||[]).filter(x=>{
-          const dd=new Date(String(x.date||'').slice(0,10)+'T00:00:00Z').getUTCDay();
-          return dd!==0 && dd!==6;
-        });
-        return wk.map(x=>({date:x.date, pctAboveMA50:x.pct_above_ma50, pctAboveMA200:x.pct_above_ma200}));
-  }catch(e){ return []; }
+      .eq("market", market).order("date", { ascending: false }).limit(60);
+    if (error) return [];
+    return (data || [])
+      .filter((x) => {
+        const dd = new Date(String(x.date || "").slice(0, 10) + "T00:00:00Z").getUTCDay();
+        return dd !== 0 && dd !== 6;
+      })
+      .map((x) => ({ date: x.date, pctAboveMA50: x.pct_above_ma50, pctAboveMA200: x.pct_above_ma200 }))
+      .reverse();   // เก่า → ใหม่
+  } catch (e) { return []; }
 }
 
-// เทรนด์ label จาก delta
-function trend(dv, dw){
-  if (dv == null && dw == null) return "";
-  // ใช้ delta ช่วง 5 วันเป็นหลัก (vw มีทิศ) แล้ว delta 1วันเสริม
-  let s = "";
-  if (dw != null && Math.abs(dw) >= 1) s += dw > 0 ? "ดีขึ้น ▲" : "อ่อนลง ▼";
-  else s += dw != null ? "ทรง ▲/▽" : (dv != null ? (dv > 0 ? "ดีขึ้น ▲" : dv < 0 ? "อ่อนลง ▼" : "ทรง") : "");
-  return s;
+// Δ จาก history ล้วน: จุดล่าสุดที่บันทึก เทียบจุดก่อนหน้า (1D) และ 5 วันทำการก่อน (5D)
+// (ของเดิมเอาค่าสดไปลบจุดล่าสุดใน history ซึ่งคือค่าเดียวกันหลังตลาดปิด → Δ1D เป็น 0 เสมอ,
+//  และ Δ5D ใช้ index ผิด 1 ช่อง = 4 วันทำการ; ค่าที่คำนวณไม่ได้ก็กลายเป็น 0 แทนที่จะเป็น null)
+function deltas(points, key) {
+  const pts = points.filter((x) => x[key] != null);
+  const n = pts.length;
+  const last = n ? pts[n - 1][key] : null;
+  const d = (back) => (n > back && last != null ? Math.round((last - pts[n - 1 - back][key]) * 10) / 10 : null);
+  return { d1: d(1), d5: d(5), asOf: n ? pts[n - 1].date : null };
 }
 
-async function currentBreadth(market) {
-  const r = await fetch(`https://rsdashclean.vercel.app/api/scan?market=${market}`, { headers: { "User-Agent": "Mozilla/5.0" } });
-  if (!r.ok) return null;
-  const d = await r.json();
-  const bf = d?.marketSummary?.breadth_full || {};
-  if (bf.pctAboveMA50 == null) return null;
-  return { ma50: bf.pctAboveMA50, ma200: bf.pctAboveMA200, a50: bf.aboveMA50, a200: bf.aboveMA200, total: bf.total, up: bf.up, down: bf.down };
+// เทรนด์จาก Δ5D เป็นหลัก ถ้าไม่มีใช้ Δ1D
+function trend(d1, d5) {
+  if (d1 == null && d5 == null) return "";
+  if (d5 != null) {
+    if (Math.abs(d5) >= 1) return d5 > 0 ? "ดีขึ้น ▲" : "อ่อนลง ▼";
+    return "ทรงตัว";
+  }
+  return d1 > 0 ? "ดีขึ้น ▲" : d1 < 0 ? "อ่อนลง ▼" : "ทรงตัว";
 }
 
 export default async function handler(req, res) {
@@ -46,30 +50,25 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   try {
     const out = { updated_at: new Date().toISOString(), markets: [] };
-    for (const m of ["thailand", "america"]) {
-      const cur = await currentBreadth(m);
-      if (!cur) continue;
-      const history = await loadHist(m);
-      // หา Δ เทียบวาน (จุดก่อนหน้าสุด) + Δ5D (จุดที่ 6 นับจากท้าย)
-      const ptsMA50 = (history || []).filter(x => x.pctAboveMA50 != null);
-      const ptsMA200 = (history || []).filter(x => x.pctAboveMA200 != null);
-      const dl50 = ptsMA50.length >= 2 ? cur.ma50 - ptsMA50[ptsMA50.length - 1].pctAboveMA50 : null;
-            const dw50 = ptsMA50.length >= 6 ? cur.ma50 - ptsMA50[ptsMA50.length - 5].pctAboveMA50 : null;
-            const dl200 = ptsMA200.length >= 2 ? cur.ma200 - ptsMA200[ptsMA200.length - 1].pctAboveMA200 : null;
-            const dw200 = ptsMA200.length >= 6 ? cur.ma200 - ptsMA200[ptsMA200.length - 5].pctAboveMA200 : null;
-      const r50 = Math.round((dl50 != null ? dl50 : 0) * 10) / 10;
-      const r500 = Math.round((dw50 != null ? dw50 : 0) * 10) / 10;
-      const r200 = Math.round((dl200 != null ? dl200 : 0) * 10) / 10;
-      const r2000 = Math.round((dw200 != null ? dw200 : 0) * 10) / 10;
+    const results = await Promise.all(["thailand", "america"].map(async (m) => {
+      try {
+        const [cur, history] = await Promise.all([getLiveBreadth(m), loadHist(m)]);
+        return { m, cur, history };
+      } catch (e) { return { m, cur: null, history: [] }; }
+    }));
+    for (const { m, cur, history } of results) {
+      if (!cur || cur.pctAboveMA50 == null) continue;
+      const a50 = deltas(history, "pctAboveMA50");
+      const a200 = deltas(history, "pctAboveMA200");
       out.markets.push({
         market: m, label: mkLabel[m] || m,
-        ma50: cur.ma50, ma200: cur.ma200, a50: cur.a50, a200: cur.a200, total: cur.total, up: cur.up, down: cur.down,
-        d1: { ma50: r50, ma200: r200 },
-        d5: { ma50: r500, ma200: r2000 },
-        trend: {
-          ma50: trend(r50, r500),
-          ma200: trend(r200, r2000),
-        },
+        ma50: cur.pctAboveMA50, ma200: cur.pctAboveMA200,
+        a50: cur.aboveMA50, a200: cur.aboveMA200,
+        total: cur.total, up: cur.up, down: cur.down,
+        d1: { ma50: a50.d1, ma200: a200.d1 },
+        d5: { ma50: a50.d5, ma200: a200.d5 },
+        deltaAsOf: a50.asOf,
+        trend: { ma50: trend(a50.d1, a50.d5), ma200: trend(a200.d1, a200.d5) },
       });
     }
     return res.status(200).json(out);

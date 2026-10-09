@@ -14,9 +14,16 @@ export function supabase() {
   return client;
 }
 
+// วันที่ "วันนี้" ตามเขตเวลาของตลาด (YYYY-MM-DD) — เดิมใช้ UTC ทำให้เซสชัน US ที่ข้ามเที่ยงคืน UTC
+// ถูกแบ่งเป็นสองวัน และ Rank Change เทียบกับ snapshot ของเซสชันเดียวกัน
+const MARKET_TZ = { thailand: "Asia/Bangkok", america: "America/New_York" };
+export function marketToday(market = "thailand") {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: MARKET_TZ[market] || "UTC" }).format(new Date());
+}
+
 // Return the most recent snapshot STRICTLY before today (for Rank Change), for a given market.
 export async function loadPreviousSnapshot(market = "thailand") {
-  const date = new Date().toISOString().slice(0, 10);
+  const date = marketToday(market);
   const prefix = market + "|";
   const db = supabase();
   const { data, error } = await db
@@ -33,8 +40,8 @@ export async function loadPreviousSnapshot(market = "thailand") {
 
 // Upsert today's snapshot (dt = market|date กัน ไทย/US ทับกัน).
 export async function saveSnapshot(payload) {
-  const date = new Date().toISOString().slice(0, 10);
   const market = payload.market || "thailand";
+  const date = marketToday(market);
   const db = supabase();
   const { error } = await db
     .from("snapshots")
@@ -122,11 +129,11 @@ export async function loadBreadthHistory(market = "thailand", days = 90) {
     .from("snapshots")
     .select("dt, payload")
     .like("dt", market + "|%")
-    .order("dt", { ascending: true })
-    .limit(200);
+    .order("dt", { ascending: false })   // ล่าสุดก่อน แล้วกลับเป็นเก่า→ใหม่ (เดิม asc+limit(200) ตัดวันใหม่ทิ้งเมื่อเกิน 200 วัน)
+    .limit(Math.max(days, 1));
   if (error) return { history: [], error: error.message };
   const out = [];
-  for (const s of data || []) {
+  for (const s of (data || []).slice().reverse()) {
     const p = s.payload || {};
     const bf = p.marketSummary?.breadth_full || p.breadth_full;
     if (!bf || bf.pctAboveMA50 == null) continue;

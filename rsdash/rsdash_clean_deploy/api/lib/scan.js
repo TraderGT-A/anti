@@ -60,7 +60,8 @@ const MARKETS = {
 
 export const TV_COLS = ["name", "description", "close", "change", "volume", "Value.Traded",
   "Perf.W", "Perf.1M", "Perf.3M", "Perf.6M", "Perf.Y", "Perf.YTD", "market_cap_basic", "sector", "industry",
-  "SMA50", "SMA200", "relative_volume_10d_calc", "average_volume_10d_calc", "type", "logoid"];
+  "SMA50", "SMA200", "relative_volume_10d_calc", "average_volume_10d_calc", "type", "logoid",
+  "open", "high", "low"];   // OHLC ของวันล่าสุด — ใช้เติมแท่งสุดท้ายของกราฟเมื่อ Yahoo ล่าช้า (ต่อท้ายเสมอ ห้ามแทรกกลาง เพราะ destructure ตามตำแหน่ง)
 
 // ==== Thai index membership (จริงจาก set.or.th PDF, point-in-time 2026H2) ====
 // เดิมใช้ mcap bucket (slice 0,50/0,100) = ผิด (KCE ขึ้น SET50, DR อย่าง MICRON01 ขึ้น SET50) —
@@ -73,11 +74,11 @@ const TH_S100 = new Set([
   "AAV","ADVANC","AEONTS","AMATA","AOT","AP","AURA","AWC","BA","BAM","BANPU","BBL",
   "BCH","BCP","BCPG","BDMS","BEM","BGRIM","BH","BJC","BLA","BTG","BTS","CBG",
   "CCET","CENTEL","CHG","CK","COM7","CPALL","CPF","CPN","CRC","DELTA","DOHOME","EA",
-  "EGCO","ERW","GFPT","GLOBAL","GPSC","GULF","GUNKUL","HANA","HMPRO","ICHI","IRPC","IVL",
-  "JMT","JTS","KBANK","KCE","KKP","KTB","KTC","LH","M","MEGA","MINT","MOSHI",
+  "EGCO","ERW","GFPT","GLOBAL","GPSC","GST","GULF","GUNKUL","HANA","HMPRO","ICHI","IRPC","IVL",
+  "JMART","JMT","KBANK","KCE","KKP","KTB","KTC","LH","M","MEGA","MINT","MOSHI",
   "MRDIYT","MTC","OR","OSP","PLANB","PR9","PRM","PTG","PTT","PTTEP","PTTGC","QH",
   "RATCH","RCL","SAWAD","SCB","SCC","SCGP","SIRI","SPALI","SPRC","STA","STECON","STGT",
-  "TASCO","TCAP","TFG","THAI","THCOM","TIDLOR","TISCO","TLI","TOA","TOP","TRUE","TTB",
+  "TASCO","TCAP","TFG","THAI","TIDLOR","TISCO","TLI","TOA","TOP","TRUE","TTB",
   "TU","VGI","WHA","WHAUP",
 ]);
 export function thGroup(ticker) {
@@ -97,8 +98,8 @@ export function isCommonStock(sym, name, industry) {
   return true;
 }
 
-export function calcScore(p3, p6, p1) {
-  return 0.4 * (p3 || 0) + 0.3 * (p6 || 0) + 0.3 * (p1 || 0);
+export function calcScore(p1m, p3, p6, p1) {
+  return 0.3 * (p1m || 0) + 0.3 * (p3 || 0) + 0.2 * (p6 || 0) + 0.2 * (p1 || 0);
 }
 
 export function percentile(ascIdx, total) {
@@ -122,6 +123,7 @@ export async function scanMarket(market = "thailand") {
       range: [0, 4000],
     }),
   });
+  if (!res.ok) throw new Error("TradingView scan HTTP " + res.status);
   const json = await res.json();
   const rows = json.data || [];
   const total = json.totalCount || rows.length;
@@ -131,7 +133,7 @@ export async function scanMarket(market = "thailand") {
     const d = r.d || [];
     if (d.length < TV_COLS.length) continue;
     const [symbol, name, close, change, volume, val, p1w, p1m, p3, p6, p1, pYTD, mcap, sector, industry,
-              sma50, sma200, relVol, avgVol, secType, logoId] = d;
+              sma50, sma200, relVol, avgVol, secType, logoId, dOpen, dHigh, dLow] = d;
     // กรองด้วย type ตรง ๆ: เอาเฉพาะหุ้นสามัญ (ตัด ETF/fund/warrant/DR ทั้ง 2 ตลาด) — แม่นกว่าการเดาจากชื่อ
     // (ของเดิม: includes("ETF") ไปโดน "N-ETF-lix" → Netflix หาย; กฎ "CLASS A" → META/GOOGL/COIN หายทั้งบริษัท)
     if (secType && secType !== "stock") continue;
@@ -144,12 +146,13 @@ export async function scanMarket(market = "thailand") {
       ticker: symbol, name: name || symbol, price: close, change,
       volume: volume || 0, val: val || 0, mcap: mcap || 0,
       p1w: p1w || 0, p1m: p1m || 0, p3m: p3 || 0, p6m: p6 || 0, p1y: p1 || 0, pYTD: pYTD || 0,
-      score: calcScore(p3, p6, p1),
+      score: calcScore(p1m, p3, p6, p1),
       sector: sector || "Other", industry: industry || sector || "Other",
       isDR: _hasDR,
-      hasPerf: (p3 != null || p6 != null || p1 != null),   // มีผลตอบแทนให้คำนวณ RS จริงไหม
+      hasPerf: (p1m != null || p3 != null || p6 != null || p1 != null),   // มีผลตอบแทนให้คำนวณ RS จริงไหม
       sma50: sma50 || null, sma200: sma200 || null,
       relVol: relVol || null, avgVol: avgVol || null,
+      o: dOpen ?? null, h: dHigh ?? null, l: dLow ?? null,   // OHLC วันนี้จาก TradingView
       logoId: logoId || "",        // TradingView logoid → ใช้ดึงโลโก้จริงจาก s3-symbol-logo.tradingview.com
     });
   }
@@ -185,6 +188,63 @@ export async function scanMarket(market = "thailand") {
 
   clean.sort((a, b) => b.score - a.score);
   return { rows, total, raw, clean, market };
+}
+
+// Breadth แท้ทั้งกระดาน (นับจาก raw = ทุกหุ้นที่ผ่าน junk/close ก่อนกรอง RS/สภาพคล่อง)
+// ใช้ร่วมกันระหว่าง /api/scan, /api/market-brief, /api/market-breadth เพื่อให้เลขตรงกันทุกหน้า
+export function breadthFull(raw) {
+  const all = raw || [];
+  const up = all.filter(s => (s.change ?? 0) > 0).length;
+  const down = all.filter(s => (s.change ?? 0) < 0).length;
+  const above50 = all.filter(s => s.sma50 && s.price && s.price > s.sma50).length;
+  const above200 = all.filter(s => s.sma200 && s.price && s.price > s.sma200).length;
+  const pct = (n) => (all.length ? Math.round(n / all.length * 100) : 0);
+  return {
+    up, down, total: all.length, upPct: pct(up),
+    aboveMA50: above50, aboveMA200: above200,
+    pctAboveMA50: pct(above50), pctAboveMA200: pct(above200),
+  };
+}
+
+// Breadth ปัจจุบันของตลาด — ใช้แคชที่ /api/scan เพิ่งคำนวณไว้ก่อน (5 นาที) ไม่งั้นสแกนเอง
+// (แทนการยิง HTTP วนกลับมาที่ /api/scan ของโดเมนตัวเอง)
+export async function getLiveBreadth(market = "thailand") {
+  const hit = global.__scanCache?.[market];
+  const cached = hit && hit.data?.marketSummary?.breadth_full;
+  if (cached && Date.now() - hit.ts < 300_000) return cached;
+  const mem = global.__breadthCache?.[market];
+  if (mem && Date.now() - mem.ts < 300_000) return mem.data;
+  const { raw } = await scanMarket(market);
+  const data = breadthFull(raw);
+  global.__breadthCache = global.__breadthCache || {};
+  global.__breadthCache[market] = { ts: Date.now(), data };
+  return data;
+}
+
+// สมาชิก index สหรัฐฯ จาก TradingView (symbolset) — S&P 500 / Nasdaq-100 / Dow 30 / Russell 2000
+// แทนลิสต์ฮาร์ดโค้ดในหน้าเว็บที่เก่า (Russell 2000 มีหุ้นที่เลิกซื้อขายไปแล้วเป็นร้อย)
+const INDEX_SETS = {
+  sp500: "SYML:SP;SPX", nasdaq100: "SYML:NASDAQ;NDX", dow30: "SYML:DJ;DJI", russell2000: "SYML:TVC;RUT",
+};
+export async function getIndexMembership() {
+  const hit = global.__indexesCache;
+  if (hit && Date.now() - hit.ts < 12 * 3600_000) return hit.data;
+  const out = {};
+  for (const [k, s] of Object.entries(INDEX_SETS)) {
+    const r = await fetch("https://scanner.tradingview.com/america/scan", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ symbols: { symbolset: [s] }, columns: ["name"], range: [0, 3000] }),
+    });
+    if (!r.ok) throw new Error(s + " HTTP " + r.status);
+    const j = await r.json();
+    out[k] = [...new Set((j.data || []).map((x) => String(x.d?.[0] || "").toUpperCase()).filter(Boolean))];
+  }
+  // กันข้อมูลเพี้ยน: ชุดเล็กผิดปกติ = ไม่ส่งให้หน้าเว็บทับลิสต์สำรอง
+  const ok = out.sp500.length >= 450 && out.nasdaq100.length >= 90 && out.dow30.length >= 25 && out.russell2000.length >= 1500;
+  if (!ok) throw new Error("index membership incomplete: " + JSON.stringify(Object.fromEntries(Object.entries(out).map(([k, v]) => [k, v.length]))));
+  const data = { ...out, updated_at: new Date().toISOString(), source: "tradingview_scanner_symbolset" };
+  global.__indexesCache = { ts: Date.now(), data };
+  return data;
 }
 
 // ==== universe "ทั้งหมด": หุ้นสามัญล้วนทั้งตลาด ====

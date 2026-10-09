@@ -35,8 +35,11 @@ async function fetchOne(entry) {
   const change = last - prev;
   const changePct = prev ? (change / prev) * 100 : 0;
   // สถานะตลาดเปิด-ปิด: ถ้า meta.regularMarketPrice ไม่เท่า close ล่าสุด → กำลัง live
-  const lastTs = ts[ts.length-1]; const now = Math.floor(Date.now()/1000);
-  const barIsToday = lastTs && now - lastTs < 3*3600;  // bar ล่าสุดอายุ < 3 ชม = still trading
+  // LIVE = เวลาปัจจุบันอยู่ในช่วงซื้อขายปกติของ Yahoo (currentTradingPeriod.regular)
+  // (ของเดิมดูอายุ bar < 3 ชม. แต่ timestamp ของ bar รายวัน = เวลาเปิดตลาด → ขึ้น LIVE แค่ 3 ชม.แรกของวัน)
+  const now = Math.floor(Date.now()/1000);
+  const reg = meta.currentTradingPeriod?.regular;
+  const barIsToday = reg && reg.start && reg.end ? (now >= reg.start && now <= reg.end) : false;
   return {
     key: entry.key, label: entry.label, symbol: entry.symbol,
     name: meta.shortName || entry.label,
@@ -51,21 +54,51 @@ async function fetchOne(entry) {
   };
 }
 
+// ค่าเฉลี่ยเคลื่อนที่ของดัชนี (SMA20/50/200) จาก TradingView — ใช้ได้ทั้งไทยและสหรัฐฯ
+// (Yahoo ให้ประวัติดัชนีไทยมาแค่ 1 แท่ง คำนวณ SMA เองไม่ได้ → "โหมดตลาด" ของไทยเคยหายเงียบๆ)
+const TV_INDEX = {
+  thailand: { ep: "thailand", map: { SET: "SET:SET", SET50: "SET:SET50", SET100: "SET:SET100", mai: "SET:MAI" } },
+  america: { ep: "america", map: { SPX: "SP:SPX", NAS: "NASDAQ:NDX", DOW: "DJ:DJI", RUT: "TVC:RUT" } },
+};
+async function fetchSMAs(market) {
+  const cfg = TV_INDEX[market]; if (!cfg) return {};
+  try {
+    const r = await fetch(`https://scanner.tradingview.com/${cfg.ep}/scan`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ symbols: { tickers: Object.values(cfg.map) }, columns: ["close", "SMA20", "SMA50", "SMA200"] }),
+    });
+    if (!r.ok) return {};
+    const j = await r.json();
+    const byTv = Object.fromEntries((j.data || []).map((x) => [x.s, x.d]));
+    const out = {};
+    for (const [key, tv] of Object.entries(cfg.map)) {
+      const d = byTv[tv]; if (!d) continue;
+      const rd = (v) => (Number.isFinite(v) ? Math.round(v * 100) / 100 : null);
+      out[key] = { tvClose: rd(d[0]), sma20: rd(d[1]), sma50: rd(d[2]), sma200: rd(d[3]) };
+    }
+    return out;
+  } catch (e) { return {}; }
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   if (req.method === "OPTIONS") return res.status(200).end();
   const force = req.query.force === "1";
+  if (force) {
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  } else {
+    res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=60");
+  }
   const market = (req.query.market === "us" || req.query.market === "america") ? "america" : "thailand";
   const list = INDEXES[market] || INDEXES.thailand;
   const ck = global.__indexCache?.[market];
   const now = Date.now();
-  if (!force && ck && now - ck.ts < 300_000) return res.status(200).json(ck.data);
+  // force ข้ามแคชได้ แต่ไม่ยิง Yahoo ถี่กว่า 20 วิ (หน้าเว็บเรียก force ทุก auto-refresh)
+  if (ck && now - ck.ts < (force ? 20_000 : 300_000)) return res.status(200).json(ck.data);
   try {
-    const results = [];
-    for (const e of list) {
-      try { const d = await fetchOne(e); if (d) results.push(d); } catch (err) { /* skip one */ }
-    }
+    const [settled, smas] = await Promise.all([Promise.allSettled(list.map((e) => fetchOne(e))), fetchSMAs(market)]);
+    const results = settled.filter((s) => s.status === "fulfilled" && s.value).map((s) => ({ ...s.value, ...(smas[s.value.key] || {}) }));
     const payload = { market, count: results.length, indexes: results, updated_at: new Date().toISOString() };
     if (!global.__indexCache) global.__indexCache = {};
     global.__indexCache[market] = { data: payload, ts: Date.now() };
