@@ -62,6 +62,42 @@ export default async function handler(req, res) {
     res.setHeader("Cache-Control", "public, s-maxage=1800, stale-while-revalidate=3600");
     return res.status(200).json({ market, asOf: new Date().toISOString(), requested: list.length, sq: out });
   }
+  if (universe === "dlog") {   // Decision Log ส่วนตัว — ทั้งอ่านและเขียนต้องมีรหัส (env DLOG_KEY ส่งใน header x-dlog-key) เก็บในตาราง snapshots คีย์ "dlog|..."
+    res.setHeader("Cache-Control", "no-store");
+    const need = (process.env.DLOG_KEY || "").trim(), got = String(req.headers["x-dlog-key"] || "").trim();
+    if (!need) return res.status(503).json({ error: "DLOG_KEY not configured" });
+    if (got !== need) return res.status(401).json({ error: "unauthorized" });
+    try {
+      const db = supabase(), clip = (v, n) => (typeof v === "string" ? v.slice(0, n) : v == null ? "" : String(v).slice(0, n));
+      if (req.method === "POST") {
+        const b = typeof req.body === "string" ? JSON.parse(req.body) : (req.body || {});
+        if (b.action === "add") {
+          const e = b.entry || {}, id = new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14) + "-" + Math.random().toString(36).slice(2, 6), T = (k) => clip(e[k], 8000);
+          const ev = (Array.isArray(e.evidence) ? e.evidence : []).slice(0, 30).map((x) => ({ evidence: clip(x && x.evidence, 1000), source: clip(x && x.source, 500), supports: clip(x && x.supports, 500), limit: clip(x && x.limit, 500) }));
+          const entry = { id, createdAt: new Date().toISOString(), owner: T("owner"), question: T("question"), objective: T("objective"), horizon: T("horizon"), constraints: T("constraints"), dataCutoff: T("dataCutoff"), tickers: T("tickers"),
+            evidence: ev, facts: T("facts"), assumptions: T("assumptions"), supporting: T("supporting"), contradicting: T("contradicting"), missing: T("missing"), alternatives: T("alternatives"),
+            repro: { snapshot: T("reproSnapshot"), versions: T("reproVersions"), params: T("reproParams"), runId: T("reproRun"), validation: T("reproValidation") },
+            decision: { action: ["act", "no-action", "more-evidence"].includes(e.action) ? e.action : "more-evidence", rationale: T("rationale"), conditions: T("conditions"), changeMind: T("changeMind"), nextReview: T("nextReview") }, reviews: [] };
+          if (!entry.question) return res.status(400).json({ error: "question required" });
+          const { error } = await db.from("snapshots").upsert({ dt: "dlog|" + id, created_at: entry.createdAt, payload: entry }, { onConflict: "dt" });
+          if (error) return res.status(500).json({ error: error.message });
+          return res.status(200).json({ ok: true, id });
+        }
+        if (b.action === "review") {   // ต่อท้ายการทบทวนย้อนหลัง (append-only: ไม่แก้ของเดิม)
+          const id = clip(b.id, 40), r = b.review || {}, cur = await db.from("snapshots").select("payload").eq("dt", "dlog|" + id).maybeSingle();
+          if (!cur.data) return res.status(404).json({ error: "not found" });
+          const entry = cur.data.payload; entry.reviews = (entry.reviews || []).concat([{ at: new Date().toISOString(), outcome: clip(r.outcome, 4000), held: clip(r.held, 4000), processVsOutcome: clip(r.processVsOutcome, 4000), lesson: clip(r.lesson, 4000) }]).slice(-50);
+          const { error } = await db.from("snapshots").upsert({ dt: "dlog|" + id, created_at: entry.createdAt, payload: entry }, { onConflict: "dt" });
+          if (error) return res.status(500).json({ error: error.message });
+          return res.status(200).json({ ok: true });
+        }
+        return res.status(400).json({ error: "bad action" });
+      }
+      const { data, error } = await db.from("snapshots").select("payload").like("dt", "dlog|%").order("dt", { ascending: false }).limit(300);
+      if (error) return res.status(500).json({ error: error.message });
+      return res.status(200).json({ entries: (data || []).map((x) => x.payload) });
+    } catch (e) { return res.status(500).json({ error: String((e && e.message) || e) }); }
+  }
   if (universe === "leaders") {   // ผู้นำหุ้นไทย near52wHigh + โมเมนตัม 12-1 (ไทยเท่านั้น) — GET = ดูรายชื่อ/ผล paper-trade, tick=1 (cron + CRON_SECRET) = เก็บ snapshot และเดิน paper-trade 1 วัน
     const L = globalThis.Leaders, KEY = "leaders|state";
     try {

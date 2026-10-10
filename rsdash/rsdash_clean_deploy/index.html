@@ -148,6 +148,7 @@
                     <button id="navTop20" class="tf-chip" onclick="setPage('top20')">🏆 Top20</button>
                     <button id="navScanner" class="tf-chip" onclick="setPage('scanner')">🎯 Scanner</button>
                     <button id="navLeaders" class="tf-chip" onclick="setPage('leaders')">🏆 ผู้นำรายเดือน</button>
+                    <button id="navDlog" class="tf-chip" onclick="setPage('dlog')">📓 บันทึกตัดสินใจ</button>
                     <button id="navReport" class="tf-chip" onclick="setPage('report')">📅 Report</button>
                   </div></div></div><!-- /topbar -->
 
@@ -184,6 +185,16 @@
                     <div id="ldHow" class="text-[11px] text-slate-400 mt-3 leading-relaxed"></div>
                   </div>
 
+                  <!-- 📓 Decision Log: บันทึกเหตุผลการตัดสินใจ + ทบทวนย้อนหลัง (ส่วนตัว ต้องใช้รหัส) -->
+                  <div id="dlogPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
+                    <div class="flex flex-wrap items-center gap-2 mb-2"><h2 class="text-sm font-bold">📓 Decision Log — บันทึกเหตุผลและทบทวนย้อนหลัง</h2>
+                      <input id="dlKey" type="password" placeholder="รหัส Decision Log" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-xs text-white w-40">
+                      <button class="tf-chip" onclick="dlogLoad(true)">เข้าสู่ระบบ</button><button class="tf-chip" onclick="dlogToggleForm()">➕ บันทึกใหม่</button></div>
+                    <div id="dlMsg" class="text-[11px] text-slate-400 mb-2"></div>
+                    <div id="dlForm" style="display:none" class="rounded-lg border border-[#243044] p-3 mb-3 text-[11px] text-slate-300 grid gap-2"></div>
+                    <div id="dlList"></div>
+                    <div class="text-[10px] text-slate-500 mt-2 leading-relaxed">เทมเพลตจาก Decision Log (QuantCorner) · บันทึกเป็นแบบต่อท้ายเท่านั้น (ทบทวนเพิ่มได้ แก้ของเดิมไม่ได้) · ส่งออกเป็น .md เข้า vault ด้วย <code>node scripts/export_dlog_to_vault.mjs</code> · ไม่ใช่คำแนะนำการลงทุน</div>
+                  </div>
                   <!-- 📅 Report: เทียบอันดับ Top-N ระหว่าง 2 วัน (ข้อมูลจาก /api/history) -->
                   <div id="reportPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
                     <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -719,6 +730,9 @@ function setPage(pg){
   const scp=document.getElementById('scannerPanel'); if(scp) scp.style.display = (pg==='scanner') ? '' : 'none';
   const nsc=document.getElementById('navScanner'); if(nsc) nsc.classList.toggle('active', pg==='scanner');
   if(pg==='scanner'){ renderScanner(); }
+  const dlp=document.getElementById('dlogPanel'); if(dlp) dlp.style.display = (pg==='dlog') ? '' : 'none';
+  const ndl=document.getElementById('navDlog'); if(ndl) ndl.classList.toggle('active', pg==='dlog');
+  if(pg==='dlog'){ dlogInit(); }
   const ldp=document.getElementById('leadersPanel'); if(ldp) ldp.style.display = (pg==='leaders') ? '' : 'none';
   const nld=document.getElementById('navLeaders'); if(nld) nld.classList.toggle('active', pg==='leaders');
   if(pg==='leaders'){ renderLeaders(); }
@@ -836,6 +850,61 @@ function ldSpark(nav){
   const W=300,H=70,vals=nav.flatMap(p=>[p.s,p.e,p.x]),mn=Math.min(...vals),mx=Math.max(...vals),rg=(mx-mn)||1;
   const line=(k,col)=>'<polyline fill="none" stroke="'+col+'" stroke-width="1.6" points="'+nav.map((p,i)=>(i/(nav.length-1)*W).toFixed(1)+','+(H-(p[k]-mn)/rg*H).toFixed(1)).join(' ')+'"/>';
   return '<svg viewBox="0 0 '+W+' '+H+'" class="w-full h-20">'+line('x','#6b7787')+line('e','#f59e0b')+line('s','#30d158')+'</svg><div class="text-[10px] flex gap-3 text-slate-400"><span style="color:#30d158">━ พอร์ตตามกฎ</span><span style="color:#f59e0b">━ EW พูลเดียวกัน</span><span style="color:#6b7787">━ SET</span></div>';
+}
+/* ---------- 📓 Decision Log ---------- */
+const DL_FIELDS=[['owner','ผู้ตัดสินใจ / ผู้ทบทวน',1],['question','คำถามวิจัย / หุ้นหรือเรื่องที่ตัดสินใจ *',2],['tickers','หุ้นที่เกี่ยวข้อง (คั่นด้วยจุลภาค)',1],['objective','เป้าหมาย',2],['horizon','ระยะเวลาถือ',1],['constraints','ข้อจำกัด (สภาพคล่อง ความเสี่ยงที่รับได้ ฯลฯ)',2],['dataCutoff','ข้อมูลที่มี ณ ตอนนั้น (วันที่/แหล่ง)',1],
+ ['facts','ข้อเท็จจริง',2],['assumptions','สมมติฐาน',2],['supporting','หลักฐานสนับสนุน',2],['contradicting','หลักฐานคัดค้าน',2],['missing','ข้อมูลที่ยังขาด',2],['alternatives','ทางเลือกอื่นที่พิจารณา',2],
+ ['reproSnapshot','ข้อมูลที่ใช้ (snapshot/แหล่ง)',1],['reproVersions','เวอร์ชัน โมเดล/สคริปต์/skill',1],['reproParams','พารามิเตอร์ที่ใช้',1],['reproRun','run ID / commit',1],['reproValidation','ผลตรวจสอบ/ความไว (sensitivity)',2],
+ ['rationale','เหตุผลของการตัดสินใจ',2],['conditions','เงื่อนไข/ขีดจำกัด (เช่น ตัดขาดทุนที่)',2],['changeMind','อะไรจะทำให้เปลี่ยนใจ',2],['nextReview','วัน/เงื่อนไขทบทวนครั้งถัดไป',1]];
+let dlBusy=false;
+const dlEsc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function dlKey(){ const e=document.getElementById('dlKey'); return (e&&e.value.trim())||''; }
+function dlMsg(m,bad){ const e=document.getElementById('dlMsg'); if(e){ e.textContent=m||''; e.style.color=bad?'#fb7185':''; } }
+function dlogInit(){
+  const k=document.getElementById('dlKey'); if(k&&!k.value){ try{ k.value=localStorage.getItem('rsd_dlkey')||''; }catch(e){} }
+  const f=document.getElementById('dlForm'); if(f&&!f.dataset.built){ f.dataset.built=1;
+    f.innerHTML='<div class="font-bold text-xs">บันทึกการตัดสินใจใหม่</div>'+DL_FIELDS.map(([id,lb,r])=>'<label class="flex flex-col gap-0.5">'+lb+(r>1?'<textarea id="dlf_'+id+'" rows="2" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-white"></textarea>':'<input id="dlf_'+id+'" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-white">')+'</label>').join('')
+    +'<div class="font-bold text-xs mt-1">ตารางหลักฐาน (แต่ละแถว: หลักฐาน | แหล่ง/หน้า/เวลา | สนับสนุนอะไร | ข้อจำกัด — คั่นด้วย | หนึ่งแถวต่อบรรทัด)</div><textarea id="dlf_evidence" rows="4" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-white"></textarea>'
+    +'<label class="flex flex-col gap-0.5">การตัดสินใจ<select id="dlf_action" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-white"><option value="act">ลงมือทำ</option><option value="no-action">ไม่ทำ</option><option value="more-evidence" selected>ขอหลักฐานเพิ่ม</option></select></label>'
+    +'<div><button class="tf-chip" onclick="dlogSave()">💾 บันทึก</button></div>'; }
+  if(dlKey()) dlogLoad(false); else dlMsg('ใส่รหัสแล้วกดเข้าสู่ระบบ (รหัสอยู่ในไฟล์ dlog_key.txt ในโฟลเดอร์ secrets ของเครื่องคุณ)');
+}
+function dlogToggleForm(){ const f=document.getElementById('dlForm'); if(f) f.style.display=(f.style.display==='none')?'':'none'; }
+async function dlApi(method,body){
+  const r=await fetch(API+'/api/scan?universe=dlog',{method,headers:Object.assign({'x-dlog-key':dlKey()},body?{'Content-Type':'application/json'}:{}),body:body?JSON.stringify(body):undefined});
+  const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error(r.status===401?'รหัสไม่ถูกต้อง':(j.error||('HTTP '+r.status))); return j;
+}
+async function dlogLoad(save){
+  if(dlBusy) return; dlBusy=true; dlMsg('กำลังโหลด...');
+  try{ const j=await dlApi('GET'); if(save){ try{ localStorage.setItem('rsd_dlkey',dlKey()); }catch(e){} } dlMsg(j.entries.length+' รายการ'); dlogRender(j.entries); }
+  catch(e){ dlMsg(String(e.message||e),true); document.getElementById('dlList').innerHTML=''; } finally{ dlBusy=false; }
+}
+function dlogRender(es){
+  const act={act:'ลงมือทำ','no-action':'ไม่ทำ','more-evidence':'ขอหลักฐานเพิ่ม'};
+  document.getElementById('dlList').innerHTML=es.map(e=>{
+    const d=e.decision||{}, rv=(e.reviews||[]).map(r=>'<div class="border-l-2 border-sky-700 pl-2 mt-1"><b>ทบทวน '+dlEsc((r.at||'').slice(0,10))+'</b> · ผล: '+dlEsc(r.outcome)+' · สมมติฐานที่ถูก/พัง: '+dlEsc(r.held)+' · กระบวนการเทียบผลลัพธ์: '+dlEsc(r.processVsOutcome)+' · บทเรียน: '+dlEsc(r.lesson)+'</div>').join('');
+    const row=(l,v)=>v?'<div><span class="text-slate-500">'+l+':</span> '+dlEsc(v)+'</div>':'';
+    return '<details class="rounded-lg border border-[#1e2634] mb-2 p-2 text-[11px] text-slate-300"><summary class="cursor-pointer"><b>'+dlEsc((e.createdAt||'').slice(0,10))+'</b> · '+dlEsc(e.question)+' · <span class="text-sky-300">'+(act[d.action]||'')+'</span>'+((e.reviews||[]).length?' · ทบทวนแล้ว '+e.reviews.length+' ครั้ง':'')+'</summary><div class="mt-2 grid gap-1">'
+      +row('หุ้น',e.tickers)+row('เป้าหมาย',e.objective)+row('ระยะเวลา',e.horizon)+row('ข้อจำกัด',e.constraints)+row('ข้อมูล ณ ตอนนั้น',e.dataCutoff)+row('ข้อเท็จจริง',e.facts)+row('สมมติฐาน',e.assumptions)+row('หลักฐานสนับสนุน',e.supporting)+row('หลักฐานคัดค้าน',e.contradicting)+row('ข้อมูลที่ขาด',e.missing)+row('ทางเลือกอื่น',e.alternatives)
+      +(e.evidence&&e.evidence.length?'<div class="text-slate-500">ตารางหลักฐาน:</div>'+e.evidence.map(x=>'<div class="pl-2">• '+dlEsc(x.evidence)+' | '+dlEsc(x.source)+' | '+dlEsc(x.supports)+' | '+dlEsc(x.limit)+'</div>').join(''):'')
+      +row('เหตุผล',d.rationale)+row('เงื่อนไข/ขีดจำกัด',d.conditions)+row('อะไรทำให้เปลี่ยนใจ',d.changeMind)+row('ทบทวนครั้งถัดไป',d.nextReview)
+      +row('ข้อมูลที่ใช้',e.repro&&e.repro.snapshot)+row('เวอร์ชัน',e.repro&&e.repro.versions)+row('พารามิเตอร์',e.repro&&e.repro.params)+row('run/commit',e.repro&&e.repro.runId)+row('ผลตรวจสอบ',e.repro&&e.repro.validation)
+      +rv+'<div class="mt-2 grid gap-1"><div class="font-bold">เพิ่มการทบทวนย้อนหลัง</div>'
+      +['outcome|ผลที่เกิดขึ้นจริง','held|สมมติฐานข้อไหนถูก/พัง','processVsOutcome|กระบวนการดีไหม เทียบกับผลลัพธ์','lesson|บทเรียน/ข้อเสนอแก้วิธี'].map(s=>{const [k,l]=s.split('|'); return '<input id="dlr_'+e.id+'_'+k+'" placeholder="'+l+'" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-white">';}).join('')
+      +'<div><button class="tf-chip" onclick="dlogReview(\''+e.id+'\')">➕ บันทึกการทบทวน</button></div></div></div></details>';
+  }).join('')||'<div class="text-slate-500 text-xs">ยังไม่มีบันทึก</div>';
+}
+async function dlogSave(){
+  const e={}; DL_FIELDS.forEach(([id])=>{ e[id]=document.getElementById('dlf_'+id).value; }); e.action=document.getElementById('dlf_action').value;
+  e.evidence=document.getElementById('dlf_evidence').value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const p=l.split('|').map(s=>s.trim()); return {evidence:p[0],source:p[1],supports:p[2],limit:p[3]};});
+  if(!e.question.trim()){ dlMsg('ต้องกรอกคำถาม/เรื่องที่ตัดสินใจ',true); return; }
+  try{ await dlApi('POST',{action:'add',entry:e}); DL_FIELDS.forEach(([id])=>{ document.getElementById('dlf_'+id).value=''; }); document.getElementById('dlf_evidence').value=''; dlogToggleForm(); await dlogLoad(false); dlMsg('บันทึกแล้ว'); }
+  catch(x){ dlMsg(String(x.message||x),true); }
+}
+async function dlogReview(id){
+  const g=k=>document.getElementById('dlr_'+id+'_'+k).value, r={outcome:g('outcome'),held:g('held'),processVsOutcome:g('processVsOutcome'),lesson:g('lesson')};
+  if(!Object.values(r).some(v=>v.trim())){ dlMsg('กรอกอย่างน้อยหนึ่งช่อง',true); return; }
+  try{ await dlApi('POST',{action:'review',id,review:r}); await dlogLoad(false); dlMsg('บันทึกการทบทวนแล้ว'); } catch(x){ dlMsg(String(x.message||x),true); }
 }
 async function renderLeaders(){
   const gEl=document.getElementById('ldGate'), pEl=document.getElementById('ldPaper'), body=document.getElementById('ldBody'), how=document.getElementById('ldHow');
