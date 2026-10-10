@@ -15,7 +15,8 @@ const IDX_COST = CFG.cost / 2;   // ดัชนี/ETF ต้นทุนต่
 const HERMES = process.env.HERMES_SCRIPTS || "C:/Users/Tar/AppData/Local/hermes/scripts";
 const px = JSON.parse(fs.readFileSync(path.join(HERMES, "bt_ohlcv_full.json"), "utf8"));
 const csv = fs.readFileSync(path.join(HERMES, "idx_SET_daily_full.csv"), "utf8").trim().split(/\r?\n/).slice(1).map((l) => l.split(","));
-const cal = csv.map((r) => r[0]), n = cal.length, calIdx = new Map(cal.map((d, i) => [d, i]));
+const cal = csv.map((r) => r[0]), calIdx = new Map(cal.map((d, i) => [d, i]));
+const nEnd = process.env.TO ? cal.findIndex((d) => d > process.env.TO) : -1, n = nEnd > 0 ? nEnd : cal.length;   // TO=YYYY-MM-DD จำกัดช่วงทดสอบ (ใช้ตรวจนอกตัวอย่าง)
 const IC = Float64Array.from(csv.map((r) => +r[4])), IO = Float64Array.from(csv.map((r) => +r[1]));
 const T = [];
 for (const [tk, bars] of Object.entries(px)) {
@@ -130,7 +131,7 @@ for (const k of ["A", "B", "C", "D", "E"]) {
     console.log("".padEnd(36), `เกณฑ์: (1)ชนะดัชนีทั้ง3ช่วง ${c1 ? "ผ่าน" : "ไม่ผ่าน"} · (2)DD ${c2 ? "ผ่าน" : "ไม่ผ่าน"}` + (base ? ` · (3)เหนือสุ่ม p95 ${c3 ? "ผ่าน" : "ไม่ผ่าน"} (อยู่ p${pc.toFixed(0)}, สุ่ม median ${base[Math.floor(base.length*0.5)].toFixed(1)}%, p95 ${base[Math.floor(base.length*0.95)].toFixed(1)}%)` : "") + `  ⇒ ${pass ? "✅ ผ่านทั้งหมด" : "❌ ไม่ผ่าน"}`);
   }
 }
-fs.writeFileSync(path.join(ROOT, "data", `bt_compare_${MK}_${FROM.slice(0,4)}.json`), JSON.stringify({ generated_at: new Date().toISOString(), period: [cal[START], cal[n - 1]], halves: [cal[START], cal[MID], cal[n - 1]], benchmark: bF, results: result, control_cagr_percentiles: Object.fromEntries(["C", "D", "E"].map((k) => [k, { p5: ctrl[k][Math.floor(ctrl[k].length*0.05)], p50: ctrl[k][Math.floor(ctrl[k].length*0.5)], p95: ctrl[k][Math.floor(ctrl[k].length*0.95)] }])) }, null, 1));
+fs.writeFileSync(path.join(ROOT, "data", `bt_compare_${MK}_${FROM.slice(0,4)}${process.env.TO ? "_to" + process.env.TO.slice(0,4) : ""}.json`), JSON.stringify({ generated_at: new Date().toISOString(), period: [cal[START], cal[n - 1]], halves: [cal[START], cal[MID], cal[n - 1]], benchmark: bF, results: result, control_cagr_percentiles: Object.fromEntries(["C", "D", "E"].map((k) => [k, { p5: ctrl[k][Math.floor(ctrl[k].length*0.05)], p50: ctrl[k][Math.floor(ctrl[k].length*0.5)], p95: ctrl[k][Math.floor(ctrl[k].length*0.95)] }])) }, null, 1));
 
 // dump เส้น equity สำหรับวิเคราะห์เพิ่ม (รายปี/ช่วงที่กระจุก)
-fs.writeFileSync(path.join(ROOT, "data", `bt_eq_${MK}_${FROM.slice(0, 4)}.json`), JSON.stringify({ dates: cal.slice(START), A: Array.from(S.A.eq.slice(START)), B: Array.from(S.B.eq.slice(START)), D: Array.from(S.D.eq.slice(START)), E: Array.from(S.E.eq.slice(START)) }));
+fs.writeFileSync(path.join(ROOT, "data", `bt_eq_${MK}_${FROM.slice(0, 4)}${process.env.TO ? "_to" + process.env.TO.slice(0,4) : ""}.json`), JSON.stringify({ dates: cal.slice(START), A: Array.from(S.A.eq.slice(START)), B: Array.from(S.B.eq.slice(START)), D: Array.from(S.D.eq.slice(START)), E: Array.from(S.E.eq.slice(START)) }));
