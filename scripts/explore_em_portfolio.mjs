@@ -5,7 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const HERMES = process.env.HERMES_SCRIPTS || "C:/Users/Tar/AppData/Local/hermes/scripts", MKT = process.argv[2];
-const COST = +(process.env.COST || 0.0035), JUMP = 0.35, LIQ = +(process.env.LIQ || 0.5);   // LIQ = เก็บหุ้นที่มูลค่าซื้อขาย 20 วันสูงกว่าเปอร์เซ็นไทล์นี้ของแต่ละเดือน
+const DROP = +(process.env.DROP || 0), DSEED = +(process.env.DSEED || 1), hsh = (s) => { let h = 2166136261 ^ DSEED; for (const ch of s) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return ((h >>> 0) % 10000) / 10000; }, LAGD = +(process.env.LAGD || 0), COST = +(process.env.COST || 0.0035), JUMP = 0.35, LIQ = +(process.env.LIQ || 0.5);   // LIQ = เก็บหุ้นที่มูลค่าซื้อขาย 20 วันสูงกว่าเปอร์เซ็นไทล์นี้ของแต่ละเดือน
 const emd = JSON.parse(fs.readFileSync(path.join(HERMES, "em", MKT + ".json"), "utf8")), ds = new Set();
 for (const d of Object.values(emd)) for (const x of d.t) if (x >= "2005-06-01") ds.add(x);
 const cal = [...ds].sort(), n = cal.length, calIdx = new Map(cal.map((d, i) => [d, i])), S = [];
@@ -24,7 +24,7 @@ const monthEnds = []; for (let i = 260; i < n - 1; i++) if (cal[i].slice(0, 7) !
 const months = [];
 for (let m = 0; m < monthEnds.length - 1; m++) {
   const k = monthEnds[m], k2 = monthEnds[m + 1], rows = [];
-  for (const s of S) { if (k - 252 < s.first || k2 + 1 > s.last) continue; let t = 0; for (let j = k - 19; j <= k; j++) t += s.c[j] * s.v[j]; if (!(t > 0)) continue; if (s.bp[k2 + 2] - s.bp[k - 252] > 0) continue; if (!(s.o[k + 1] > 0) || !(s.v[k + 1] > 0) || !(s.o[k2 + 1] > 0)) continue; rows.push({ s, turn: t, ret: s.o[k2 + 1] / s.o[k + 1] - 1 }); }
+  for (const s of S) { if (DROP > 0 && hsh(s.tk) < DROP) continue; if (k - 252 < s.first || k2 + 1 > s.last) continue; let t = 0; for (let j = k - 19; j <= k; j++) t += s.c[j] * s.v[j]; if (!(t > 0)) continue; if (s.bp[k2 + 2] - s.bp[k - 252] > 0) continue; if (!(s.o[k + 1 + LAGD] > 0) || !(s.v[k + 1 + LAGD] > 0) || !(s.o[k2 + 1 + LAGD] > 0)) continue; rows.push({ s, turn: t, ret: s.o[k2 + 1 + LAGD] / s.o[k + 1 + LAGD] - 1 }); }
   if (rows.length < 40) continue; const sorted = rows.map((r) => r.turn).sort((a, b) => a - b), thr = sorted[Math.floor(sorted.length * LIQ)], keep = rows.filter((r) => r.turn >= thr); if (keep.length < 30) continue;
   const mo = { k, date: cal[k], rows: keep, f: {} }; for (const f of Object.keys(F)) { const v = keep.map((r) => F[f](r.s, k)), mu = v.filter(Number.isFinite), m0 = mu.reduce((p, q) => p + q, 0) / mu.length, s0 = Math.sqrt(mu.reduce((p, q) => p + (q - m0) ** 2, 0) / mu.length) || 1; mo.f[f] = v.map((x) => (Number.isFinite(x) ? (x - m0) / s0 : 0)); } months.push(mo);
 }

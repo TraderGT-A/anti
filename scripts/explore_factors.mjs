@@ -5,10 +5,15 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const HERMES = process.env.HERMES_SCRIPTS || "C:/Users/Tar/AppData/Local/hermes/scripts";
-const MK = (process.argv[2] || "th").toLowerCase(), IS_US = MK === "us", IS_EM = MK.startsWith("em:");
-const H = 21, DATA_FROM = IS_US ? "2013-06-01" : (IS_EM ? "2005-06-01" : "2000-06-01"), MIN_PRICE = +(process.env.MIN_PRICE || (IS_US ? 10 : (IS_EM ? 0 : 1))), MIN_TURN = +(process.env.MIN_TURN || (IS_US ? 20e6 : (IS_EM ? 0 : 5e6))), JUMP = 0.35, TAG = process.env.TAG || "";
+const MK = (process.argv[2] || "th").toLowerCase(), IS_US = MK === "us", IS_OLD = MK === "usold", IS_EM = MK.startsWith("em:");
+const H = +(process.env.H || 21), DATA_FROM = IS_US ? "2013-06-01" : (IS_EM ? "2005-06-01" : (IS_OLD ? "1999-06-01" : "2000-06-01")), MIN_PRICE = +(process.env.MIN_PRICE || ((IS_US || IS_OLD) ? 10 : (IS_EM ? 0 : 1))), MIN_TURN = +(process.env.MIN_TURN || ((IS_US || IS_OLD) ? 20e6 : (IS_EM ? 0 : 5e6))), JUMP = 0.35, TAG = process.env.TAG || "";
 let cal, n, calIdx, rawStocks = [];
-if (IS_EM) {
+if (IS_OLD) {
+  const DIR = path.join(HERMES, "us_old"), ds = new Set(), tmp = [];
+  for (const f of fs.readdirSync(DIR).filter((x) => /^chunk_\d+\.json$/.test(x)).sort()) { const ch = JSON.parse(fs.readFileSync(path.join(DIR, f), "utf8")); for (const [tk, b] of Object.entries(ch)) { tmp.push([tk, b]); for (const x of b.t) if (x >= DATA_FROM) ds.add(x); } }
+  cal = [...ds].sort(); n = cal.length; calIdx = new Map(cal.map((d, i) => [d, i]));
+  for (const [tk, b] of tmp) rawStocks.push([tk, b.t, b.o, b.h, b.l, b.c, b.v]);
+} else if (IS_EM) {
   const emd = JSON.parse(fs.readFileSync(path.join(HERMES, "em", MK.slice(3) + ".json"), "utf8")), ds = new Set();
   for (const d of Object.values(emd)) for (const x of d.t) if (x >= DATA_FROM) ds.add(x);
   cal = [...ds].sort(); n = cal.length; calIdx = new Map(cal.map((d, i) => [d, i]));
@@ -35,7 +40,13 @@ for (const [tk, ts, bo, bh, bl, bc, bv] of rawStocks) {
 console.log(MK, "stocks", S.length, "days", n, cal[0], "→", cal.at(-1));
 const rets = (s) => { const r = new Float32Array(n); for (let i = s.first + 1; i <= s.last; i++) r[i] = s.c[i] / s.c[i - 1] - 1; return r; };
 for (const s of S) s.r = rets(s);
+// ผลตอบแทนตลาด = ค่าเฉลี่ยเท่ากันของหุ้นที่ซื้อขายวันนั้น (ใช้คำนวณ beta / โมเมนตัมส่วนที่เหลือ)
+const MR = new Float32Array(n); for (let i = 1; i < n; i++) { let t = 0, c = 0; for (const s of S) if (i > s.first && i <= s.last && s.v[i] > 0 && Math.abs(s.r[i]) < 0.35) { t += s.r[i]; c++; } MR[i] = c ? t / c : 0; }
+const betaOf = (s, k) => { let mx = 0, my = 0; for (let j = k - 251; j <= k; j++) { mx += MR[j]; my += s.r[j]; } mx /= 252; my /= 252; let a = 0, b = 0; for (let j = k - 251; j <= k; j++) { a += (MR[j] - mx) * (s.r[j] - my); b += (MR[j] - mx) ** 2; } return b ? a / b : NaN; };
 const FEATS = {
+  "beta252": (s, k) => betaOf(s, k),
+  "resMom12-1": (s, k) => { const b = betaOf(s, k); let t = 0; for (let j = k - 251; j <= k - 21; j++) t += s.r[j] - b * MR[j]; return t; },
+  "idioVol252": (s, k) => { const b = betaOf(s, k); let m = 0; const e = []; for (let j = k - 251; j <= k; j++) { const x = s.r[j] - b * MR[j]; e.push(x); m += x; } m /= e.length; let v = 0; e.forEach((x) => (v += (x - m) ** 2)); return -Math.sqrt(v / (e.length - 1)); },
   "r1w": (s, k) => s.c[k] / s.c[k - 5] - 1, "r1m": (s, k) => s.c[k] / s.c[k - 21] - 1, "r3m": (s, k) => s.c[k] / s.c[k - 63] - 1, "r6m": (s, k) => s.c[k] / s.c[k - 126] - 1, "r12m": (s, k) => s.c[k] / s.c[k - 252] - 1,
   "r12-1": (s, k) => s.c[k - 21] / s.c[k - 252] - 1, "r6-1": (s, k) => s.c[k - 21] / s.c[k - 126] - 1,
   "near52wHigh": (s, k) => { let m = 0; for (let j = k - 251; j <= k; j++) if (s.h[j] > m) m = s.h[j]; return s.c[k] / m; },
@@ -55,6 +66,13 @@ const FEATS = {
   "overnight60": (s, k) => { let t = 0; for (let j = k - 59; j <= k; j++) t += s.o[j] / s.c[j - 1] - 1; return t / 60; },
   "intraday60": (s, k) => { let t = 0; for (let j = k - 59; j <= k; j++) t += s.c[j] / s.o[j] - 1; return t / 60; },
   "price(log)": (s, k) => Math.log(s.c[k]),
+  "near26wHigh": (s, k) => { let m = 0; for (let j = k - 125; j <= k; j++) if (s.h[j] > m) m = s.h[j]; return s.c[k] / m; },
+  "near13wHigh": (s, k) => { let m = 0; for (let j = k - 62; j <= k; j++) if (s.h[j] > m) m = s.h[j]; return s.c[k] / m; },
+  "daysSince52wHigh": (s, k) => { let m = 0, d = 0; for (let j = k - 251; j <= k; j++) if (s.h[j] >= m) { m = s.h[j]; d = k - j; } return -d; },
+  "rangePos52w": (s, k) => { let hi = 0, lo = Infinity; for (let j = k - 251; j <= k; j++) { if (s.h[j] > hi) hi = s.h[j]; if (s.l[j] < lo) lo = s.l[j]; } return (s.c[k] - lo) / (hi - lo); },
+  "accel": (s, k) => s.c[k] / s.c[k - 63] - 1 - (s.c[k - 63] / s.c[k - 252] - 1) / 3,
+  "upVolRatio60": (s, k) => { let u = 0, d = 0; for (let j = k - 59; j <= k; j++) { if (s.r[j] > 0) u += s.v[j]; else if (s.r[j] < 0) d += s.v[j]; } return d ? Math.log((u + 1) / (d + 1)) : NaN; },
+  "high52new5d": (s, k) => { let m = 0; for (let j = k - 251; j <= k - 5; j++) if (s.h[j] > m) m = s.h[j]; let b = 0; for (let j = k - 4; j <= k; j++) if (s.c[j] > m) b = 1; return b; },
   "r1m×dollarVolRank": null,
 };
 delete FEATS["r1m×dollarVolRank"];
@@ -64,7 +82,7 @@ const names = Object.keys(FEATS);
 const monthEnds = []; for (let i = 260; i < n - H - 2; i++) if (cal[i].slice(0, 7) !== cal[i + 1].slice(0, 7)) monthEnds.push(i);
 const rank = (a) => { const idx = a.map((v, i) => [v, i]).sort((x, y) => x[0] - y[0]), r = new Float64Array(a.length); let i = 0; while (i < idx.length) { let j = i; while (j + 1 < idx.length && idx[j + 1][0] === idx[i][0]) j++; const rv = (i + j) / 2 + 1; for (let q = i; q <= j; q++) r[idx[q][1]] = rv; i = j + 1; } return r; };
 const corr = (x, y) => { const m = x.length; let mx = 0, my = 0; for (let i = 0; i < m; i++) { mx += x[i]; my += y[i]; } mx /= m; my /= m; let sxy = 0, sxx = 0, syy = 0; for (let i = 0; i < m; i++) { sxy += (x[i] - mx) * (y[i] - my); sxx += (x[i] - mx) ** 2; syy += (y[i] - my) ** 2; } return sxx && syy ? sxy / Math.sqrt(sxx * syy) : NaN; };
-const eras = IS_EM ? [["2006-12", "2006-01-01", "2012-12-31"], ["2013-19", "2013-01-01", "2019-12-31"], ["2020-26", "2020-01-01", "9999"]] : IS_US ? [["2014-19", "2014-01-01", "2019-12-31"], ["2020-26", "2020-01-01", "9999"]] : [["2001-07", "2001-01-01", "2007-12-31"], ["2008-14", "2008-01-01", "2014-12-31"], ["2015-20", "2015-01-01", "2020-12-31"], ["2021-26", "2021-01-01", "9999"]];
+const eras = IS_OLD ? [["2001-05", "2001-01-01", "2005-12-31"], ["2006-09", "2006-01-01", "2009-12-31"], ["2010-13", "2010-01-01", "2013-12-31"]] : IS_EM ? [["2006-12", "2006-01-01", "2012-12-31"], ["2013-19", "2013-01-01", "2019-12-31"], ["2020-26", "2020-01-01", "9999"]] : IS_US ? [["2014-19", "2014-01-01", "2019-12-31"], ["2020-26", "2020-01-01", "9999"]] : [["2001-07", "2001-01-01", "2007-12-31"], ["2008-14", "2008-01-01", "2014-12-31"], ["2015-20", "2015-01-01", "2020-12-31"], ["2021-26", "2021-01-01", "9999"]];
 const rec = {}; names.forEach((f) => (rec[f] = { ic: [], q: [], date: [] }));
 const ewAll = [];
 for (const k of monthEnds) {
