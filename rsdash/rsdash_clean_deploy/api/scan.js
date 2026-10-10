@@ -5,6 +5,7 @@ import { scanMarket, toCommonStocks, breadthFull, getIndexMembership } from "./l
 const FORCE_COOLDOWN_MS = 30_000;
 import { loadPreviousSnapshot, saveSnapshot, marketToday, supabase } from "./lib/supabase.js";
 import "../trendlib.js";
+import "../fundlog.js";   // globalThis.FundLog — บันทึก EPS แบบ point-in-time
 import "../leaders.js";   // globalThis.Leaders — ผู้นำหุ้นไทย + paper-trade (กฎล็อกใน research/PREREG_forward_th_leaders_2026-10-10.md)   // ตั้ง globalThis.TrendLib (ไฟล์เดียวกับที่เว็บ/เทสต์ใช้ — อยู่นอก api/ จึงไม่นับเป็น Function)
 
 export default async function handler(req, res) {
@@ -85,8 +86,26 @@ export default async function handler(req, res) {
         if (!sec || req.headers.authorization !== "Bearer " + sec) { res.setHeader("Cache-Control", "no-store"); return res.status(401).json({ error: "unauthorized" }); }
         const out = L.step(state, snap);
         if (out.changed) { const { error } = await db.from("snapshots").upsert({ dt: KEY, created_at: new Date().toISOString(), payload: state }, { onConflict: "dt" }); if (error) return res.status(500).json({ error: error.message }); }
+        let fund = null;   // เก็บ EPS/กำไรสุทธิแบบ point-in-time (เฉพาะวันที่ค่าเปลี่ยน) — ล้มเหลวต้องไม่กระทบ paper-trade
+        try {
+          const FL = globalThis.FundLog, tks = new Set(rows.map((x) => x.tk));
+          const fr = await fetch("https://scanner.tradingview.com/thailand/scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ symbols: { query: { types: [] }, tickers: [] }, columns: ["name", ...FL.COLS], range: [0, 4000] }) });
+          const cur = {}; for (const x of ((await fr.json())?.data || [])) { const d = x.d || []; if (tks.has(d[0])) cur[d[0]] = FL.pack(d.slice(1)); }
+          if (Object.keys(cur).length > 100) {
+            const FK = "fund|th|latest", LK = "fund|th|log|" + snap.date.slice(0, 7), prev = await db.from("snapshots").select("payload").eq("dt", FK).maybeSingle();
+            const df = FL.diff((prev.data && prev.data.payload && prev.data.payload.f) || {}, cur);
+            if (df.changes.length) {
+              const lg = await db.from("snapshots").select("payload").eq("dt", LK).maybeSingle(), log = (lg.data && lg.data.payload) || { cols: FL.COLS, days: {} };
+              log.days[snap.date] = df.changes.map((c) => [c.tk, ...c.v]);
+              const now = new Date().toISOString();
+              const e1 = await db.from("snapshots").upsert({ dt: LK, created_at: now, payload: log }, { onConflict: "dt" });
+              const e2 = await db.from("snapshots").upsert({ dt: FK, created_at: now, payload: { d: snap.date, cols: FL.COLS, f: df.latest } }, { onConflict: "dt" });
+              fund = { added: df.added, changed: df.changed, error: (e1.error || e2.error || {}).message || null };
+            } else fund = { added: 0, changed: 0 };
+          } else fund = { skipped: "too few rows " + Object.keys(cur).length };
+        } catch (e) { fund = { error: String((e && e.message) || e) }; }
         res.setHeader("Cache-Control", "no-store");
-        return res.status(200).json({ ok: true, date: snap.date, changed: out.changed, rebalanced: !!out.rebalanced, reason: out.reason || null, rows: rows.length, summary: L.summary(state) });
+        return res.status(200).json({ ok: true, date: snap.date, changed: out.changed, rebalanced: !!out.rebalanced, reason: out.reason || null, rows: rows.length, summary: L.summary(state), fund });
       }
       const sig = L.pick(rows, gate);
       res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=900");
