@@ -64,14 +64,21 @@ export default async function handler(req, res) {
   if (universe === "leaders") {   // ผู้นำหุ้นไทย near52wHigh + โมเมนตัม 12-1 (ไทยเท่านั้น) — GET = ดูรายชื่อ/ผล paper-trade, tick=1 (cron + CRON_SECRET) = เก็บ snapshot และเดิน paper-trade 1 วัน
     const L = globalThis.Leaders, KEY = "leaders|state";
     try {
-      const { raw } = await scanMarket("thailand");
+      const isUs = req.query.market === "us" || req.query.market === "america", MKT = isUs ? "america" : "thailand";
+      const { raw } = await scanMarket(MKT);
       const rows = toCommonStocks(raw).filter((s) => s.price > 0 && s.hi52 > 0).map((s) => ({ tk: s.ticker, name: s.name, close: s.price, open: s.o || null, hi52: s.hi52, p1y: s.p1y, p1m: s.p1m, turn: (s.avgVol || 0) * s.price }));
       let gate = {}, setClose = null;
       try {
-        const r = await fetch("https://scanner.tradingview.com/thailand/scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ symbols: { tickers: ["SET:SET"] }, columns: ["close", "SMA50", "SMA200"] }) });
+        const r = await fetch("https://scanner.tradingview.com/" + MKT + "/scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ symbols: { tickers: [isUs ? "SP:SPX" : "SET:SET"] }, columns: ["close", "SMA50", "SMA200"] }) });
         const d = (await r.json())?.data?.[0]?.d; if (d) { gate = { price: d[0], sma50: d[1], sma200: d[2] }; setClose = d[0]; }
       } catch (e) { /* Gate = unknown → 50% */ }
-      const snap = { date: marketToday("thailand"), rows, gate, setClose };
+      const snap = { date: marketToday(MKT), rows, gate, setClose };
+      if (isUs) {   // สหรัฐฯ: รายชื่อประกอบเท่านั้น — backtest 26 ปีไม่พบ edge จึงไม่มี paper-trade/state
+        if (req.query.tick) { res.setHeader("Cache-Control", "no-store"); return res.status(400).json({ error: "tick is Thailand-only" }); }
+        const sig = L.pick(rows, gate, 20, "america");
+        res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=900");
+        return res.status(200).json({ market: "america", noEdge: true, asOf: snap.date, gate: sig.gate, gateIdx: gate, poolSize: sig.poolSize, picks: sig.top });
+      }
       const db = supabase(), cur = await db.from("snapshots").select("payload").eq("dt", KEY).maybeSingle(), state = (cur.data && cur.data.payload) || L.newState();
       if (req.query.tick === "1" || req.query.tick === "true") {
         const sec = process.env.CRON_SECRET;

@@ -63,3 +63,9 @@ test('summary: ผลตอบแทนสะสมเทียบ EW และ 
   let s = L.newState(); L.step(s, snap('2026-10-29', mkRows(), GREEN, 1500)); L.step(s, snap('2026-10-30', mkRows(0, 0.01), GREEN, 1515));
   const m = L.summary(s); assert.equal(m.start, '2026-10-29'); assert.ok(Math.abs(m.set - 0.01) < 1e-12); assert.equal(m.rebalances, 0);
 });
+
+test('poolUS: ราคา ≥ $10 และมูลค่าซื้อขาย ≥ $20M เท่านั้น และ pick ตลาด US ใช้พูลนี้', () => {
+  const rows = [{ tk: 'A', close: 50, hi52: 60, p1y: 40, p1m: 3, turn: 30e6 }, { tk: 'B', close: 9.9, hi52: 12, p1y: 40, p1m: 3, turn: 90e6 }, { tk: 'C', close: 50, hi52: 60, p1y: 40, p1m: 3, turn: 19e6 }, { tk: 'D', close: 50, hi52: 0, p1y: 40, p1m: 3, turn: 90e6 }];
+  assert.deepEqual(L.poolUS(rows).map((r) => r.tk), ['A']);
+  const s = L.pick(rows, GREEN, 20, 'america'); assert.equal(s.poolSize, 1); assert.equal(s.top[0].tk, 'A');
+});

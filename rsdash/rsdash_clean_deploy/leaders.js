@@ -24,6 +24,9 @@
     return ok.filter((r) => r.turn >= thr);
   }
 
+  /* พูล US (ข้อมูลประกอบอย่างเดียว ไม่มี edge): ราคา ≥ $10 และมูลค่าซื้อขายเฉลี่ย ≥ $20M — เกณฑ์เดียวกับ backtest US */
+  function poolUS(rows) { return (rows || []).filter((r) => r && r.close >= 10 && r.turn >= 20e6 && r.hi52 > 0 && fin(r.p1y) && fin(r.p1m) && 1 + r.p1m / 100 > 0); }
+
   /* คะแนน = z(ราคา/high52) + z(โมเมนตัม 12-1) ภายในพูล (เรียงจากมากไปน้อย) */
   function score(poolRows) {
     const feats = poolRows.map((r) => ({ r, near52: r.close / r.hi52, mom: (1 + r.p1y / 100) / (1 + r.p1m / 100) - 1 }));
@@ -32,8 +35,8 @@
     return feats.sort((a, b) => b.score - a.score);
   }
 
-  function pick(rows, gateIdx, n) {
-    n = n || N; const gate = gateOf(gateIdx), pl = pool(rows), sc = score(pl), top = sc.slice(0, n), w = top.length ? gate.exposure / n : 0;
+  function pick(rows, gateIdx, n, market) {
+    n = n || N; const gate = gateOf(gateIdx), pl = (market === 'america' || market === 'us') ? poolUS(rows) : pool(rows), sc = score(pl), top = sc.slice(0, n), w = top.length ? gate.exposure / n : 0;
     return { gate, poolSize: pl.length, poolTickers: pl.map((r) => r.tk), top: top.map((f, i) => ({ rank: i + 1, tk: f.r.tk, name: f.r.name, close: f.r.close, near52: f.near52, mom: f.mom, score: f.score, weight: w, turn: f.r.turn })) };
   }
 
@@ -91,7 +94,7 @@
     return { start: a.d, asOf: b.d, days, strategy: b.s - 1, ew: b.e - 1, set: b.x - 1, excessVsEW: b.s - b.e, excessVsSET: b.s - b.x, rebalances: (state.rebal || []).length };
   }
 
-  const api = { N, COST, CAPITAL, EXPOSURE, gateOf, pool, score, pick, newState, step, summary };
+  const api = { N, COST, CAPITAL, EXPOSURE, gateOf, pool, poolUS, score, pick, newState, step, summary };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   g.Leaders = api;
 })(typeof window !== 'undefined' ? window : globalThis);
