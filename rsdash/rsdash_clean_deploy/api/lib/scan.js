@@ -61,7 +61,8 @@ const MARKETS = {
 export const TV_COLS = ["name", "description", "close", "change", "volume", "Value.Traded",
   "Perf.W", "Perf.1M", "Perf.3M", "Perf.6M", "Perf.Y", "Perf.YTD", "market_cap_basic", "sector", "industry",
   "SMA50", "SMA200", "relative_volume_10d_calc", "average_volume_10d_calc", "type", "logoid",
-  "open", "high", "low"];   // OHLC ของวันล่าสุด — ใช้เติมแท่งสุดท้ายของกราฟเมื่อ Yahoo ล่าช้า (ต่อท้ายเสมอ ห้ามแทรกกลาง เพราะ destructure ตามตำแหน่ง)
+  "open", "high", "low",
+  "SMA150", "EMA20", "price_52_week_high", "price_52_week_low", "ATR", "Volatility.W", "Volatility.M"];   // ชุดสำหรับ Trend Template / Scanner พักตัวแคบ (ต่อท้ายเสมอ)   // OHLC ของวันล่าสุด — ใช้เติมแท่งสุดท้ายของกราฟเมื่อ Yahoo ล่าช้า (ต่อท้ายเสมอ ห้ามแทรกกลาง เพราะ destructure ตามตำแหน่ง)
 
 // ==== Thai index membership (จริงจาก set.or.th PDF, point-in-time 2026H2) ====
 // เดิมใช้ mcap bucket (slice 0,50/0,100) = ผิด (KCE ขึ้น SET50, DR อย่าง MICRON01 ขึ้น SET50) —
@@ -133,7 +134,8 @@ export async function scanMarket(market = "thailand") {
     const d = r.d || [];
     if (d.length < TV_COLS.length) continue;
     const [symbol, name, close, change, volume, val, p1w, p1m, p3, p6, p1, pYTD, mcap, sector, industry,
-              sma50, sma200, relVol, avgVol, secType, logoId, dOpen, dHigh, dLow] = d;
+              sma50, sma200, relVol, avgVol, secType, logoId, dOpen, dHigh, dLow,
+              sma150, ema20, hi52, lo52, atr, volW, volM] = d;
     // กรองด้วย type ตรง ๆ: เอาเฉพาะหุ้นสามัญ (ตัด ETF/fund/warrant/DR ทั้ง 2 ตลาด) — แม่นกว่าการเดาจากชื่อ
     // (ของเดิม: includes("ETF") ไปโดน "N-ETF-lix" → Netflix หาย; กฎ "CLASS A" → META/GOOGL/COIN หายทั้งบริษัท)
     if (secType && secType !== "stock") continue;
@@ -152,6 +154,8 @@ export async function scanMarket(market = "thailand") {
       hasPerf: (p1m != null || p3 != null || p6 != null || p1 != null),   // มีผลตอบแทนให้คำนวณ RS จริงไหม
       sma50: sma50 || null, sma200: sma200 || null,
       relVol: relVol || null, avgVol: avgVol || null,
+      sma150: sma150 || null, ema20: ema20 || null, hi52: hi52 || null, lo52: lo52 || null,
+      atr: atr || null, volW: volW || null, volM: volM || null,   // ATR14 (หน่วยราคา) + ความผันผวนรายสัปดาห์/เดือน (%) จาก TradingView
       o: dOpen ?? null, h: dHigh ?? null, l: dLow ?? null,   // OHLC วันนี้จาก TradingView
       logoId: logoId || "",        // TradingView logoid → ใช้ดึงโลโก้จริงจาก s3-symbol-logo.tradingview.com
     });
