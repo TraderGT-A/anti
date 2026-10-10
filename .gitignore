@@ -25,3 +25,6 @@ npm-debug.log*
 *.zip
 
 data/bt_cache/
+
+research_py/.venv/
+__pycache__/
