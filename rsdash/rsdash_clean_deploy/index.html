@@ -163,12 +163,13 @@
                       <label class="flex flex-col gap-0.5">3M ≥ <b id="scMomV">20</b>%<input id="scMom" type="range" min="0" max="100" step="5" value="20" class="accent-sky-500 w-28"></label>
                       <label class="flex flex-col gap-0.5">มูลค่าซื้อขาย/วัน ≥ <select id="scVal" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-white"></select></label>
                       <label class="flex items-center gap-1.5 cursor-pointer select-none"><input id="scTT" type="checkbox" checked class="accent-emerald-500"> ต้องผ่าน Trend Template ครบ 8</label>
+                      <label class="flex items-center gap-1.5 cursor-pointer select-none" title="ATR10 ÷ ATR50 ≤ 0.85 คำนวณจากแท่งรายวัน (นิยามเดียวกับ backtest)"><input id="scSq" type="checkbox" checked class="accent-emerald-500"> ต้องบีบตัว (ATR10/ATR50 ≤ 0.85)</label>
                     </div>
                     <div id="scSummary" class="text-[11px] text-slate-400 mb-2"></div>
                     <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-[10px] uppercase text-slate-500 border-b border-[#1e2634]"><tr>
-                      <th class="p-2">Setup</th><th class="p-2">หุ้น</th><th class="p-2">RS</th><th class="p-2">ราคา</th><th class="p-2" title="ห่างจุดสูง 52 สัปดาห์">จากจุดสูง</th><th class="p-2" title="ATR14 ÷ ราคา — ยิ่งต่ำยิ่งนิ่ง">ATR%</th><th class="p-2" title="ความผันผวนรายสัปดาห์ ÷ รายเดือน (&lt;1 = กำลังบีบตัว)">บีบตัว</th><th class="p-2">TT</th><th class="p-2">RVOL</th><th class="p-2">3M</th>
+                      <th class="p-2">Setup</th><th class="p-2">หุ้น</th><th class="p-2">RS</th><th class="p-2">ราคา</th><th class="p-2" title="ห่างจุดสูง 52 สัปดาห์">จากจุดสูง</th><th class="p-2" title="ATR14 ÷ ราคา — ยิ่งต่ำยิ่งนิ่ง">ATR%</th><th class="p-2" title="ATR10 ÷ ATR50 จากแท่งรายวัน (ต่ำกว่า 0.85 = บีบตัว)">บีบตัว</th><th class="p-2">TT</th><th class="p-2">RVOL</th><th class="p-2">3M</th>
                     </tr></thead><tbody id="scBody"></tbody></table></div>
-                    <div class="text-[10px] text-slate-500 mt-2 leading-relaxed">⚠️ เกณฑ์นี้ตีความจากแนวทางของ Minervini/Qullamaggie (แหล่งรอง) <b>ยังไม่ผ่าน backtest ของเราเอง</b> — ใช้คัดหุ้นที่ควรเปิดดูกราฟ ไม่ใช่สัญญาณซื้อ · ข้อ 3 ของ Trend Template (SMA200 ชี้ขึ้น) ในตารางเป็นค่าประมาณ ยืนยันจริงได้ในหน้าต่างหุ้น · คะแนน Setup = RS 30 + Trend Template 25 + ใกล้จุดสูง 15 + บีบตัว 20 + ปริมาณแห้ง 10 แล้วคูณ Market Gate (เขียว×1 / เหลือง×0.7 / แดง×0.4)</div>
+                    <div class="text-[10px] text-slate-500 mt-2 leading-relaxed">⚠️ เกณฑ์นี้ตีความจากแนวทางของ Minervini/Qullamaggie (แหล่งรอง) <b>ยังไม่ผ่าน backtest ของเราเอง</b> — ใช้คัดหุ้นที่ควรเปิดดูกราฟ ไม่ใช่สัญญาณซื้อ · ข้อ 3 ของ Trend Template (SMA200 ชี้ขึ้น) ในตารางเป็นค่าประมาณ ยืนยันจริงได้ในหน้าต่างหุ้น · บีบตัว = ATR10/ATR50 ≤ 0.85 (คำนวณจากแท่งรายวัน เฉพาะหุ้นที่ผ่านด่านแรก ~60 ตัว แคช 6 ชม.) · คะแนน Setup = RS 30 + Trend Template 25 + ใกล้จุดสูง 15 + บีบตัว 20 + ปริมาณแห้ง 10 แล้วคูณ Market Gate (เขียว×1 / เหลือง×0.7 / แดง×0.4)</div>
                   </div>
 
                   <!-- 📅 Report: เทียบอันดับ Top-N ระหว่าง 2 วัน (ข้อมูลจาก /api/history) -->
@@ -729,7 +730,7 @@ const SC_VAL = {
 function scParams(){
   const g=id=>document.getElementById(id);
   return { rsMin:Number(g('scRs').value), nearHigh:Number(g('scNear').value), atrMax:Number(g('scAtr').value),
-           p3mMin:Number(g('scMom').value), minVal:Number(g('scVal').value||0), ttOnly:g('scTT').checked };
+           p3mMin:Number(g('scMom').value), minVal:Number(g('scVal').value||0), ttOnly:g('scTT').checked, needSqueeze:g('scSq').checked };
 }
 function scGateInfo(){
   const x = indexList.find(i=>i.key===(currentMarket==='america'?'SPX':'SET'));
@@ -739,6 +740,18 @@ function scFill(){
   const sel=document.getElementById('scVal'); if(!sel || sel.dataset.mk===currentMarket) return;
   sel.innerHTML = (SC_VAL[currentMarket]||SC_VAL.thailand).map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('');
   sel.value = '20000000'; sel.dataset.mk = currentMarket;
+}
+/* ATR10/ATR50 ของหุ้นผ่านด่านแรก — ให้เซิร์ฟเวอร์คำนวณ (แคชฝั่งเซิร์ฟเวอร์ 6 ชม. + ฝั่งเบราว์เซอร์) แล้ววาดตารางใหม่เอง */
+const SQ = {}; let sqBusy = false;
+async function loadSqueeze(tks){
+  if(sqBusy) return; sqBusy = true; const mk = currentMarket;
+  try{
+    for(let i=0;i<tks.length;i+=40){
+      const j = await (await fetch(API+'/api/scan?universe=squeeze&market='+mk+'&t='+encodeURIComponent(tks.slice(i,i+40).join(',')))).json();
+      const m = SQ[mk] || (SQ[mk] = {}); Object.keys(j.sq||{}).forEach(k=>{ m[k] = { ts: Date.now(), v: j.sq[k] }; });
+      tks.slice(i,i+40).forEach(k=>{ if(!m[k]) m[k] = { ts: Date.now() - 5*3600e3, v: { atrRatio: NaN } }; });   // ดึงไม่ได้ → ลองใหม่ใน ~1 ชม. ไม่ยิงซ้ำรัว
+    }
+  }catch(e){} finally{ sqBusy = false; if(curPage==='scanner' && mk===currentMarket) renderScanner(); }
 }
 function renderScanner(){
   if(typeof TrendLib==='undefined' || !document.getElementById('scBody')) return;
@@ -755,10 +768,15 @@ function renderScanner(){
     + (gi.reason?` · <span class="opacity-80">${gi.reason}</span>`:'')
     + (bf?` · หุ้นเหนือ SMA50 <b>${bf.pctAboveMA50}%</b> · เหนือ SMA200 <b>${bf.pctAboveMA200}%</b>`:'')
     + `<div class="opacity-80 mt-0.5">${advice}${gi.mult<1?` (คะแนน ×${gi.mult})`:''}</div></div>`;
+  const SQm = SQ[currentMarket] || (SQ[currentMarket] = {});
+  (stockData||[]).forEach(s=>{ const c=SQm[s.ticker]; s.sq = (c && Date.now()-c.ts < 6*3600e3) ? c.v : undefined; });
   const all = (stockData||[]).map(s=>({ s, r: TrendLib.setup(s, P, gi) }));
+  const stage1 = all.filter(x=>x.r.pass1).sort((a,b)=>b.r.raw-a.r.raw).slice(0,60);
+  const need = stage1.filter(x=>!x.s.sq).map(x=>x.s.ticker);
+  if(need.length) loadSqueeze(need);
   const hit = all.filter(x=>x.r.pass).sort((a,b)=>b.r.score-a.r.score || (b.s.rs||0)-(a.s.rs||0));
   const ttAll = all.filter(x=>x.r.tt===8).length;
-  document.getElementById('scSummary').innerHTML = `ผ่านเงื่อนไข <b class="text-white">${hit.length}</b> จาก ${all.length} ตัว · ผ่าน Trend Template ครบ 8 ข้อ ${ttAll} ตัว · ข้อมูลสแกน ${stockData.length?'สด':'ยังไม่โหลด'}`;
+  document.getElementById('scSummary').innerHTML = `ผ่านเงื่อนไข <b class="text-white">${hit.length}</b> จาก ${all.length} ตัว (ผ่านด่านแรก ${all.filter(x=>x.r.pass1).length}${need.length?` · กำลังคำนวณบีบตัว ${need.length} ตัว…`:''}) · ผ่าน Trend Template ครบ 8 ข้อ ${ttAll} ตัว · ข้อมูลสแกน ${stockData.length?'สด':'ยังไม่โหลด'}`;
   const pctc = v=> v==null?'-':v.toFixed(1)+'%';
   document.getElementById('scBody').innerHTML = hit.slice(0,100).map(({s,r})=>{
     const tc = r.tt===8?'text-emerald-400':(r.tt>=6?'text-amber-300':'text-slate-400');
@@ -777,7 +795,7 @@ function renderScanner(){
       <td class="p-2">${fPct(s.p3m)}</td></tr>`;
   }).join('') || '<tr><td colspan="10" class="p-4 text-center text-slate-500">ไม่มีหุ้นผ่านเงื่อนไขตอนนี้ — ลองผ่อนสไลเดอร์ (เช่น ห่างจุดสูง/ATR) หรือปิด “ต้องผ่าน Trend Template”</td></tr>';
 }
-['scRs','scNear','scAtr','scMom','scVal','scTT'].forEach(id=>{ const e=document.getElementById(id); if(e) e.addEventListener(id==='scVal'||id==='scTT'?'change':'input',()=>{ if(curPage==='scanner') renderScanner(); }); });
+['scRs','scNear','scAtr','scMom','scVal','scTT','scSq'].forEach(id=>{ const e=document.getElementById(id); if(e) e.addEventListener(id==='scVal'||id==='scTT'||id==='scSq'?'change':'input',()=>{ if(curPage==='scanner') renderScanner(); }); });
 
 /* Trend Template แบบแม่น (จากแท่งรายวัน) ในหน้าต่างหุ้น */
 function renderModalTT(data){
@@ -2144,6 +2162,7 @@ async function autoRefreshLight(silent){
         };
       });
 
+      if(curPage==='scanner') renderScanner();
       if(d.marketSummary) summaryData = d.marketSummary;
       if(d.moneyFlow) moneyFlowData = d.moneyFlow;
       if(d.themes) themesData = d.themes;

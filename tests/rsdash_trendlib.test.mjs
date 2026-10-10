@@ -4,7 +4,7 @@ import '../rsdash/trendlib.js';
 const T = globalThis.TrendLib;
 
 const strong = { price: 100, sma50: 95, sma150: 85, sma200: 75, hi52: 105, lo52: 50, rs: 92, p6m: 40, p3m: 30,
-  ema20: 98, atr: 3, volW: 2.0, volM: 2.6, relVol: 0.7, val: 1e8 };
+  ema20: 98, atr: 3, sq: { atrRatio: 0.7 }, relVol: 0.7, val: 1e8 };
 
 test('gate: green / yellow / red', () => {
   assert.equal(T.gate({ price: 110, sma50: 100, sma200: 90 }).state, 'green');
@@ -32,6 +32,11 @@ test('setup: pass / fail filters and gate multiplier', () => {
   const r = T.setup(strong, {}, g);
   assert.equal(r.pass, true);
   assert.ok(r.raw > 60 && r.raw <= 100);
+  const loose = T.setup({ ...strong, sq: { atrRatio: 0.95 } }, {}, g);
+  assert.equal(loose.pass, false);                                                    // ยังไม่บีบตัว (ATR10/ATR50 > 0.85)
+  assert.equal(loose.pass1, true);                                                   // แต่ผ่านด่านแรก → ถูกเลือกไปคำนวณ ATR
+  assert.equal(T.setup({ ...strong, sq: { atrRatio: 0.95 } }, { needSqueeze: false }, g).pass, true);
+  assert.equal(T.setup({ ...strong, sq: undefined }, {}, g).pass, false);            // ยังไม่มีข้อมูลบีบตัว = ยังไม่ผ่าน
   assert.equal(T.setup({ ...strong, atr: 9 }, {}, g).pass, false);                  // ATR 9% > 5%
   assert.equal(T.setup({ ...strong, atr: 0.3 }, {}, g).pass, false);                // ATR 0.3% = ราคาตรึง (deal-pinned) ไม่นับว่าบีบตัว
   assert.equal(T.setup({ ...strong, price: 80 }, {}, g).pass, false);               // ไกลจุดสูง
@@ -52,6 +57,8 @@ test('fromBars: steady uptrend passes; downtrend fails; short history -> null', 
   const dn = up.map((b, i) => { const c = 200 * Math.pow(0.996, i); return { ...b, open: c, high: c * 1.01, low: c * 0.99, close: c }; });
   assert.ok(T.fromBars(dn, 90, 85).tt <= 3);
   assert.equal(T.fromBars(up.slice(0, 150), 90), null);
+  assert.equal(T.squeeze(up.slice(0, 30)), null);
+  assert.equal(T.squeeze(up).asOf, 259);
   // ทะลุหลังบีบตัว: 15 แท่งสุดท้ายแคบลงมาก → atrRatio ต่ำ
   const sq = up.map((b, i) => i < 245 ? b : { ...b, high: b.close * 1.002, low: b.close * 0.998 });
   assert.ok(T.fromBars(sq, 90, 85).contraction.atrRatio < 0.5);

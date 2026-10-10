@@ -3,7 +3,8 @@ import { scanMarket, toCommonStocks, breadthFull, getIndexMembership } from "./l
 
 // force=1 ข้ามแคชได้ แต่ไม่ให้สแกน TradingView + เขียน Supabase ถี่กว่านี้ (กันผู้เข้าชมหลายคน/auto-refresh รัวใส่)
 const FORCE_COOLDOWN_MS = 30_000;
-import { loadPreviousSnapshot, saveSnapshot } from "./lib/supabase.js";
+import { loadPreviousSnapshot, saveSnapshot, marketToday } from "./lib/supabase.js";
+import "../trendlib.js";   // ตั้ง globalThis.TrendLib (ไฟล์เดียวกับที่เว็บ/เทสต์ใช้ — อยู่นอก api/ จึงไม่นับเป็น Function)
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -32,6 +33,32 @@ export default async function handler(req, res) {
       res.setHeader("Cache-Control", "no-store");
       return res.status(502).json({ error: String((e && e.message) || e) });
     }
+  }
+  if (universe === "squeeze") {   // ATR10/ATR50 ของหุ้นที่ client ส่งมา (≤80 ตัว) — คำนวณจากแท่งรายวัน Yahoo, แคช 6 ชม. ต่อหุ้น (อัตโนมัติ ไม่ต้องมีใครมาเรียกด้วยมือ)
+    const list = [...new Set(String(req.query.t || "").split(",").map((x) => x.trim()).filter((x) => /^[A-Za-z0-9.\-]{1,12}$/.test(x)))].slice(0, 80);
+    global.__sqCache = global.__sqCache || {};
+    const TTL = 6 * 3600_000, today = marketToday(market), out = {}, todo = [];
+    for (const tk of list) { const c = global.__sqCache[market + "|" + tk]; if (c && now - c.ts < TTL) out[tk] = c.v; else todo.push(tk); }
+    const ysym = (tk) => market === "america" ? tk.replace(/\./g, "-") : (/\.BK$/.test(tk) ? tk : tk + ".BK");
+    const one = async (tk) => {
+      try {
+        const r = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ysym(tk))}?interval=1d&range=1y`, { headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" } });
+        const q = (await r.json())?.chart?.result?.[0]; if (!q) return;
+        const ts = q.timestamp || [], z = q.indicators?.quote?.[0] || {}, bars = [];
+        for (let i = 0; i < ts.length; i++) {
+          if (z.close?.[i] == null || z.high?.[i] == null || z.low?.[i] == null) continue;
+          const d = new Date(ts[i] * 1000).toISOString().slice(0, 10);
+          if (d >= today) continue;   // ตัดแท่งของวันนี้ (ยังไม่ปิด → ช่วงแกว่งสั้นเกินจริง ทำให้ดูบีบตัวเกินจริง)
+          bars.push({ time: d, open: z.open?.[i] ?? z.close[i], high: z.high[i], low: z.low[i], close: z.close[i], volume: z.volume?.[i] || 0 });
+        }
+        const v = globalThis.TrendLib.squeeze(bars); if (!v || !Number.isFinite(v.atrRatio)) return;
+        const rounded = { atrRatio: Math.round(v.atrRatio * 1000) / 1000, atr10Pct: Math.round(v.atr10Pct * 100) / 100, range10Pct: Math.round(v.range10Pct * 100) / 100, volDry: v.volDry == null ? null : Math.round(v.volDry * 100) / 100, asOf: v.asOf };
+        global.__sqCache[market + "|" + tk] = { ts: Date.now(), v: rounded }; out[tk] = rounded;
+      } catch (e) { /* ตัวไหนดึงไม่ได้ก็ข้าม */ }
+    };
+    for (let i = 0; i < todo.length; i += 10) await Promise.all(todo.slice(i, i + 10).map(one));
+    res.setHeader("Cache-Control", "public, s-maxage=1800, stale-while-revalidate=3600");
+    return res.status(200).json({ market, asOf: new Date().toISOString(), requested: list.length, sq: out });
   }
   if (universe === "all") {
     if (!force) {
@@ -212,7 +239,7 @@ export default async function handler(req, res) {
     };
 
     // snapshot เก็บเฉพาะฟิลด์หลัก — ฟิลด์ Scanner (SMA150/EMA20/52w/ATR/vol) คำนวณสดทุกสแกน ไม่ต้องบวม DB
-    const SCANNER_ONLY = ["sma150", "ema20", "hi52", "lo52", "atr", "volW", "volM"];
+    const SCANNER_ONLY = ["sma150", "ema20", "hi52", "lo52", "atr"];
     await saveSnapshot({ ...payload, data: clean.map(s => { const c = { ...s }; SCANNER_ONLY.forEach(k => delete c[k]); return c; }) });   // persist to Supabase (แยก snapshot ต่อ market)
     if (!global.__scanCache) global.__scanCache = {};
     global.__scanCache[market] = { data: payload, ts: Date.now() };
