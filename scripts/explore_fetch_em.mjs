@@ -4,7 +4,8 @@ import fs from "node:fs";
 import path from "node:path";
 const HERMES = process.env.HERMES_SCRIPTS || "C:/Users/Tar/AppData/Local/hermes/scripts", OUT = path.join(HERMES, "em"); fs.mkdirSync(OUT, { recursive: true });
 const UA = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" }, sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const MARKETS = { indonesia: { scan: "indonesia", suf: { IDX: ".JK" } }, malaysia: { scan: "malaysia", suf: { MYX: ".KL" } }, singapore: { scan: "singapore", suf: { SGX: ".SI" } }, india: { scan: "india", suf: { NSE: ".NS" } }, korea: { scan: "korea", suf: { KRX: ".KS", KOSDAQ: ".KQ" } }, taiwan: { scan: "taiwan", suf: { TWSE: ".TW", TPEX: ".TWO" } }, hongkong: { scan: "hongkong", suf: { HKEX: ".HK" } }, australia: { scan: "australia", suf: { ASX: ".AX" } } };
+const MARKETS = { indonesia: { scan: "indonesia", suf: { IDX: ".JK" } }, singapore: { scan: "singapore", suf: { SGX: ".SI" } }, india: { scan: "india", suf: { NSE: ".NS" } }, korea: { scan: "korea", suf: { KRX: ".KS", KOSDAQ: ".KQ" } }, taiwan: { scan: "taiwan", suf: { TWSE: ".TW", TPEX: ".TWO" } }, hongkong: { scan: "hongkong", suf: { HKEX: ".HK" } }, australia: { scan: "australia", suf: { ASX: ".AX" } },
+  japan: { scan: "japan", suf: { TSE: ".T" } }, germany: { scan: "germany", suf: { XETR: ".DE" } }, uk: { scan: "uk", suf: { LSE: ".L" } }, france: { scan: "france", suf: { EURONEXT: ".PA" } }, canada: { scan: "canada", suf: { TSX: ".TO" } }, brazil: { scan: "brazil", suf: { BMFBOVESPA: ".SA" } }, mexico: { scan: "mexico", suf: { BMV: ".MX" } }, turkey: { scan: "turkey", suf: { BIST: ".IS" } }, southafrica: { scan: "rsa", suf: { JSE: ".JO" } } };
 const TOP = +(process.env.TOP || 400), P1 = Math.floor(Date.UTC(2005, 0, 1) / 1000), P2 = Math.floor(Date.now() / 1000), r4 = (x) => Math.round(x * 10000) / 10000;
 async function yahoo(sym) {
   for (let a = 0; a < 3; a++) {

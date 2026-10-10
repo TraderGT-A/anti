@@ -5,10 +5,15 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const HERMES = process.env.HERMES_SCRIPTS || "C:/Users/Tar/AppData/Local/hermes/scripts";
-const MK = (process.argv[2] || "th").toLowerCase(), IS_US = MK === "us";
-const H = 21, DATA_FROM = IS_US ? "2013-06-01" : "2000-06-01", MIN_PRICE = +(process.env.MIN_PRICE || (IS_US ? 10 : 1)), MIN_TURN = +(process.env.MIN_TURN || (IS_US ? 20e6 : 5e6)), JUMP = 0.35, TAG = process.env.TAG || "";
+const MK = (process.argv[2] || "th").toLowerCase(), IS_US = MK === "us", IS_EM = MK.startsWith("em:");
+const H = 21, DATA_FROM = IS_US ? "2013-06-01" : (IS_EM ? "2005-06-01" : "2000-06-01"), MIN_PRICE = +(process.env.MIN_PRICE || (IS_US ? 10 : (IS_EM ? 0 : 1))), MIN_TURN = +(process.env.MIN_TURN || (IS_US ? 20e6 : (IS_EM ? 0 : 5e6))), JUMP = 0.35, TAG = process.env.TAG || "";
 let cal, n, calIdx, rawStocks = [];
-if (IS_US) {
+if (IS_EM) {
+  const emd = JSON.parse(fs.readFileSync(path.join(HERMES, "em", MK.slice(3) + ".json"), "utf8")), ds = new Set();
+  for (const d of Object.values(emd)) for (const x of d.t) if (x >= DATA_FROM) ds.add(x);
+  cal = [...ds].sort(); n = cal.length; calIdx = new Map(cal.map((d, i) => [d, i]));
+  for (const [tk, d] of Object.entries(emd)) rawStocks.push([tk, d.t, d.o, d.h, d.l, d.c, d.v]);
+} else if (IS_US) {
   const DIR = path.join(HERMES, "us11"), bench = JSON.parse(fs.readFileSync(path.join(DIR, "bench.json"), "utf8"));
   cal = bench["^GSPC"].t.filter((d) => d >= DATA_FROM); n = cal.length; calIdx = new Map(cal.map((d, i) => [d, i]));
   for (const f of fs.readdirSync(DIR).filter((x) => /^chunk_\d+\.json$/.test(x)).sort()) { const ch = JSON.parse(fs.readFileSync(path.join(DIR, f), "utf8")); for (const [tk, b] of Object.entries(ch)) rawStocks.push([tk, b.t, b.o, b.h, b.l, b.c, b.v]); }
@@ -59,7 +64,7 @@ const names = Object.keys(FEATS);
 const monthEnds = []; for (let i = 260; i < n - H - 2; i++) if (cal[i].slice(0, 7) !== cal[i + 1].slice(0, 7)) monthEnds.push(i);
 const rank = (a) => { const idx = a.map((v, i) => [v, i]).sort((x, y) => x[0] - y[0]), r = new Float64Array(a.length); let i = 0; while (i < idx.length) { let j = i; while (j + 1 < idx.length && idx[j + 1][0] === idx[i][0]) j++; const rv = (i + j) / 2 + 1; for (let q = i; q <= j; q++) r[idx[q][1]] = rv; i = j + 1; } return r; };
 const corr = (x, y) => { const m = x.length; let mx = 0, my = 0; for (let i = 0; i < m; i++) { mx += x[i]; my += y[i]; } mx /= m; my /= m; let sxy = 0, sxx = 0, syy = 0; for (let i = 0; i < m; i++) { sxy += (x[i] - mx) * (y[i] - my); sxx += (x[i] - mx) ** 2; syy += (y[i] - my) ** 2; } return sxx && syy ? sxy / Math.sqrt(sxx * syy) : NaN; };
-const eras = IS_US ? [["2014-19", "2014-01-01", "2019-12-31"], ["2020-26", "2020-01-01", "9999"]] : [["2001-07", "2001-01-01", "2007-12-31"], ["2008-14", "2008-01-01", "2014-12-31"], ["2015-20", "2015-01-01", "2020-12-31"], ["2021-26", "2021-01-01", "9999"]];
+const eras = IS_EM ? [["2006-12", "2006-01-01", "2012-12-31"], ["2013-19", "2013-01-01", "2019-12-31"], ["2020-26", "2020-01-01", "9999"]] : IS_US ? [["2014-19", "2014-01-01", "2019-12-31"], ["2020-26", "2020-01-01", "9999"]] : [["2001-07", "2001-01-01", "2007-12-31"], ["2008-14", "2008-01-01", "2014-12-31"], ["2015-20", "2015-01-01", "2020-12-31"], ["2021-26", "2021-01-01", "9999"]];
 const rec = {}; names.forEach((f) => (rec[f] = { ic: [], q: [], date: [] }));
 const ewAll = [];
 for (const k of monthEnds) {
@@ -88,4 +93,4 @@ table.sort((a, b) => Math.abs(b.all.t) - Math.abs(a.all.t));
 const fm = (x) => (x * 100).toFixed(2);
 for (const r of table) console.log(r.f.padEnd(16), `IC ${r.all.ic.toFixed(3)} t ${r.all.t.toFixed(1)} Q5-EW ${fm(r.all.topExM)} Q1-EW ${fm(r.all.botExM)}`.padEnd(46), r.es.map((e) => (e ? `${e.ic.toFixed(3)} t${e.t.toFixed(1)} Q5 ${fm(e.topExM)} Q1 ${fm(e.botExM)}`.padEnd(30) : "-".padEnd(24))).join(""));
 const ewm = ewAll.reduce((a, r) => a + r[1], 0) / ewAll.length; console.log(`\nEW ทั้งกระดาน ${H} วัน เฉลี่ย ${fm(ewm)}%/รอบ · เดือนที่ใช้ ${ewAll.length}`);
-fs.writeFileSync(path.join(ROOT, "data", `explore_factors_${MK}${TAG}_2026-10-10.json`), JSON.stringify({ H, eras, table, ew: ewAll }));
+fs.writeFileSync(path.join(ROOT, "data", `explore_factors_${MK.replace(":", "_")}${TAG}_2026-10-10.json`), JSON.stringify({ H, eras, table, ew: ewAll }));
