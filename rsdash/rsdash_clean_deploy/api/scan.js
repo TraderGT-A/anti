@@ -3,8 +3,9 @@ import { scanMarket, toCommonStocks, breadthFull, getIndexMembership } from "./l
 
 // force=1 ข้ามแคชได้ แต่ไม่ให้สแกน TradingView + เขียน Supabase ถี่กว่านี้ (กันผู้เข้าชมหลายคน/auto-refresh รัวใส่)
 const FORCE_COOLDOWN_MS = 30_000;
-import { loadPreviousSnapshot, saveSnapshot, marketToday } from "./lib/supabase.js";
-import "../trendlib.js";   // ตั้ง globalThis.TrendLib (ไฟล์เดียวกับที่เว็บ/เทสต์ใช้ — อยู่นอก api/ จึงไม่นับเป็น Function)
+import { loadPreviousSnapshot, saveSnapshot, marketToday, supabase } from "./lib/supabase.js";
+import "../trendlib.js";
+import "../leaders.js";   // globalThis.Leaders — ผู้นำหุ้นไทย + paper-trade (กฎล็อกใน research/PREREG_forward_th_leaders_2026-10-10.md)   // ตั้ง globalThis.TrendLib (ไฟล์เดียวกับที่เว็บ/เทสต์ใช้ — อยู่นอก api/ จึงไม่นับเป็น Function)
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -59,6 +60,37 @@ export default async function handler(req, res) {
     for (let i = 0; i < todo.length; i += 10) await Promise.all(todo.slice(i, i + 10).map(one));
     res.setHeader("Cache-Control", "public, s-maxage=1800, stale-while-revalidate=3600");
     return res.status(200).json({ market, asOf: new Date().toISOString(), requested: list.length, sq: out });
+  }
+  if (universe === "leaders") {   // ผู้นำหุ้นไทย near52wHigh + โมเมนตัม 12-1 (ไทยเท่านั้น) — GET = ดูรายชื่อ/ผล paper-trade, tick=1 (cron + CRON_SECRET) = เก็บ snapshot และเดิน paper-trade 1 วัน
+    const L = globalThis.Leaders, KEY = "leaders|state";
+    try {
+      const { raw } = await scanMarket("thailand");
+      const rows = toCommonStocks(raw).filter((s) => s.price > 0 && s.hi52 > 0).map((s) => ({ tk: s.ticker, name: s.name, close: s.price, open: s.o || null, hi52: s.hi52, p1y: s.p1y, p1m: s.p1m, turn: (s.avgVol || 0) * s.price }));
+      let gate = {}, setClose = null;
+      try {
+        const r = await fetch("https://scanner.tradingview.com/thailand/scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ symbols: { tickers: ["SET:SET"] }, columns: ["close", "SMA50", "SMA200"] }) });
+        const d = (await r.json())?.data?.[0]?.d; if (d) { gate = { price: d[0], sma50: d[1], sma200: d[2] }; setClose = d[0]; }
+      } catch (e) { /* Gate = unknown → 50% */ }
+      const snap = { date: marketToday("thailand"), rows, gate, setClose };
+      const db = supabase(), cur = await db.from("snapshots").select("payload").eq("dt", KEY).maybeSingle(), state = (cur.data && cur.data.payload) || L.newState();
+      if (req.query.tick === "1" || req.query.tick === "true") {
+        const sec = process.env.CRON_SECRET;
+        if (!sec || req.headers.authorization !== "Bearer " + sec) { res.setHeader("Cache-Control", "no-store"); return res.status(401).json({ error: "unauthorized" }); }
+        const out = L.step(state, snap);
+        if (out.changed) { const { error } = await db.from("snapshots").upsert({ dt: KEY, created_at: new Date().toISOString(), payload: state }, { onConflict: "dt" }); if (error) return res.status(500).json({ error: error.message }); }
+        res.setHeader("Cache-Control", "no-store");
+        return res.status(200).json({ ok: true, date: snap.date, changed: out.changed, rebalanced: !!out.rebalanced, reason: out.reason || null, rows: rows.length, summary: L.summary(state) });
+      }
+      const sig = L.pick(rows, gate);
+      res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=900");
+      return res.status(200).json({
+        asOf: snap.date, gate: sig.gate, gateIdx: gate, poolSize: sig.poolSize, picks: sig.top,
+        paper: { started: state.start, lastDate: state.lastDate, summary: L.summary(state), nav: (state.nav || []).slice(-400), rebalances: (state.rebal || []).slice(-6).reverse(), holdings: Object.keys((state.S && state.S.pos) || {}).length },
+      });
+    } catch (e) {
+      res.setHeader("Cache-Control", "no-store");
+      return res.status(500).json({ error: String((e && e.message) || e) });
+    }
   }
   if (universe === "all") {
     if (!force) {
