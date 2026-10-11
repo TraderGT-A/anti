@@ -13,6 +13,7 @@
 | Market Gate (ดัชนี vs SMA50/200) | ช่วยไทย แต่ทำให้ US แย่ลง | `EXPLORE_edge_search_*` |
 | น้ำหนักพอร์ต Top20 ไทย (inv-vol / risk parity / HRP เทียบ EW) | ไม่ผ่านเกณฑ์ลงทะเบียน: ลด beta/ขาดทุนวิกฤตได้บ้าง แต่ Sharpe ไม่สม่ำเสมอ (ล้มในช่วง 2020–26) → คง EW | `research/REPORT_th_weighting_riskfolio_*` |
 | ตัวกรอง/คะแนนความผันผวนต่ำบน near52+mom | ไม่ผ่าน: ลด DD บางช่วงแต่ตัดผู้ชนะผันผวนสูง CAGR ตก (2020–26 ตกหนัก) ข้ามตลาดผ่าน 1/4 | `research/REPORT_th_lowvol_filter_*` |
+| VCP Screener ของ tradermonty (US: ซื้อหลัง Breakout / Buy-stop ที่ pivot, เรตติ้ง ≥ Good) | ไม่ผ่าน: CAGR +1–2% ต่ำกว่า S&P TR 11–16 จุด, ชนะสุ่ม 233–323/500, 0/106 หน้าต่าง 3 ปี; ดีกว่า M/Q เดิมแต่ส่วนหนึ่งเพราะ exposure ต่ำ | `research/REPORT_vcp_us_*` |
 | ผู้นำไทยรายเดือน + Gate | อยู่ใน forward paper-trade (เริ่ม 2026-10-10) ตัดสินได้เมื่อ ≥ 36 เดือน | `PREREG_forward_th_leaders_*` |
 
 ## ข้อควรระวังที่เจอจริง
