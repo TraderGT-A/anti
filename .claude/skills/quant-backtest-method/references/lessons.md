@@ -12,6 +12,7 @@
 | พอร์ตดัชนีข้ามตลาดตามเทรนด์ | ลด MaxDD (~−19% เทียบ ~−52%) ที่ CAGR ใกล้เคียง | `scripts/explore_trendport.mjs` |
 | Market Gate (ดัชนี vs SMA50/200) | ช่วยไทย แต่ทำให้ US แย่ลง | `EXPLORE_edge_search_*` |
 | น้ำหนักพอร์ต Top20 ไทย (inv-vol / risk parity / HRP เทียบ EW) | ไม่ผ่านเกณฑ์ลงทะเบียน: ลด beta/ขาดทุนวิกฤตได้บ้าง แต่ Sharpe ไม่สม่ำเสมอ (ล้มในช่วง 2020–26) → คง EW | `research/REPORT_th_weighting_riskfolio_*` |
+| ตัวกรอง/คะแนนความผันผวนต่ำบน near52+mom | ไม่ผ่าน: ลด DD บางช่วงแต่ตัดผู้ชนะผันผวนสูง CAGR ตก (2020–26 ตกหนัก) ข้ามตลาดผ่าน 1/4 | `research/REPORT_th_lowvol_filter_*` |
 | ผู้นำไทยรายเดือน + Gate | อยู่ใน forward paper-trade (เริ่ม 2026-10-10) ตัดสินได้เมื่อ ≥ 36 เดือน | `PREREG_forward_th_leaders_*` |
 
 ## ข้อควรระวังที่เจอจริง

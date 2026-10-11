@@ -1,4 +1,4 @@
----
+﻿---
 title: "📈 Quant — Map of Content"
 tags: [MOC, quant, index]
 created: 2026-10-11
@@ -16,8 +16,7 @@ updated: 2026-10-11
 | [[แผนที่งานวิจัย]] | ทุกการทดสอบ: สมมติฐาน → PREREG → REPORT → คำตัดสิน |
 | [[แหล่งข้อมูล]] | ข้อมูลแต่ละชุดมาจากไหน ข้อจำกัดคืออะไร |
 | [[บทเรียนและวิธีวิจัย]] | กฎกันผลหลอก + สิ่งที่รู้แล้ว + สิ่งที่ยังไม่รู้ |
-| `04_การตัดสินใจ/` | Decision Log ที่ส่งออกจาก rsdash (`node scripts/export_dlog_to_vault.mjs`) |
-| [[Forward Test ผู้นำไทย]] | paper-trade อัตโนมัติ ตัดสินได้เมื่อ ≥ 36 เดือน |
+| [[Forward Test ผู้นำไทย]] | **ยกเลิก 2026-10-11** (เก็บเป็นประวัติ) |
 
 ## ✅ สถานะ ณ 2026-10-11 (สั้น ๆ)
 - **ยังไม่มีกลยุทธ์ใดที่พิสูจน์ edge ได้** — ที่ใกล้ที่สุดคือ near52wHigh + โมเมนตัม 12-1 (ไทยและตลาดเอเชีย/ยุโรป/EM) ซึ่งเป็นผลสำรวจ in-sample
@@ -25,6 +24,6 @@ updated: 2026-10-11
 - งานค้าง: EPS point-in-time (กำลังสะสม), survivorship ของไทย/EM, พอร์ต Riskfolio
 
 ## 🔗 โค้ดและเว็บ
-- เว็บ: https://rsdashclean.vercel.app (แท็บ 🎯 Scanner · 🏆 ผู้นำรายเดือน · 📓 บันทึกตัดสินใจ)
+- เว็บ: https://rsdashclean.vercel.app (แท็บ 🎯 Scanner · 🏆 ผู้นำรายเดือน (รายชื่อประกอบ ไม่มี paper-trade))
 - โค้ด: `rsdash/` · สคริปต์ทดสอบ: `scripts/` · ผลดิบ: `data/` · เทสต์: `tests/`
-- สร้างรายการอัตโนมัติ: `node scripts/build_quant_wiki.mjs`
+- ตรวจลิงก์ใน vault: `node scripts/build_quant_wiki.mjs`

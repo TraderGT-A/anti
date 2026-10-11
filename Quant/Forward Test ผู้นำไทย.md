@@ -1,4 +1,4 @@
----
+﻿---
 title: "Forward Test ผู้นำไทย"
 tags: [quant, forward-test, paper-trade]
 created: 2026-10-11
@@ -6,6 +6,7 @@ updated: 2026-10-11
 ---
 
 # Forward Test — ผู้นำหุ้นไทย (near52wHigh + โมเมนตัม 12-1)
+> ⛔ **ยกเลิกวันที่ 2026-10-11 ตามคำสั่งผู้ใช้:** ถอดระบบ paper-trade และ Decision Log ออกจาก rsdash แล้ว (cron ยังเก็บ snapshot ผู้นำรายวัน leaders|day|YYYY-MM-DD และ EPS point-in-time ต่อไป ตามที่ผู้ใช้สั่ง) ไม่มีผลประเมิน edge จาก forward test — เอกสารด้านล่างเก็บไว้เป็นประวัติเท่านั้น
 > กฎล็อกแล้วที่ [[research/PREREG_forward_th_leaders_2026-10-10]] · ที่มา [[research/EXPLORE_edge_search_2026-10-10]] · กลับไป [[000_Quant_Index]]
 
 ## สรุปกฎ (ฉบับย่อ — ต้นฉบับคือ PREREG)
