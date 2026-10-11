@@ -62,106 +62,59 @@ export default async function handler(req, res) {
     res.setHeader("Cache-Control", "public, s-maxage=1800, stale-while-revalidate=3600");
     return res.status(200).json({ market, asOf: new Date().toISOString(), requested: list.length, sq: out });
   }
-  if (universe === "dlog") {   // Decision Log ส่วนตัว — ทั้งอ่านและเขียนต้องมีรหัส (env DLOG_KEY ส่งใน header x-dlog-key) เก็บในตาราง snapshots คีย์ "dlog|..."
-    res.setHeader("Cache-Control", "no-store");
-    const need = (process.env.DLOG_KEY || "").trim(), got = String(req.headers["x-dlog-key"] || "").trim();
-    if (!need) return res.status(503).json({ error: "DLOG_KEY not configured" });
-    if (got !== need) return res.status(401).json({ error: "unauthorized" });
-    try {
-      const db = supabase(), clip = (v, n) => (typeof v === "string" ? v.slice(0, n) : v == null ? "" : String(v).slice(0, n));
-      if (req.method === "POST") {
-        const b = typeof req.body === "string" ? JSON.parse(req.body) : (req.body || {});
-        if (b.action === "add") {
-          const e = b.entry || {}, id = new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14) + "-" + Math.random().toString(36).slice(2, 6), T = (k) => clip(e[k], 8000);
-          const ev = (Array.isArray(e.evidence) ? e.evidence : []).slice(0, 30).map((x) => ({ evidence: clip(x && x.evidence, 1000), source: clip(x && x.source, 500), supports: clip(x && x.supports, 500), limit: clip(x && x.limit, 500) }));
-          const entry = { id, createdAt: new Date().toISOString(), owner: T("owner"), question: T("question"), objective: T("objective"), horizon: T("horizon"), constraints: T("constraints"), dataCutoff: T("dataCutoff"), tickers: T("tickers"),
-            evidence: ev, facts: T("facts"), assumptions: T("assumptions"), supporting: T("supporting"), contradicting: T("contradicting"), missing: T("missing"), alternatives: T("alternatives"),
-            repro: { snapshot: T("reproSnapshot"), versions: T("reproVersions"), params: T("reproParams"), runId: T("reproRun"), validation: T("reproValidation") },
-            decision: { action: ["act", "no-action", "more-evidence"].includes(e.action) ? e.action : "more-evidence", rationale: T("rationale"), conditions: T("conditions"), changeMind: T("changeMind"), nextReview: T("nextReview") }, reviews: [] };
-          if (!entry.question) return res.status(400).json({ error: "question required" });
-          const { error } = await db.from("snapshots").upsert({ dt: "dlog|" + id, created_at: entry.createdAt, payload: entry }, { onConflict: "dt" });
-          if (error) return res.status(500).json({ error: error.message });
-          return res.status(200).json({ ok: true, id });
-        }
-        if (b.action === "review") {   // ต่อท้ายการทบทวนย้อนหลัง (append-only: ไม่แก้ของเดิม)
-          const id = clip(b.id, 40), r = b.review || {}, cur = await db.from("snapshots").select("payload").eq("dt", "dlog|" + id).maybeSingle();
-          if (!cur.data) return res.status(404).json({ error: "not found" });
-          const entry = cur.data.payload; entry.reviews = (entry.reviews || []).concat([{ at: new Date().toISOString(), outcome: clip(r.outcome, 4000), held: clip(r.held, 4000), processVsOutcome: clip(r.processVsOutcome, 4000), lesson: clip(r.lesson, 4000) }]).slice(-50);
-          const { error } = await db.from("snapshots").upsert({ dt: "dlog|" + id, created_at: entry.createdAt, payload: entry }, { onConflict: "dt" });
-          if (error) return res.status(500).json({ error: error.message });
-          return res.status(200).json({ ok: true });
-        }
-        return res.status(400).json({ error: "bad action" });
-      }
-      const { data, error } = await db.from("snapshots").select("payload").like("dt", "dlog|%").order("dt", { ascending: false }).limit(300);
-      if (error) return res.status(500).json({ error: error.message });
-      return res.status(200).json({ entries: (data || []).map((x) => x.payload) });
-    } catch (e) { return res.status(500).json({ error: String((e && e.message) || e) }); }
-  }
-  if (universe === "leaders") {   // ผู้นำหุ้นไทย near52wHigh + โมเมนตัม 12-1 (ไทยเท่านั้น) — GET = ดูรายชื่อ/ผล paper-trade, tick=1 (cron + CRON_SECRET) = เก็บ snapshot และเดิน paper-trade 1 วัน
-    const L = globalThis.Leaders, KEY = "leaders|state";
+  if (universe === "leaders") {   // ผู้นำ near52wHigh + โมเมนตัม 12-1 (รายชื่อประกอบการคัดกรอง ไทย/US) — GET = รายชื่อ; tick=1 (cron + CRON_SECRET, ไทย) = เก็บ snapshot ผู้นำรายวัน + EPS แบบ point-in-time (ไม่มี paper-trade)
+    const L = globalThis.Leaders;
     try {
       const isUs = req.query.market === "us" || req.query.market === "america", MKT = isUs ? "america" : "thailand";
       const { raw } = await scanMarket(MKT);
-      const rows = toCommonStocks(raw).filter((s) => s.price > 0 && s.hi52 > 0).map((s) => ({ tk: s.ticker, name: s.name, close: s.price, open: s.o || null, hi52: s.hi52, p1y: s.p1y, p1m: s.p1m, turn: (s.avgVol || 0) * s.price }));
-      let gate = {}, setClose = null;
+      const rows = toCommonStocks(raw).filter((s) => s.price > 0 && s.hi52 > 0).map((s) => ({ tk: s.ticker, tv: s.tv, name: s.name, close: s.price, open: s.o || null, hi52: s.hi52, p1y: s.p1y, p1m: s.p1m, turn: (s.avgVol || 0) * s.price }));
+      let gate = {};
       try {
         const r = await fetch("https://scanner.tradingview.com/" + MKT + "/scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ symbols: { tickers: [isUs ? "SP:SPX" : "SET:SET"] }, columns: ["close", "SMA50", "SMA200"] }) });
-        const d = (await r.json())?.data?.[0]?.d; if (d) { gate = { price: d[0], sma50: d[1], sma200: d[2] }; setClose = d[0]; }
+        const d = (await r.json())?.data?.[0]?.d; if (d) gate = { price: d[0], sma50: d[1], sma200: d[2] };
       } catch (e) { /* Gate = unknown → 50% */ }
-      const snap = { date: marketToday(MKT), rows, gate, setClose };
-      if (isUs) {   // สหรัฐฯ: รายชื่อประกอบเท่านั้น — backtest 26 ปีไม่พบ edge จึงไม่มี paper-trade/state
-        if (req.query.tick) { res.setHeader("Cache-Control", "no-store"); return res.status(400).json({ error: "tick is Thailand-only" }); }
-        const sig = L.pick(rows, gate, 20, "america");
-        res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=900");
-        return res.status(200).json({ market: "america", noEdge: true, asOf: snap.date, gate: sig.gate, gateIdx: gate, poolSize: sig.poolSize, picks: sig.top });
-      }
-      if (/^\d{4}-\d{2}$/.test(String(req.query.archive || ""))) {   // GET ?archive=YYYY-MM → snapshot สัญญาณที่ใช้ rebalance (ข้อมูลตลาดสาธารณะ) สำหรับตรวจกลไก
-        const a = await supabase().from("snapshots").select("payload").eq("dt", "leaders|snap|" + req.query.archive).maybeSingle();
-        res.setHeader("Cache-Control", "public, s-maxage=600");
-        return a.data ? res.status(200).json(a.data.payload) : res.status(404).json({ error: "no archive" });
-      }
-      const db = supabase(), cur = await db.from("snapshots").select("payload").eq("dt", KEY).maybeSingle(), state = (cur.data && cur.data.payload) || L.newState();
+      const date = marketToday(MKT);
       if (req.query.tick === "1" || req.query.tick === "true") {
+        if (isUs) { res.setHeader("Cache-Control", "no-store"); return res.status(400).json({ error: "tick is Thailand-only" }); }
         const sec = process.env.CRON_SECRET;
         if (!sec || req.headers.authorization !== "Bearer " + sec) { res.setHeader("Cache-Control", "no-store"); return res.status(401).json({ error: "unauthorized" }); }
-        const prevSnap = state.lastSnap, out = L.step(state, snap);
-        let archived = null;   // เก็บ snapshot สัญญาณสิ้นเดือน (ข้อมูลที่ใช้เลือกหุ้นจริง) เพื่อตรวจกลไกย้อนหลังตาม PREREG — ไม่กระทบกฎ
-        if (out.rebalanced && prevSnap) { try { const { error: ae } = await db.from("snapshots").upsert({ dt: "leaders|snap|" + prevSnap.date.slice(0, 7), created_at: new Date().toISOString(), payload: { date: prevSnap.date, gate: prevSnap.gate, setClose: prevSnap.setClose, rows: prevSnap.rows.map((r) => ({ tk: r.tk, name: r.name, close: r.close, open: r.open, hi52: r.hi52, p1y: r.p1y, p1m: r.p1m, turn: Math.round(r.turn) })) } }, { onConflict: "dt" }); archived = ae ? ae.message : true; } catch (e) { archived = String((e && e.message) || e); } }
-        if (out.changed) { const { error } = await db.from("snapshots").upsert({ dt: KEY, created_at: new Date().toISOString(), payload: state }, { onConflict: "dt" }); if (error) return res.status(500).json({ error: error.message }); }
-        let fund = null;   // เก็บ EPS/กำไรสุทธิแบบ point-in-time (เฉพาะวันที่ค่าเปลี่ยน) — ล้มเหลวต้องไม่กระทบ paper-trade
+        let snapSaved = null;   // เก็บ snapshot ผู้นำรายวัน (วันทำการเท่านั้น; วันหยุดตลาดอาจซ้ำของเดิม) = ข้อมูล point-in-time สำหรับ backtest/ตรวจย้อนหลังในอนาคต
         try {
-          const FL = globalThis.FundLog, tks = new Set(rows.map((x) => x.tk));
+          const dow = new Date(date + "T12:00:00Z").getUTCDay();
+          if (dow >= 1 && dow <= 5) {
+            const { error: se } = await supabase().from("snapshots").upsert({ dt: "leaders|day|" + date, created_at: new Date().toISOString(), payload: { date, gate, rows: rows.map((r) => ({ tk: r.tk, close: r.close, open: r.open, hi52: r.hi52, p1y: r.p1y, p1m: r.p1m, turn: Math.round(r.turn) })) } }, { onConflict: "dt" });
+            snapSaved = se ? se.message : true;
+          } else snapSaved = "weekend-skip";
+        } catch (e) { snapSaved = String((e && e.message) || e); }
+        let fund = null;   // เก็บ EPS/กำไรสุทธิแบบ point-in-time (เฉพาะวันที่ค่าเปลี่ยน)
+        try {
+          const db = supabase(), FL = globalThis.FundLog, tks = new Set(rows.map((x) => x.tk));
           const fr = await fetch("https://scanner.tradingview.com/thailand/scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ symbols: { query: { types: [] }, tickers: [] }, columns: ["name", ...FL.COLS], range: [0, 4000] }) });
           const cur = {}; for (const x of ((await fr.json())?.data || [])) { const d = x.d || []; if (tks.has(d[0])) cur[d[0]] = FL.pack(d.slice(1)); }
           if (Object.keys(cur).length > 100) {
-            const FK = "fund|th|latest", LK = "fund|th|log|" + snap.date.slice(0, 7), prev = await db.from("snapshots").select("payload").eq("dt", FK).maybeSingle();
+            const FK = "fund|th|latest", LK = "fund|th|log|" + date.slice(0, 7), prev = await db.from("snapshots").select("payload").eq("dt", FK).maybeSingle();
             const df = FL.diff((prev.data && prev.data.payload && prev.data.payload.f) || {}, cur);
             if (df.changes.length) {
               const lg = await db.from("snapshots").select("payload").eq("dt", LK).maybeSingle(), log = (lg.data && lg.data.payload) || { cols: FL.COLS, days: {} };
-              log.days[snap.date] = df.changes.map((c) => [c.tk, ...c.v]);
+              log.days[date] = df.changes.map((c) => [c.tk, ...c.v]);
               const now = new Date().toISOString();
               const e1 = await db.from("snapshots").upsert({ dt: LK, created_at: now, payload: log }, { onConflict: "dt" });
-              const e2 = await db.from("snapshots").upsert({ dt: FK, created_at: now, payload: { d: snap.date, cols: FL.COLS, f: df.latest } }, { onConflict: "dt" });
+              const e2 = await db.from("snapshots").upsert({ dt: FK, created_at: now, payload: { d: date, cols: FL.COLS, f: df.latest } }, { onConflict: "dt" });
               fund = { added: df.added, changed: df.changed, error: (e1.error || e2.error || {}).message || null };
             } else fund = { added: 0, changed: 0 };
           } else fund = { skipped: "too few rows " + Object.keys(cur).length };
         } catch (e) { fund = { error: String((e && e.message) || e) }; }
         res.setHeader("Cache-Control", "no-store");
-        return res.status(200).json({ ok: true, date: snap.date, changed: out.changed, rebalanced: !!out.rebalanced, reason: out.reason || null, rows: rows.length, summary: L.summary(state), fund, archived });
+        return res.status(200).json({ ok: true, date, rows: rows.length, snapSaved, fund });
       }
-      const sig = L.pick(rows, gate);
+      const sig = L.pick(rows, gate, 20, isUs ? "america" : undefined);
       res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=900");
-      return res.status(200).json({
-        asOf: snap.date, gate: sig.gate, gateIdx: gate, poolSize: sig.poolSize, picks: sig.top,
-        paper: { started: state.start, lastDate: state.lastDate, summary: L.summary(state), nav: (state.nav || []).slice(-400), rebalances: (state.rebal || []).slice(-6).reverse(), holdings: Object.keys((state.S && state.S.pos) || {}).length },
-      });
+      return res.status(200).json(Object.assign({ asOf: date, gate: sig.gate, gateIdx: gate, poolSize: sig.poolSize, picks: sig.top }, isUs ? { market: "america", noEdge: true } : {}));
     } catch (e) {
       res.setHeader("Cache-Control", "no-store");
       return res.status(500).json({ error: String((e && e.message) || e) });
     }
-  }
-  if (universe === "all") {
+  }  if (universe === "all") {
     if (!force) {
       res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=60");   // สั้นกว่า default (กัน CDN แคชคำตอบข้าม deploy)
     }

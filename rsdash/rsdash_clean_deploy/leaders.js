@@ -37,7 +37,7 @@
 
   function pick(rows, gateIdx, n, market) {
     n = n || N; const gate = gateOf(gateIdx), pl = (market === 'america' || market === 'us') ? poolUS(rows) : pool(rows), sc = score(pl), top = sc.slice(0, n), w = top.length ? gate.exposure / n : 0;
-    return { gate, poolSize: pl.length, poolTickers: pl.map((r) => r.tk), top: top.map((f, i) => ({ rank: i + 1, tk: f.r.tk, name: f.r.name, close: f.r.close, near52: f.near52, mom: f.mom, score: f.score, weight: w, turn: f.r.turn })) };
+    return { gate, poolSize: pl.length, poolTickers: pl.map((r) => r.tk), top: top.map((f, i) => ({ rank: i + 1, tk: f.r.tk, tv: f.r.tv, name: f.r.name, close: f.r.close, near52: f.near52, mom: f.mom, score: f.score, weight: w, turn: f.r.turn })) };
   }
 
   /* ---------- paper-trade ---------- */

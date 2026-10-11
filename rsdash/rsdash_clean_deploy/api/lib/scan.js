@@ -157,7 +157,7 @@ export async function scanMarket(market = "thailand") {
       sma150: sma150 || null, ema20: ema20 || null, hi52: hi52 || null, lo52: lo52 || null,
       atr: atr || null,   // ATR14 (หน่วยราคา) จาก TradingView
       o: dOpen ?? null, h: dHigh ?? null, l: dLow ?? null,   // OHLC วันนี้จาก TradingView
-      logoId: logoId || "",        // TradingView logoid → ใช้ดึงโลโก้จริงจาก s3-symbol-logo.tradingview.com
+      tv: r.s || "",               // สัญลักษณ์เต็มของ TradingView (EXCHANGE:SYMBOL) — ใช้ส่งออก Watchlist\n      logoId: logoId || "",        // TradingView logoid → ใช้ดึงโลโก้จริงจาก s3-symbol-logo.tradingview.com
     });
   }
 

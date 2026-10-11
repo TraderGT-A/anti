@@ -148,14 +148,13 @@
                     <button id="navTop20" class="tf-chip" onclick="setPage('top20')">🏆 Top20</button>
                     <button id="navScanner" class="tf-chip" onclick="setPage('scanner')">🎯 Scanner</button>
                     <button id="navLeaders" class="tf-chip" onclick="setPage('leaders')">🏆 ผู้นำรายเดือน</button>
-                    <button id="navDlog" class="tf-chip" onclick="setPage('dlog')">📓 บันทึกตัดสินใจ</button>
                     <button id="navReport" class="tf-chip" onclick="setPage('report')">📅 Report</button>
                   </div></div></div><!-- /topbar -->
 
                   <!-- 🎯 Scanner: Trend Template + พักตัวแคบ (สไตล์ Minervini / Qullamaggie) + Market Gate -->
                   <div id="scannerPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
                     <div class="flex flex-wrap items-center gap-2 mb-2">
-                      <h2 class="text-sm font-bold flex items-center gap-2">🎯 Scanner — หุ้นแกร่งที่กำลังพักตัวแคบ <span class="mk-chip mk-tag"></span></h2>
+                      <h2 class="text-sm font-bold flex items-center gap-2">🎯 Scanner — หุ้นแกร่งที่กำลังพักตัวแคบ <span class="mk-chip mk-tag"></span></h2> <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('scanner','copy',this)">📋 TV</button><button class="tf-chip" onclick="wlExport('scanner','file',this)">⬇ .txt</button></span>
                     </div>
                     <div id="scGate" class="mb-2"></div>
                     <div class="flex flex-wrap items-end gap-x-4 gap-y-2 mb-2 text-[11px] text-slate-300">
@@ -174,27 +173,16 @@
                     <div class="text-[10px] text-slate-500 mt-2 leading-relaxed">⚠️ เกณฑ์นี้ตีความจากแนวทางของ Minervini/Qullamaggie (แหล่งรอง) และ <b>backtest ของเรา (ไทย 2015–26, US 2015–26) ไม่พบ edge ที่พิสูจน์ได้</b> — ใช้คัดหุ้นที่ควรเปิดดูกราฟเท่านั้น ไม่ใช่สัญญาณซื้อ · ข้อ 3 ของ Trend Template (SMA200 ชี้ขึ้น) ในตารางเป็นค่าประมาณ ยืนยันจริงได้ในหน้าต่างหุ้น · บีบตัว = ATR10/ATR50 ≤ 0.85 (คำนวณจากแท่งรายวัน เฉพาะหุ้นที่ผ่านด่านแรก ~60 ตัว แคช 6 ชม.) · คะแนน Setup = RS 30 + Trend Template 25 + ใกล้จุดสูง 15 + บีบตัว 20 + ปริมาณแห้ง 10 แล้วคูณ Market Gate (เขียว×1 / เหลือง×0.7 / แดง×0.4)</div>
                   </div>
 
-                  <!-- 🏆 ผู้นำหุ้นไทย: near52wHigh + โมเมนตัม 12-1 Top20 รายเดือน + Gate + paper-trade (ผลสำรวจ in-sample) -->
+                  <!-- 🏆 ผู้นำหุ้นไทย: near52wHigh + โมเมนตัม 12-1 Top20 รายเดือน + Gate (ผลสำรวจ in-sample) -->
                   <div id="leadersPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
-                    <div class="flex flex-wrap items-center gap-2 mb-2"><h2 class="text-sm font-bold flex items-center gap-2">🏆 ผู้นำหุ้นไทยรายเดือน — ใกล้จุดสูง 52 สัปดาห์ + โมเมนตัม 12-1 <span class="mk-chip mk-tag"></span></h2></div>
-                    <div id="ldWarn" class="rounded-lg border border-amber-700/60 bg-amber-900/10 text-amber-200 px-3 py-2 text-[11px] leading-relaxed mb-2">⚠️ <b>ผลวิจัยในอดีต (in-sample) ยังไม่พิสูจน์ edge — ไม่ใช่คำแนะนำการลงทุน</b> · ตลาดสหรัฐฯ ไม่พบ edge จากแนวทางนี้ (หน้านี้ใช้กับตลาดไทยเท่านั้น) · พอร์ตด้านล่างเป็น paper-trade อัตโนมัติ (ไม่ใช่เงินจริง) ตามกฎที่ล็อกไว้ล่วงหน้า</div>
+                    <div class="flex flex-wrap items-center gap-2 mb-2"><h2 class="text-sm font-bold flex items-center gap-2">🏆 ผู้นำหุ้นไทยรายเดือน — ใกล้จุดสูง 52 สัปดาห์ + โมเมนตัม 12-1 <span class="mk-chip mk-tag"></span></h2> <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('leaders','copy',this)">📋 TV</button><button class="tf-chip" onclick="wlExport('leaders','file',this)">⬇ .txt</button></span></div>
+                    <div id="ldWarn" class="rounded-lg border border-amber-700/60 bg-amber-900/10 text-amber-200 px-3 py-2 text-[11px] leading-relaxed mb-2">⚠️ <b>ผลวิจัยในอดีต (in-sample) ยังไม่พิสูจน์ edge — ไม่ใช่คำแนะนำการลงทุน</b> · ตลาดสหรัฐฯ ไม่พบ edge จากแนวทางนี้ (หน้านี้ใช้กับตลาดไทยเท่านั้น)</div>
                     <div id="ldGate" class="mb-2"></div>
-                    <div id="ldPaper" class="mb-3"></div>
                     <div class="text-xs font-bold mb-1">รายชื่อตามกฎ ณ ข้อมูลล่าสุด (Top 20 · น้ำหนักเท่ากัน × สัดส่วนหุ้นตาม Gate)</div>
                     <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-[10px] uppercase text-slate-500 border-b border-[#1e2634]"><tr><th class="p-2">#</th><th class="p-2">หุ้น</th><th class="p-2">ราคา</th><th class="p-2" title="ราคาปัจจุบัน ÷ high 52 สัปดาห์">ใกล้จุดสูง</th><th class="p-2" title="ผลตอบแทน 12 เดือนไม่รวมเดือนล่าสุด">โมเมนตัม 12-1</th><th class="p-2">คะแนน</th><th class="p-2">น้ำหนัก</th></tr></thead><tbody id="ldBody"></tbody></table></div>
                     <div id="ldHow" class="text-[11px] text-slate-400 mt-3 leading-relaxed"></div>
                   </div>
 
-                  <!-- 📓 Decision Log: บันทึกเหตุผลการตัดสินใจ + ทบทวนย้อนหลัง (ส่วนตัว ต้องใช้รหัส) -->
-                  <div id="dlogPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
-                    <div class="flex flex-wrap items-center gap-2 mb-2"><h2 class="text-sm font-bold">📓 Decision Log — บันทึกเหตุผลและทบทวนย้อนหลัง</h2>
-                      <input id="dlKey" type="password" placeholder="รหัส Decision Log" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-xs text-white w-40">
-                      <button class="tf-chip" onclick="dlogLoad(true)">เข้าสู่ระบบ</button><button class="tf-chip" onclick="dlogToggleForm()">➕ บันทึกใหม่</button></div>
-                    <div id="dlMsg" class="text-[11px] text-slate-400 mb-2"></div>
-                    <div id="dlForm" style="display:none" class="rounded-lg border border-[#243044] p-3 mb-3 text-[11px] text-slate-300 grid gap-2"></div>
-                    <div id="dlList"></div>
-                    <div class="text-[10px] text-slate-500 mt-2 leading-relaxed">เทมเพลตจาก Decision Log (QuantCorner) · บันทึกเป็นแบบต่อท้ายเท่านั้น (ทบทวนเพิ่มได้ แก้ของเดิมไม่ได้) · ส่งออกเป็น .md เข้า vault ด้วย <code>node scripts/export_dlog_to_vault.mjs</code> · ไม่ใช่คำแนะนำการลงทุน</div>
-                  </div>
                   <!-- 📅 Report: เทียบอันดับ Top-N ระหว่าง 2 วัน (ข้อมูลจาก /api/history) -->
                   <div id="reportPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
                     <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -237,7 +225,7 @@
                       <h2 class="text-sm font-bold flex items-center gap-2">🏆 Top 20 ผลตอบแทน <span class="mk-chip mk-tag"></span></h2>
                       <button id="tpTh" class="tf-chip active" onclick="setTopMk('thailand')">🇹🇭 ไทย</button>
                       <button id="tpUs" class="tf-chip" onclick="setTopMk('america')">🇺🇸 อเมริกา</button>
-                      <span class="flex items-center gap-1 ml-auto">
+                      <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('top20','copy',this)">📋 TV</button><button class="tf-chip" onclick="wlExport('top20','file',this)">⬇ .txt</button></span> <span class="flex items-center gap-1 ml-auto">
                         <button id="tpViewTable" class="tf-chip active" onclick="setTopView('table')">📋 ตาราง</button>
                         <button id="tpViewCard" class="tf-chip" onclick="setTopView('card')">🗂️ การ์ด</button>
                       </span>
@@ -320,6 +308,7 @@
             <option value="80">RS ≥ 80</option>
             <option value="90">RS ≥ 90</option>
     </select>
+    <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('stocks','copy',this)">📋 TV</button><button class="tf-chip" onclick="wlExport('stocks','file',this)">⬇ .txt</button></span>
     <select id="perPageSel" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white">
           <option value="10" selected>แสดง 10</option>
           <option value="20">แสดง 20</option>
@@ -730,9 +719,6 @@ function setPage(pg){
   const scp=document.getElementById('scannerPanel'); if(scp) scp.style.display = (pg==='scanner') ? '' : 'none';
   const nsc=document.getElementById('navScanner'); if(nsc) nsc.classList.toggle('active', pg==='scanner');
   if(pg==='scanner'){ renderScanner(); }
-  const dlp=document.getElementById('dlogPanel'); if(dlp) dlp.style.display = (pg==='dlog') ? '' : 'none';
-  const ndl=document.getElementById('navDlog'); if(ndl) ndl.classList.toggle('active', pg==='dlog');
-  if(pg==='dlog'){ dlogInit(); }
   const ldp=document.getElementById('leadersPanel'); if(ldp) ldp.style.display = (pg==='leaders') ? '' : 'none';
   const nld=document.getElementById('navLeaders'); if(nld) nld.classList.toggle('active', pg==='leaders');
   if(pg==='leaders'){ renderLeaders(); }
@@ -804,6 +790,7 @@ function renderScanner(){
   const need = stage1.filter(x=>!x.s.sq).map(x=>x.s.ticker);
   if(need.length) loadSqueeze(need);
   const hit = all.filter(x=>x.r.pass).sort((a,b)=>b.r.score-a.r.score || (b.s.rs||0)-(a.s.rs||0));
+  window._wl_scanner = hit.map(x=>x.s);
   const ttAll = all.filter(x=>x.r.tt===8).length;
   document.getElementById('scSummary').innerHTML = `ผ่านเงื่อนไข <b class="text-white">${hit.length}</b> จาก ${all.length} ตัว (ผ่านด่านแรก ${all.filter(x=>x.r.pass1).length}${need.length?` · กำลังคำนวณบีบตัว ${need.length} ตัว…`:''}) · ผ่าน Trend Template ครบ 8 ข้อ ${ttAll} ตัว · ข้อมูลสแกน ${stockData.length?'สด':'ยังไม่โหลด'}`;
   const pctc = v=> v==null?'-':v.toFixed(1)+'%';
@@ -851,77 +838,43 @@ function ldSpark(nav){
   const line=(k,col)=>'<polyline fill="none" stroke="'+col+'" stroke-width="1.6" points="'+nav.map((p,i)=>(i/(nav.length-1)*W).toFixed(1)+','+(H-(p[k]-mn)/rg*H).toFixed(1)).join(' ')+'"/>';
   return '<svg viewBox="0 0 '+W+' '+H+'" class="w-full h-20">'+line('x','#6b7787')+line('e','#f59e0b')+line('s','#30d158')+'</svg><div class="text-[10px] flex gap-3 text-slate-400"><span style="color:#30d158">━ พอร์ตตามกฎ</span><span style="color:#f59e0b">━ EW พูลเดียวกัน</span><span style="color:#6b7787">━ SET</span></div>';
 }
-/* ---------- 📓 Decision Log ---------- */
-const DL_FIELDS=[['owner','ผู้ตัดสินใจ / ผู้ทบทวน',1],['question','คำถามวิจัย / หุ้นหรือเรื่องที่ตัดสินใจ *',2],['tickers','หุ้นที่เกี่ยวข้อง (คั่นด้วยจุลภาค)',1],['objective','เป้าหมาย',2],['horizon','ระยะเวลาถือ',1],['constraints','ข้อจำกัด (สภาพคล่อง ความเสี่ยงที่รับได้ ฯลฯ)',2],['dataCutoff','ข้อมูลที่มี ณ ตอนนั้น (วันที่/แหล่ง)',1],
- ['facts','ข้อเท็จจริง',2],['assumptions','สมมติฐาน',2],['supporting','หลักฐานสนับสนุน',2],['contradicting','หลักฐานคัดค้าน',2],['missing','ข้อมูลที่ยังขาด',2],['alternatives','ทางเลือกอื่นที่พิจารณา',2],
- ['reproSnapshot','ข้อมูลที่ใช้ (snapshot/แหล่ง)',1],['reproVersions','เวอร์ชัน โมเดล/สคริปต์/skill',1],['reproParams','พารามิเตอร์ที่ใช้',1],['reproRun','run ID / commit',1],['reproValidation','ผลตรวจสอบ/ความไว (sensitivity)',2],
- ['rationale','เหตุผลของการตัดสินใจ',2],['conditions','เงื่อนไข/ขีดจำกัด (เช่น ตัดขาดทุนที่)',2],['changeMind','อะไรจะทำให้เปลี่ยนใจ',2],['nextReview','วัน/เงื่อนไขทบทวนครั้งถัดไป',1]];
-let dlBusy=false;
-const dlEsc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function dlKey(){ const e=document.getElementById('dlKey'); return (e&&e.value.trim())||''; }
-function dlMsg(m,bad){ const e=document.getElementById('dlMsg'); if(e){ e.textContent=m||''; e.style.color=bad?'#fb7185':''; } }
-function dlogInit(){
-  const k=document.getElementById('dlKey'); if(k&&!k.value){ try{ k.value=localStorage.getItem('rsd_dlkey')||''; }catch(e){} }
-  const f=document.getElementById('dlForm'); if(f&&!f.dataset.built){ f.dataset.built=1;
-    f.innerHTML='<div class="font-bold text-xs">บันทึกการตัดสินใจใหม่</div>'+DL_FIELDS.map(([id,lb,r])=>'<label class="flex flex-col gap-0.5">'+lb+(r>1?'<textarea id="dlf_'+id+'" rows="2" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-white"></textarea>':'<input id="dlf_'+id+'" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-white">')+'</label>').join('')
-    +'<div class="font-bold text-xs mt-1">ตารางหลักฐาน (แต่ละแถว: หลักฐาน | แหล่ง/หน้า/เวลา | สนับสนุนอะไร | ข้อจำกัด — คั่นด้วย | หนึ่งแถวต่อบรรทัด)</div><textarea id="dlf_evidence" rows="4" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-white"></textarea>'
-    +'<label class="flex flex-col gap-0.5">การตัดสินใจ<select id="dlf_action" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-white"><option value="act">ลงมือทำ</option><option value="no-action">ไม่ทำ</option><option value="more-evidence" selected>ขอหลักฐานเพิ่ม</option></select></label>'
-    +'<div><button class="tf-chip" onclick="dlogSave()">💾 บันทึก</button></div>'; }
-  if(dlKey()) dlogLoad(false); else dlMsg('ใส่รหัสแล้วกดเข้าสู่ระบบ (รหัสอยู่ในไฟล์ dlog_key.txt ในโฟลเดอร์ secrets ของเครื่องคุณ)');
+/* ---------- ส่งออก Watchlist ไป TradingView ---------- */
+function wlSyms(list, mk){
+  const seen=new Set(), out=[];
+  (list||[]).forEach(s=>{ const tk=s.ticker||s.tk; if(!tk) return; const t=s.tv || ((mk==='america'?'':'SET:')+tk); if(!seen.has(t)){ seen.add(t); out.push(t); } });
+  return out;
 }
-function dlogToggleForm(){ const f=document.getElementById('dlForm'); if(f) f.style.display=(f.style.display==='none')?'':'none'; }
-async function dlApi(method,body){
-  const r=await fetch(API+'/api/scan?universe=dlog',{method,headers:Object.assign({'x-dlog-key':dlKey()},body?{'Content-Type':'application/json'}:{}),body:body?JSON.stringify(body):undefined});
-  const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error(r.status===401?'รหัสไม่ถูกต้อง':(j.error||('HTTP '+r.status))); return j;
-}
-async function dlogLoad(save){
-  if(dlBusy) return; dlBusy=true; dlMsg('กำลังโหลด...');
-  try{ const j=await dlApi('GET'); if(save){ try{ localStorage.setItem('rsd_dlkey',dlKey()); }catch(e){} } dlMsg(j.entries.length+' รายการ'); dlogRender(j.entries); }
-  catch(e){ dlMsg(String(e.message||e),true); document.getElementById('dlList').innerHTML=''; } finally{ dlBusy=false; }
-}
-function dlogRender(es){
-  const act={act:'ลงมือทำ','no-action':'ไม่ทำ','more-evidence':'ขอหลักฐานเพิ่ม'};
-  document.getElementById('dlList').innerHTML=es.map(e=>{
-    const d=e.decision||{}, rv=(e.reviews||[]).map(r=>'<div class="border-l-2 border-sky-700 pl-2 mt-1"><b>ทบทวน '+dlEsc((r.at||'').slice(0,10))+'</b> · ผล: '+dlEsc(r.outcome)+' · สมมติฐานที่ถูก/พัง: '+dlEsc(r.held)+' · กระบวนการเทียบผลลัพธ์: '+dlEsc(r.processVsOutcome)+' · บทเรียน: '+dlEsc(r.lesson)+'</div>').join('');
-    const row=(l,v)=>v?'<div><span class="text-slate-500">'+l+':</span> '+dlEsc(v)+'</div>':'';
-    return '<details class="rounded-lg border border-[#1e2634] mb-2 p-2 text-[11px] text-slate-300"><summary class="cursor-pointer"><b>'+dlEsc((e.createdAt||'').slice(0,10))+'</b> · '+dlEsc(e.question)+' · <span class="text-sky-300">'+(act[d.action]||'')+'</span>'+((e.reviews||[]).length?' · ทบทวนแล้ว '+e.reviews.length+' ครั้ง':'')+'</summary><div class="mt-2 grid gap-1">'
-      +row('หุ้น',e.tickers)+row('เป้าหมาย',e.objective)+row('ระยะเวลา',e.horizon)+row('ข้อจำกัด',e.constraints)+row('ข้อมูล ณ ตอนนั้น',e.dataCutoff)+row('ข้อเท็จจริง',e.facts)+row('สมมติฐาน',e.assumptions)+row('หลักฐานสนับสนุน',e.supporting)+row('หลักฐานคัดค้าน',e.contradicting)+row('ข้อมูลที่ขาด',e.missing)+row('ทางเลือกอื่น',e.alternatives)
-      +(e.evidence&&e.evidence.length?'<div class="text-slate-500">ตารางหลักฐาน:</div>'+e.evidence.map(x=>'<div class="pl-2">• '+dlEsc(x.evidence)+' | '+dlEsc(x.source)+' | '+dlEsc(x.supports)+' | '+dlEsc(x.limit)+'</div>').join(''):'')
-      +row('เหตุผล',d.rationale)+row('เงื่อนไข/ขีดจำกัด',d.conditions)+row('อะไรทำให้เปลี่ยนใจ',d.changeMind)+row('ทบทวนครั้งถัดไป',d.nextReview)
-      +row('ข้อมูลที่ใช้',e.repro&&e.repro.snapshot)+row('เวอร์ชัน',e.repro&&e.repro.versions)+row('พารามิเตอร์',e.repro&&e.repro.params)+row('run/commit',e.repro&&e.repro.runId)+row('ผลตรวจสอบ',e.repro&&e.repro.validation)
-      +rv+'<div class="mt-2 grid gap-1"><div class="font-bold">เพิ่มการทบทวนย้อนหลัง</div>'
-      +['outcome|ผลที่เกิดขึ้นจริง','held|สมมติฐานข้อไหนถูก/พัง','processVsOutcome|กระบวนการดีไหม เทียบกับผลลัพธ์','lesson|บทเรียน/ข้อเสนอแก้วิธี'].map(s=>{const [k,l]=s.split('|'); return '<input id="dlr_'+e.id+'_'+k+'" placeholder="'+l+'" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-white">';}).join('')
-      +'<div><button class="tf-chip" onclick="dlogReview(\''+e.id+'\')">➕ บันทึกการทบทวน</button></div></div></div></details>';
-  }).join('')||'<div class="text-slate-500 text-xs">ยังไม่มีบันทึก</div>';
-}
-async function dlogSave(){
-  const e={}; DL_FIELDS.forEach(([id])=>{ e[id]=document.getElementById('dlf_'+id).value; }); e.action=document.getElementById('dlf_action').value;
-  e.evidence=document.getElementById('dlf_evidence').value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const p=l.split('|').map(s=>s.trim()); return {evidence:p[0],source:p[1],supports:p[2],limit:p[3]};});
-  if(!e.question.trim()){ dlMsg('ต้องกรอกคำถาม/เรื่องที่ตัดสินใจ',true); return; }
-  try{ await dlApi('POST',{action:'add',entry:e}); DL_FIELDS.forEach(([id])=>{ document.getElementById('dlf_'+id).value=''; }); document.getElementById('dlf_evidence').value=''; dlogToggleForm(); await dlogLoad(false); dlMsg('บันทึกแล้ว'); }
-  catch(x){ dlMsg(String(x.message||x),true); }
-}
-async function dlogReview(id){
-  const g=k=>document.getElementById('dlr_'+id+'_'+k).value, r={outcome:g('outcome'),held:g('held'),processVsOutcome:g('processVsOutcome'),lesson:g('lesson')};
-  if(!Object.values(r).some(v=>v.trim())){ dlMsg('กรอกอย่างน้อยหนึ่งช่อง',true); return; }
-  try{ await dlApi('POST',{action:'review',id,review:r}); await dlogLoad(false); dlMsg('บันทึกการทบทวนแล้ว'); } catch(x){ dlMsg(String(x.message||x),true); }
+function wlFlash(btn,msg){ if(!btn) return; if(!btn.dataset.t) btn.dataset.t=btn.textContent; btn.textContent=msg; setTimeout(()=>{ btn.textContent=btn.dataset.t; },2200); }
+async function wlExport(kind, how, btn){
+  let list, base, mk=currentMarket;
+  if(kind==='stocks'){ list=window._wl_stocks; base='Stocks'; }
+  else if(kind==='scanner'){ list=window._wl_scanner; base='Scanner'; }
+  else if(kind==='leaders'){ list=window._wl_leaders; base='Leaders'; }
+  else if(kind==='top20'){ list=topVisibleRows(); base='Top20'; mk=topMk; }
+  const syms=wlSyms(list,mk);
+  if(!syms.length){ wlFlash(btn,'ยังไม่มีรายการ'); return; }
+  const name='RS_'+base+'_'+(mk==='america'?'US':'TH')+'_'+new Date().toISOString().slice(0,10);
+  if(how==='copy'){
+    try{ await navigator.clipboard.writeText(syms.join(',')); wlFlash(btn,'คัดลอก '+syms.length+' ตัวแล้ว'); }
+    catch(e){ window.prompt('คัดลอกข้อความนี้ (Ctrl+C) แล้ววางในช่อง Add symbol ของ TradingView', syms.join(',')); }
+  } else {
+    const blob=new Blob(['###'+name+','+syms.join(',')],{type:'text/plain'}), a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download=name+'.txt'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    wlFlash(btn,'ดาวน์โหลด '+syms.length+' ตัวแล้ว');
+  }
 }
 async function renderLeaders(){
-  const gEl=document.getElementById('ldGate'), pEl=document.getElementById('ldPaper'), body=document.getElementById('ldBody'), how=document.getElementById('ldHow');
+  const gEl=document.getElementById('ldGate'), body=document.getElementById('ldBody'), how=document.getElementById('ldHow');
   if(!gEl) return;
   if(ldBusy) return; ldBusy=true; gEl.innerHTML='<div class="text-slate-400 text-xs animate-pulse">กำลังโหลด...</div>';
   try{
     const j=await (await fetch(API+'/api/scan?universe=leaders&market='+currentMarket)).json(); if(j.error) throw new Error(j.error);
+    window._wl_leaders = (j.picks||[]).map(p=>({ticker:p.tk, tv:p.tv}));
     const US=(j.market==='america'), idxName=US?'S&P 500':'SET', warn=document.getElementById('ldWarn');
-    if(warn) warn.innerHTML = US ? '⚠️ <b>ตลาดสหรัฐฯ: ผลทดสอบย้อนหลัง 26 ปีไม่พบ edge จากกฎนี้</b> — รายชื่อด้านล่างเป็นเพียงข้อมูลประกอบสำหรับคัดกรองเอง (ผู้นำ ณ ปัจจุบันตามกฎเดียวกับตลาดไทย) <b>ไม่ใช่สัญญาณซื้อขาย</b> และไม่มี paper-trade ให้ติดตาม' : '⚠️ <b>ผลวิจัยในอดีต (in-sample) ยังไม่พิสูจน์ edge — ไม่ใช่คำแนะนำการลงทุน</b> · พอร์ตด้านล่างเป็น paper-trade อัตโนมัติ (ไม่ใช่เงินจริง) ตามกฎที่ล็อกไว้ล่วงหน้า · ตลาดสหรัฐฯ ไม่พบ edge จากแนวทางนี้ (สลับเป็นตลาดสหรัฐฯ เพื่อดูรายชื่อประกอบ)';
+    if(warn) warn.innerHTML = US ? '⚠️ <b>ตลาดสหรัฐฯ: ผลทดสอบย้อนหลัง 26 ปีไม่พบ edge จากกฎนี้</b> — รายชื่อด้านล่างเป็นเพียงข้อมูลประกอบสำหรับคัดกรองเอง (ผู้นำ ณ ปัจจุบันตามกฎเดียวกับตลาดไทย) <b>ไม่ใช่สัญญาณซื้อขาย</b>' : '⚠️ <b>ผลวิจัยในอดีต (in-sample) ยังไม่พิสูจน์ edge — ไม่ใช่คำแนะนำการลงทุน</b> · ตลาดสหรัฐฯ ไม่พบ edge จากแนวทางนี้ (สลับเป็นตลาดสหรัฐฯ เพื่อดูรายชื่อประกอบ)';
     const g=j.gate||{state:'unknown',exposure:0.5}, col={green:'border-emerald-600/60 bg-emerald-900/10 text-emerald-300',yellow:'border-amber-600/60 bg-amber-900/10 text-amber-300',red:'border-rose-600/60 bg-rose-900/10 text-rose-300',unknown:'border-slate-600/60 text-slate-400'}[g.state], ic={green:'🟢',yellow:'🟡',red:'🔴',unknown:'⚪'}[g.state];
     const gi=j.gateIdx||{}, fx=v=>Number.isFinite(v)?Number(v).toFixed(2):'-';
     gEl.innerHTML='<div class="rounded-lg border '+col+' px-3 py-2 text-xs"><b class="text-sm">'+ic+' สัดส่วนหุ้นตาม Gate = '+Math.round(g.exposure*100)+'%</b> · '+idxName+' '+fx(gi.price)+' · SMA50 '+fx(gi.sma50)+' · SMA200 '+fx(gi.sma200)+'<div class="opacity-80 mt-0.5">เขียว ('+idxName+' > SMA50 > SMA200) 100% · เหลือง 50% · แดง ('+idxName+' ต่ำกว่า SMA200 ฯลฯ) 0% — ข้อมูล ณ '+j.asOf+' · พูล '+j.poolSize+' ตัว ('+(US?'ราคา ≥ USD 10 และมูลค่าซื้อขายเฉลี่ย ≥ USD 20M':'ครึ่งบนตามมูลค่าซื้อขาย')+')'+(US?' · <i>Gate ใช้เป็นข้อมูลประกอบ ไม่ได้ใช้ซื้อขาย</i>':'')+'</div></div>';
-    const sm=(j.paper&&j.paper.summary)||{}, pc=x=>(x>=0?'+':'')+(x*100).toFixed(1)+'%';
-    if(US){ pEl.innerHTML=''; }
-    else if(sm.days>=1){
-      pEl.innerHTML='<div class="rounded-lg border border-[#1e2634] bg-[#0a0f16] p-2.5"><div class="text-xs font-bold mb-1">📒 Paper-trade อัตโนมัติ (เริ่ม '+sm.start+' · อัปเดต '+sm.asOf+' · ปรับพอร์ตมาแล้ว '+sm.rebalances+' ครั้ง · ถืออยู่ '+(j.paper.holdings||0)+' ตัว)</div><div class="text-[11px] text-slate-300 mb-1">พอร์ตตามกฎ <b class="text-white">'+pc(sm.strategy)+'</b> · EW พูลเดียวกัน <b>'+pc(sm.ew)+'</b> · SET <b>'+pc(sm.set)+'</b> · ส่วนต่างเทียบ EW <b class="'+(sm.excessVsEW>=0?'pos':'neg')+'">'+pc(sm.excessVsEW)+'</b></div>'+ldSpark(j.paper.nav)+'<div class="text-[10px] text-slate-500 mt-1">ซื้อขายวันทำการแรกของเดือนที่ราคาเปิด ด้วยสัญญาณวันสุดท้ายของเดือนก่อน ต้นทุน 0.35%/ข้าง · ต้องสะสม ≥ 36 เดือนจึงจะประเมิน edge ทางสถิติได้ — ตอนนี้ใช้ตรวจว่าระบบทำงานตามกฎ</div></div>';
-    } else { pEl.innerHTML='<div class="rounded-lg border border-[#1e2634] bg-[#0a0f16] p-2.5 text-[11px] text-slate-400">📒 Paper-trade เริ่มเก็บข้อมูลแล้ว'+(j.paper&&j.paper.started?' (วันที่ '+j.paper.started+')':'')+' — จะเริ่มซื้อขายสมมติในวันทำการแรกของเดือนหน้า ด้วยสัญญาณจากวันสุดท้ายของเดือนนี้</div>'; }
     body.innerHTML=(j.picks||[]).map(p=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.tk)+'\',\''+jq(p.name)+'\',\''+currentMarket+'\')"><td class="p-2 text-slate-400">'+p.rank+'</td><td class="p-2"><b class="text-sky-400">'+p.tk+'</b> <span class="text-[10px] text-slate-500">'+(p.name||'')+'</span></td><td class="p-2">'+fNum(p.close)+'</td><td class="p-2">'+((p.near52-1)*100).toFixed(1)+'%</td><td class="p-2 '+(p.mom>=0?'pos':'neg')+'">'+(p.mom*100).toFixed(0)+'%</td><td class="p-2">'+p.score.toFixed(2)+'</td><td class="p-2">'+(p.weight*100).toFixed(1)+'%</td></tr>').join('')||'<tr><td colspan="7" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
     how.innerHTML=US?'<b>กฎ:</b> พูล = หุ้นสามัญสหรัฐฯ ราคา ≥ USD 10 มูลค่าซื้อขายเฉลี่ย ≥ USD 20M · คะแนน = z(ราคา÷high52สัปดาห์) + z(โมเมนตัม 12-1) · แสดง Top 20 ผู้นำ ณ ปัจจุบัน<br><b>ผลทดสอบย้อนหลังในสหรัฐฯ (หุ้น 2,300+ ตัว, 2000–2026): ไม่พบ edge</b> — factor ทุกตัว (ใกล้จุดสูง โมเมนตัม ความผันผวน ฯลฯ) ทำนายผลตอบแทนเดือนถัดไปไม่ได้ (IC ≈ 0) พอร์ต Top20 ไม่ชนะ S&P 500 และกฎเทรนด์/VIX ระดับดัชนีก็ไม่ชนะการถือตรง จึงใช้เป็น <b>ข้อมูลประกอบการคัดกรองด้วยตัวเอง</b> เท่านั้น':'<b>กฎ:</b> พูล = หุ้นสามัญไทยราคา ≥ 1 บาท เก็บครึ่งบนตามมูลค่าซื้อขาย · คะแนน = z(ราคา÷high52สัปดาห์) + z(โมเมนตัม 12-1) · ถือ Top 20 น้ำหนักเท่ากัน × Gate · ปรับเดือนละครั้ง<br><b>ผลสำรวจย้อนหลัง (in-sample, ไทย 2006–2026, ต้นทุน 0.35%/ข้าง):</b> Top20 + Gate ≈ 15%/ปี เทียบ EW ของพูล 2.6% (SET ราคา ~4%) MaxDD ราว −21% · รูปแบบเดียวกันชนะ EW ใน 8/8 ตลาดเอเชีย-แปซิฟิกที่ทดสอบ และ 3/4 ตลาดที่ล็อกกฎตรวจนอกตัวอย่าง (บราซิล เม็กซิโก ตุรกี แอฟริกาใต้) · <b>ข้อจำกัด:</b> ใช้เฉพาะหุ้นที่ยังจดทะเบียน (survivorship) ไม่รวมปันผล/ภาษี/สลิปเพจจริง ผลตอบแทนกระจุกในบางปี ช่วง 2013–2019 อ่อนที่สุด · เกณฑ์/รายงานเต็มใน research/EXPLORE_edge_search_2026-10-10.md';
   }catch(e){ gEl.innerHTML='<div class="text-rose-400 text-xs">โหลดไม่สำเร็จ: '+e.message+'</div>'; }
@@ -2363,6 +2316,7 @@ function renderView(){
     const mr=!minRS || (x.rs!=null && x.rs>=minRS);
     return ms&&mg&&mr;
   });
+  window._wl_stocks = list;   // ทั้งรายการที่ผ่านตัวกรอง (ไม่ใช่แค่หน้าปัจจุบัน) ใช้ส่งออก Watchlist
   const cv=document.getElementById('cardsView'), tv=document.getElementById('tableView'), tb=document.getElementById('tableBody');
   cv.innerHTML=''; tb.innerHTML='';
   // unified pagination (ทั้ง card และ table)
