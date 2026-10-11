@@ -116,11 +116,18 @@ export default async function handler(req, res) {
         res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=900");
         return res.status(200).json({ market: "america", noEdge: true, asOf: snap.date, gate: sig.gate, gateIdx: gate, poolSize: sig.poolSize, picks: sig.top });
       }
+      if (/^\d{4}-\d{2}$/.test(String(req.query.archive || ""))) {   // GET ?archive=YYYY-MM → snapshot สัญญาณที่ใช้ rebalance (ข้อมูลตลาดสาธารณะ) สำหรับตรวจกลไก
+        const a = await supabase().from("snapshots").select("payload").eq("dt", "leaders|snap|" + req.query.archive).maybeSingle();
+        res.setHeader("Cache-Control", "public, s-maxage=600");
+        return a.data ? res.status(200).json(a.data.payload) : res.status(404).json({ error: "no archive" });
+      }
       const db = supabase(), cur = await db.from("snapshots").select("payload").eq("dt", KEY).maybeSingle(), state = (cur.data && cur.data.payload) || L.newState();
       if (req.query.tick === "1" || req.query.tick === "true") {
         const sec = process.env.CRON_SECRET;
         if (!sec || req.headers.authorization !== "Bearer " + sec) { res.setHeader("Cache-Control", "no-store"); return res.status(401).json({ error: "unauthorized" }); }
-        const out = L.step(state, snap);
+        const prevSnap = state.lastSnap, out = L.step(state, snap);
+        let archived = null;   // เก็บ snapshot สัญญาณสิ้นเดือน (ข้อมูลที่ใช้เลือกหุ้นจริง) เพื่อตรวจกลไกย้อนหลังตาม PREREG — ไม่กระทบกฎ
+        if (out.rebalanced && prevSnap) { try { const { error: ae } = await db.from("snapshots").upsert({ dt: "leaders|snap|" + prevSnap.date.slice(0, 7), created_at: new Date().toISOString(), payload: { date: prevSnap.date, gate: prevSnap.gate, setClose: prevSnap.setClose, rows: prevSnap.rows.map((r) => ({ tk: r.tk, name: r.name, close: r.close, open: r.open, hi52: r.hi52, p1y: r.p1y, p1m: r.p1m, turn: Math.round(r.turn) })) } }, { onConflict: "dt" }); archived = ae ? ae.message : true; } catch (e) { archived = String((e && e.message) || e); } }
         if (out.changed) { const { error } = await db.from("snapshots").upsert({ dt: KEY, created_at: new Date().toISOString(), payload: state }, { onConflict: "dt" }); if (error) return res.status(500).json({ error: error.message }); }
         let fund = null;   // เก็บ EPS/กำไรสุทธิแบบ point-in-time (เฉพาะวันที่ค่าเปลี่ยน) — ล้มเหลวต้องไม่กระทบ paper-trade
         try {
@@ -141,7 +148,7 @@ export default async function handler(req, res) {
           } else fund = { skipped: "too few rows " + Object.keys(cur).length };
         } catch (e) { fund = { error: String((e && e.message) || e) }; }
         res.setHeader("Cache-Control", "no-store");
-        return res.status(200).json({ ok: true, date: snap.date, changed: out.changed, rebalanced: !!out.rebalanced, reason: out.reason || null, rows: rows.length, summary: L.summary(state), fund });
+        return res.status(200).json({ ok: true, date: snap.date, changed: out.changed, rebalanced: !!out.rebalanced, reason: out.reason || null, rows: rows.length, summary: L.summary(state), fund, archived });
       }
       const sig = L.pick(rows, gate);
       res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=900");
