@@ -1,0 +1,123 @@
+/* store.mjs — state (กันข่าวซ้ำ, สมาชิก Top20) + เขียน md
+   กติกาสำคัญ: ส่วนก่อน "## Feed" (สรุปที่ Claude เขียน, มุมมองจาก X, โน้ตผู้ใช้) ห้ามแตะ */
+import { createHash } from 'node:crypto';
+import { readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs';
+
+export const newState = () => ({ v: 1, lastRun: null, seen: {}, members: {}, recent: {} });
+
+export const addDays = (iso, n) => { const d = new Date(iso + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+
+export function itemKey(item) {
+  let u = String(item.url || '');
+  try {
+    const x = new URL(u); x.hash = '';
+    for (const k of [...x.searchParams.keys()]) if (/^utm_/i.test(k)) x.searchParams.delete(k);
+    u = x.toString();
+  } catch { /* url เพี้ยน ใช้ตามเดิม */ }
+  return createHash('sha1').update(u).digest('hex');
+}
+
+export const normTitle = (t) => String(t || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+
+export function dedupe(items, state) {
+  const out = [], titles = new Set();
+  for (const r of state.recent[items[0] && items[0].ticker] || []) titles.add(normTitle(r.title));
+  for (const it of items) {
+    const k = itemKey(it), t = normTitle(it.title);
+    if (state.seen[k] || titles.has(t)) continue;
+    state.seen[k] = it.published; titles.add(t); out.push(it);
+  }
+  return out;
+}
+
+export function loadState(path) {
+  if (!existsSync(path)) return newState();
+  return { ...newState(), ...JSON.parse(readFileSync(path, 'utf8')) };
+}
+
+export function saveState(path, state) {
+  writeFileSync(path + '.tmp', JSON.stringify(state, null, 1));
+  renameSync(path + '.tmp', path);
+}
+
+export function updateMembership(state, universe, today) {
+  const entered = [], left = [], now = new Set();
+  for (const u of universe) {
+    now.add(u.ticker);
+    const m = state.members[u.ticker];
+    if (!m || m.left) { state.members[u.ticker] = { name: u.name, since: today, lists: u.lists }; entered.push(u.ticker); }
+    else { m.name = u.name; m.lists = u.lists; }
+  }
+  for (const [t, m] of Object.entries(state.members)) if (!now.has(t) && !m.left) { m.left = today; left.push(t); }
+  return { entered, left };
+}
+
+export function sinceFor(state, ticker, today) {
+  const m = state.members[ticker];
+  if (!state.lastRun || !m || m.since === today) return addDays(today, -30);
+  return state.lastRun;
+}
+
+export function pruneRecent(state, today) {
+  const r30 = addDays(today, -30), s120 = addDays(today, -120);
+  for (const t of Object.keys(state.recent)) state.recent[t] = state.recent[t].filter((x) => x.published >= r30);
+  for (const [k, d] of Object.entries(state.seen)) if (d < s120) delete state.seen[k];
+}
+
+export const fileNameFor = (ticker) => String(ticker).replace(/\./g, '-') + '.md';
+
+const label = (it) => {
+  const m = it.meta || {};
+  if (it.source === 'yahoo') return 'Yahoo';
+  if (it.source === 'gnews') return m.publisher || 'Google News';
+  if (it.source === 'sec') return `SEC ${m.form || ''}`.trim();
+  if (it.source === 'reddit') return `Reddit r/${m.sub} ▲${m.score || 0}`;
+  return it.source;
+};
+const mdText = (s) => String(s).replace(/[\[\]]/g, (c) => (c === '[' ? '(' : ')')).replace(/\s+/g, ' ');
+const mdUrl = (u) => String(u).replace(/[ ()]/g, (c) => encodeURIComponent(c));
+
+export function renderFeedBlock(date, items) {
+  return `### ${date}\n` + items.map((it) => `- [${label(it)}] ${mdText(it.title)} ([ลิงก์](${mdUrl(it.url)}))`).join('\n') + '\n';
+}
+
+function frontmatter(meta) {
+  const lines = ['---', `ticker: ${meta.ticker}`, 'market: america', `in_top20_since: ${meta.since}`, `lists: [${(meta.lists || []).join(', ')}]`, `last_fetch: ${meta.lastFetch}`];
+  if (meta.left) lines.push(`left_top20: ${meta.left}`);
+  return lines.join('\n') + '\n---\n';
+}
+
+export function upsertStockMd(existing, meta, block) {
+  let md = existing;
+  if (md == null) {
+    md = `# ${meta.ticker} — ${meta.name}\n\n## ทำไมติด Top20\n_ยังไม่มีสรุป — สั่ง "สรุป Top20 US"_\n\n## มุมมองจาก X\n_ยังไม่มี — สั่ง "ดู X ของ ${meta.ticker}"_\n\n## Feed\n`;
+  } else {
+    md = md.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '');
+  }
+  md = frontmatter(meta) + md;
+  if (!block) return md;
+  let feed = md.search(/^## Feed[ \t]*\r?$/m);
+  if (feed < 0) { md = md.replace(/\s*$/, '\n\n## Feed\n'); feed = md.search(/^## Feed[ \t]*\r?$/m); }
+  const head = block.slice(0, block.indexOf('\n') + 1), lines = block.slice(head.length);
+  const sameDay = md.indexOf('\n' + head, feed);
+  if (sameDay >= 0) { const at = sameDay + 1 + head.length; return md.slice(0, at) + lines + md.slice(at); }
+  const afterFeed = md.indexOf('\n', feed) + 1;
+  return md.slice(0, afterFeed) + '\n' + block + md.slice(afterFeed).replace(/^(?=\S)/, '\n');
+}
+
+const cell = (s) => String(s == null ? '' : s).replace(/\|/g, '\\|');
+
+export function renderIndexMd(state, today) {
+  const d7 = addDays(today, -7), active = [], gone = [];
+  for (const [t, m] of Object.entries(state.members)) (m.left ? gone : active).push([t, m]);
+  const link = (t) => `[[${fileNameFor(t).slice(0, -3)}]]`;
+  const cnt = (t, reddit) => (state.recent[t] || []).filter((x) => x.published >= d7 && (x.source === 'reddit') === reddit).length;
+  let md = `---\nlast_fetch: ${today}\n---\n# Top20 หุ้น US (YTD ∪ RS)\n\n_อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย · อัปเดตอัตโนมัติจาก scripts/news_\n\n`;
+  md += '| หุ้น | ชื่อ | List | เข้าเมื่อ | ข่าว 7 วัน | Reddit 7 วัน |\n|---|---|---|---|---|---|\n';
+  for (const [t, m] of active.sort((a, b) => a[1].since.localeCompare(b[1].since) || a[0].localeCompare(b[0]))) md += `| ${link(t)} | ${cell(m.name)} | ${(m.lists || []).join('+')} | ${m.since} | ${cnt(t, false)} | ${cnt(t, true)} |\n`;
+  if (gone.length) {
+    md += '\n## หลุดแล้ว\n\n| หุ้น | ชื่อ | เข้า | หลุด |\n|---|---|---|---|\n';
+    for (const [t, m] of gone.sort((a, b) => b[1].left.localeCompare(a[1].left))) md += `| ${link(t)} | ${cell(m.name)} | ${m.since} | ${m.left} |\n`;
+  }
+  return md;
+}
