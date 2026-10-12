@@ -62,14 +62,15 @@ async function main() {
     if (!byDay.size) md = upsertStockMd(md, meta, null);
     for (const d of [...byDay.keys()].sort()) md = upsertStockMd(md, meta, renderFeedBlock(d, byDay.get(d)));
     writeMd(t, md);
+    if (!DRY) saveState(STATE, state);   // md เขียนแล้ว → จำว่าเห็นข่าวแล้วทันที (ถ้ารอบนี้ล้มกลางทาง รอบหน้าจะไม่ต่อท้ายซ้ำ)
     console.log(`${t}: +${items.length}`);
   }
   for (const t of left) { const md = readMd(t), m = state.members[t]; if (md) writeMd(t, upsertStockMd(md, { ticker: t, name: m.name, lists: m.lists, since: m.since, lastFetch: today, left: m.left }, null)); }
 
   pruneRecent(state, today);
   writeFileSync(join(OUT, '_Top20.md'), renderIndexMd(state, today));
+  if (!DRY) { state.lastRun = today; saveState(STATE, state); }   // บันทึกก่อน push: push พังต้องไม่ทำให้ state หาย
   const pushed = await push(state, activeOf());
-  if (!DRY) { state.lastRun = today; saveState(STATE, state); }
   log(`ok tickers=${Math.min(activeOf().length, LIMIT)} new=${fresh} errors=${errors} ${pushed}${DRY ? ' (dry)' : ''}`);
 }
 

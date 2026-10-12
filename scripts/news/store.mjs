@@ -21,18 +21,25 @@ export const normTitle = (t) => String(t || '').toLowerCase().replace(/[^\p{L}\p
 
 export function dedupe(items, state) {
   const out = [], titles = new Set();
-  for (const r of state.recent[items[0] && items[0].ticker] || []) titles.add(normTitle(r.title));
+  for (const r of state.recent[items[0] && items[0].ticker] || []) if (r.source !== 'sec') titles.add(normTitle(r.title));
   for (const it of items) {
-    const k = itemKey(it), t = normTitle(it.title);
-    if (state.seen[k] || titles.has(t)) continue;
-    state.seen[k] = it.published; titles.add(t); out.push(it);
+    // SEC: title มักซ้ำกัน ("8-K: 8-K") ทั้งที่เป็นคนละฉบับ → ใช้ URL อย่างเดียว
+    const k = itemKey(it), t = it.source === 'sec' ? null : normTitle(it.title);
+    if (state.seen[k] || (t && titles.has(t))) continue;
+    state.seen[k] = it.published; if (t) titles.add(t); out.push(it);
   }
   return out;
 }
 
 export function loadState(path) {
   if (!existsSync(path)) return newState();
-  return { ...newState(), ...JSON.parse(readFileSync(path, 'utf8')) };
+  try { return { ...newState(), ...JSON.parse(readFileSync(path, 'utf8')) }; }
+  catch (e) {   // ไฟล์เสีย (เช่น sync ชนกัน) → เก็บไว้ดูทีหลัง แล้วเริ่มใหม่ แทนที่จะล้มทุกรอบ
+    const bad = `${path}.corrupt-${Date.now()}`;
+    renameSync(path, bad);
+    console.warn(`WARN state corrupt (${e.message}) → moved to ${bad}, starting fresh`);
+    return newState();
+  }
 }
 
 export function saveState(path, state) {
@@ -81,23 +88,33 @@ export function renderFeedBlock(date, items) {
   return `### ${date}\n` + items.map((it) => `- [${sourceLabel(it)}] ${mdText(it.title)} ([ลิงก์](${mdUrl(it.url)}))`).join('\n') + '\n';
 }
 
-function frontmatter(meta) {
-  const lines = ['---', `ticker: ${meta.ticker}`, 'market: america', `in_top20_since: ${meta.since}`, `lists: [${(meta.lists || []).join(', ')}]`, `last_fetch: ${meta.lastFetch}`];
+const OWN_KEYS = new Set(['ticker', 'market', 'in_top20_since', 'lists', 'last_fetch', 'left_top20']);
+
+/* เขียนเฉพาะ key ของสคริปต์ — property อื่นที่ผู้ใช้เพิ่ม (tags ฯลฯ) เก็บไว้ตามเดิม */
+function frontmatter(meta, oldBody) {
+  const lines = [`ticker: ${meta.ticker}`, 'market: america', `in_top20_since: ${meta.since}`, `lists: [${(meta.lists || []).join(', ')}]`, `last_fetch: ${meta.lastFetch}`];
   if (meta.left) lines.push(`left_top20: ${meta.left}`);
-  return lines.join('\n') + '\n---\n';
+  let skip = false;
+  for (const l of String(oldBody || '').split(/\r?\n/)) {
+    const key = (l.match(/^([A-Za-z0-9_-]+):/) || [])[1];
+    if (key) skip = OWN_KEYS.has(key); else if (!/^\s/.test(l)) skip = false;   // บรรทัดย่อหน้า = ค่าต่อของ key ก่อนหน้า
+    if (!skip && l.trim()) lines.push(l);
+  }
+  return '---\n' + lines.join('\n') + '\n---\n';
 }
 
 export function upsertStockMd(existing, meta, block) {
-  let md = existing;
+  let md = existing, oldFm = '';
   if (md == null) {
     md = `# ${meta.ticker} — ${meta.name}\n\n## ทำไมติด Top20\n_ยังไม่มีสรุป — สั่ง "สรุป Top20 US"_\n\n## มุมมองจาก X\n_ยังไม่มี — สั่ง "ดู X ของ ${meta.ticker}"_\n\n## Feed\n`;
   } else {
-    md = md.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '');
+    md = md.replace(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/, (_, body) => { oldFm = body; return ''; });
   }
-  md = frontmatter(meta) + md;
+  md = frontmatter(meta, oldFm) + md;
   if (!block) return md;
   let feed = md.search(/^## Feed[ \t]*\r?$/m);
   if (feed < 0) { md = md.replace(/\s*$/, '\n\n## Feed\n'); feed = md.search(/^## Feed[ \t]*\r?$/m); }
+  if (md.indexOf('\n', feed) < 0) md += '\n';   // ไฟล์จบที่ "## Feed" พอดี (ไม่มี newline)
   const head = block.slice(0, block.indexOf('\n') + 1), lines = block.slice(head.length);
   const sameDay = md.indexOf('\n' + head, feed);
   if (sameDay >= 0) { const at = sameDay + 1 + head.length; return md.slice(0, at) + lines + md.slice(at); }

@@ -67,7 +67,7 @@ export function parseReddit(xml, { ticker }) {
 /* ดึง map ticker → CIK ครั้งเดียวต่อรอบ (ต้องมี User-Agent ที่มีช่องทางติดต่อตามกติกา SEC) */
 export async function fetchCikMap(secUA, fetchFn = fetch) {
   if (!secUA) return new Map();
-  const r = await fetchFn('https://www.sec.gov/files/company_tickers.json', { headers: { 'User-Agent': secUA } });
+  const r = await fetchFn('https://www.sec.gov/files/company_tickers.json', { headers: { 'User-Agent': secUA }, signal: AbortSignal.timeout(20000) });
   if (!r.ok) throw new Error(`sec tickers HTTP ${r.status}`);
   return parseSecTickers(JSON.parse(await r.text()));
 }
@@ -79,7 +79,7 @@ export async function fetchTicker(ticker, { sinceISO, cikMap = new Map(), secUA 
   const get = async (name, url, headers, parse) => {
     try {
       await sleep(1000);
-      const r = await fetchFn(url, { headers });
+      const r = await fetchFn(url, { headers, signal: AbortSignal.timeout(20000) });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       items.push(...parse(await r.text()));
     } catch (e) { errors.push(`${name}: ${e.message}`); }

@@ -103,3 +103,10 @@ test('fetchTicker: BRK.B ใช้สัญลักษณ์ BRK-B ใน URL',
   assert.ok(calls.some((u) => u.includes('s=BRK-B')));
   assert.ok(!calls.some((u) => u.includes('BRK.B')));
 });
+
+test('[review I5] ทุก request มี timeout (AbortSignal)', async () => {
+  const inits = [];
+  const f = async (url, init) => { inits.push(init); return { ok: false, status: 404, text: async () => '' }; };
+  await fetchTicker('NVDA', { sinceISO: '2026-09-01', cikMap: new Map(), secUA: '', fetchFn: f, sleep: noSleep });
+  assert.ok(inits.length > 0 && inits.every((i) => i && i.signal instanceof AbortSignal));
+});

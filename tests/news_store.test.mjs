@@ -120,3 +120,38 @@ test('renderIndexMd: ลิงก์ [[BRK-B]] + นับข่าว 7 วั�
   assert.match(md, /\| \[\[OLD\]\] \| Old Co \| 2026-10-01 \| 2026-10-10 \|/);
   assert.match(md, /last_fetch: 2026-10-12/);
 });
+
+// ---- final review fixes ----
+test('[review C1] ไฟล์จบที่ "## Feed" ไม่มี newline → frontmatter ยังอยู่บนสุด และ block อยู่ใต้ Feed', () => {
+  const base = upsertStockMd(null, meta, null).replace(/\n$/, '');   // จบที่ "## Feed" พอดี
+  const md = upsertStockMd(base, meta, renderFeedBlock('2026-10-12', [it({ title: 'T' })]));
+  assert.match(md, /^---\nticker: NVDA/);
+  assert.ok(md.indexOf('## Feed') < md.indexOf('### 2026-10-12'));
+});
+
+test('[review I3] SEC สองฉบับ title เหมือนกันแต่ URL ต่าง → เก็บทั้งคู่', () => {
+  const s = newState();
+  const a = it({ source: 'sec', title: '8-K: 8-K', url: 'https://sec.gov/a', meta: { form: '8-K' } });
+  const b = it({ source: 'sec', title: '8-K: 8-K', url: 'https://sec.gov/b', meta: { form: '8-K' } });
+  assert.equal(dedupe([a, b], s).length, 2);
+  s.recent.NVDA = [a];
+  assert.equal(dedupe([it({ source: 'sec', title: '8-K: 8-K', url: 'https://sec.gov/c', meta: { form: '8-K' } })], s).length, 1);
+});
+
+test('[review I4] property ที่ผู้ใช้เพิ่มใน frontmatter (tags) ไม่หาย', () => {
+  let md = upsertStockMd(null, meta, null).replace('last_fetch: 2026-10-12\n', 'last_fetch: 2026-10-12\ntags: [ai, mine]\n');
+  md = upsertStockMd(md, { ...meta, lastFetch: '2026-10-13', left: '2026-10-13' }, null);
+  assert.match(md, /tags: \[ai, mine\]/);
+  assert.match(md, /last_fetch: 2026-10-13/);
+  assert.match(md, /left_top20: 2026-10-13/);
+  assert.equal(md.match(/last_fetch:/g).length, 1);
+});
+
+test('[review I6] state file เสีย → เริ่ม state ใหม่ และย้ายไฟล์เสียไปเป็น .corrupt-*', async () => {
+  const { writeFileSync, readdirSync } = await import('node:fs');
+  const dir = mkdtempSync(join(tmpdir(), 'news-'));
+  const p = join(dir, 'state.json');
+  writeFileSync(p, '{"v":1,"seen":{"a"');
+  assert.deepEqual(loadState(p), newState());
+  assert.ok(readdirSync(dir).some((f) => f.startsWith('state.json.corrupt-')));
+});

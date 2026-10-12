@@ -71,3 +71,20 @@ test('pushRows: HTTP error → ok:false ไม่ throw', async () => {
   assert.equal(out.ok, false);
   assert.equal(out.status, 401);
 });
+
+// ---- final review fixes ----
+test('[review C2] แถวมี/ไม่มี summary ปนกัน → แยก request ให้ key ในแต่ละ request ตรงกัน (PostgREST PGRST102)', async () => {
+  const reqs = [];
+  const fake = async (url, init) => { reqs.push(JSON.parse(init.body)); return { ok: true, status: 201, text: async () => '' }; };
+  const out = await pushRows([{ ticker: 'A', summary: 's', summary_at: 'd' }, { ticker: 'B' }, { ticker: 'C' }], { url: 'https://p', key: 'K', fetchFn: fake });
+  assert.equal(out.ok, true);
+  assert.equal(reqs.length, 2);
+  for (const body of reqs) { const k0 = Object.keys(body[0]).sort().join(); assert.ok(body.every((r) => Object.keys(r).sort().join() === k0)); }
+});
+
+test('[review I5] network error ตอน push → ok:false ไม่ throw', async () => {
+  const fake = async () => { throw new TypeError('fetch failed'); };
+  const out = await pushRows([{ ticker: 'A' }], { url: 'https://p', key: 'K', fetchFn: fake });
+  assert.equal(out.ok, false);
+  assert.equal(out.status, 0);
+});
