@@ -1,0 +1,25 @@
+---
+ticker: AE
+market: thailand
+in_top20_since: 2026-10-12
+lists: [RS]
+last_fetch: 2026-10-12
+---
+# AE — All Energy & Utilities Public Company Limited
+
+## ทำไมติด Top20
+_ยังไม่มีสรุป — สั่ง "สรุป Top20 US"_
+
+## มุมมองจาก X
+_ยังไม่มี — สั่ง "ดู X ของ AE"_
+
+## Feed
+
+### 2026-10-09
+- [Facebook] กรุงเทพธุรกิจ. . เจาะงบ Q3/69 เฟ้นหุ้นเด่นกำไรกระฉูด | SET Afternoon | 9–10-69 . 🟡 ตลาดหุ้นไทยเริ่มเงียบเหงา ก่อนสัปดาห์หน้าจะหยุดยาวหลาย ขณะที่บรรยากาศลงทุนเริ่มมีสัญญาณที่ดีขึ้น หลังบอนด์ยีลด์เริ่มชะลอความร้อนแรง และเตรียมเข้าสู่ฤดูการประกาศผลประกอบการงวดไตรมาส 3 ([ลิงก์](https://news.google.com/rss/articles/CBMiiAZBVV95cUxNam1ORmE2bGxQeDhqWWNxdDMyVVdMZEFmeThROW00aU9TM2JQUDRHRDFNaVlIQW9TQ196LUE3UUNqY2ZsWm44Q1J5M3VlVF9NMEtVWTQwWTEzaWxMWEhoT0kwaklVOXhuRlI4OUM2bVRwcmNqY0RVVDh3aXYtT1lEb0dUU1ZYbklkbkZXLWpHZy1KR1lZbXoxUEtoTVNHeVl0RkFmdGEtMFBlaGFNejhMM1ZNWGhid3dOeTZHQXJ0ZmROaEVKTWgtZGdDUzliOTJpdnIwc1dINGozN3FiLXBZYVh2dWdjTi1CX0dWZVNnZEJxV3pRWkJrcFROZ1dtRXc2YU1Fck41SVQ3Z1FYam5XUEloa0ttR1hra251bmRhbmdNVnI4ZlNlX1p1VnI0UjQ1cXVSaVpvYlFQYS1nOWZBRkZ1Y2Y3YWJPUG53M0dIMjRweGhXTWxaaTFlbi1qdWhDNmEwV1hoeW5Mdmx5YzI2b3dXOUF1YkRycXFBc2NWOVJlSGx4ZS1saF9oUllEUVJhWlZPYndWRHpfczRoYXEwVG9sS2s0SDVNZ3JsMlFkdVJWWkZQdC1XMC03SGVWdmdfanREd1F6SjZSRlFydFRaMDVGMURiWW01ZXMtVTZGRkktT1FEWmgzdFo5MUJUdUF2OWUwWlNsbno0b1oxNndvU3VBeFVubXhxMllzV0FKb1ZTMFcwQ1kzQTV0QjVOckVnc3dPX1pqSy1IWUg0VG0tVVdudmlWM2k1REVvUDM1ZkRTVHoyYnBFR01DdnJrZDR3YlF5LVJjdWNHSmRGbnRvbXpQdWh2Y3lic3pCZ3E2TWZOR3M5b2t2dWZLX1lFRGRtUE1zWjA0QjhKS2ZkQzhGaGgwOVdPam9YbloxOTN1Q1FXdFJRZUpPRjAzRTBZTl96UXc1NzBoY0VaVzc3b0U0ZkJ3ZWViS2Z3cXZ5cjBYSFdWYXZkb0NZdVd2WWhmcHd5eWNsVDl2LTA1TFA5MExGQ1A4aDRLNExpV29pQzBERFFlR1dFYzFLYQ?oc=5))
+
+### 2026-10-07
+- [thestandard.co] EGCO ทุ่มลงทุนปิดดีลซื้อหุ้น 45.05% 'Astoria Energy II' โรงไฟฟ้าก๊าซฯ 615 เมกะวัตต์ ในสหรัฐฯ เสริมพอร์ตรายได้ทันที ([ลิงก์](https://news.google.com/rss/articles/CBMiakFVX3lxTE5ZWnZiUk9OUFF2VGRWRzZyTG1oZDZreXNvY0dIQ1hzcks4cjhxQ1RmaTFERTB3TUZWN2JkT2NaNlFlRXdrclFMZlRpelNnblJxVkUwQUtLMTVRdUNwTl9EZ3BjbG9zZTIyX3c?oc=5))
+
+### 2026-10-06
+- [Facebook] กรุงเทพธุรกิจ. . ฟันด์โฟลว์ไหลออกไม่หยุด ต่างชาติขายเฉียด 4 หมื่นล้าน | SET Afternoon | 6-10-69 . 🟡 จับสัญญาณหุ้นไทย หลังต่างชาติยังถล่มขายไม่หยุด 10 วันทำการติดต่อกันส่งผลให้ฟันด์โฟลว์ไหลออกรวมเกือบ 4 หมื่นล้านบาท หลังบอนด์ยีลด์ทั่วโลกยังพุ่งสูง รวมวิเคราะห์แรงขายจากนั ([ลิงก์](https://news.google.com/rss/articles/CBMikgZBVV95cUxNWG5rSG52TjR3b3kwWnhSWHUzc0h0bGpJUEJiR0h2QXYzNnhuMzJ1NGY5RGxmdG14NmszRlhjZ1dIX1Z0LVdSeTNqTnZMb3BlNXRPbHhlMjd1TnBraWRJc3lJc1ZoSUdsTl91Qy1FcXhhTUw2NzVxcFJjT1gyN0JMMTd1YXd3TS15SUxha25pUjNpdE5QSXUzXzd6bWlyMXE4VkF3Q2R4RVlvb19SSDN3N1M4bThRUUV5WDJwU2dhQlBCbVRoQkNXUzVxZm9uTG1KalRCNzRXdDgtMXJ3UDBVSzJXRWpwRWpqeU5nc3ExcHJiRE5hMFNDenFOTWJ3a3VrUXh1b0RsdnpEOUZvWE9XYUJLTExoN3kxTkRMN1dhUDZJVG5uejVCZ1pHT1pNNWN2WVJGNDdOU1dUZTFFZFVsWlVSYTR2QkFGTnMyUmZFdWhidURSYnNiXzVXZGtRczJoNEFBb1AzeWktYmpQVS0zWHdmTVo3RGNMelZFS0ozam1icmRpelJhVVJCQzVKellMTzhfLWZZQ0RyY0xuSW44UWVfUkYzbkcyUGJ2Q1N3WkwyTVZyMlljUTRqMzJGUk9URWRWaUh6VUtXa2hWbmpEOEx2Y3RuZHB2WjhfVDhXV1Vla2pad2diVEpYdzZEMldIUGdBT0JMZDRrVjRCejVuR3MwczVyaS1ZaWhueTBFZVdrTWNCQURZenFGX0dYdm82bFhSNElFUzlSckZPVzM4U2JWUUNCLWJlUUxIcF8yQWxVZC04dTFkTldxSldrM21qbVZKYXJyN01fTHpZVFEyQktkM0RhLUJhZjV2WVBIY3VZYW51dnFyNDZzMnhWV1ZwNlhnbTdjb21TbXFqdGxjdVpXYi1hdFVOdGZrZ0dfUEZDRUl5Z29GX090RFRvTjdVWkhKRDdabWY1M2IwdnBTSnZyV1FyRVVpQW0wWXRlelNqWXJ5M3JsNjg5Y25xSG1EekJ0WGh0VkdLVllrWndBM2dKcl9qUG1EOGo1TklZLUFVQndtWnBhRXJxa0JVOHhSYkE?oc=5))

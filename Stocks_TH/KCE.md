@@ -1,0 +1,43 @@
+---
+ticker: KCE
+market: thailand
+in_top20_since: 2026-10-12
+lists: [YTD, RS]
+last_fetch: 2026-10-12
+---
+# KCE — KCE Electronics Public Co., Ltd.
+
+## ทำไมติด Top20
+_ยังไม่มีสรุป — สั่ง "สรุป Top20 US"_
+
+## มุมมองจาก X
+_ยังไม่มี — สั่ง "ดู X ของ KCE"_
+
+## Feed
+
+### 2026-10-12
+- [Share2Trade] หุ้นอิเล็กฯ Q3 ปังยกแผง จับตากำไรมีแววทะยานแรง ([ลิงก์](https://news.google.com/rss/articles/CBMiwwRBVV95cUxOSG9xcmVtSk1nZEwxVTdDWGpmRUhuZWJCMzZjeGQ1b2ZrU1pLTnUtWDlJeWtJVTg5akhnN2pQYU84NjdyS3ljQXRmYUJxZW5oYVk1NE9BSVdaNEFYQUZfRzdmSXlBcW9DQTlQYVFqeWNSZnI1LWM2cEFDTEowUTEzQWhPMDY2a1hPQUZOSkpqR0hJUUJVSE5ZckFOSTl1LW40YWdxNzA1M0sxU0FacFFfQVJYN2RWdkdjQkFKTU9Xako1S0Vta3U1WjVQb1BwOGRPaFl3dk9rcGxEUE55ME1seUpqcTlQTU9yMkZhdHd0SXQyckRoTjczYkctbUpOR0lvOE5tTnVHeWpGOFZLLXRrOFRmc3VEbUF4WXdYVFRETTVQaWpWckJET3BXQXR6SFdUYlZmaVhHdzUxLXRjZm9ZYmV3akw3a08tcTA4YnRub0YwN0tHSUpCbzRvY0NJREotVnRUbmhHb2ExMmg2cHdaRnlmYmpGM3VfSVdneFhnZjVqTmlabElIUlByWjNRZ1dfQkRGVFE5UjhCeDV4a2FRV2FDVnpmcTBvUEpzblFqQmpYajJSTkZzcWdkbWlzajBqU2VySGFHVmpGRDB0SDlxZ3c4dGZiU3BvYXRZdWp5Q0VDS0hYT3lsSno4TE9aMUYxX1h4TGdiMjRhbWVubzRjLWVWWVRBejFqSXBsOFJNTUtvVmZSVGtZWjkxMVA1ZmtYMG1XZXNaOHpjdm9BelhrMmFRdl9RZ0xyVm5rS2hJM2F0Vlk?oc=5))
+
+### 2026-10-08
+- [LINE TODAY] “บอนด์ยีลด์สหรัฐ” พุ่งนิวไฮรอบ 24 ปี โบรกฯ ชู “ส่งออก-อิเล็กฯ” รับอานิสงส์ | ข่าวหุ้นธุรกิจ ([ลิงก์](https://news.google.com/rss/articles/CBMiVkFVX3lxTFBwTHFuajRYNkhXX3pRM0lzUzMxeDVzWEpTSUhieHJXVUxWVmZkOVEwWUlxS3JkX2xjOGxNbHZJdzEzOU55SkF4OXlOVUk0bjJLdU5nZlN3?oc=5))
+
+### 2026-10-07
+- [ข่าวหุ้นธุรกิจออนไลน์] KCE วิ่งต่อ 4% ลุ้นกำไร Q3 โต 66% แตะ 495 ล้าน โบรกชูเป้า 97 บาท ([ลิงก์](https://news.google.com/rss/articles/CBMiVkFVX3lxTFBZTTQxUUJIbmFQMS05akliUExhRzl4Y0VaaTFZdThqT2Fmc2g3dk5YRXF1Y0JSaHlXYVlMdkViMUk4NU9yZXFkZXdlQldtZU9jamNYcUln?oc=5))
+- [Thunhoon] หุ้นไทยพักเที่ยงดีดขึ้น 6.18 จุด ซื้อ SCC-KCE-TOP ([ลิงก์](https://news.google.com/rss/articles/CBMiWkFVX3lxTFBSVG81ckxIZFhneWswdlJ2Z1NLb0tmUHY4R2hNNVdIa1A4SmdoRTIzeWp2ZGEwYklLQjhmS09XYXUtVTJmbzJmeEcwY3p1Uk5yVHVtNVYzMlU0UQ?oc=5))
+- [Hoonsmart] บล.กรุงศรี คาด SET วันนี้ “Sideways/Up” หุ้นเด่น PTTGC – DELTA – KCE ([ลิงก์](https://news.google.com/rss/articles/CBMiTkFVX3lxTE5JbWtWbGRucGZneENjMGFidnRCUW9oM3pKYkQwRll1eXFxQllHeC1ZYndvR1plcy1ONHA2TnRJUVl5OWc1aU1pSjN3N0RxUQ?oc=5))
+- [LINE TODAY] “ชัยยศ” มอง SET อ่อนตามหุ้นเอเชีย แนะ Selective Buy ชู TOP-PTTGC-KCE-DELTA | ข่าวหุ้นธุรกิจ ([ลิงก์](https://news.google.com/rss/articles/CBMiVkFVX3lxTE5tZkZETWsyWl9tYXdHcy02R0dMVW1PeDBFSTVnQmx0YlNLMWZVNlFfVjhDLWtucTkyRXVwMHlpVG5iVGlCX1hycTUxVDIwM2lpblNmMmh3?oc=5))
+- [Share2Trade] Gossip Station by..เจ๊จิ๋ม 7-10-2569 ลุ้นหุ้น SET50/SET100 ครึ่งแรกปี 70 ใครเสี่ยงหลุด-ได้ไปต่อ ([ลิงก์](https://news.google.com/rss/articles/CBMitwVBVV95cUxPSjAwbjl3bUExUnhTNVlLcDdoaXJ2dWgtc2toOWlrVmtDX3h2dllnUS1yVnluVkVTaldWQm96aFZZb2MwMzhhampmcHpvd3ZNVDdENGdaZjNPN3pjZGxKbV9kdmVyQ0xGOXhZeEF2b2g5aEYySDd0VGE1a3k3bjI0ZmYwWG9yeHR3bU1KQWxlR24yOGx6dGk3ZERfbGF4SG5kNV9Zc3BCR1pNRC1aWTgzUENOQU5WcUotWllwNllhZkhwSVJSaGdOY1ZnelM0U2dKX0JseGVqVHR2NkVCbldaT2FjRjYtRk8zYzlIZTBXS1JIN1lZd1haQl9HRjJEX0tmZGpxQnNaTkhiVDIwdDc3a1cxZ3B1bTlHRlo3eWQyUXJYT0hhd1g4SG9HZFVzQWNRVWdCRTlMc2dNYjNiY2lHdmpjWnoyRzlxMzRjcFd1NUd5UDBULTY3U3l3eldhQ3hPWlppV0ZONEljVVlhSTF2X3VObTlVX0tITDZ6MUZuRnhORGNTRENJSEtXVk11dDZzZkNjMWdJbFBOekcwUnh2QVhkeEEtYlQ1alFyN2tBa0JCUUdlX2J2WUJ6WG85WnlfdVVkQW1RVmxMZGEzSEZUTUg1SFdmMm9iajZadVVuTVRaWkF0OFUwMHQ4aXU4NzI4ZTlDdjZQTThnS2tDRjk0TEZPNWd5dnF6SnhBWllQMXZlbGJGaEpZU00ybkpLZDlTNEVDM3JvWjVBZDRTSWllU0dkaHlRck9uWGhCbjFTakxScGlDQWo0OTU5TURSNUFvWUEyZXpOV3RfSU5IN3QxZkI3Y250OHZ1cVM5VXNQR2lhTGxJZnhsaW9PSE53MHNQLU1TRDBIMjZJYzdGSlpmTmpZOGhsVDhhRDNDM0dKZHRpSTBOUnZZRDJneThSamJaNTlHRlBVcw?oc=5))
+- [Thunhoon] ส่องกลยุทธ์ลงทุน‘หุ้นอิเล็ก’ ‘DELTA-KCE’เด่นถือยาว ([ลิงก์](https://news.google.com/rss/articles/CBMiXEFVX3lxTE13cjgyNTFmSGNwajJ3Yk8tZ1hjTXNLdDZIa1NKUWR5a2s0cENXMllUV0w5blRTdFByRGZObHFQOUNrcHczNEQ2eUg4ZlVJNWhLNlFIUWRQbGNNa3pJ?oc=5))
+- [Hoonsmart] บล.ทรีนีตี้คาดหุ้นทรงตัว แนะ BJC-GFPT-KCE ([ลิงก์](https://news.google.com/rss/articles/CBMiTkFVX3lxTE1IS1lYaGxER3BHX3BlUVZ6NEJhZ0tIMW9YRUd6THA1REJHWDdveDYycDFzZ05pQ0tYakxTZ0tUcHhjOUdSTjE4M2dwOUJtUQ?oc=5))
+- [LINE TODAY] หุ้นไทยวันนี้ ไซด์เวย์กรอบ 1,570-1,595 จุด ต่างชาติขายต่อเนื่องกดดัน | การเงินธนาคาร ([ลิงก์](https://news.google.com/rss/articles/CBMigAFBVV95cUxNMkNxWXFTSzdlZVRZdjhwVTJlZXpxcy1mX3dtVmxJaUtFLWhHaGVrUE9TTlEyYWFPNlhyVnFtbndVR3lCRFFneURnd0RrV1dIYzRSUFRkZS1oRzY4ZVJ6M2U5SnVTWms4WDRDc2ZCMWp5ZHJVLVZobnRVXzNrdlhsMA?oc=5))
+- [LINE TODAY] SET ปิดบวก 2 จุด แรงซื้อ SCC-หุ้นน้ำมันหนุน พรุ่งนี้แกว่งไซด์เวย์ | ข่าวหุ้นธุรกิจ ([ลิงก์](https://news.google.com/rss/articles/CBMiVkFVX3lxTE9KVVdwM25LbzczU2hZR092VmszUDZDaV96NlBkbC12N25tYUdTNnhfa25GS2RyNUtxb2tOSWhaT2tnU3F0bHE0SXJqa0Ixc3NwTkxReGtR?oc=5))
+
+### 2026-10-06
+- [Share2Trade] หวั่นน้ำท่วมโรงงาน KCE-HANA โบรกฯเลือก DELTA ขึ้นแท่นหุ้นเด่น หลังราคาหุ้นยัง laggard กว่ากลุ่ม ([ลิงก์](https://news.google.com/rss/articles/CBMipAdBVV95cUxQUDUxM1YwdHhGYTJnTlRXdGp4dWQwUTdyT0Z6SUZoZ1QzQ0hldmV6TXJ1RVFRbVJoa3Vnb0JsY1ZYSjR4R2xNTHJTdU84aDdRV2t5dWw0UUdGSzcwUmpWQWtEZWEzY3ZBbDExRGdDZXBNX1MzeUpFYkhzczN2OFY4TmlCemNzMm5ibEY4THY3ZUZrZ3dKVW9KUEE5ZktrcTlMX3dvNGFVT2N0YTJUYmpfME12bXRtdDN0d3pZN3NubVRCUFY0RjRKRmtLWEFVMmsySUxDVXVZNkN1WGliY1kxWVdVYU92V1JGTWVGMzZYbll5RGRCak1SR3hLaXpuemR1aVdvVTIzWDNzTWlaN2E5dmVEYWVkQ0VsdUllbk9ESDlGOWJrelVuSXhqdThyVHRiNGpMR3IxdVluT3lqNWV5ampDZjhVbS1zSnFhckJmSWt1MFZYVGU1dHQ2S292Mjc4UkN0Z1VYQ1FtaDUxX0VDV3hzbEFlZE5URVFyX1FUcUNTSTVQSmNVTXlCN2pkeGR5S0E1M2FETDZXeFV5b0dxR2dQa3FVbXk5bDV6Y0x0WGZaaG9kQzY3aHpxeUlkeE9qRXBkUXEwMnZ4ejhxdGRtZldnOE1McFF3QTMxMEd2R3ZWZ1pCX18xZ3dwYkhWZk9tWVdraE5rcTUtQ1FOcW9QbFBYaExWeVk1WDFUcnpmNzBia3BxOEd6TkM0X2E1QWZTX1pQLXIyLXRmVTE1ME11ek5ZSmpYeUpMUW1wN0pVUndoSWhDWHVZRk51VnZQbzZvZGNtWGtyak9GN1FPUkpZcUh4SGlJZkJRWjhGN0pCVmhqVW9XRU9wOVBjb1JzUlZIZVphLXg4cXhENXdIa3Y0d291MDZ5c2F4MVZlUHBpbUw3bXJRTGxUMmlNN3Z2dEJseDlRNjhwbWg4NmlRR2hDVEZ4dV9sRUJkZWMzR2RyZVg1MDhxTU1qbHlWX2ljWWl5aFV4UFNOTWhqNkZmRWpMNHpnSkhsRUNkamxtN2g3NWZ5bG9OVG1TeC1XbGNzVlpKbXNvSkF2N290cVBLQ3VxUXkyN1JCZ1ZjclZvcU1WUncxbG1lSllfNk9VdWlwWUhPTUp5dEhuS21mcTJYWE9wZldycXhDWFB5YW9ONF92MlBzMVdFWDRibGJQQVBHVnZrMV9rdnZzbHhzNGtqY1FGOEE1RlBMZGg3M0tEbjNaZUdmekVsUDN2Q1ozUTFFOFVqWW1yZA?oc=5))
+- [Hoonsmart] "กรุงศรี" คาด SET วันนี้ “Sideways/Up” หุ้นเด่น AWC-KCE-DELTA ([ลิงก์](https://news.google.com/rss/articles/CBMiTkFVX3lxTFBrYVJVUDFvM0wtNGgwNVZfNDNqQlRBRDl3T0ZON0F0OHU5U0RDeDRHWFlza1ZxVHNaYVlvS1ZpTi1pNFFVWnVvSXRsLTNQdw?oc=5))
+- [วารสารการเงินธนาคาร] โผหุ้นเข้า SET50 รอบครึ่งปีหลัง 70 นักวิเคราะห์ชู KCE เด่น ([ลิงก์](https://news.google.com/rss/articles/CBMiVEFVX3lxTFBVV3ZWY1ZFUVRlWk5oaXoxRjI3LW5lMnI2SGlnOU9qLTl4VVduYmhsc0JSVFNGT3RjaDY4dWt3MjRVVjZjSk9sTkVMZHlKMFBwUVBjcA?oc=5))
+- [มิติหุ้น] DELTA กูรูเชียร์เด่นสุดกลุ่มอิเล็กฯ ดีมานด์AI-ดาต้าเซ็นเตอร์พุ่ง - มิติหุ้น | ชี้ชัดทุกการลงทุน ([ลิงก์](https://news.google.com/rss/articles/CBMiVkFVX3lxTFBZRFd5UDQ5a3lqZmtaMWgwVThCbzQzeE83aGRFeGZUSFBXZjZPYzhDRnpDREkxMURnZXVhVG94WjlwaXNGTXdNOGZiMFVDMl82QUF5OXZ3?oc=5))
+
+### 2026-10-05
+- [Facebook] หุ้นไทยดีด 4.83 จุด ซื้อ DELTA-KCE-KTB #หุ้นไทยวันนี้ #delta #หุ้นอิเล็กทรอนิกส์ #หุ้นแบงก์ #ทันหุ้น ([ลิงก์](https://news.google.com/rss/articles/CBMihgZBVV95cUxPMXBWUEtjYUVyNjZLeVJ2NTVDZ0NEZ0huUnJCWF80aUhuVmR1M1BmQzAtbENEb1padWs0V3JpNUZrSVFtV3BsRWRuTHpJb0M0eVFHRkt5cnNpZ2dpZHdXYUpzZXBQckNOb1oxWmhnS3NIWVo1TVBBWURVRl93WElfSUlILTNJenR2MmR4NjZQNGJKTlk3cXhBYkhCemRydDVYUFExVk9ZYnhjaWFZQ1Vydnd6X0F1RlhBdy1xQVg2MjdWRG5aRW1uRUdVWm1hUEVrWnp2VDNpTURFUGJtaXVhSnJuOWFDVWN0Rm8weWxOMmpTZnVWalZ3blZINUVkVFdTM0FwX0xBTGRiZnoxNlNwQUZmSG5rbmdjU19hOFhHZndVc04yZHZLSFdsZmppdnhuc1dzcjJuTmFDUzc5ajVuVHZVR2ZJNFF0MXF4SzE4OHJIa3F0ZU1LT1lvcWRsbGV4WjNlVFNkLU9mbXMyNzRMb1BOX1M2TG96SG91RjRjckRjZjRPVnB6VGJUcnJZZlBfa0hnTHNaQy1Ua2VaS3lBSFdDdVZrUUF4dzRUTE5FbmJMM2hzczZYOVJNaUZLT21ORzJ3Z2N4Z1h1MDVoWU9YSk8wQU5qdlQwM3Z5QkF5enhQNGpvZFV2STlVTTlGTXY2aWNRQzgwS3NIb19JUjRZZnJ6eUhMZzEzc2o5X0hvMzZBWHFWeFFMRkZBRlNBUVAydUxfM1dRaE1QckpBemVxYkFBWkRiZkJGZ1dCb3BReG1ZWUp3cW40YlRLVHZfYW1Cb0pvTGlqMjM0Z2tEVjhBaDdPb0N6dG1QaWRheEFxWXJNS0Q0c1puZVpWN09ENGNRRHluVTkxd1NSWmpMM3pGMktGWlZNdDd0SGttand1UkNTMDd4YmRCUnJSc1pMVThhRk41WFJMTzhfazQ1RFQ4emkzelNHZFdQS1RrZTg3dUo5RFFCZ3MxYV9CczF1SGh3Wm1ibThsQXFWNU15dUpvbTF1MTJUclpEQTNmMk5aT29JeUUwVmc?oc=5))
+- [Thunhoon] หุ้นไทยวันนี้ดีดขึ้น 4.83 จุด ซื้อ DELTA-KCE-KTB ([ลิงก์](https://news.google.com/rss/articles/CBMiY0FVX3lxTE5TbUVvQ0t0QzBsajZUS1pzTmJKZ1FKNTZVNkhnMUVEZ2llVTVyZEVoaXVrMndPWHRvbUhzWGNIVU1MYTllN0gzbjhsRFhXRVFpNDNORFd0UXF2VWh6c2lpMnZPUQ?oc=5))

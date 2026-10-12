@@ -1,0 +1,19 @@
+---
+ticker: CNT
+market: thailand
+in_top20_since: 2026-10-12
+lists: [YTD, RS]
+last_fetch: 2026-10-12
+---
+# CNT — Christiani & Nielsen Thailand Public Co. Ltd.
+
+## ทำไมติด Top20
+_ยังไม่มีสรุป — สั่ง "สรุป Top20 US"_
+
+## มุมมองจาก X
+_ยังไม่มี — สั่ง "ดู X ของ CNT"_
+
+## Feed
+
+### 2026-10-07
+- [Facebook] News1. . ต่างชาติทุบหุ้นติดต่อปีที่ 4 ([ลิงก์](https://news.google.com/rss/articles/CBMipgNBVV95cUxOb2lhaTZfOVZ5TTE5WEYzU0JfalNmeXNKeU5KRUU2NmZabmR6QkE1NHF5OU1xbmU2WVlqWE0xbFhtaXl0MkN5ZFZweVFVaG95ZHd2WnhTV1pkRXk2akoxZVNNZmlKRXZJTTZMYUYzeGNnLXlmaTJtb2w2dVBUZ25DYU4wTTNBWU52c0phR1lDX2tob3o4Zy1QZktKNXZ3X2hyODVwRFVSUjZkVUUtbnBvX0Y0Zno4NlJmNTJBbERnejZZNFJlaE5XS2x5Q250Y2xYQk5RUFhUWEVWZkJ6LVRyVXdxTEZidjVYa09YZGxwaVc2Y3VsWHZWWkVxb0ZvX2FsWm4yY2d0UjBNQmFjaVdHQTlvUGhQSzhVOUE0anlERzVrZmU3cHlzeENqU2hmNnBLdnduMlNVNk81ZFk4MjdWSFpNT3dCMHpnTjFha1dNRkpBOFpTcVJaSnFYeTZwTnR4bWdTeGpacVdTYkEzMTgyMXVNbEZzTUV5TGpKMTJYX1o4bEZoZ3J4a2hRbnlHdDgwd21pMl9TZVM1RDQtb0pPNWctZ05Pdw?oc=5))
