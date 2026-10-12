@@ -9,7 +9,7 @@ export function extractSummary(md) {
   const text = m[1].trim();
   if (!text || PLACEHOLDER.test(text)) return null;
   const at = (text.match(/_อัปเดต (\d{4}-\d{2}-\d{2})/) || [])[1] || null;
-  return { text: text.slice(0, 1500), at };
+  return { text: text.slice(0, 2500), at };
 }
 
 export function buildRow(ticker, member, recentItems, summary, today) {

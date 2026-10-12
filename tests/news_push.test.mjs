@@ -16,9 +16,9 @@ test('extractSummary: placeholder หรือไม่มีหัวข้อ 
   assert.equal(extractSummary('# no sections'), null);
 });
 
-test('extractSummary: ตัดที่ 1500 ตัวอักษร', () => {
-  const s = extractSummary(mdWith('_อัปเดต 2026-10-14_\n' + 'ก'.repeat(3000)));
-  assert.equal(s.text.length, 1500);
+test('extractSummary: ตัดที่ 2500 ตัวอักษร', () => {
+  const s = extractSummary(mdWith('_อัปเดต 2026-10-14_\n' + 'ก'.repeat(4000)));
+  assert.equal(s.text.length, 2500);
 });
 
 const items = [
