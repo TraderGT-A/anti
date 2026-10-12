@@ -24,3 +24,11 @@ test('validRows: ต้องเป็น array ≤100 แถว และ ticke
   assert.equal(validRows([{ ticker: '<script>' }]), false);
   assert.equal(validRows(Array.from({ length: 101 }, (_, i) => ({ ticker: 'T' + i }))), false);
 });
+
+test('[RLS] notesRowKey: เพิ่มแถวใหม่ทุกครั้ง (ห้าม update) — key ใหม่เรียงตามเวลาได้และขึ้นต้นด้วย prefix', async () => {
+  const { notesPrefix, notesRowKey } = await import('../rsdash/api/_lib/notes.js');
+  assert.equal(notesPrefix('america'), 'notes|america|');
+  const a = notesRowKey('america', 1791800000000), b = notesRowKey('america', 1791800000001);
+  assert.ok(a.startsWith('notes|america|') && b > a && a.length === b.length);
+  assert.ok(notesRowKey('america', 999) < notesRowKey('america', 1791800000000));   // zero-pad ให้เรียงแบบข้อความได้
+});

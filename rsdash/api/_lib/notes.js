@@ -13,4 +13,7 @@ export function mergeNotes(oldRows, newRows) {
 
 export const validRows = (rows) => Array.isArray(rows) && rows.length <= 100 && rows.every((r) => r && /^[A-Za-z0-9.\-]{1,12}$/.test(String(r.ticker || '')));
 
-export const notesKey = (market) => 'notes|' + (market === 'thailand' ? 'thailand' : 'america');
+// RLS ของตาราง snapshots ให้ anon "เพิ่ม" แถวได้แต่ "แก้" ไม่ได้ → ทุกครั้งที่เขียนเป็นแถวใหม่ (dt = prefix + เวลา ms เติมศูนย์ 15 หลัก)
+// แล้วอ่านแถวล่าสุดด้วยการเรียง dt จากมากไปน้อย
+export const notesPrefix = (market) => 'notes|' + (market === 'thailand' ? 'thailand' : 'america') + '|';
+export const notesRowKey = (market, ms = Date.now()) => notesPrefix(market) + String(ms).padStart(15, '0');
