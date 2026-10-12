@@ -66,19 +66,19 @@ export function pruneRecent(state, today) {
 
 export const fileNameFor = (ticker) => String(ticker).replace(/\./g, '-') + '.md';
 
-const label = (it) => {
+export const sourceLabel = (it) => {
   const m = it.meta || {};
   if (it.source === 'yahoo') return 'Yahoo';
   if (it.source === 'gnews') return m.publisher || 'Google News';
   if (it.source === 'sec') return `SEC ${m.form || ''}`.trim();
-  if (it.source === 'reddit') return `Reddit r/${m.sub} ▲${m.score || 0}`;
+  if (it.source === 'reddit') return `Reddit r/${m.sub}` + (m.score ? ` ▲${m.score}` : '');
   return it.source;
 };
 const mdText = (s) => String(s).replace(/[\[\]]/g, (c) => (c === '[' ? '(' : ')')).replace(/\s+/g, ' ');
 const mdUrl = (u) => String(u).replace(/[ ()]/g, (c) => encodeURIComponent(c));
 
 export function renderFeedBlock(date, items) {
-  return `### ${date}\n` + items.map((it) => `- [${label(it)}] ${mdText(it.title)} ([ลิงก์](${mdUrl(it.url)}))`).join('\n') + '\n';
+  return `### ${date}\n` + items.map((it) => `- [${sourceLabel(it)}] ${mdText(it.title)} ([ลิงก์](${mdUrl(it.url)}))`).join('\n') + '\n';
 }
 
 function frontmatter(meta) {

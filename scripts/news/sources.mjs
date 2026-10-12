@@ -52,13 +52,16 @@ export function parseSecSubmissions(json, { ticker, cik, sinceISO }) {
   return out;
 }
 
-export function parseReddit(text, { ticker, sub }) {
-  let j; try { j = typeof text === 'string' ? JSON.parse(text) : text; } catch { return []; }
-  const kids = j && j.data && Array.isArray(j.data.children) ? j.data.children : [];
-  return kids.map((k) => k && k.data).filter((d) => d && d.title && d.permalink && d.created_utc).map((d) => ({
-    ticker, source: 'reddit', title: String(d.title).trim(), url: 'https://www.reddit.com' + d.permalink,
-    published: new Date(d.created_utc * 1000).toISOString().slice(0, 10), meta: { score: d.ups || 0, sub: d.subreddit || sub },
-  }));
+/* Reddit: ใช้ Atom search feed (JSON ตอบ 403 ถ้าไม่ล็อกอิน) — ไม่มีคะแนนโหวตใน feed */
+export function parseReddit(xml, { ticker }) {
+  const out = [];
+  for (const m of String(xml || '').matchAll(/<entry>([\s\S]*?)<\/entry>/g)) {
+    const title = tag(m[1], 'title'), url = (m[1].match(/<link[^>]*href="([^"]+)"/) || [])[1] || '';
+    const published = isoDate(tag(m[1], 'published') || tag(m[1], 'updated')), sub = (m[1].match(/<category[^>]*term="([^"]+)"/) || [])[1] || '';
+    if (!title || !/^https:\/\/www\.reddit\.com\//.test(url) || !published) continue;
+    out.push({ ticker, source: 'reddit', title, url: decode(url), published, meta: { sub } });
+  }
+  return out;
 }
 
 /* ดึง map ticker → CIK ครั้งเดียวต่อรอบ (ต้องมี User-Agent ที่มีช่องทางติดต่อตามกติกา SEC) */
@@ -87,8 +90,6 @@ export async function fetchTicker(ticker, { sinceISO, cikMap = new Map(), secUA 
   if (!secUA) errors.push('sec: skipped (NEWS_SEC_UA not set)');
   else if (!cik) errors.push(`sec: no CIK for ${sym}`);
   else await get('sec', `https://data.sec.gov/submissions/CIK${cik}.json`, { 'User-Agent': secUA }, (t) => parseSecSubmissions(JSON.parse(t), { ticker, cik, sinceISO }));
-  for (const sub of SUBS) {
-    await get(`reddit r/${sub}`, `https://www.reddit.com/r/${sub}/search.json?q=${encodeURIComponent(sym)}&restrict_sr=1&sort=new&t=week&limit=25`, { 'User-Agent': UA }, (t) => parseReddit(t, { ticker, sub }));
-  }
+  await get('reddit', `https://www.reddit.com/r/${SUBS.join('+')}/search.rss?q=${encodeURIComponent(sym)}&restrict_sr=1&sort=new&t=week&limit=25`, { 'User-Agent': UA }, (t) => parseReddit(t, { ticker }));
   return { items: items.filter((x) => x.published >= sinceISO), errors };
 }

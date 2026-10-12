@@ -35,3 +35,4 @@ data/news_state.json
 data/news_state.json.tmp
 data/news_log.txt
 .superpowers/
+data/news_run.txt

@@ -52,15 +52,16 @@ test('parseSecTickers: Map symbol → CIK 10 หลัก', () => {
   assert.equal(m.get('BRK-B'), '0001067983');
 });
 
-test('parseReddit: meta.score/sub, url เต็ม; ข้อความไม่ใช่ JSON คืน []', () => {
-  const it = parseReddit(fx('reddit.json'), { ticker: 'NVDA', sub: 'stocks' });
+test('parseReddit (Atom): sub จาก category, url ของโพสต์, decode title; หน้า error คืน []', () => {
+  const it = parseReddit(fx('reddit.xml'), { ticker: 'NVDA' });
   assert.equal(it.length, 2);
   assert.equal(it[0].url, 'https://www.reddit.com/r/stocks/comments/abc123/nvda_earnings_preview/');
-  assert.equal(it[0].meta.score, 412);
+  assert.equal(it[0].title, 'NVDA earnings preview & what to expect');
   assert.equal(it[0].meta.sub, 'stocks');
+  assert.equal(it[1].meta.sub, 'wallstreetbets');
   assert.equal(it[0].published, '2026-10-12');
-  assert.deepEqual(parseReddit('not json', { ticker: 'NVDA', sub: 'stocks' }), []);
-  assert.deepEqual(parseReddit(fx('error.html'), { ticker: 'NVDA', sub: 'stocks' }), []);
+  assert.deepEqual(parseReddit('not xml', { ticker: 'NVDA' }), []);
+  assert.deepEqual(parseReddit(fx('error.html'), { ticker: 'NVDA' }), []);
 });
 
 function fakeFetch(map, calls) {
@@ -73,21 +74,23 @@ function fakeFetch(map, calls) {
 
 test('fetchTicker: yahoo 429 → แหล่งอื่นยังครบ, errors มี yahoo 1 บรรทัด, กรอง since', async () => {
   const calls = [];
-  const f = fakeFetch({ 'feeds.finance.yahoo.com': 429, 'news.google.com': fx('gnews.xml'), 'data.sec.gov': fx('sec_submissions.json'), 'reddit.com/r/': fx('reddit.json') }, calls);
+  const f = fakeFetch({ 'feeds.finance.yahoo.com': 429, 'news.google.com': fx('gnews.xml'), 'data.sec.gov': fx('sec_submissions.json'), 'reddit.com/r/': fx('reddit.xml') }, calls);
   const out = await fetchTicker('NVDA', { sinceISO: '2026-09-01', cikMap: new Map([['NVDA', '0001045810']]), secUA: 'Test test@example.com', fetchFn: f, sleep: noSleep });
+  assert.equal(calls.filter((u) => u.includes('reddit.com')).length, 1);   // 3 subreddit ใน request เดียว (กัน 429)
+  assert.ok(calls.some((u) => u.includes('/r/stocks+wallstreetbets+investing/search.rss?')));
   assert.equal(out.errors.length, 1);
   assert.match(out.errors[0], /yahoo/);
   const bySrc = (s) => out.items.filter((x) => x.source === s).length;
   assert.equal(bySrc('yahoo'), 0);
   assert.equal(bySrc('gnews'), 2);
   assert.equal(bySrc('sec'), 2);
-  assert.equal(bySrc('reddit'), 3);   // 3 subreddit × 1 โพสต์ใหม่ (โพสต์เก่าถูกกรอง)
+  assert.equal(bySrc('reddit'), 1);   // โพสต์เก่าถูกกรองด้วย since
   assert.ok(out.items.every((x) => x.published >= '2026-09-01'));
 });
 
 test('fetchTicker: ไม่มี secUA → ไม่เรียก data.sec.gov และบอกเหตุใน errors', async () => {
   const calls = [];
-  const f = fakeFetch({ 'feeds.finance.yahoo.com': fx('yahoo.xml'), 'news.google.com': fx('gnews.xml'), 'reddit.com/r/': fx('reddit.json') }, calls);
+  const f = fakeFetch({ 'feeds.finance.yahoo.com': fx('yahoo.xml'), 'news.google.com': fx('gnews.xml'), 'reddit.com/r/': fx('reddit.xml') }, calls);
   const out = await fetchTicker('NVDA', { sinceISO: '2026-09-01', cikMap: new Map([['NVDA', '0001045810']]), secUA: '', fetchFn: f, sleep: noSleep });
   assert.ok(!calls.some((u) => u.includes('data.sec.gov')));
   assert.ok(out.errors.includes('sec: skipped (NEWS_SEC_UA not set)'));
