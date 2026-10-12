@@ -36,3 +36,5 @@ data/news_state.json.tmp
 data/news_log.txt
 .superpowers/
 data/news_run.txt
+data/profiles_missing.json
+data/profiles_run.txt
