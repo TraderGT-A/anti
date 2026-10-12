@@ -9,9 +9,13 @@ last_fetch: 2026-10-12
 
 ## ทำไมติด Top20
 _อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
-**บริษัททำอะไร:** Erasca เป็นบริษัทไบโอเทคที่พัฒนายามะเร็งชนิดมุ่งเป้า โดยเน้นเป้าหมายกลุ่ม RAS ที่เป็นตัวขับมะเร็งหลายชนิด
-**กำลังทำอะไรอยู่:** ประกาศข้อมูลยา ERAS-0015 ซึ่งเป็นยากลุ่ม pan-RAS เมื่อประมาณวันที่ 6 ต.ค.
-**ตลาดสนใจอะไร:** บทวิเคราะห์ใน Seeking Alpha มองว่าการที่ Revolution Medicines ได้รับอนุมัติยากลุ่มเดียวกัน ช่วยลดความเสี่ยงให้ผู้ตามอย่าง Erasca เพราะแสดงว่าแนวทางนี้ใช้ได้จริง
+
+Erasca เป็นบริษัทไบโอเทคที่พัฒนายามะเร็งชนิดมุ่งเป้า โดยเน้นเป้าหมายกลุ่ม RAS ที่เป็นตัวขับมะเร็งหลายชนิด
+
+ตอนนี้ประกาศข้อมูลยา ERAS-0015 ซึ่งเป็นยากลุ่ม pan-RAS เมื่อประมาณวันที่ 6 ต.ค.
+
+ตลาดกำลังจับตาบทวิเคราะห์ใน Seeking Alpha มองว่าการที่ Revolution Medicines ได้รับอนุมัติยากลุ่มเดียวกัน ช่วยลดความเสี่ยงให้ผู้ตามอย่าง Erasca เพราะแสดงว่าแนวทางนี้ใช้ได้จริง
+
 แหล่ง: [AD HOC NEWS](https://news.google.com/rss/articles/CBMivgFBVV95cUxOTGNCU0c4aFRCdXNlZXVTVFBWWFoxYmg2VTNBUWJuT0ZXaFNkbUZ3Wm5Fd3lNNTF2VzBCU1hhcVZzVGdaYXJRaGd3dXdvVTBHeWVIRUhaUkFoZUhfbUJoaTNJS0FQNVA0ZFJsS1oxMGxBVTNhaUd3eTdSY2haV01MUGRYbjA5NUJOWGtkbXBaSm9oY19zQXdJOHU0R19LYlVaWHR3QkNtTmRyWHh6ZDYzWjlOLVlIaWRNWUh2c0ZB?oc=5) · [Seeking Alpha](https://news.google.com/rss/articles/CBMirAFBVV95cUxQQS1LRE5pRTVrV21YVFotNTBWaVRBZU1xUnE5NUxuTlp2eU9lS210MWhrb2pMR1F0T2hENC0tQzNSZnRueGg5aFBHTkN4dWdZTHB0bWpGYjNjSFM4MDJDTWZCRjBSRzN4bjlOUkxJbHBVQUVaQ2JScUZvVDg1RjM3RjlwZ0ZrVzVKQlhsU0ZrT3o1NGxTUUdGLVVXRUpxU1U1Z3d4Q2RPck1yZGxI?oc=5) · [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/propanc-biopharma-highlights-differentiated-prp-123000402.html?.tsrc=rss)
 
 ## มุมมองจาก X

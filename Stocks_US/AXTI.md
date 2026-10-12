@@ -9,12 +9,19 @@ last_fetch: 2026-10-12
 
 ## ทำไมติด Top20
 _อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
-**บริษัททำอะไร:** AXT ผลิตแผ่นวัสดุตั้งต้น (substrate) แบบ indium phosphide และ gallium arsenide ซึ่งใช้ทำชิปแสงและชิปสื่อสารความเร็วสูงในดาต้าเซ็นเตอร์ AI
-**กำลังทำอะไรอยู่:** ได้รับการจัดให้เป็นหนึ่งในผู้ได้ประโยชน์จากเทคโนโลยี co-packaged optics (16 ก.ย.) และถูกเพิ่มเข้าดัชนี S&P SmallCap 600 (หุ้นขึ้น 16% ในวันที่ 21 ก.ย.)
-**ทำไมหุ้นขึ้นตอนนี้:** ล่าสุดมีพาดหัวว่าหุ้นพุ่งแรงหลังบริษัทให้แนวโน้มที่ดีมากและมียอดขายรายไตรมาสสูงสุดเป็นประวัติการณ์ โดย Needham มองว่าเป็นโอกาสเครือข่าย AI ที่จับต้องได้ ก่อนหน้านั้นหุ้นเคยร่วง 10% ในวันเดียวทั้งที่นักวิเคราะห์เพิ่มประมาณการรายได้ปี 2027 มากกว่าเท่าตัว
-**ตลาดสนใจอะไร:** ความต้องการ InP ที่พุ่งขึ้นจากเครือข่าย AI และมุมมอง Wedbush ว่าจีนต้องการระบบออปติกและเครือข่ายที่เร็วขึ้น
-**กำลังรออะไร:** บริษัทจะประกาศงบไตรมาส 3 ปี 2026 วันที่ 29 ต.ค. 2026
-**ความเสี่ยง:** บทวิเคราะห์ระบุว่าราคาแพงเมื่อเทียบกับยอดขาย และหุ้นเคยตกสามวันติดก่อนหน้านี้ จึงแกว่งแรง
+
+AXT ผลิตแผ่นวัสดุตั้งต้น (substrate) แบบ indium phosphide และ gallium arsenide ซึ่งใช้ทำชิปแสงและชิปสื่อสารความเร็วสูงในดาต้าเซ็นเตอร์ AI
+
+ตอนนี้ได้รับการจัดให้เป็นหนึ่งในผู้ได้ประโยชน์จากเทคโนโลยี co-packaged optics (16 ก.ย.) และถูกเพิ่มเข้าดัชนี S&P SmallCap 600 (หุ้นขึ้น 16% ในวันที่ 21 ก.ย.)
+
+ล่าสุดมีพาดหัวว่าหุ้นพุ่งแรงหลังบริษัทให้แนวโน้มที่ดีมากและมียอดขายรายไตรมาสสูงสุดเป็นประวัติการณ์ โดย Needham มองว่าเป็นโอกาสเครือข่าย AI ที่จับต้องได้ ก่อนหน้านั้นหุ้นเคยร่วง 10% ในวันเดียวทั้งที่นักวิเคราะห์เพิ่มประมาณการรายได้ปี 2027 มากกว่าเท่าตัว
+
+ตลาดกำลังจับตาความต้องการ InP ที่พุ่งขึ้นจากเครือข่าย AI และมุมมอง Wedbush ว่าจีนต้องการระบบออปติกและเครือข่ายที่เร็วขึ้น
+
+สิ่งที่ตลาดรออยู่คือบริษัทจะประกาศงบไตรมาส 3 ปี 2026 วันที่ 29 ต.ค. 2026
+
+ความเสี่ยงคือบทวิเคราะห์ระบุว่าราคาแพงเมื่อเทียบกับยอดขาย และหุ้นเคยตกสามวันติดก่อนหน้านี้ จึงแกว่งแรง
+
 แหล่ง: [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/axt-inc-schedules-third-quarter-200500856.html?.tsrc=rss) · [TIKR](https://www.tikr.com/blog/axt-stock-fell-10-in-a-day-even-as-analysts-more-than-doubled-their-2027-revenue-estimates-heres-where-the-stock-could-go?ref=yahoofinance&.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/axt-inc-axti-climbs-16-200025106.html?.tsrc=rss) · [Stocktwits](https://news.google.com/rss/articles/CBMizAFBVV95cUxQQUh2MkEwdXRnc2l1SDFtNVluNjdYdU5rOEMxQ0FJMXEzNUlhU1R3dnBXNUhfZlk0cGZBVGNFT2NZTTRzbkFlLWxLMmdLTDJFSlNLdlNEcWIxVHZtYnVueWt6M18xbnhfV0lyeVB6d2p0X3Y2UERpSXdUNURxbU1tXzlFNy1ycjR4X1VEd0ZYMW8yalRGYk5CWHVrRnBJeXFyY1NPSGJsNXhjZjBoai1lZU9EZFctbjc1WENZWDd2cDN2a2pod1hoT0pNVk0?oc=5)
 
 ## มุมมองจาก X

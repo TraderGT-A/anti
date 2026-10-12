@@ -9,11 +9,17 @@ last_fetch: 2026-10-12
 
 ## ทำไมติด Top20
 _อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
-**บริษัททำอะไร:** Lumentum ผลิตเลเซอร์และชิ้นส่วนออปติกที่ส่งข้อมูลด้วยแสง ใช้ในดาต้าเซ็นเตอร์ AI และเครือข่ายสื่อสาร
-**กำลังทำอะไรอยู่:** ขยายการผลิตส่วนประกอบออปติกให้ทันความต้องการของลูกค้า AI ซึ่งตอนนี้บริษัทบอกว่าเต็มกำลังการผลิต
-**ทำไมหุ้นขึ้นตอนนี้:** วันที่ 9 ต.ค. CEO บอกว่าชิ้นส่วนออปติก AI ขายเต็มถึงต้นปี 2029 หุ้นขึ้นราว 6-9% ในวันนั้น และลากหุ้นคู่แข่งอย่าง Coherent กับ Applied Optoelectronics ขึ้นด้วย
-**ตลาดสนใจอะไร:** Morgan Stanley และ Barclays มองว่ายังมีที่ให้ขึ้นต่อ และนักลงทุนจับตาการลงทุนดาต้าเซ็นเตอร์ของ Google
-**ความเสี่ยง:** หุ้นกลุ่มออปติกอ่อนไหวต่อผลตอบแทนพันธบัตรที่สูงขึ้น (Coherent เคยร่วงเกือบ 10% ในวันเดียว) และ LITE เองเคยร่วง 5.6% ในวันที่ 8 ต.ค.
+
+Lumentum ผลิตเลเซอร์และชิ้นส่วนออปติกที่ส่งข้อมูลด้วยแสง ใช้ในดาต้าเซ็นเตอร์ AI และเครือข่ายสื่อสาร
+
+ตอนนี้ขยายการผลิตส่วนประกอบออปติกให้ทันความต้องการของลูกค้า AI ซึ่งตอนนี้บริษัทบอกว่าเต็มกำลังการผลิต
+
+วันที่ 9 ต.ค. CEO บอกว่าชิ้นส่วนออปติก AI ขายเต็มถึงต้นปี 2029 หุ้นขึ้นราว 6-9% ในวันนั้น และลากหุ้นคู่แข่งอย่าง Coherent กับ Applied Optoelectronics ขึ้นด้วย
+
+ตลาดกำลังจับตาMorgan Stanley และ Barclays มองว่ายังมีที่ให้ขึ้นต่อ และนักลงทุนจับตาการลงทุนดาต้าเซ็นเตอร์ของ Google
+
+ความเสี่ยงคือหุ้นกลุ่มออปติกอ่อนไหวต่อผลตอบแทนพันธบัตรที่สูงขึ้น (Coherent เคยร่วงเกือบ 10% ในวันเดียว) และ LITE เองเคยร่วง 5.6% ในวันที่ 8 ต.ค.
+
 แหล่ง: [Investopedia](https://www.investopedia.com/market-update-nvidia-backed-lumentum-says-it-cant-keep-up-with-ai-demand-the-stock-is-surging-lite-12166244?.tsrc=rss) · [24/7 Wall St.](https://247wallst.com/investing/2026/10/09/optics-stocks-rally-on-sold-out-optical-capacity-through-early-2029-applied-optoelectronics-and-lumentum-surge-7-coherent-climbs-5/?.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/m/d05141fe-d936-31c6-9482-280e8f4ae825/lumentum-can%E2%80%99t-keep-up-with.html?.tsrc=rss) · [TIKR](https://www.tikr.com/blog/coherent-stock-fell-nearly-10-in-a-day-as-rising-yields-hit-optics-stocks-heres-where-the-stock-could-go-by-2031?ref=yahoofinance&.tsrc=rss)
 
 ## มุมมองจาก X

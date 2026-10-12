@@ -9,8 +9,11 @@ last_fetch: 2026-10-12
 
 ## ทำไมติด Top20
 _อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
-**ตลาดสนใจอะไร:** MarketBeat รายงานว่ายอด short interest (หุ้นที่ถูกขายชอร์ต) ของ PSIG เพิ่มขึ้นมากถึง 1,198% ซึ่งบ่งชี้ว่ามีผู้เดิมพันว่าหุ้นจะลง
-**ความเสี่ยง:** การขายชอร์ตที่เพิ่มขึ้นมากอาจทำให้ราคาแกว่งแรงทั้งสองทางเมื่อมีการปิดสถานะ
+
+ตลาดกำลังจับตาMarketBeat รายงานว่ายอด short interest (หุ้นที่ถูกขายชอร์ต) ของ PSIG เพิ่มขึ้นมากถึง 1,198% ซึ่งบ่งชี้ว่ามีผู้เดิมพันว่าหุ้นจะลง
+
+ความเสี่ยงคือการขายชอร์ตที่เพิ่มขึ้นมากอาจทำให้ราคาแกว่งแรงทั้งสองทางเมื่อมีการปิดสถานะ
+
 แหล่ง: [MarketBeat](https://news.google.com/rss/articles/CBMizgFBVV95cUxPNTJheVlDblZNU2g5eEhPUFF6S2JVY0xlelpMeW82TG1LSkd3ckl5WGZMbC1XQnlTZTBRa3dmX29VRVpsaXQzUTA1Y1QxNDRIb0toUnQ5OHJ1T2tuVmJkQ1ppcVFxS1VzU1FHTlJTRURRVC1LaGVKX2NLSUhfeHJMY0VaWlBWVkloXzN5YTFicVVfVzFaQVB0OFlJY0s5X3VwMHBIZHR2RUJCT2dqZkxzYy1vMVo4akcyVjdoMGxpeE53RzRlZGo1SHBhTEFjdw?oc=5)
 
 ## มุมมองจาก X

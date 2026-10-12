@@ -9,11 +9,17 @@ last_fetch: 2026-10-12
 
 ## ทำไมติด Top20
 _อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
-**บริษัททำอะไร:** Rackspace Technology ให้บริการดูแลระบบคลาวด์แบบหลายค่ายแก่องค์กร (managed cloud)
-**กำลังทำอะไรอยู่:** เข้าร่วมโครงการ NVIDIA Cloud Partner (ปลาย ก.ย.) และล่าสุดมีข่าวข้อตกลงกับ AMD ควบคู่กับการลดพนักงาน
-**ทำไมหุ้นขึ้นตอนนี้:** วันที่ 11 ต.ค. หุ้นพุ่งราว 25% ก่อนตลาดเปิดตามข่าวข้อตกลงกับ AMD และก่อนหน้านั้นขึ้น 15.8% หลังเข้าโครงการของ NVIDIA
-**ตลาดสนใจอะไร:** การปรับธุรกิจไปสู่ AI cloud
-**ความเสี่ยง:** หนี้สินรวมราว 2.8 พันล้านดอลลาร์ยังเป็นภาระ
+
+Rackspace Technology ให้บริการดูแลระบบคลาวด์แบบหลายค่ายแก่องค์กร (managed cloud)
+
+ตอนนี้เข้าร่วมโครงการ NVIDIA Cloud Partner (ปลาย ก.ย.) และล่าสุดมีข่าวข้อตกลงกับ AMD ควบคู่กับการลดพนักงาน
+
+วันที่ 11 ต.ค. หุ้นพุ่งราว 25% ก่อนตลาดเปิดตามข่าวข้อตกลงกับ AMD และก่อนหน้านั้นขึ้น 15.8% หลังเข้าโครงการของ NVIDIA
+
+ตลาดกำลังจับตาการปรับธุรกิจไปสู่ AI cloud
+
+ความเสี่ยงคือหนี้สินรวมราว 2.8 พันล้านดอลลาร์ยังเป็นภาระ
+
 แหล่ง: [Stocktwits](https://news.google.com/rss/articles/CBMikgJBVV95cUxPU19MeXpiZzlET2JVSFVBOXBKYUprSXliUWNWaXpYQWlhX1VVRk5RV2VtVnl5T3RubWJBV0Q5QXhWdy1saHdPWnVmSmMwMk45ZzhfWTRONnNUSUxHMjlfellnSkp4azhCNG1hSnVWbk43cEVESTZ3U0RmXzdRM1loX3g5MUVqb0xrb0NZclFRWjNSZHpfZU02czRyT085XzU5OEtuT3ozaXE1U2ItZldQZURMeWRKaC1zd3pFSXNFVzFwVkoyTGpCTDRnMHRPVkRQbDdYVkN1NWVPa0gxZkF0aFZmRWRhR0NVc0NYOS1CXzR0V2xCX3RxQjJOVnpvTVZvekRlMnBVRUY3SEtFZXRNd0Rn?oc=5) · [Yahoo Finance](https://finance.yahoo.com/technology/ai/articles/why-rackspace-technology-rxt-15-011428011.html?.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/rackspace-nvidia-partnership-sparks-early-163851620.html?.tsrc=rss)
 
 ## มุมมองจาก X

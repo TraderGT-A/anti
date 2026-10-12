@@ -9,11 +9,17 @@ last_fetch: 2026-10-12
 
 ## ทำไมติด Top20
 _อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
-**บริษัททำอะไร:** Veradermics เป็นบริษัทไบโอเทคที่พัฒนายารักษาผมร่วง/ผมบางแบบรับประทาน
-**ทำไมหุ้นขึ้นตอนนี้:** วันที่ 9 ต.ค. หุ้นพุ่งราว 14% ไปที่ประมาณ 126.63 ดอลลาร์ ทำ high 12 เดือนใหม่ โดย TipRanks ระบุว่าเป็นผลของความหวังเรื่องผลรักษาผมร่วงที่ดี
-**ตลาดสนใจอะไร:** นักลงทุนเปรียบเทียบกับกระแสยาลดน้ำหนักอย่าง Ozempic และจับตาผลทดลองที่รออยู่
-**กำลังรออะไร:** ผลการทดลองที่คาดว่าจะประกาศในครึ่งหลังของปี 2026
-**ความเสี่ยง:** หุ้นผันผวน เช่น ร่วง 8.1% เมื่อ 6 ต.ค. และผลทดลองที่รออยู่เป็นเหตุการณ์สองด้าน
+
+Veradermics เป็นบริษัทไบโอเทคที่พัฒนายารักษาผมร่วง/ผมบางแบบรับประทาน
+
+วันที่ 9 ต.ค. หุ้นพุ่งราว 14% ไปที่ประมาณ 126.63 ดอลลาร์ ทำ high 12 เดือนใหม่ โดย TipRanks ระบุว่าเป็นผลของความหวังเรื่องผลรักษาผมร่วงที่ดี
+
+นักลงทุนเปรียบเทียบกับกระแสยาลดน้ำหนักอย่าง Ozempic และจับตาผลทดลองที่รออยู่
+
+สิ่งที่ตลาดรออยู่คือผลการทดลองที่คาดว่าจะประกาศในครึ่งหลังของปี 2026
+
+ความเสี่ยงคือหุ้นผันผวน เช่น ร่วง 8.1% เมื่อ 6 ต.ค. และผลทดลองที่รออยู่เป็นเหตุการณ์สองด้าน
+
 แหล่ง: [TipRanks](https://news.google.com/rss/articles/CBMimgFBVV95cUxNbDQ2NkhQZGY3NUJjNzZrWlpFVjB4R21DSXEzb0tfQWtqXzBIRkx3RUk3UWFsLWlmamV4UG5ieGYwaEFKV2pIcEt6UGZyS0d0NVlqQU5qdS1oVnNuMWJvRmV2X1ZRUnUzb1RndzVtWEVVS1NDYk5ZZ1ItOXVFS0VzQ1I4NDNBeFBMcng0YkNZSi1zLUU1TkdCU1Jn?oc=5) · [Seeking Alpha](https://news.google.com/rss/articles/CBMitwFBVV95cUxPN3VtYnpaN3RWdno4TjY5RVdxSDBFZkFjeTI2eU5uNi1FMlZ3djBPMXdOU1pGcFAyLWppSC1rMmlQUWd6UmFzcjU1Z3k1TWZHNkZxNXIwRXdoRE5DcnkwWk10cXY2REFTQXotRWlJY2o4YmNxNXByRFJXTHhsalFIbEN5OGE2NUNZMmo4T3RDLXJ0WjhMMFJXNndMcmE3V0ZiQ0NYRnhNV3VVcVJmNGJTSEpmUlpMbk0?oc=5) · [Kalkine](https://news.google.com/rss/articles/CBMikAFBVV95cUxQQnhRZ1RiU2FoMk4zTnE1ZmxZcVdWNDIyQnFEU3RMNElDM1p4eTJVRFNFb0g4Yk1YXzA1d1VIYWhvd0p1aU1XcU1oQk40SWNrU2hMSEpqSGs0OF9mbVFuOVNQOUhlUWhZcTFydGI5eVBGZEI4ZG1tSHFMQ1BFcXBSV2pqMmE4UXZGRDdpV0lpSC0?oc=5) · [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/baldness-drug-stocks-veradermics-mane-002949530.html?.tsrc=rss)
 
 ## มุมมองจาก X

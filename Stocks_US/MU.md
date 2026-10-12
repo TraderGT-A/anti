@@ -9,11 +9,17 @@ last_fetch: 2026-10-12
 
 ## ทำไมติด Top20
 _อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
-**บริษัททำอะไร:** Micron เป็นผู้ผลิตชิปความจำ DRAM, HBM และ NAND รายใหญ่ของโลก ซึ่งเป็นหัวใจของเซิร์ฟเวอร์ AI
-**กำลังทำอะไรอยู่:** ได้ประโยชน์จากความต้องการหน่วยความจำที่ขาดตลาด และมีข่าวลงทุนราว 10 พันล้านดอลลาร์ในงานวิจัยหน่วยความจำสำหรับ AI
-**ทำไมหุ้นขึ้นตอนนี้:** หุ้นกลับขึ้นมายืนเหนือ 1,000 ดอลลาร์ มูลค่าตลาดอยู่เหนือ 1 ล้านล้านดอลลาร์ และขึ้นราว 169% ตั้งแต่ต้นปี ท่ามกลางการเทขายแล้วเด้งกลับของหุ้นชิปความจำ
-**ตลาดสนใจอะไร:** ความขาดแคลนหน่วยความจำ ราคา DRAM ที่ปรับขึ้น และเป้าราคาที่ห่างกันมาก เช่น BofA เห็นขึ้นอีกราว 24% และ Jim Cramer มองว่าอาจ "ขึ้นอีกเท่าตัว"
-**ความเสี่ยง:** หุ้นลงจากจุดสูงสุดราว 18%, สหภาพแรงงานของ Micron ในไต้หวันอนุมัติให้หยุดงานเรื่องโบนัสซึ่งกระทบห่วงโซ่อุปทาน, CEO ขายหุ้นตามแผน และนักวิเคราะห์บางรายเตือนว่ารายได้อาจลดลงมากภายในปี 2030
+
+Micron เป็นผู้ผลิตชิปความจำ DRAM, HBM และ NAND รายใหญ่ของโลก ซึ่งเป็นหัวใจของเซิร์ฟเวอร์ AI
+
+ตอนนี้ได้ประโยชน์จากความต้องการหน่วยความจำที่ขาดตลาด และมีข่าวลงทุนราว 10 พันล้านดอลลาร์ในงานวิจัยหน่วยความจำสำหรับ AI
+
+หุ้นกลับขึ้นมายืนเหนือ 1,000 ดอลลาร์ มูลค่าตลาดอยู่เหนือ 1 ล้านล้านดอลลาร์ และขึ้นราว 169% ตั้งแต่ต้นปี ท่ามกลางการเทขายแล้วเด้งกลับของหุ้นชิปความจำ
+
+ตลาดกำลังจับตาความขาดแคลนหน่วยความจำ ราคา DRAM ที่ปรับขึ้น และเป้าราคาที่ห่างกันมาก เช่น BofA เห็นขึ้นอีกราว 24% และ Jim Cramer มองว่าอาจ "ขึ้นอีกเท่าตัว"
+
+ความเสี่ยงคือหุ้นลงจากจุดสูงสุดราว 18%, สหภาพแรงงานของ Micron ในไต้หวันอนุมัติให้หยุดงานเรื่องโบนัสซึ่งกระทบห่วงโซ่อุปทาน, CEO ขายหุ้นตามแผน และนักวิเคราะห์บางรายเตือนว่ารายได้อาจลดลงมากภายในปี 2030
+
 แหล่ง: [Motley Fool](https://www.fool.com/investing/2026/10/11/micron-is-down-x-from-its-high-history-suggests-th/?.tsrc=rss) · [Barchart](https://www.barchart.com/story/news/5727029/microns-taiwan-union-authorized-a-strike-over-a-bonus-dispute-what-this-means-for-mu-stock?.tsrc=rss) · [Stocktwits](https://news.google.com/rss/articles/CBMizAFBVV95cUxNbUFBNy1FYTdMaE82X1FJX3BjU0R4UmJtTWFrekF4SjJfQzZYdzRtVk5LRnV6SERoZWJkTnNoWjJEOGpucFE4cDBhM2xHZFE0c1BPcjRlUGtUMDc1VFlnZ3RxbHJYUktkamVmdHpET3F0TUQ0RUY1cndJSUhzRFlrYlV1dFJ2TG03MUt2b0ItYVRQME4xSEc2aWw3d192REZNd1ZpbHY4eHFycF8xNUppMmt5dllQaWJ1UVNkUDZrOEVUbldla0VpRm5BT0Y?oc=5) · [Stocktwits](https://news.google.com/rss/articles/CBMi5wFBVV95cUxNTXBtTE9uNjRBaDcxVkNjYWw0UmlKYWlpODY4Y0N1eTFKenVZX2xSSVlKTUt4RWhUNjRoTnQtOThvd1VQc3B2eXRIRlVPVmpJM3ZOc3RJaU5ka1VZNlRPeHhnVUVyYU9za3RseVFSeGlCcnVpWUhnYzBzNy1tTlJiN0szTEs1NC1vRkxsVGl6b09yaFRZS0hZU3ByR3pMWmdVcDF5OGUzZXczZDNMVWZXMUlKVWE5Y2o4WlR1Q1BsNkt2RnVSUHdyZjV4WWRJYU01N1FQTzdRSEs2Z2NYNE5oYUQ1SWNSV2s?oc=5)
 
 ## มุมมองจาก X

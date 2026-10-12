@@ -9,9 +9,13 @@ last_fetch: 2026-10-12
 
 ## ทำไมติด Top20
 _อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
-**บริษัททำอะไร:** Cypherpunk Technologies เป็นบริษัทจดทะเบียนใน Nasdaq ที่มุ่งถือสกุลเงินดิจิทัล Zcash (ZEC) ข่าวของหุ้นจึงขยับตามความเคลื่อนไหวของ Zcash เป็นหลัก
-**ทำไมหุ้นขึ้นตอนนี้:** ต้นเดือน ต.ค. มีข่าวเด่นของกลุ่ม Zcash คือ Winklevoss Twins วางแผนลงทุนราว 100 ล้านดอลลาร์ในเหรียญนี้ และยื่นขอ ETF Zcash ชื่อ "WINK" ซึ่งอาจเป็นกองทุน spot ZEC ตัวที่สองในสหรัฐต่อจาก ZCSH ของ Grayscale
-**ตลาดสนใจอะไร:** นักลงทุนจับตาการไหลเข้าของเงินสถาบันสู่ Zcash ผ่าน ETF และการสนับสนุนจากแพลตฟอร์มอย่าง Gemini ที่เปลี่ยนซอฟต์แวร์ Zcash เมื่อปลาย ก.ย.
+
+Cypherpunk Technologies เป็นบริษัทจดทะเบียนใน Nasdaq ที่มุ่งถือสกุลเงินดิจิทัล Zcash (ZEC) ข่าวของหุ้นจึงขยับตามความเคลื่อนไหวของ Zcash เป็นหลัก
+
+ต้นเดือน ต.ค. มีข่าวเด่นของกลุ่ม Zcash คือ Winklevoss Twins วางแผนลงทุนราว 100 ล้านดอลลาร์ในเหรียญนี้ และยื่นขอ ETF Zcash ชื่อ "WINK" ซึ่งอาจเป็นกองทุน spot ZEC ตัวที่สองในสหรัฐต่อจาก ZCSH ของ Grayscale
+
+นักลงทุนจับตาการไหลเข้าของเงินสถาบันสู่ Zcash ผ่าน ETF และการสนับสนุนจากแพลตฟอร์มอย่าง Gemini ที่เปลี่ยนซอฟต์แวร์ Zcash เมื่อปลาย ก.ย.
+
 แหล่ง: [CryptoProwl](https://www.cryptoprowl.com/releases/winklevoss-twins-to-launch-new-zcash-etf-7253?.tsrc=rss) · [Unchained](https://unchainedcrypto.com/winklevoss-zcash-etf-could-become-the-second-u-s-spot-zec-fund-after-grayscales-zcsh/?.tsrc=rss) · [24/7 Wall St.](https://247wallst.com/investing/cryptocurrency/2026/10/06/the-winklevoss-twins-plan-to-invest-100-million-in-the-coin-that-outperformed-bitcoin/?.tsrc=rss)
 
 ## มุมมองจาก X

@@ -9,11 +9,17 @@ last_fetch: 2026-10-12
 
 ## ทำไมติด Top20
 _อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
-**บริษัททำอะไร:** Twist Bioscience ผลิต DNA สังเคราะห์ให้ห้องวิจัยและบริษัทยา ซึ่งเป็นวัตถุดิบของงานวิจัยและการค้นหายาด้วย AI
-**กำลังทำอะไรอยู่:** ร่วมมือกับ Eli Lilly ในโครงการ TuneLab ด้าน AI ค้นหายา (ประมาณ 22 ก.ย.) และเกี่ยวกับดีลด้าน AI อื่น ๆ
-**ทำไมหุ้นขึ้นตอนนี้:** วันที่ 25 ก.ย. หุ้นขึ้น 16% ซึ่ง Leerink มองว่าเป็นผลจาก Anthropic และวันที่ 5 ต.ค. ขึ้นอีกราว 8.7% หลังข่าวดีลกับ Lilly พร้อมเป้าราคาที่ขึ้น (Barclays ที่ 215 ดอลลาร์)
-**ตลาดสนใจอะไร:** บทบาทของ DNA สังเคราะห์ในยุค AI ค้นหายา แต่ก็มีบทวิเคราะห์ว่ามูลค่า "ตึงเกินไป" เมื่อเทียบกับความจริง
-**ความเสี่ยง:** ผู้บริหารขายหุ้นหลายครั้ง (CEO ขายตามแผน; ผู้บริหารอีกรายขายราว 56.3 ล้านดอลลาร์) ARK ขายหุ้นราว 18 ล้านดอลลาร์ และ Jefferies เริ่มประเมินที่ Hold
+
+Twist Bioscience ผลิต DNA สังเคราะห์ให้ห้องวิจัยและบริษัทยา ซึ่งเป็นวัตถุดิบของงานวิจัยและการค้นหายาด้วย AI
+
+ตอนนี้ร่วมมือกับ Eli Lilly ในโครงการ TuneLab ด้าน AI ค้นหายา (ประมาณ 22 ก.ย.) และเกี่ยวกับดีลด้าน AI อื่น ๆ
+
+วันที่ 25 ก.ย. หุ้นขึ้น 16% ซึ่ง Leerink มองว่าเป็นผลจาก Anthropic และวันที่ 5 ต.ค. ขึ้นอีกราว 8.7% หลังข่าวดีลกับ Lilly พร้อมเป้าราคาที่ขึ้น (Barclays ที่ 215 ดอลลาร์)
+
+ตลาดกำลังจับตาบทบาทของ DNA สังเคราะห์ในยุค AI ค้นหายา แต่ก็มีบทวิเคราะห์ว่ามูลค่า "ตึงเกินไป" เมื่อเทียบกับความจริง
+
+ความเสี่ยงคือผู้บริหารขายหุ้นหลายครั้ง (CEO ขายตามแผน; ผู้บริหารอีกรายขายราว 56.3 ล้านดอลลาร์) ARK ขายหุ้นราว 18 ล้านดอลลาร์ และ Jefferies เริ่มประเมินที่ Hold
+
 แหล่ง: [Yahoo Finance](https://finance.yahoo.com/technology/ai/articles/twist-bioscience-twst-expands-ai-100850469.html?.tsrc=rss) · [TIKR](https://www.tikr.com/blog/twist-bioscience-stock-jumped-16-thursday-leerink-says-anthropic-made-it-happen?ref=yahoofinance&.tsrc=rss) · [Stocktwits](https://stocktwits.com/news-articles/markets/equity/cathie-wood-loads-up-on-these-biotech-stocks-after-strong-rallies-unloads-18-m-worth-of-twst-shares/cZDt2hdRBkH?.tsrc=rss) · [Seeking Alpha](https://news.google.com/rss/articles/CBMiwAFBVV95cUxQTXBnRFRfTWpMRnJvcXJqX1RIM0IxNEhLZ2NMcS1Ha25VUWRCNDdjdVBBZFJZUjlpX0I2Yi05bnNGVHJMOHZGZFNvaHV0blFpaDBQejI5QUJTcjFIZGdQYm14NHRNNzFlSW5jbHNZbVFDaTE2dUpYZkp1WWI2SWdQdENnYkJ0MGhvYTluX0dHQ3BDWXhWbzdXV0dVaTdHZEZuWXJLekVGN2FrZmRpWEdXX3lESTVVWW8wc0lDMEtMbm4?oc=5)
 
 ## มุมมองจาก X

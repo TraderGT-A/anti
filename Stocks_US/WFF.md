@@ -9,8 +9,11 @@ last_fetch: 2026-10-12
 
 ## ทำไมติด Top20
 _อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
-**ทำไมหุ้นขึ้นตอนนี้:** วันที่ 9 ต.ค. หุ้นพุ่งราว 204% (บางสื่อว่าเกือบ 500%) โดยสื่ออย่าง Quiver Quantitative มองว่าการเก็งกำไรมีน้ำหนักมากกว่าปัจจัยพื้นฐาน
-**ความเสี่ยง:** ราคาแกว่งตามแรงเก็งกำไรระยะสั้น อาจกลับทิศได้เร็ว
+
+วันที่ 9 ต.ค. หุ้นพุ่งราว 204% (บางสื่อว่าเกือบ 500%) โดยสื่ออย่าง Quiver Quantitative มองว่าการเก็งกำไรมีน้ำหนักมากกว่าปัจจัยพื้นฐาน
+
+ความเสี่ยงคือราคาแกว่งตามแรงเก็งกำไรระยะสั้น อาจกลับทิศได้เร็ว
+
 แหล่ง: [Quiver Quantitative](https://news.google.com/rss/articles/CBMiwAFBVV95cUxPd3NrOWVtMGhKbDVfUUx1em5HaDNvZlF1TGwyLWdFTFU2Z0Y4UUpDdUl6dUk3NXR0ckd1WTI5eVRYQy1IM1FCNjAxaUkxajk4NFliX2NEdTVFM2RJQmNWM0ZDUndGVXFnWllTTVRpRzRYZ2hUckkxM2dXM3RkWDBCOElacUZIVXB1V1ZfOFBNUmFOX28xNzI4VTRNbUU5Wl9iWGpMMDhvZVR0X3Z4VzdHRkY4ZjRfS0pZbDhhZWN5cG4?oc=5) · [Pluang](https://news.google.com/rss/articles/CBMihgFBVV95cUxObzVBUm1rT1NRWWhOT295WUoxaXBsTzg5UlpMSkhJZjdleVBhWER1emFrelJRMk1tNy0wTmM2SDB6N2lvbkl6SC1naTM4Zng4dHZvZ2FwdEVTUFo1YjdaT0hzRmtLVVF1T013eVNBX0sxMWRSSjU4TEJJV2w4OXlNZERFLUlydw?oc=5)
 
 ## มุมมองจาก X

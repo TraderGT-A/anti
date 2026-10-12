@@ -9,10 +9,15 @@ last_fetch: 2026-10-12
 
 ## ทำไมติด Top20
 _อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
-**บริษัททำอะไร:** Penguin Solutions ทำระบบคอมพิวเตอร์ AI/HPC และโมดูลหน่วยความจำให้ดาต้าเซ็นเตอร์
-**กำลังทำอะไรอยู่:** ธุรกิจหน่วยความจำโตเร็วจากความต้องการ AI และมีข่าวลือว่าดีล GPU 36,000 ตัวในนอร์เวย์น่าจะเป็นโครงการ AI ของ Volta ที่เกี่ยวกับ Anthropic (เป็นการคาดเดาของ Benzinga ไม่ใช่การยืนยัน)
-**ทำไมหุ้นขึ้นตอนนี้:** วันที่ 7 ต.ค. รายงานงบไตรมาส 4 ปีงบ 2026 ที่รายได้สูงสุดเป็นประวัติการณ์ พร้อมยกแนวโน้มปีงบ 2027 หุ้นพุ่งราว 13-15% ต่อมา BofA เริ่มให้ Buy (9 ต.ค.) และ Needham ขึ้นเป้าราคาจาก 80 เป็น 85 ดอลลาร์
-**ตลาดสนใจอะไร:** ความต้องการหน่วยความจำ AI และการปรับเป้าราคาของนักวิเคราะห์หลายแห่ง
+
+Penguin Solutions ทำระบบคอมพิวเตอร์ AI/HPC และโมดูลหน่วยความจำให้ดาต้าเซ็นเตอร์
+
+ตอนนี้ธุรกิจหน่วยความจำโตเร็วจากความต้องการ AI และมีข่าวลือว่าดีล GPU 36,000 ตัวในนอร์เวย์น่าจะเป็นโครงการ AI ของ Volta ที่เกี่ยวกับ Anthropic (เป็นการคาดเดาของ Benzinga ไม่ใช่การยืนยัน)
+
+วันที่ 7 ต.ค. รายงานงบไตรมาส 4 ปีงบ 2026 ที่รายได้สูงสุดเป็นประวัติการณ์ พร้อมยกแนวโน้มปีงบ 2027 หุ้นพุ่งราว 13-15% ต่อมา BofA เริ่มให้ Buy (9 ต.ค.) และ Needham ขึ้นเป้าราคาจาก 80 เป็น 85 ดอลลาร์
+
+ตลาดกำลังจับตาความต้องการหน่วยความจำ AI และการปรับเป้าราคาของนักวิเคราะห์หลายแห่ง
+
 แหล่ง: [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/penguin-solutions-peng-flies-13-224051948.html?.tsrc=rss) · [Yahoo Finance](https://www.proactiveinvestors.com/companies/news/1099916/penguin-solutions-initiated-with-a-buy-from-bank-of-america-on-ai-memory-demand-1099916.html?.tsrc=rss) · [Benzinga](https://www.benzinga.com/markets/prediction-markets/26/10/62219517/penguin-36000-gpu-anthropic-norway?utm_source=yahooFinance&utm_campaign=partner_feed&utm_medium=referral&.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/why-penguin-solutions-peng-stock-222710070.html?.tsrc=rss)
 
 ## มุมมองจาก X

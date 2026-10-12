@@ -9,8 +9,11 @@ last_fetch: 2026-10-12
 
 ## ทำไมติด Top20
 _อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
-**บริษัททำอะไร:** Silicom ของอิสราเอลทำการ์ดเครือข่ายและอุปกรณ์เชื่อมต่อสำหรับเซิร์ฟเวอร์และระบบสื่อสาร
-**กำลังรออะไร:** Silicom จะประกาศผลไตรมาส 3 ปี 2026 วันที่ 29 ต.ค. 2026
+
+Silicom ของอิสราเอลทำการ์ดเครือข่ายและอุปกรณ์เชื่อมต่อสำหรับเซิร์ฟเวอร์และระบบสื่อสาร
+
+สิ่งที่ตลาดรออยู่คือSilicom จะประกาศผลไตรมาส 3 ปี 2026 วันที่ 29 ต.ค. 2026
+
 แหล่ง: [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/silicoms-third-quarter-2026-results-121500516.html?.tsrc=rss) · [Barrons](https://news.google.com/rss/articles/CBMiowFBVV95cUxQd1dhTlowQnZpZVFkSUxyNVpPWm11WjBZUTBPRVNFejZGMi01ekJHWklmRFM4V2s3SWppeXdoWExyd2dodFQyZEZkSE9qWFBDTFh0cThVcXNzMHRNQ2lxcXlkR18teEhjNzFzbWhDQ2VYV3lpalM1OUxQYlJoN0xqTzJUVXZqcjhHbHJqYnl5ckwtdjNVdEJ6LWtQN2x3Q3ZDYU5Z?oc=5)
 
 ## มุมมองจาก X

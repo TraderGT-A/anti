@@ -9,11 +9,17 @@ last_fetch: 2026-10-12
 
 ## ทำไมติด Top20
 _อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
-**บริษัททำอะไร:** agilon health ร่วมมือกับกลุ่มคลินิกแพทย์ปฐมภูมิในสหรัฐ เพื่อดูแลผู้สูงอายุที่ใช้ Medicare Advantage โดยรับความเสี่ยงค่ารักษาร่วมกับแพทย์ (ไม่ใช่ AGL Energy ของออสเตรเลีย)
-**กำลังทำอะไรอยู่:** ช่วงปลาย ก.ย. ขยายความร่วมมือกับ Jackson Clinic (30 ก.ย.) และ Springfield Clinic (23 ก.ย.) ผ่านโครงการ Senior Health Connect ACO และขยายแบบ full-risk Medicare กับ Family Practice Center (17 ก.ย.)
-**ทำไมหุ้นขึ้นตอนนี้:** กลางเดือน ก.ย. Bernstein ปรับมุมมองขึ้น ทำให้เกิดเรื่องเล่าว่าบริษัทกำลังฟื้นตัว และหุ้นขยับขึ้นหลายวัน
-**ตลาดสนใจอะไร:** นักลงทุนดูว่าการเพิ่มพันธมิตรคลินิกจะทำให้ธุรกิจกลับมาเติบโตและมีกำไรได้จริงหรือไม่
-**กำลังรออะไร:** agilon ประกาศกำหนดวันรายงานงบไตรมาส 3 ปี 2026 แล้ว (รายละเอียดวันที่อยู่ในข่าวแหล่งอ้างอิง)
+
+agilon health ร่วมมือกับกลุ่มคลินิกแพทย์ปฐมภูมิในสหรัฐ เพื่อดูแลผู้สูงอายุที่ใช้ Medicare Advantage โดยรับความเสี่ยงค่ารักษาร่วมกับแพทย์ (ไม่ใช่ AGL Energy ของออสเตรเลีย)
+
+ตอนนี้ช่วงปลาย ก.ย. ขยายความร่วมมือกับ Jackson Clinic (30 ก.ย.) และ Springfield Clinic (23 ก.ย.) ผ่านโครงการ Senior Health Connect ACO และขยายแบบ full-risk Medicare กับ Family Practice Center (17 ก.ย.)
+
+กลางเดือน ก.ย. Bernstein ปรับมุมมองขึ้น ทำให้เกิดเรื่องเล่าว่าบริษัทกำลังฟื้นตัว และหุ้นขยับขึ้นหลายวัน
+
+นักลงทุนดูว่าการเพิ่มพันธมิตรคลินิกจะทำให้ธุรกิจกลับมาเติบโตและมีกำไรได้จริงหรือไม่
+
+สิ่งที่ตลาดรออยู่คือagilon ประกาศกำหนดวันรายงานงบไตรมาส 3 ปี 2026 แล้ว (รายละเอียดวันที่อยู่ในข่าวแหล่งอ้างอิง)
+
 แหล่ง: [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/agilon-health-sets-date-report-200500047.html?.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/agilon-health-agl-bernstein-upgrade-100930384.html?.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/agilon-health-jackson-clinic-advance-130000938.html?.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/why-did-agilon-health-agl-131835774.html?.tsrc=rss)
 
 ## มุมมองจาก X

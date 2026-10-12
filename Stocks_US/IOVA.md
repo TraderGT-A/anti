@@ -9,11 +9,17 @@ last_fetch: 2026-10-12
 
 ## ทำไมติด Top20
 _อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
-**บริษัททำอะไร:** Iovance พัฒนาการรักษามะเร็งด้วยเซลล์ภูมิคุ้มกันของผู้ป่วยเอง (TIL) ยาหลักใช้กับมะเร็งผิวหนังเมลาโนมา
-**กำลังทำอะไรอยู่:** ยกประมาณการรายได้ปีนี้ขึ้น ซึ่งเป็นเหตุการณ์สำคัญที่สื่อพูดถึงต้นเดือน ต.ค.
-**ทำไมหุ้นขึ้นตอนนี้:** หุ้นทำ high 52 สัปดาห์ในช่วงนี้ หลัง UBS ขึ้นเป้าราคาและกลุ่มยามะเร็งเมลาโนมาถูกมองในแง่ดี Baird ก็ขึ้นเป้าราคาเป็น 11 ดอลลาร์
-**ตลาดสนใจอะไร:** ความหวังของกลุ่มเมลาโนมา ต่อเนื่องจากข่าววัคซีนมะเร็งของ Moderna/Merck และการเติบโตของยอดขายยา
-**ความเสี่ยง:** หุ้นกลับตัวลงเป็นช่วง ๆ เช่น วันที่ 6 ต.ค. และมีเสียงเตือนจากสื่อบางแห่งว่าไบโอเทคที่ขึ้นเร็วอาจร่วงได้
+
+Iovance พัฒนาการรักษามะเร็งด้วยเซลล์ภูมิคุ้มกันของผู้ป่วยเอง (TIL) ยาหลักใช้กับมะเร็งผิวหนังเมลาโนมา
+
+ตอนนี้ยกประมาณการรายได้ปีนี้ขึ้น ซึ่งเป็นเหตุการณ์สำคัญที่สื่อพูดถึงต้นเดือน ต.ค.
+
+หุ้นทำ high 52 สัปดาห์ในช่วงนี้ หลัง UBS ขึ้นเป้าราคาและกลุ่มยามะเร็งเมลาโนมาถูกมองในแง่ดี Baird ก็ขึ้นเป้าราคาเป็น 11 ดอลลาร์
+
+ตลาดกำลังจับตาความหวังของกลุ่มเมลาโนมา ต่อเนื่องจากข่าววัคซีนมะเร็งของ Moderna/Merck และการเติบโตของยอดขายยา
+
+ความเสี่ยงคือหุ้นกลับตัวลงเป็นช่วง ๆ เช่น วันที่ 6 ต.ค. และมีเสียงเตือนจากสื่อบางแห่งว่าไบโอเทคที่ขึ้นเร็วอาจร่วงได้
+
 แหล่ง: [Stocktwits](https://news.google.com/rss/articles/CBMi2gFBVV95cUxNWDFCSTdWb0FtZ3BQNXl3TVhtTmVudkU0Z2NjVkdZZGZrMmthMHIxY3dDbXdMUzZpeFpjUmVXWUdqR1NjTlVHdHRSWjI5Ynp2LU9DSGM1OVhSdXk5bWlSb0ZDM3NkZUZiRURFSVZTWlpsX3YxOG9kOUdDVFBBTFFlRHhIWUhmQjR5Uk1Fb2p0cnRRU2RsbVRuOGxuUmlfMUdQc0hrRnk3b0o4eDk5dnRkRVRwWkV6bEU4MkRIbmlfYkZzQjJpMFRkX19lc2REX1FBS2t6X1EtZFJEUQ?oc=5) · [Simply Wall Street](https://news.google.com/rss/articles/CBMi7gFBVV95cUxNNl9DLVhMT0pGdWVvdnBvVk5mT1dpeWRTOWd1eGpFOVdYQjVjTWpOU1lfbXhkR09LVWJwbUJnZUZMYnBhMjQ5VmE5aWk2d0NEcDZhXzY1aVBiOXRZaTJVSzVnYVM3bVhDemFycnhXV1cwRWdtd0V4ZWZ2M3hITkVNMHMtemFxNTU1NklGTXJ5ZTNJVVg1dnQ4N2FidVROdHhaMTg5TG5LRVNkRkZCOE1GTGZaM0tCZjVSS1Frc2VtT0V3Y0FDanNFSHJuR2RoWDN2b3hBWDhTSHU3SVdmU3F6ZEpsS2JLc0RzSExaeGp30gHzAUFVX3lxTFBUbkJMekxRYVI3bnRxZ2ZvOFVZY2ZYN1kzM1k3NDlsY0dSTVFRc05GZmFHcm1hZTV6S3Nwd05IY2dmRE9haDZiUnZEWlBxMFZZTHdYTEFQN2VQZWJPOUtXS2hiT1EyNVdPV3ZTckZJb1M4ajJNVGpHOTN6U3E3ZWlxUlJORW82dVpLUVByYlJwMHRWOU9oeFlNaEJsNXJ6T2RCek5fSW5YbVpfTXdRMzJ5RFBSMFR2RWpyYVZVYTRHcmN0Y3l6c24wUDRpX1JFVGJZejAtTVZFdUdnRU5hYS1rWVRxOTN0YmJ2MldHZGZYa2dTQQ?oc=5) · [GuruFocus](https://news.google.com/rss/articles/CBMilgFBVV95cUxORVBtRkpnVGZoMndtM2p4REhwNzZIa3lqMDRpcVktNUt3bG5PWkd2MkJ0WkpzNWhIcUp3Z3FIR2dJRG1OZnIwbkZUdkdrVUpSSjQ3WHBuUmhTM09ycmc5S3RHX3F1NUtqMHJGZTFqbVZEVHI2LVM3T3lBTTN0d2JxcDdFa3dZQ0ZVOUZUNFhEbFoxQXBhU2c?oc=5)
 
 ## มุมมองจาก X
