@@ -34,5 +34,14 @@
     return `<button class="tf-chip !py-0 !px-1.5 !min-h-0 text-[10px] ml-1" title="ข่าว 7 วัน · แตะเพื่อดูสรุปว่าทำไมติด Top20" onclick="event.stopPropagation();toggleNotes('${a}','${b}')">📰 ${Number(row.news_7d) || 0}</button>`;
   }
 
-  g.Notes = { esc, notesHtml, badgeHtml, panelId };
+  /* แผงใต้หุ้น — open=true วาดแบบเปิดพร้อมเนื้อหา (ตารางถูกวาดใหม่เป็นระยะ ต้องคงสถานะที่ผู้ใช้เปิดไว้) */
+  function panelHtml(row, m, tk, open, kind) {
+    if (!row) return '';
+    const id = panelId(m, tk), style = open ? '' : ' style="display:none"', body = open ? notesHtml(row) : '';
+    return kind === 'table'
+      ? `<tr id="${id}"${style}><td colspan="8" class="p-1" data-notes>${body}</td></tr>`
+      : `<div id="${id}" class="mt-1"${style} data-notes>${body}</div>`;
+  }
+
+  g.Notes = { esc, notesHtml, badgeHtml, panelId, panelHtml };
 })(globalThis);

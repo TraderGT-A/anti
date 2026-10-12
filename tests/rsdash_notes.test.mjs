@@ -50,3 +50,15 @@ test('badgeHtml: ไม่มีแถว → ""; มีแถว → ปุ่�
 test('panelId ปลอดภัยสำหรับ ticker มีจุด', () => {
   assert.equal(N.panelId('america', 'BRK.B'), 'notes_america_BRK_B');
 });
+
+test('[bug: แผงหายเมื่อตารางวาดใหม่] panelHtml: เปิดอยู่ → แสดงเนื้อหาเลย, ปิด → ซ่อนและว่าง, ไม่มีข้อมูล → ""', () => {
+  const open = N.panelHtml(row, 'america', 'NVDA', true, 'table');
+  assert.match(open, /^<tr id="notes_america_NVDA"/);
+  assert.ok(!open.includes('display:none'));
+  assert.match(open, /Nvidia beats/);
+  const closed = N.panelHtml(row, 'america', 'NVDA', false, 'card');
+  assert.match(closed, /^<div id="notes_america_NVDA"/);
+  assert.match(closed, /display:none/);
+  assert.ok(!closed.includes('Nvidia beats'));
+  assert.equal(N.panelHtml(undefined, 'america', 'NVDA', true, 'table'), '');
+});

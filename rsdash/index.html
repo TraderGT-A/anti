@@ -1015,10 +1015,13 @@ function ensureNotes(m){   // คืน true เมื่อเพิ่งโ�
   return notesLoading[m];
 }
 const noteOf=(m,tk)=>notesData[m] ? notesData[m].get(tk) : undefined;
+const notesOpen=new Set();   // แผงที่ผู้ใช้เปิดไว้ — ตาราง Top20 ถูกวาดใหม่เป็นระยะ ต้องวาดกลับแบบเปิด
+const notesPanel=(m,tk,kind)=>Notes.panelHtml(noteOf(m,tk),m,tk,notesOpen.has(m+'|'+tk),kind);
 function toggleNotes(m,tk){
   const el=document.getElementById(Notes.panelId(m,tk)); if(!el) return;
-  const open=el.style.display==='none';
-  if(open && !el.dataset.filled){ (el.querySelector('[data-notes]')||el).innerHTML=Notes.notesHtml(noteOf(m,tk)); el.dataset.filled='1'; }
+  const open=el.style.display==='none', key=m+'|'+tk;
+  if(open){ notesOpen.add(key); const box=el.matches('[data-notes]')?el:el.querySelector('[data-notes]'); if(box && !box.innerHTML) box.innerHTML=Notes.notesHtml(noteOf(m,tk)); }
+  else notesOpen.delete(key);
   el.style.display=open?'':'none';
 }
 function setTopUniverse(u){
@@ -1172,7 +1175,7 @@ function topTableHTML(rows, m){
       '<td class="p-1 text-right" id="p2y_'+m+'_'+s.ticker+'">'+(has2?fPctExact(p2yCache[p2yKey(m,s.ticker)]):'<span class="text-slate-600">…</span>')+'</td>'+
       '<td class="p-1 text-right">'+fmtPx(s.price)+'</td>'+
       '<td class="p-1 text-left truncate max-w-[120px] text-slate-400">'+(s.industry||'')+'</td></tr>'+
-      (noteOf(m,s.ticker) ? '<tr id="'+Notes.panelId(m,s.ticker)+'" style="display:none"><td colspan="8" class="p-1" data-notes></td></tr>' : '');
+      notesPanel(m,s.ticker,'table');
   }).join('');
   return '<div class="overflow-x-auto"><table class="w-full text-[11px]">'+
     '<thead><tr class="text-slate-400 border-b border-[#243044]">'+
@@ -1206,7 +1209,7 @@ function topCardItems(rows, m){
       </div>
       <div class="text-[10px] text-slate-500 mt-0.5 truncate">${s.industry||''}</div>
       <div class="relative mt-1"><div id="${cid}" class="chart" style="height:150px"></div></div>
-      ${noteOf(m,tk) ? `<div id="${Notes.panelId(m,tk)}" class="mt-1" style="display:none"></div>` : ''}
+      ${notesPanel(m,tk,'card')}
     </div>`;
   }).join('');
 }
