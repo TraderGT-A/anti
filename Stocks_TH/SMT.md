@@ -8,7 +8,17 @@ last_fetch: 2026-10-12
 # SMT — Stars Microelectronics (Thailand) Public Co. Ltd.
 
 ## ทำไมติด Top20
-_ยังไม่มีสรุป — สั่ง "สรุป Top20 US"_
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+
+Stars Microelectronics (SMT) รับจ้างผลิตและประกอบชิ้นส่วนอิเล็กทรอนิกส์ ให้ลูกค้าทั้งในและต่างประเทศ
+
+ที่หุ้นถูกพูดถึง เพราะข่าวหุ้นธุรกิจ (6 ต.ค.) ระบุว่า SMT บวกต่อ 5% ลุ้นกำไรไตรมาส 3 ฟื้นแรง โบรกฯ อัพเป้าเป็น 8.40 บาท และหยวนต้า (9 ต.ค.) ชู HANA-SMT เป็นหุ้นเด่น ชี้ว่าหุ้นชิปย่อลงเป็นจังหวะสะสม รับ AI โตต่อ
+
+ตลาดกำลังจับตางบไตรมาส 3 ที่คาดว่าจะฟื้นแรง
+
+ความเสี่ยงคือ ตลท. สั่งให้ SMT อยู่ในมาตรการกำกับการซื้อขายระดับ 1 คือห้ามคำนวณวงเงินซื้อขาย และต้องซื้อด้วยเงินสดเต็มจำนวน (Cash Balance) ตั้งแต่ 12 ถึง 30 ต.ค. 2569 ซึ่งทำให้การเก็งกำไรทำได้ยากขึ้น
+
+แหล่ง: [ข่าวหุ้นธุรกิจออนไลน์](https://news.google.com/rss/articles/CBMiVkFVX3lxTE5MMnhpcVc5Qy1GUEtaRllILVUzQkNMVXpXR3BhQVpzeDdzZmcxTV8yVmIzS05jZ19UcDc2bHBNYmFyNW9nZENoWml6M2NYNV9TcTRGMk9B?oc=5) · [ข่าวหุ้นธุรกิจออนไลน์](https://news.google.com/rss/articles/CBMiS0FVX3lxTFBvaGF5TEp0cWhRV1N3X2hoWC10MDVZY1o2bzVxdEFlN0lTVC1OUHFLeHUxdzdkOG1lT1JPZWdvOHBPQXBaVjhjRFBhRQ?oc=5) · [InfoQuest](https://www.infoquest.co.th/2026/662114)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ SMT"_

@@ -8,7 +8,17 @@ last_fetch: 2026-10-12
 # IRPC — IRPC Public Co., Ltd.
 
 ## ทำไมติด Top20
-_ยังไม่มีสรุป — สั่ง "สรุป Top20 US"_
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+
+IRPC เป็นโรงกลั่นน้ำมันและปิโตรเคมีในเครือ ปตท. ผลิตน้ำมันสำเร็จรูป พลาสติก (PE, PP, ABS ฯลฯ) และให้บริการท่าเรือ/คลังเก็บ
+
+หุ้นขึ้นแรงช่วงต้นเดือน เพราะข่าวหุ้นธุรกิจ (6 ต.ค.) ระบุว่า PTTGC-TOP-IRPC บวกคึกรับค่าการกลั่นพุ่ง หลังจีนลดส่งออกเชื้อเพลิง และมิติหุ้น (7 ต.ค.) ชี้ว่า IRPC จ่อทุบ High 52 สัปดาห์ เพราะเงินใหญ่ไล่เก็บและมี CEO ใหม่
+
+ตลาดกำลังจับตาค่าการกลั่นและทิศทางน้ำมัน รวมถึงรายการหุ้นที่ถูก Cover-Short สูงสุด 20 อันดับ ณ 9 ต.ค. ที่ข่าวหุ้นธุรกิจเผยแพร่เมื่อ 12 ต.ค.
+
+ความเสี่ยงคือกลุ่มโรงกลั่นเพิ่งถูกขายทำกำไรเมื่อ 12 ต.ค. เพราะกังวลว่าจีนและรัสเซียจะกลับมาส่งออกน้ำมันสำเร็จรูป (IRPC ลง 2.04% เหลือ 2.88 บาท ณ เวลา 14.15 น.)
+
+แหล่ง: [ข่าวหุ้นธุรกิจออนไลน์](https://news.google.com/rss/articles/CBMiVkFVX3lxTE9uUGJWVU9KVVRBaEhPelNjd25XZGZaV193ZHR3VVlvMzIyZ1FzaVR2TEJBU2t5S0pCSGZrSWtGbktQM1ZoVWU3MUVGRnc3ck9CUGp1Q1JR?oc=5) · [มิติหุ้น](https://news.google.com/rss/articles/CBMiVkFVX3lxTFA1OC1hdnZaeWdBblZadkdydTFvUFphUjlPRHFENGpibHNOcmczaGszTUc0eFBBSjJPM0JjV0RrSXZJQzVSaTl4VEpGZG1wTzg0OVhuQmNB?oc=5) · [LINE TODAY](https://news.google.com/rss/articles/CBMigAFBVV95cUxPUFhfdG14d1NFc3Y0RnptTzBzUEU4cTFzVGpPZUJ1YmVJWlJxb05HTHFET3VxbEUtVjNsbzNPM0ViVURkaHpDMGVCbmZCdTJFSW5nRkk0YkhTZGZhWmNaamVLMUNESllFa2VUSGh4dmFucXhNREM5cS16VEV1WWUtYQ?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ IRPC"_

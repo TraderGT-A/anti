@@ -8,7 +8,17 @@ last_fetch: 2026-10-12
 # HANA — Hana Microelectronics Public Co., Ltd.
 
 ## ทำไมติด Top20
-_ยังไม่มีสรุป — สั่ง "สรุป Top20 US"_
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+
+Hana Microelectronics (HANA) รับจ้างผลิตและทดสอบชิ้นส่วนอิเล็กทรอนิกส์ เช่น แผงวงจร การประกอบและทดสอบ IC และบริการ outsource งานเซมิคอนดักเตอร์
+
+ที่หุ้นถูกพูดถึงมากช่วงนี้ เพราะข่าวหุ้นธุรกิจ (9 ต.ค.) ระบุว่า HANA เด้ง 2% ลุ้นกำไรไตรมาส 3 โต 733% แตะราว 317 ล้านบาท โบรกฯ แนะ "ซื้อ" เป้า 64.60 บาท และหยวนต้า (8 ต.ค.) มองหุ้นอิเล็กทรอนิกส์เป็นขาขึ้นยาว 12 เดือน เพราะ AI ดันกำไรฟื้น
+
+ตลาดกำลังจับตางบไตรมาส 3 ของกลุ่มอิเล็กทรอนิกส์ และเงินที่ไหลเข้าหุ้นเทคโนโลยีสหรัฐที่ดัน NASDAQ ทำสถิติสูงสุด ว่าจะส่งต่อมาถึงหุ้นเทคไทยหรือไม่
+
+ความเสี่ยงคือข่าวหุ้นธุรกิจ (12 ต.ค.) รายงานอันดับหุ้นที่ต่างชาติขายสุทธิผ่าน NVDR โดยกลุ่มอิเล็กฯ อย่าง DELTA ถูกขายมากสุด 455.92 ล้านบาท แปลว่าแรงขายต่างชาติยังกดดันกลุ่มนี้
+
+แหล่ง: [ข่าวหุ้นธุรกิจออนไลน์](https://news.google.com/rss/articles/CBMiVkFVX3lxTFB0Nlhnd2Nrb29sdzVqU0FoWGJYNnotMU9xOWtGamhsU25qWWUwUXRNSXlQNkRRR2xXdTNOY1A0ZE1zeTBQQzJ5QzJxVkdRUVZBZGk0NldB?oc=5) · [วารสารการเงินธนาคาร](https://news.google.com/rss/articles/CBMiVEFVX3lxTE9JNmtHN3ZQRF9JbjhkLVVhcE44UC1XeWdQdHp5bjdjd3lESGVqUDIzY1pFejZ5QkdsZm1nSmpfNjZTZkxLU2R4N2FUT2hONDBWSEpXQQ?oc=5) · [ข่าวหุ้นธุรกิจออนไลน์](https://news.google.com/rss/articles/CBMiS0FVX3lxTFBmX2dVX3ZwVERfOXlnUU44YlhmYlV0S1VVRDFOWS1oeDQyRGt1dk4xRDNJbVNEN1lJcnhVaFkyR1Yxam5mVldUaUMzWQ?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ HANA"_

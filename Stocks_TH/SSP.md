@@ -8,7 +8,19 @@ last_fetch: 2026-10-12
 # SSP — Sermsang Power Corp. Public Co. Ltd.
 
 ## ทำไมติด Top20
-_ยังไม่มีสรุป — สั่ง "สรุป Top20 US"_
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+
+Sermsang Power (SSP) ผลิตและขายไฟฟ้าจากพลังงานแสงอาทิตย์และลม
+
+ตอนนี้บริษัทเดินหน้าวินด์ฟาร์ม "บาโก" ขนาด 150 เมกะวัตต์ มูลค่าราว 8 พันล้านบาท คาดเริ่มจ่ายไฟเชิงพาณิชย์ (COD) ไตรมาส 4 ปี 70
+
+หุ้นพุ่งวันที่ 7 ต.ค. ราว 8% (ทันหุ้นรายงาน +11.84%) เพราะความคืบหน้าวินด์ฟาร์ม และมีโบรกฯ แนะ "ซื้อ" อัพเป้าเป็น 14.10 บาท ส่วน 12 ต.ค. SSP ได้รางวัล CAC Change Agent ระดับ 3 ดาว ด้านธรรมาภิบาล
+
+ตลาดกำลังจับตาความคืบหน้าโครงการบาโกและหุ้นกลุ่มพลังงานทดแทน
+
+ความเสี่ยงคือหุ้นขึ้นแรงในเวลาสั้น และโครงการใหม่ยังต้องก่อสร้างอีกกว่า 1 ปีก่อนมีรายได้ จึงมีความเสี่ยงล่าช้า
+
+แหล่ง: [ข่าวหุ้นธุรกิจออนไลน์](https://news.google.com/rss/articles/CBMiVkFVX3lxTE9wSUdycXpDa1l0T0RWZTZ0b0EzVDQ1d1pCcVJLVXhUS0lnUXdMMFpSX0dfcjMxaGFQWnFWcHBTN0VnaExkOGFONHV6TW5JVFJNeGJfbmxR?oc=5) · [LINE TODAY](https://news.google.com/rss/articles/CBMiVkFVX3lxTE5qWklDbFZOYUJyWXVqNzNhSWNtcTRiNXliVDQySEs0SFhOUEt0clFNRXBpNGJJOXdzbFI0b1pEUE55b1p1Ym15dDRXSFl5ZTI3RkstYkxR?oc=5) · [Facebook](https://news.google.com/rss/articles/CBMi_AVBVV95cUxPSl8wYzN3Y0xiZU9KYm50OWM1ZHFSNy11TnY5VHd6Mi1lN004YmN6Q19kbEdTYVM5MlJMQ1FZNl9TS0p6X2NBaWI5eHJ3SVpxOWlCemhWLWJoaHdwRWszVUdGNURTZXdCQy1LS1haejNVZDlzSmJzU3hfcm4tSlJUcUhUcmxhZmlnTW5IZnRxaXJSYjQzVXZiSFNmMVFBM1l1c3Rac0lhdHEyRzkwelZ0ZzFWOHJLRm1xQm5DYnVpa3VKQ1dkMkp2MGJpVjBSOTJMc2JCNmFPTDktcTdrejg4bzh5aHhKZWw1SEtRenVQdGxvQVFMTW1TUy0tbHJfcF9IYWVTcWM2MGkxZGpsQ0wteDloRGFyU1BleEJjbU0yQlBDb29FcFlPTUNNZjYybTJZRzZtWWQ2bEZWSVc0NzhsblZxN3huWTlCOWxNX0RQSVFqeXA4RHpGTGVNeEg1LUV4NzVfNTJTdFlYVC1La01hWl9JWWJ6RVFZa0VGRVktQ01lY1ZwSnhWVjdLYWJXb3BzSUJseW92NmdlbzBxUXdWOGFKd2tLd0ZVbjVLUHBPLVdFVW5qYjBFUkExbWQ5cC1KSVNjQlMxcDVmYXdZSk9iSml0bnMxZXN5U0VHVFpfNU9zX1ExSjVIVnVNdXkxaXpQQVpGbEF0c0NNdG9STmtfd0hZQUxEVEVRbkVKa0FwR0Y3dFpGbVJ1ZlFuMjJKbG1WT1ZJLWhsOVo3d1pZQ1Q3TGwyQXlXbnc5NGQ5SnBmU29ocGg1a3FUSVMzdXNZQjRlTEJlTFNzdnVza3RIdkpnSm1wNGpPTVpXN2k1amUwczdRc25HNUlIa1lENU1hb3JYUWJwQmYtd0ZNNzVhb0VJc1NfdF9TY3hoTzVIaHRUbGRPVl82clotUkFqWFdGYURjam1CbzRqenUwOFA4Mi1IYkhZRE1hNGJGUmhLTldDVFY5TkREVkRZc3JoczRqZERscWd2UFJGVVFzMDdFM1hwLVY2YncxUGxiQjBZNg?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ SSP"_

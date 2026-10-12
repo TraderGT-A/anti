@@ -8,7 +8,17 @@ last_fetch: 2026-10-12
 # TRT — Tirathai Public Co., Ltd.
 
 ## ทำไมติด Top20
-_ยังไม่มีสรุป — สั่ง "สรุป Top20 US"_
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+
+Tirathai (TRT) ผลิต ซ่อม และบำรุงรักษาหม้อแปลงไฟฟ้าทั้งแบบกำลัง จำหน่าย และพิเศษ รวมทั้งบริการติดตั้งและให้เช่าหม้อแปลง
+
+หุ้นเด่นเพราะ Thunhoon (11 ต.ค.) คัดหุ้น mai 10 ตัวที่ราคาติดจรวด ให้ TRT เป็นแชมป์ พุ่ง 236%
+
+ตลาดโดยรวมซึมเมื่อ 12 ต.ค. ข่าวหุ้นธุรกิจรายงาน SET ปิดเช้าลบ 4 จุด รอลุ้นงบบริษัทจดทะเบียนไทยและต่างประเทศ
+
+ความเสี่ยงคือราคาขึ้นหลายเท่าในช่วงสั้น จึงผันผวนสูง และข่าวที่เก็บได้ยังไม่ระบุเหตุผลทางธุรกิจ
+
+แหล่ง: [Thunhoon](https://news.google.com/rss/articles/CBMiY0FVX3lxTE9ZcW1xVzE3Q1JXSkh0QnUxRElMRjJhNTFqR1FWN3NKdHpmVTBoM0ZzdnlKZDlFVW5OMVdCMHU0TEJaZFh1T3YxRmlISGw4UWROV1BVTGdyTGt5X0F3Y2pPd3lPYw?oc=5) · [LINE TODAY](https://news.google.com/rss/articles/CBMiVkFVX3lxTE0xaTRwOXFTUmNfQlItS0xPZ1ZGdlJCMWlWZGdTSUJKa0wwaTdjMm9ERjQyQnlKZ0ZoYVY1RElocTZXaFRydW5HZFBJam5aM0FOSHFvZ2t3?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ TRT"_

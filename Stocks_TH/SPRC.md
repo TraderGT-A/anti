@@ -8,7 +8,17 @@ last_fetch: 2026-10-12
 # SPRC — Star Petroleum Refining Public Co. Ltd.
 
 ## ทำไมติด Top20
-_ยังไม่มีสรุป — สั่ง "สรุป Top20 US"_
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+
+Star Petroleum Refining (SPRC) เป็นโรงกลั่นน้ำมันที่ระยอง ผลิตน้ำมันสำเร็จรูปป้อนตลาดในประเทศ
+
+หุ้นขึ้นช่วงต้นเดือนเพราะข่าวหุ้นธุรกิจ (7 ต.ค.) ระบุว่าจีนระงับส่งออกน้ำมันสำเร็จรูป ดันค่าการกลั่นเอเชียสูง หนุน TOP-SPRC-BCP และ SPRC เคยบวก 4% เป็นอันดับหนึ่งใน SET100 วันที่ 5 ต.ค.
+
+ตลาดกำลังจับตาว่าจีนและรัสเซียจะกลับมาส่งออกน้ำมันสำเร็จรูปหรือไม่ เพราะเมื่อ 12 ต.ค. กลุ่มโรงกลั่นร่วงนำโดย TOP และ SPRC ด้วยความกังวลนี้ (SPRC ลบราว 5.6% มาที่ 15.20 บาท ณ 14.15 น.)
+
+ความเสี่ยงคือค่าการกลั่นผันผวนตามราคาน้ำมันและนโยบายส่งออกของจีน หุ้นจึงขึ้นลงแรงได้ เช่นวันที่ 10 ต.ค. ที่ SPRC-TOP ร่วง 5.59% จากแรงขายทำกำไร
+
+แหล่ง: [ข่าวหุ้นธุรกิจออนไลน์](https://news.google.com/rss/articles/CBMiS0FVX3lxTFBVcWFNNGVoUDd1bXl5RF9USzZkODVfLUFxdEdhR28yVFl2VHlVWFBxdzltVjN5cDJ6VUtQVlJKTXA2cDR2cUJVSnUzQQ?oc=5) · [bangkokbiznews](https://news.google.com/rss/articles/CBMiYkFVX3lxTE5aOWpyOERscGxpV3pEMmtUc2ZJLUNrY0FvazhjLXVvT09LbGdTcGttaWllQzFoQXB4X3k2dTdnZzlKeXBoQ2k5OS1NZlRJcFk4Njh6dWJ5eVdtaWlycDJTZFNR?oc=5) · [InfoQuest](https://www.infoquest.co.th/2026/662667)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ SPRC"_

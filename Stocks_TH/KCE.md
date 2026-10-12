@@ -8,7 +8,19 @@ last_fetch: 2026-10-12
 # KCE — KCE Electronics Public Co., Ltd.
 
 ## ทำไมติด Top20
-_ยังไม่มีสรุป — สั่ง "สรุป Top20 US"_
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+
+KCE Electronics (KCE) ผลิตแผ่นวงจรพิมพ์ (PCB) แผ่นลามิเนตและพรีเพกที่ใช้ทำ PCB และผลิตภัณฑ์เคมี ส่งขายอเมริกา ยุโรป และเอเชีย
+
+ตอนนี้ตลาดกำลังลุ้นงบไตรมาส 3 ข่าวหุ้นธุรกิจ (7 ต.ค.) ระบุว่า KCE วิ่งต่อ 4% ลุ้นกำไรโต 66% แตะ 495 ล้านบาท และโบรกฯ ชูเป้า 97 บาท ส่วน Share2Trade (12 ต.ค.) เขียนว่าหุ้นอิเล็กฯ ภาพรวมงบ Q3 ดูดีทั้งกลุ่ม
+
+ชื่อ KCE ถูกโบรกฯ หลายเจ้าแนะนำซ้ำ ๆ ทั้งกรุงศรี ทรีนีตี้ และ "ชัยยศ" ขณะที่วารสารการเงินธนาคาร (6 ต.ค.) ชี้ว่านักวิเคราะห์ชู KCE เด่นในโผหุ้นเข้า SET50 รอบครึ่งปีหลัง 70 และบอนด์ยีลด์สหรัฐที่พุ่งสูงสุดรอบ 24 ปีก็ถูกมองว่าหนุนกลุ่มส่งออก-อิเล็กฯ
+
+สิ่งที่ตลาดรออยู่คือการประกาศงบไตรมาส 3 ของ KCE และการปรับรายชื่อ SET50/SET100 รอบถัดไป
+
+ความเสี่ยงคือ Share2Trade (6 ต.ค.) ระบุว่ามีความกังวลน้ำท่วมโรงงาน KCE และ HANA และต่างชาติยังขายหุ้นไทยต่อเนื่อง
+
+แหล่ง: [ข่าวหุ้นธุรกิจออนไลน์](https://news.google.com/rss/articles/CBMiVkFVX3lxTFBZTTQxUUJIbmFQMS05akliUExhRzl4Y0VaaTFZdThqT2Fmc2g3dk5YRXF1Y0JSaHlXYVlMdkViMUk4NU9yZXFkZXdlQldtZU9jamNYcUln?oc=5) · [วารสารการเงินธนาคาร](https://news.google.com/rss/articles/CBMiVEFVX3lxTFBVV3ZWY1ZFUVRlWk5oaXoxRjI3LW5lMnI2SGlnOU9qLTl4VVduYmhsc0JSVFNGT3RjaDY4dWt3MjRVVjZjSk9sTkVMZHlKMFBwUVBjcA?oc=5) · [Share2Trade](https://news.google.com/rss/articles/CBMipAdBVV95cUxQUDUxM1YwdHhGYTJnTlRXdGp4dWQwUTdyT0Z6SUZoZ1QzQ0hldmV6TXJ1RVFRbVJoa3Vnb0JsY1ZYSjR4R2xNTHJTdU84aDdRV2t5dWw0UUdGSzcwUmpWQWtEZWEzY3ZBbDExRGdDZXBNX1MzeUpFYkhzczN2OFY4TmlCemNzMm5ibEY4THY3ZUZrZ3dKVW9KUEE5ZktrcTlMX3dvNGFVT2N0YTJUYmpfME12bXRtdDN0d3pZN3NubVRCUFY0RjRKRmtLWEFVMmsySUxDVXVZNkN1WGliY1kxWVdVYU92V1JGTWVGMzZYbll5RGRCak1SR3hLaXpuemR1aVdvVTIzWDNzTWlaN2E5dmVEYWVkQ0VsdUllbk9ESDlGOWJrelVuSXhqdThyVHRiNGpMR3IxdVluT3lqNWV5ampDZjhVbS1zSnFhckJmSWt1MFZYVGU1dHQ2S292Mjc4UkN0Z1VYQ1FtaDUxX0VDV3hzbEFlZE5URVFyX1FUcUNTSTVQSmNVTXlCN2pkeGR5S0E1M2FETDZXeFV5b0dxR2dQa3FVbXk5bDV6Y0x0WGZaaG9kQzY3aHpxeUlkeE9qRXBkUXEwMnZ4ejhxdGRtZldnOE1McFF3QTMxMEd2R3ZWZ1pCX18xZ3dwYkhWZk9tWVdraE5rcTUtQ1FOcW9QbFBYaExWeVk1WDFUcnpmNzBia3BxOEd6TkM0X2E1QWZTX1pQLXIyLXRmVTE1ME11ek5ZSmpYeUpMUW1wN0pVUndoSWhDWHVZRk51VnZQbzZvZGNtWGtyak9GN1FPUkpZcUh4SGlJZkJRWjhGN0pCVmhqVW9XRU9wOVBjb1JzUlZIZVphLXg4cXhENXdIa3Y0d291MDZ5c2F4MVZlUHBpbUw3bXJRTGxUMmlNN3Z2dEJseDlRNjhwbWg4NmlRR2hDVEZ4dV9sRUJkZWMzR2RyZVg1MDhxTU1qbHlWX2ljWWl5aFV4UFNOTWhqNkZmRWpMNHpnSkhsRUNkamxtN2g3NWZ5bG9OVG1TeC1XbGNzVlpKbXNvSkF2N290cVBLQ3VxUXkyN1JCZ1ZjclZvcU1WUncxbG1lSllfNk9VdWlwWUhPTUp5dEhuS21mcTJYWE9wZldycXhDWFB5YW9ONF92MlBzMVdFWDRibGJQQVBHVnZrMV9rdnZzbHhzNGtqY1FGOEE1RlBMZGg3M0tEbjNaZUdmekVsUDN2Q1ozUTFFOFVqWW1yZA?oc=5) · [LINE TODAY](https://news.google.com/rss/articles/CBMiVkFVX3lxTFBwTHFuajRYNkhXX3pRM0lzUzMxeDVzWEpTSUhieHJXVUxWVmZkOVEwWUlxS3JkX2xjOGxNbHZJdzEzOU55SkF4OXlOVUk0bjJLdU5nZlN3?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ KCE"_

@@ -8,7 +8,19 @@ last_fetch: 2026-10-12
 # GUNKUL — Gunkul Engineering Public Co. Ltd.
 
 ## ทำไมติด Top20
-_ยังไม่มีสรุป — สั่ง "สรุป Top20 US"_
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+
+Gunkul Engineering (GUNKUL) ผลิตและขายไฟฟ้าจากพลังงานทดแทน (โซลาร์ ลม) ในไทย ญี่ปุ่น และเวียดนาม พร้อมรับก่อสร้างโรงไฟฟ้า (EPC) และผลิตอุปกรณ์ระบบไฟฟ้า
+
+ตอนนี้บริษัทมีดีลผนึกกับ GULF ซึ่งอินโฟเควสท์ (5 ต.ค.) รวบรวมความเห็นนักวิเคราะห์ว่าช่วยปลดล็อกศักยภาพด้านเงินทุน ขณะที่แบ็กล็อกงาน EPC พุ่งและกำไรคาดว่าจะโตแกร่ง
+
+หุ้นถูกดันจากกระแสแผน PDP2026 ที่ Share2Trade (8 ต.ค.) ชี้ว่า GUNKUL รับอานิสงส์ก่อนใคร ช่วยให้งาน EPC บูม และ DBS (9 ต.ค.) ชู GUNKUL เป็นหุ้นเด่นกลุ่มโรงไฟฟ้า ถัดจาก GULF และ GPSC โดยมองว่า PDP2026 และดาต้าเซ็นเตอร์หนุนการเติบโตระยะยาว
+
+ตลาดกำลังจับตาว่าแผน PDP2026 จะแปลงเป็นงานจริงได้แค่ไหน และข่าว 12 ต.ค. ที่ ตลท. ใช้เกณฑ์ซื้อขายใหม่ลดแรงกดดันจากการชอร์ตเซลของหุ้น SET100
+
+ความเสี่ยงคือราคาวิ่งตามความคาดหวังเชิงนโยบาย ถ้ารายละเอียดจริงไม่เป็นไปตามที่ตลาดคาด หรือเงินต่างชาติยังไหลออกจากตลาดหุ้นไทย หุ้นก็อาจย่อได้
+
+แหล่ง: [Share2Trade](https://news.google.com/rss/articles/CBMi9AZBVV95cUxPMnJFYXJJeGVqUkRkdlpUNFJ4UkZBVFhxclRUaXE1RmhBRDlkR1pLMmlYMkpkblBzdGRGRmZtc3plMGVBcG1UZWdweHBrYU1hM18wZWwwejB6bm1lU3NZZDFZZFpSbXRXUEdLRmo5SU9yWlRxM0gxSlZtYmdPRFNqU0Zocklhak9MUVp0RmF1U3NENjFWanV1Y0xESDZVaEUzUG5aM2FCZ2xlRTJHNnQ2eWtmTmxCZzROQndqd3lhNTc4eXRhMnB0eW5DS0RjODlXNS1xTHNiYnZZaV9ka1J3UWNpdkVuR2lWY0p2WDBOakV2STlnNHNpQlBhSUw5NGZaMXJ5RmFBVlVvT0hoaFN4bXJTbmN4ZTFTNTBzNjkxNElLNjFnanVBYnNtSEZaZlF0WmhxNHlCZDlCZ1JOSlJ5N0I0R0syaFhsRmhSM09lWG1uR2wtaVQ3b0MtY19DM1pUd2ZGREQwWnBySEdRT2RLdXJLT3NyWWp5TDgwRlc0R2ppLUN1X3pmTTNsMTE5T2lMUXVlUXl2OXhYeW5lWlJyQ0NhbF9MT1gzTWV3OEM1VjZyb1FmS3c4Z1pIQURNemFDeVlYeVZWcGhNbnNnNUFJRmdsVXg0aktoQ2tMNndjUTA5QlRKLTRnMDZqNjNPdEdleEN6WlRpWFE2c2U5aW00VnpXT2hXZ09rTVdMV3p5RkhZTVFWQmxlN2tBTHUtNGhiZWduR2V1TEI4YkRTOTNVNHlyUENnaWdJbXNLRWJkMHN0WGYxQTBScHpEX281MExxUUJjMkdpVzM2UGJSbEQycVZoQmN3Z2p2Uk04alhUR040d0I5elpTN0MyNm1XNUl3MW9tV2JOb2xaUlFSeVNmcnlIVk9vNzdxUFRGaWxWWGZaOVNmVlUzbkNlLTRhQ0pwQXZPR3Y5YmxoNWNKODRYT29xYVdGMGNod1RsazRiSXYwSDh5OEpudE5QUDR1WEdrX04zOXFzdWNlRFpjS1hTcUxwOWVIU3p0Sm1WN0RPN1ZZQkJPbklBUzJGZ3J3VTk1Y2loNGdTeEdES1ZmYjhWdDhBMWhLelc1bGVzTnZ3ZWxubURJeDNaaEtaZnJyRDhDWTN1YjgtRVNMa1REYWd0RzVsbkM3c1Jha2JTeTc1dVpILTJLZ21NSkxHeVFvTnRNTHJLaQ?oc=5) · [สำนักข่าวอินโฟเควสท์](https://news.google.com/rss/articles/CBMiUEFVX3lxTE5YQ3FkSTFrUHUxRjlETzVNRHhRa1BIeVhHUFM3R01HNTd5SllKMDQ1emJCUmxIVmJQTGUxR1dsS0hGMlN1YWRxMU1RcEZQWWtS?oc=5) · [efinanceThai](https://news.google.com/rss/articles/CBMihwFBVV95cUxPalRqN0pSSXREdXVFdDlNZldrRFRDXzNpWE9uY1ZUVm5DeTZvNXE1bnU1MWRJNUFCaFIwc3JXSWFWeHZ2bW1ic1lrcVc4TmdhWldkcWIxY2lpMDBEbEhlS1ZROG5qYWZ0YW5SdjNQcW5RbXE5RHlGMFVGNi1CbXY3LWZsVWd0Tk0?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ GUNKUL"_

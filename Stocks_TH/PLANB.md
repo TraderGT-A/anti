@@ -8,7 +8,15 @@ last_fetch: 2026-10-12
 # PLANB — Plan B Media Public Company Ltd
 
 ## ทำไมติด Top20
-_ยังไม่มีสรุป — สั่ง "สรุป Top20 US"_
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+
+Plan B Media (PLANB) เป็นเจ้าของสื่อโฆษณานอกบ้าน (billboard ป้ายในอาคาร) และมีธุรกิจการตลาดกิจกรรม กีฬา และบริหารศิลปิน
+
+หุ้นวิ่งแรงเพราะแรงซื้อเก็งกำไร ข่าวหุ้นธุรกิจ (8 ต.ค.) ระบุว่า PLANB บวกสูงสุดใน SET100 ที่ 6% แตะ 8.25 บาท โดยโรบอทเทรดกินวอลุ่มตลาดราว 50% และมิติหุ้น (9 ต.ค.) ชี้ว่า 10 วันทำการที่ผ่านมาหุ้นพุ่ง 36.36% หรือเพิ่มขึ้น 2.20 บาท
+
+ความเสี่ยงคือราคาขึ้นเร็วในเวลาสั้นและมีแรงซื้อขายอัตโนมัติสูง จึงผันผวนได้ง่ายเมื่อแรงซื้อชะลอ
+
+แหล่ง: [ข่าวหุ้นธุรกิจออนไลน์](https://news.google.com/rss/articles/CBMiS0FVX3lxTFBaaEZEbGl6dy1vb0RNbVVwLWNmczllUWl6NnBUd01uMDctSlloeEVvX2U5M09HcXJZWjhxQmZ5MGdVcjlTenlTMHlGRQ?oc=5) · [มิติหุ้น](https://news.google.com/rss/articles/CBMiVkFVX3lxTFAzNFJNeXZLLVRoblR6aTY1YXpRU0dGdGpDR3FOWDlBMHdfemkzaW1kUmdGS3otcmdBY1RaLXZFd3hVWGM0TnJJZ2VSaHAwRlVleGxvaXp3?oc=5) · [ข่าวหุ้นธุรกิจออนไลน์](https://news.google.com/rss/articles/CBMiT0FVX3lxTE05N1QxdHF2YjRyQ05nbnBFMkVQckV0TURtYWtUZVA0T2tMRmM2SVE2MUZ3UzNGdjlieWNCdzRyWEhRdnRDQjN1WnBuUDBZc2c?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ PLANB"_
