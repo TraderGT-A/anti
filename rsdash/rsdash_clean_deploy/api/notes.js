@@ -2,8 +2,8 @@
 //   GET  ?market=america (ค่าเริ่มต้น) | thailand → { data: row[] }  (ยังไม่มีข้อมูล → data: [])
 //   POST ?market=america  header x-write-key = env NOTES_WRITE_KEY, body { rows: row[] } → แทนที่ชุดแถว (เก็บ summary เดิมถ้าแถวใหม่ไม่มี)
 // เก็บในตาราง snapshots เดิม (dt = "notes|<market>") — ไม่ต้องสร้างตารางใหม่
-import { supabase } from "./lib/supabase.js";
-import { mergeNotes, validRows, notesKey } from "./lib/notes.js";
+import { supabase } from "./_lib/supabase.js";
+import { mergeNotes, validRows, notesKey } from "./_lib/notes.js";
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");

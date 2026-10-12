@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mergeNotes, validRows } from '../rsdash/api/lib/notes.js';
+import { mergeNotes, validRows } from '../rsdash/api/_lib/notes.js';
 
 test('mergeNotes: แถวใหม่ไม่มี summary → เก็บ summary เดิมไว้', () => {
   const old = [{ ticker: 'A', news_7d: 1, summary: 'why A', summary_at: '2026-10-10' }];

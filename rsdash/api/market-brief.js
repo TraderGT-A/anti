@@ -1,6 +1,6 @@
 // /api/market-brief — Market Brief: บอกการเปลี่ยนแปลง Breadth เทียบวันทำการก่อนหน้า + เทียบ 5 วันทำการ
-import { supabase } from "./lib/supabase.js";
-import { getLiveBreadth } from "./lib/scan.js";
+import { supabase } from "./_lib/supabase.js";
+import { getLiveBreadth } from "./_lib/scan.js";
 
 const mkLabel = { thailand: "ไทย 🇹🇭", america: "อเมริกา 🇺🇸" };
 

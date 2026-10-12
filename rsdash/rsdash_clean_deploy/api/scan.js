@@ -1,9 +1,9 @@
 // /api/scan — full-market RS ranking with per-group filters + Rank Change via Supabase
-import { scanMarket, toCommonStocks, breadthFull, getIndexMembership } from "./lib/scan.js";
+import { scanMarket, toCommonStocks, breadthFull, getIndexMembership } from "./_lib/scan.js";
 
 // force=1 ข้ามแคชได้ แต่ไม่ให้สแกน TradingView + เขียน Supabase ถี่กว่านี้ (กันผู้เข้าชมหลายคน/auto-refresh รัวใส่)
 const FORCE_COOLDOWN_MS = 30_000;
-import { loadPreviousSnapshot, saveSnapshot, marketToday, supabase } from "./lib/supabase.js";
+import { loadPreviousSnapshot, saveSnapshot, marketToday, supabase } from "./_lib/supabase.js";
 import "../trendlib.js";
 import "../fundlog.js";   // globalThis.FundLog — บันทึก EPS แบบ point-in-time
 import "../leaders.js";   // globalThis.Leaders — ผู้นำหุ้นไทย + paper-trade (กฎล็อกใน research/PREREG_forward_th_leaders_2026-10-10.md)   // ตั้ง globalThis.TrendLib (ไฟล์เดียวกับที่เว็บ/เทสต์ใช้ — อยู่นอก api/ จึงไม่นับเป็น Function)
