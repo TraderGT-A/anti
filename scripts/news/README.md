@@ -12,9 +12,9 @@ Spec: `docs/superpowers/specs/2026-10-12-us-top20-news-design.md`
 - ผลลัพธ์:
   - `Stocks_US/<TICKER>.md` — Feed ใหม่สุดอยู่บน, จัดหัวข้อตามวันที่เผยแพร่
   - `Stocks_US/_Top20.md` — ตารางรายชื่อปัจจุบัน + หุ้นที่หลุดแล้ว
-  - Supabase `stock_notes` → ปุ่ม 📰 ในหน้า Top20 US ของ rsdash
+  - rsdash `/api/notes` (เก็บในตาราง snapshots เดิม, dt = `notes|america`) → ปุ่ม 📰 ในหน้า Top20 US
 - log: `data/news_log.txt` (บรรทัดละรอบ: `ok tickers=… new=… errors=… push=…` หรือ `FAIL …`) · รายละเอียดรอบล่าสุด: `data/news_run.txt`
-- ความลับอยู่ใน `scripts/news/.env` (ดูตัวอย่างที่ `.env.example`)
+- ความลับอยู่ใน `scripts/news/.env`: `NOTES_WRITE_KEY` ต้องตรงกับ env ชื่อเดียวกันบน Vercel (rsdash_clean)
 
 ## รันเอง
 ```bash

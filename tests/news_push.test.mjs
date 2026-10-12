@@ -52,39 +52,30 @@ test('buildRow: มี summary → ใส่ summary + summary_at', () => {
   assert.equal(r.summary_at, '2026-10-14');
 });
 
-test('pushRows: POST PostgREST upsert ด้วย header ถูกต้อง', async () => {
-  let req;
-  const fake = async (url, init) => { req = { url, init }; return { ok: true, status: 201, text: async () => '' }; };
-  const out = await pushRows([{ ticker: 'NVDA' }], { url: 'https://p.supabase.co', key: 'K', fetchFn: fake });
-  assert.deepEqual(out, { ok: true, status: 201 });
-  assert.equal(req.url, 'https://p.supabase.co/rest/v1/stock_notes?on_conflict=ticker,market');
+test('pushRows: POST ไป rsdash /api/notes ด้วย x-write-key และส่งทุกแถวใน request เดียว', async () => {
+  let req, n = 0;
+  const fake = async (url, init) => { n++; req = { url, init }; return { ok: true, status: 200, text: async () => '' }; };
+  const rows = [{ ticker: 'A', summary: 's', summary_at: 'd' }, { ticker: 'B' }];
+  const out = await pushRows(rows, { base: 'https://rs.example', key: 'K', fetchFn: fake });
+  assert.deepEqual(out, { ok: true, status: 200 });
+  assert.equal(n, 1);
+  assert.equal(req.url, 'https://rs.example/api/notes?market=america');
   assert.equal(req.init.method, 'POST');
-  assert.equal(req.init.headers.apikey, 'K');
-  assert.equal(req.init.headers.Authorization, 'Bearer K');
-  assert.equal(req.init.headers.Prefer, 'resolution=merge-duplicates');
-  assert.deepEqual(JSON.parse(req.init.body), [{ ticker: 'NVDA' }]);
+  assert.equal(req.init.headers['x-write-key'], 'K');
+  assert.deepEqual(JSON.parse(req.init.body), { rows });
+  assert.ok(req.init.signal instanceof AbortSignal);
 });
 
 test('pushRows: HTTP error → ok:false ไม่ throw', async () => {
   const fake = async () => ({ ok: false, status: 401, text: async () => 'bad key' });
-  const out = await pushRows([{ ticker: 'NVDA' }], { url: 'https://p', key: 'K', fetchFn: fake });
+  const out = await pushRows([{ ticker: 'NVDA' }], { base: 'https://p', key: 'K', fetchFn: fake });
   assert.equal(out.ok, false);
   assert.equal(out.status, 401);
 });
 
-// ---- final review fixes ----
-test('[review C2] แถวมี/ไม่มี summary ปนกัน → แยก request ให้ key ในแต่ละ request ตรงกัน (PostgREST PGRST102)', async () => {
-  const reqs = [];
-  const fake = async (url, init) => { reqs.push(JSON.parse(init.body)); return { ok: true, status: 201, text: async () => '' }; };
-  const out = await pushRows([{ ticker: 'A', summary: 's', summary_at: 'd' }, { ticker: 'B' }, { ticker: 'C' }], { url: 'https://p', key: 'K', fetchFn: fake });
-  assert.equal(out.ok, true);
-  assert.equal(reqs.length, 2);
-  for (const body of reqs) { const k0 = Object.keys(body[0]).sort().join(); assert.ok(body.every((r) => Object.keys(r).sort().join() === k0)); }
-});
-
 test('[review I5] network error ตอน push → ok:false ไม่ throw', async () => {
   const fake = async () => { throw new TypeError('fetch failed'); };
-  const out = await pushRows([{ ticker: 'A' }], { url: 'https://p', key: 'K', fetchFn: fake });
+  const out = await pushRows([{ ticker: 'A' }], { base: 'https://p', key: 'K', fetchFn: fake });
   assert.equal(out.ok, false);
   assert.equal(out.status, 0);
 });

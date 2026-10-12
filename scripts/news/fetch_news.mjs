@@ -1,9 +1,9 @@
-/* fetch_news.mjs — ดึงข่าวฟรีของหุ้น US ที่ติด Top20 (YTD ∪ RS) → Stocks_US/*.md + Supabase stock_notes
+/* fetch_news.mjs — ดึงข่าวฟรีของหุ้น US ที่ติด Top20 (YTD ∪ RS) → Stocks_US/*.md + rsdash /api/notes
    ใช้:  node scripts/news/fetch_news.mjs [--limit N] [--dry] [--summary-only] [--base URL]
      --dry           ไม่ push, ไม่บันทึก state (ไว้ทดสอบ)
      --limit N       ดึงข่าวแค่ N ตัวแรก
      --summary-only  ไม่ดึงข่าว: อ่านส่วน "ทำไมติด Top20" ใน md แล้ว push ขึ้น rsdash
-   env (scripts/news/.env): SUPABASE_URL, SUPABASE_SERVICE_KEY, NEWS_SEC_UA */
+   env (scripts/news/.env): NOTES_WRITE_KEY (ต้องตรงกับ env ชื่อเดียวกันบน Vercel), NEWS_SEC_UA (ไม่ใส่ = ข้าม SEC) */
 import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,7 +18,7 @@ const STATE = join(ROOT, 'data/news_state.json'), LOG = join(ROOT, 'data/news_lo
 const argv = process.argv.slice(2), flag = (f) => argv.includes(f), val = (f, d) => { const i = argv.indexOf(f); return i >= 0 ? argv[i + 1] : d; };
 const DRY = flag('--dry'), SUMMARY_ONLY = flag('--summary-only'), LIMIT = Number(val('--limit', 0)) || Infinity, BASE = val('--base', 'https://rsdashclean.vercel.app');
 if (existsSync(join(HERE, '.env'))) process.loadEnvFile(join(HERE, '.env'));
-const { SUPABASE_URL = '', SUPABASE_SERVICE_KEY = '', NEWS_SEC_UA = '' } = process.env;
+const { NOTES_WRITE_KEY = '', NEWS_SEC_UA = '' } = process.env;
 const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
 const log = (line) => { mkdirSync(dirname(LOG), { recursive: true }); appendFileSync(LOG, `${new Date().toISOString()} ${line}\n`); console.log(line); };
 const readMd = (t) => { const p = join(OUT, fileNameFor(t)); return existsSync(p) ? readFileSync(p, 'utf8') : null; };
@@ -26,9 +26,9 @@ const writeMd = (t, s) => writeFileSync(join(OUT, fileNameFor(t)), s);
 
 async function push(state, active) {
   if (DRY) return 'push=skipped(dry)';
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) return 'push=skipped(no key)';
+  if (!NOTES_WRITE_KEY) return 'push=skipped(no key)';
   const rows = active.map(([t, m]) => buildRow(t, m, state.recent[t], extractSummary(readMd(t)), today));
-  const r = await pushRows(rows, { url: SUPABASE_URL, key: SUPABASE_SERVICE_KEY });
+  const r = await pushRows(rows, { base: BASE, key: NOTES_WRITE_KEY });
   return r.ok ? `push=${rows.length}` : `push=FAIL(${r.status})`;
 }
 

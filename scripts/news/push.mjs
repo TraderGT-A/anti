@@ -26,22 +26,15 @@ export function buildRow(ticker, member, recentItems, summary, today) {
   return row;
 }
 
-/* PostgREST ต้องการ key เหมือนกันทุกแถวใน request เดียว → แยกกลุ่มตามชุด key
-   (ห้ามเติม summary: null ให้ครบ เพราะจะลบสรุปเดิมที่เก็บไว้) */
-export async function pushRows(rows, { url, key, fetchFn = fetch }) {
-  const groups = new Map();
-  for (const r of rows) { const sig = Object.keys(r).sort().join(); groups.set(sig, [...(groups.get(sig) || []), r]); }
-  let status = 200;
-  for (const g of groups.values()) {
-    try {
-      const r = await fetchFn(`${url}/rest/v1/stock_notes?on_conflict=ticker,market`, {
-        method: 'POST',
-        headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
-        body: JSON.stringify(g), signal: AbortSignal.timeout(20000),
-      });
-      if (!r.ok) return { ok: false, status: r.status };
-      status = r.status;
-    } catch { return { ok: false, status: 0 }; }
-  }
-  return { ok: true, status };
+/* ส่งผ่าน rsdash (/api/notes) — server เก็บในตาราง snapshots เดิม และคง summary เดิมถ้าแถวไม่มี key summary
+   ชุดแถว = หุ้นที่ยังอยู่ใน Top20 ทั้งหมด (ตัวที่หลุดจะหายจาก rsdash เอง) */
+export async function pushRows(rows, { base, key, fetchFn = fetch }) {
+  try {
+    const r = await fetchFn(`${base}/api/notes?market=america`, {
+      method: 'POST',
+      headers: { 'x-write-key': key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rows }), signal: AbortSignal.timeout(30000),
+    });
+    return { ok: !!r.ok, status: r.status };
+  } catch { return { ok: false, status: 0 }; }
 }
