@@ -10,7 +10,7 @@ Spec: `docs/superpowers/specs/2026-10-12-us-top20-news-design.md`
 - รายชื่อหุ้น = Top20 YTD ∪ Top20 RS จาก `rsdashclean.vercel.app/api/scan?market=america&universe=all&v=2`
 - แหล่งข่าว: Yahoo Finance RSS, Google News RSS, SEC EDGAR (ต้องตั้ง `NEWS_SEC_UA`), Reddit Atom (r/stocks+wallstreetbets+investing; อาจโดน 429 บางวัน)
 - หุ้นไทย (`--market thailand`): InfoQuest (เฉพาะข่าวที่หัวข้อมีชื่อหุ้น), Google News ภาษาไทย (ทันหุ้น, ข่าวหุ้นธุรกิจ, Hoonsmart ฯลฯ), Yahoo (.BK) → `Stocks_TH/`, state `data/news_state_th.json`
-- คำอธิบายบริษัท 🏢 (ทุกตัวใน rsdash, อังกฤษจาก Yahoo): `node scripts/news/fetch_profiles.mjs` (ดึงเฉพาะที่ยังไม่มี) หรือ `--refresh` เดือนละครั้ง แล้ว deploy rsdash
+- คำอธิบายบริษัท 🏢 (ทุกตัวใน rsdash, อังกฤษจาก Yahoo): อัตโนมัติด้วย Task Scheduler **"THUSHOUSE Profiles"** ทุกอาทิตย์ 07:00 (`run_profiles.cmd` → `refresh_profiles.mjs`): ดึงเฉพาะหุ้นใหม่, อาทิตย์แรกของเดือนดึงใหม่ทั้งหมด, deploy rsdash เองถ้า desc/ เปลี่ยน (ข้ามถ้ามีไฟล์อื่นแก้ค้างในโฟลเดอร์ deploy) · log `[PROFILES]` ใน data/news_log.txt
 - ผลลัพธ์:
   - `Stocks_US/<TICKER>.md` — Feed ใหม่สุดอยู่บน, จัดหัวข้อตามวันที่เผยแพร่
   - `Stocks_US/_Top20.md` — ตารางรายชื่อปัจจุบัน + หุ้นที่หลุดแล้ว
