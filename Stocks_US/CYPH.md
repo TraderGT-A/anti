@@ -8,10 +8,11 @@ last_fetch: 2026-10-12
 # CYPH — Cypherpunk Technologies Inc.
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** มีข่าว Winklevoss ยื่น Zcash ETF 'WINK' [แหล่ง](https://decrypt.co/380210/another-zcash-etf-coming-winklevoss-twins-wink?.tsrc=rss) และจะลงทุน $100M ใน ZEC (พาดหัวไม่ระบุความเชื่อมโยงกับ CYPH โดยตรง)
-- **ความเห็น/กระแส:** ไม่พบในข่าวที่เก็บได้
-- **ความเสี่ยงที่มีคนพูดถึง:** ไม่พบในข่าวที่เก็บได้
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** Cypherpunk Technologies เป็นบริษัทจดทะเบียนใน Nasdaq ที่มุ่งถือสกุลเงินดิจิทัล Zcash (ZEC) ข่าวของหุ้นจึงขยับตามความเคลื่อนไหวของ Zcash เป็นหลัก
+**ทำไมหุ้นขึ้นตอนนี้:** ต้นเดือน ต.ค. มีข่าวเด่นของกลุ่ม Zcash คือ Winklevoss Twins วางแผนลงทุนราว 100 ล้านดอลลาร์ในเหรียญนี้ และยื่นขอ ETF Zcash ชื่อ "WINK" ซึ่งอาจเป็นกองทุน spot ZEC ตัวที่สองในสหรัฐต่อจาก ZCSH ของ Grayscale
+**ตลาดสนใจอะไร:** นักลงทุนจับตาการไหลเข้าของเงินสถาบันสู่ Zcash ผ่าน ETF และการสนับสนุนจากแพลตฟอร์มอย่าง Gemini ที่เปลี่ยนซอฟต์แวร์ Zcash เมื่อปลาย ก.ย.
+แหล่ง: [CryptoProwl](https://www.cryptoprowl.com/releases/winklevoss-twins-to-launch-new-zcash-etf-7253?.tsrc=rss) · [Unchained](https://unchainedcrypto.com/winklevoss-zcash-etf-could-become-the-second-u-s-spot-zec-fund-after-grayscales-zcsh/?.tsrc=rss) · [24/7 Wall St.](https://247wallst.com/investing/cryptocurrency/2026/10/06/the-winklevoss-twins-plan-to-invest-100-million-in-the-coin-that-outperformed-bitcoin/?.tsrc=rss)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ CYPH"_

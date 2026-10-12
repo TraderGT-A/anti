@@ -8,10 +8,12 @@ last_fetch: 2026-10-12
 # PLSE — Pulse Biosciences, Inc.
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** ลงทะเบียนผู้ป่วยครบเป้าในการศึกษา NANOPULSE-AF ล่วงหน้า [แหล่ง](https://finance.yahoo.com/healthcare/articles/pulse-biosciences-achieves-enrollment-target-110000647.html?.tsrc=rss)
-- **ความเห็น/กระแส:** Canaccord ขึ้นเป้าเป็น $58 [แหล่ง](https://news.google.com/rss/articles/CBMiowFBVV95cUxQY25MSnNxMjJxUERsVmRuUVRyWkdvV2ExM0FQTFFPcWg1UjVjck8yLUlHbVByTzg4RzAtdWpTT3JCejlpWVRRQmRlU3RkV2YzTTItNUx1eWFoT2hBNDVsNDlWSkNsaE1GaWhvMmRCLW5KNkVpOUF5THRDN3BoZll5dkZSR3RKazczblh2ZjJsMFhYME1IREp4VkYwQ3pCRnJyZVNV?oc=5)
-- **ความเสี่ยงที่มีคนพูดถึง:** ไม่พบในข่าวที่เก็บได้
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** Pulse Biosciences พัฒนาเทคโนโลยี nPulse ที่ใช้พัลส์ไฟฟ้าระยะสั้นมากทำลายเนื้อเยื่อเป้าหมาย โดยเน้นสายสวนหัวใจรักษาหัวใจเต้นผิดจังหวะ (AFib)
+**กำลังทำอะไรอยู่:** วันที่ 7 ต.ค. การศึกษา NANOPULSE-AF ระยะ pivotal เก็บผู้ป่วยครบ 164 คนเร็วกว่าแผนราว 3 เดือน และยังมีการศึกษา PRECISE-BTN ที่เก็บผู้ป่วยครบเมื่อ 15 ก.ย.
+**ทำไมหุ้นขึ้นตอนนี้:** หุ้นขึ้นราว 12.3% หลังเก็บผู้ป่วยครบเร็ว และ Canaccord ขึ้นเป้าราคาเป็น 58 ดอลลาร์
+**ตลาดสนใจอะไร:** ตลาดเทคโนโลยีรักษา AFib แบบพัลส์ไฟฟ้า และการจัดสรรหุ้นสิทธิให้พนักงานใหม่ที่ราคา 49.98 ดอลลาร์สะท้อนระดับราคาล่าสุด
+แหล่ง: [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/pulse-biosciences-achieves-enrollment-target-110000647.html?.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/why-pulse-biosciences-plse-12-211527207.html?.tsrc=rss) · [GuruFocus](https://news.google.com/rss/articles/CBMiowFBVV95cUxQY25MSnNxMjJxUERsVmRuUVRyWkdvV2ExM0FQTFFPcWg1UjVjck8yLUlHbVByTzg4RzAtdWpTT3JCejlpWVRRQmRlU3RkV2YzTTItNUx1eWFoT2hBNDVsNDlWSkNsaE1GaWhvMmRCLW5KNkVpOUF5THRDN3BoZll5dkZSR3RKazczblh2ZjJsMFhYME1IREp4VkYwQ3pCRnJyZVNV?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ PLSE"_

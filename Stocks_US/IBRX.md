@@ -8,10 +8,14 @@ last_fetch: 2026-10-12
 # IBRX — ImmunityBio Inc
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** UAE อนุมัติ Anktiva วงกว้างที่สุด [แหล่ง](https://news.google.com/rss/articles/CBMiyAFBVV95cUxOeFdTNWdQeWdmbl9VdjYtd2huLVV0M2lPZ0FUSGJuUlAycm4zMl92Skg4eWJMWTlQb203SXoyR3JscTVsWTYtWHNNWms3UzlRNGNZMzJTa0o5U0NkR3Y5bWxYOXEzYjBOLWtHUzluU0JaeHNsT0pxUXkxeDZLQWhuQ0dZZlhXaVRHMFVEcnZjOFB4T3otOWZhV1d6eFhlb1FlVjFiYzI3RnhuOG1IS05Hcm9MdnVKWUlpZGgtQTYxSkxnb1lKdS1JXw?oc=5)
-- **ความเห็น/กระแส:** รายย่อยคาดว่าจะเข้า Russell 1000 [แหล่ง](https://news.google.com/rss/articles/CBMiswFBVV95cUxNMTUxUTlkWlR1N2k3Ql9hOGdEYjNnZTNpZUJfT2NSb05MZTBmMVhTZV9pQXM1OU41SWJQMVNXTGFGcjMtcHoxRE9YM1NQN1IyWjhXcmJmNllLdDZ5T3BiZDhYR1d5bnJoVmVVRE16akhJM0xGa2YzcFI3NlBPcHRlUHVuV0dmblAyM0NkWGhwSHV6N2J3Mnl1U2tTczdOMzEzNU15bDF1YkZfOTg3VGE5VzNrUQ?oc=5)
-- **ความเสี่ยงที่มีคนพูดถึง:** FDA ส่ง warning letter เรื่องโฆษณา Anktiva [แหล่ง](https://news.google.com/rss/articles/CBMiwwFBVV95cUxOMEZKVkZaR0xXRXl1cHVvaEVRaUtyRmFiQTNLeDNrN1VfTzFVOHdZN25IWDFOcklab3pnYnNqLUlkMEgyR2tQa1JxTi04TjFYQnMxZjRzbzkwUzJDQ1BVdjhYeWx3UXExUGljOERsQkR5TTl3c2FGdkpOZHFST3RQdWhYRThfTHY1a3Z0YXZVckU5VlMxQkhGRDlHS3lkbDcxSXpybUtBTk5naHFVQjhyVEFiakZDMlc5YXhJRkltaE1FdWs?oc=5)
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** ImmunityBio พัฒนายามะเร็งกลุ่มภูมิคุ้มกันบำบัด ตัวหลักคือ Anktiva ใช้รักษามะเร็งกระเพาะปัสสาวะ
+**กำลังทำอะไรอยู่:** ขยายการอนุมัติและการเข้าถึงยาในหลายประเทศ เช่น มีข่าวการอนุมัติในสหรัฐอาหรับเอมิเรตส์ การยื่นขอในซาอุดีอาระเบีย ดีลกับญี่ปุ่นเรื่อง BCG และข้อตกลงขยายการเข้าถึงยาใน 30 ประเทศ
+**ทำไมหุ้นขึ้นตอนนี้:** หุ้นได้แรงหนุนจากหลายข่าว ได้แก่ ความหวังเข้าดัชนี Russell 1000 (หุ้นเคยพุ่งราว 12%), กระแสหุ้นมะเร็งอย่าง MRNA ที่ดึงนักลงทุนมาที่ SLS และ IBRX และข่าวผลการรักษาที่ดีของ Anktiva ร่วมกับยาอื่นในมะเร็งกระเพาะปัสสาวะ
+**ตลาดสนใจอะไร:** ยอดขาย Anktiva การขยายประเทศ ข่าวซื้อกิจการจากบริษัทยายักษ์ใหญ่ที่รายย่อยลือกัน และการที่ Vanguard กับ BlackRock ถือหุ้นเพิ่ม
+**กำลังรออะไร:** มีเวิร์กช็อปของ FDA เกี่ยวกับ Anktiva ที่นักลงทุนจับตา (ข่าวที่เก็บได้ไม่ระบุวันที่ชัด)
+**ความเสี่ยง:** FDA เคยส่งหนังสือเตือนเรื่องการโฆษณา Anktiva (ผู้ก่อตั้งแย้งว่าโฆษณานั้นไม่เคยออกอากาศ) และมีเอกสารว่าผู้บริหารเสนอขายหุ้น 560,000 หุ้น
+แหล่ง: [Stocktwits](https://stocktwits.com/news-articles/markets/equity/ibrx-stock-retail-anktiva-boost-trump-cancer-panel-pick/cZDpKEmRB1C?.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/immunitybio-ibrx-could-33-undervalued-090718252.html?.tsrc=rss) · [Stocktwits](https://stocktwits.com/news-articles/markets/equity/sls-ibrx-stocks-retail-moderna-rally-mrna-lands-nasdaq-100-spot/cZDj2iqRB0D?.tsrc=rss) · [Stocktwits](https://news.google.com/rss/articles/CBMiswFBVV95cUxNMTUxUTlkWlR1N2k3Ql9hOGdEYjNnZTNpZUJfT2NSb05MZTBmMVhTZV9pQXM1OU41SWJQMVNXTGFGcjMtcHoxRE9YM1NQN1IyWjhXcmJmNllLdDZ5T3BiZDhYR1d5bnJoVmVVRE16akhJM0xGa2YzcFI3NlBPcHRlUHVuV0dmblAyM0NkWGhwSHV6N2J3Mnl1U2tTczdOMzEzNU15bDF1YkZfOTg3VGE5VzNrUQ?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ IBRX"_

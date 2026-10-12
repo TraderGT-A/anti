@@ -8,10 +8,14 @@ last_fetch: 2026-10-12
 # SLS — SELLAS Life Sciences Group, Inc.
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** Vanguard เปิดเผยถือ 5.19% ก่อนผลทดลอง Phase 3 AML [แหล่ง](https://news.google.com/rss/articles/CBMi0gFBVV95cUxNMU5JVWlvb204Q0FoNkpjWDNycTVSazJybW9CcXFZc0cwWloxejhsX2R5U3BkUU1NU0lzZGg0OVN0Sk02VFV6MFZpMU9jMDJCSVhCRWp3MzVxYkxPaW0tc1VTRnlmbmtfTmZEd0JXMFVWaHhWZHAyM1ZGTVNTR3hDRlZ0T3ZUdk9yUlJTVTl2U0ttanp6YnBpWWFBaGlsSVhmWU9hU3RrQmJ1dE9GNHZraVA0Y24yWE9lUUl3aGZCSk00VDhkQ0pOUzdWNFBnUFNCUkE?oc=5)
-- **ความเห็น/กระแส:** รายย่อยคาดหวังดีลซื้อกิจการ [แหล่ง](https://stocktwits.com/news-articles/markets/equity/sls-stock-retail-big-pharma-buyout-booth-ash/cZx4tMpRBF7?.tsrc=rss)
-- **ความเสี่ยงที่มีคนพูดถึง:** Shkreli ตั้งคำถามเรื่องจังหวะผลทดลอง [แหล่ง](https://news.google.com/rss/articles/CBMiuwFBVV95cUxObnhvZzhxaDA2VTN5Q1lrOVRRMkdhMl9KcUJXLWItd0Y3UW51bjE3WllHTk8xVmNTYnhISTlOYTE5UVVndVVHMkU4OEYyV0FwQW85RHp4OENmWXhJemhUQmc2N3pFTW5JR01TcGFtdnExNGRLVTBQbm5oaDVrVzRrSmxfaU9rQUk5djNYRHR0MUJhSWMySnkyQndnTVhvRV9pLVBjemRzcktPWm5ORUo0WmRuSzY2Y1BSaUxN?oc=5)
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** SELLAS พัฒนายามะเร็ง ตัวหลักคือ galinpepimut-S (GPS) ที่ทดสอบระยะ 3 ในผู้ป่วยมะเร็งเม็ดเลือดขาว AML (การทดลอง REGAL) และ SLS009 กลุ่ม CDK9
+**กำลังทำอะไรอยู่:** ใกล้ถึงจุดวิเคราะห์สุดท้ายของ REGAL โดย CEO ส่งสัญญาณว่ากำลังเตรียมปิดฐานข้อมูล (database lock) และมีข้อมูลก่อนคลินิกของ SLS009 ในมะเร็งตับอ่อน
+**ทำไมหุ้นขึ้นตอนนี้:** หุ้นแกว่งขึ้นตามกระแสวัคซีนมะเร็ง MRNA และการเก็งผลทดลอง มีรายงานว่าหุ้นทำ high 5 ปี ขณะที่ Vanguard เปิดเผยถือ 5.19%, Jefferies และ JPMorgan ซื้อเพิ่ม
+**ตลาดสนใจอะไร:** ผลทดลอง REGAL, ข่าวลือซื้อกิจการจากบริษัทยายักษ์ และมุมมองของ Alliance Global ว่า SLS009 นำในกลุ่ม CDK9 โดยเห็นศักยภาพขึ้นราว 200%
+**กำลังรออะไร:** ผลทดลอง REGAL ที่ตลาดพยากรณ์ใน Stocktwits ให้โอกาสสำเร็จ 83% ในเดือน พ.ย. (Martin Shkreli มองว่าอาจรอถึงคริสต์มาส)
+**ความเสี่ยง:** เป็นการเดิมพันผลทดลองครั้งเดียว ถ้าไม่สำเร็จราคาอาจลงแรง และหุ้นเคยร่วง 16.6% ในไตรมาส 3 ก่อนจะฟื้น
+แหล่ง: [Stocktwits](https://news.google.com/rss/articles/CBMirAFBVV95cUxNaVBtRjdCUUVRX0JKekNNYzdOUkhwX0ZKa3hQNHgzM3F0Z1JlajUyVVU4N3kzR0U3N0xGZHh6WlpOWjVLODR6RGRhY3BfeDFYNGtlRGYwQ3N6UUU4d3dRUWFaWnhLSnd5TlJMVWo3NEVlZEdCc3hZUE5VNHpCaUdFazlNMGVRb1BZLVF6emZScXFzcnFOLWQxbXE2NTQzUlcyTEZoeHZ2SUs0MGhF?oc=5) · [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/despite-heavy-hedge-fund-support-034502761.html?.tsrc=rss) · [Stocktwits](https://news.google.com/rss/articles/CBMi0gFBVV95cUxNMU5JVWlvb204Q0FoNkpjWDNycTVSazJybW9CcXFZc0cwWloxejhsX2R5U3BkUU1NU0lzZGg0OVN0Sk02VFV6MFZpMU9jMDJCSVhCRWp3MzVxYkxPaW0tc1VTRnlmbmtfTmZEd0JXMFVWaHhWZHAyM1ZGTVNTR3hDRlZ0T3ZUdk9yUlJTVTl2U0ttanp6YnBpWWFBaGlsSVhmWU9hU3RrQmJ1dE9GNHZraVA0Y24yWE9lUUl3aGZCSk00VDhkQ0pOUzdWNFBnUFNCUkE?oc=5) · [Stocktwits](https://news.google.com/rss/articles/CBMiuAFBVV95cUxNa1I1cGRyU1ZZbzF4ZXEtX2xGV21zdmlKZFRnYnBaaUNfaVI5Ri1HS1F6YWJvcmM0VFJ1emhtTjg0eWktM3RkblFaOEZXT0U2Y0hCR1p6MFNjYWFIWXJvQWZVZzdBdHpLdGwzUFlQcXdiSVpLUEI2QllaOVRwZTdwcHZYUkhBekZEY1h1aHRlV1hsOXNzMjZiOUhTSGlKd3ZPd1NrS0QtVUpvbmZsLVJ4dldRc2hTSXB0?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ SLS"_

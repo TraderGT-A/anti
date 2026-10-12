@@ -8,10 +8,14 @@ last_fetch: 2026-10-12
 # KOD — Kodiak Sciences, Inc.
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** เสนอข้อมูลทางคลินิกที่งาน AAO 2026 วันที่ 9 ต.ค. [แหล่ง](https://finance.yahoo.com/healthcare/articles/kodiak-sciences-present-clinical-data-110000960.html?.tsrc=rss)
-- **ความเห็น/กระแส:** นักวิเคราะห์ฝั่งบวก [แหล่ง](https://news.google.com/rss/articles/CBMiiAJBVV95cUxPTmZZbTNLYm1UVnJHbEk4ai1NQzJzZEowY2ljMXFPV0F2cGtKYndDQ2VVUDRpUnc1T0pBdzBnYXFxQmFpeVBtUEJMR2FPZDNBMm1nUE9NNFhSQUlVYzN6LWs3WWxLUi03ZGRkd084OE9tR3B6ZS1Jc0lvQ2RNVVhVTXhYNENJd2ZGV2JnVWtpR19DeHVTd2hQaDRTOWpxMWVyaENJbEdyOU04Z1VJdUlHZEROODFKYVZWVS1yY1U2aF90SWFKZVIycnBJdkVEN3I4ZV82NTM5QWlXemY3dVdCQ19sUE1vdmZkYUlLV0JqeUNpTDdXeU1lMVJPelpINFRyTkx5c1oxMFY?oc=5)
-- **ความเสี่ยงที่มีคนพูดถึง:** Simply Wall St มองว่าราคาแพงกว่ามูลค่าราว 7% [แหล่ง](https://finance.yahoo.com/healthcare/articles/kodiak-sciences-kod-could-7-191220884.html?.tsrc=rss)
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** Kodiak Sciences พัฒนายาตาสำหรับโรคจอประสาทตาเสื่อมแบบเปียก (wet AMD) และโรคจอตาจากเบาหวาน ซึ่งปกติต้องฉีดเข้าลูกตาบ่อย ๆ
+**กำลังทำอะไรอยู่:** ผลวิจัยระยะ 3 ของยา 2 ตัว (รวม KSI-501) ให้ผลเทียบเท่า aflibercept (Eylea) บริษัทเตรียมยื่นขออนุมัติยา (BLA) และนำเสนอข้อมูลคลินิกครบทั้ง 3 โปรแกรมที่งานประชุม AAO 2026 เมื่อวันที่ 9 ต.ค.
+**ทำไมหุ้นขึ้นตอนนี้:** ปลายเดือน ก.ย. หุ้นพุ่งเกือบ 178% ในวันเดียว (จากราว 32 เป็น 90 ดอลลาร์ตามรายงาน) หลังประกาศผลระยะ 3 ได้ตามเป้า
+**ตลาดสนใจอะไร:** นักลงทุนดูว่ายาจะสู้ตลาดของ Regeneron ได้แค่ไหน และข้อมูลจากงาน AAO หลังจากหุ้นขึ้นราว 600% ในปีเดียว
+**กำลังรออะไร:** การยื่นขออนุมัติ BLA ที่สื่อว่าใกล้เข้ามา (ยังไม่ระบุวัน)
+**ความเสี่ยง:** ราคาวิ่งแรงมาก บทวิเคราะห์บางแห่งมองว่าตอนนี้แพงเกินไป Wall Street Zen ปรับลดเหลือ Sell และ Martin Shkreli วิจารณ์ว่าผลยัง "ไม่ดีพอ"
+แหล่ง: [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/kod-stock-soars-178-positive-141300086.html?.tsrc=rss) · [MarketBeat](https://www.marketbeat.com/instant-alerts/event-kodiak-sciences-two-wet-amd-treatments-match-aflibercept-in-phase-iii-study-2026-10-02/?utm_source=yahoofinance&utm_medium=yahoofinance&.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/kodiak-sciences-present-clinical-data-110000960.html?.tsrc=rss) · [24/7 Wall St.](https://247wallst.com/investing/2026/09/30/a-32-biotech-became-a-90-biotech-overnight-is-it-too-late-to-buy-kodiak/?.tsrc=rss)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ KOD"_

@@ -8,10 +8,11 @@ last_fetch: 2026-10-12
 # USDE — StablecoinX, Inc. Class A
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** Binance กำหนดเปิดซื้อขาย StablecoinX tokenized security [แหล่ง](https://news.google.com/rss/articles/CBMiWEFVX3lxTFBrRDZhckJXZXU3NzRHR1Rtd2c0N1FwT1Bvc2o3MF95UFdQaHgyUGxRdXRNTkFDSVRqWDJ5ZGtLTm5IUHVYeU9HOFRoWDg4c3RQenNwOHY3QUg?oc=5)
-- **ความเห็น/กระแส:** Standard Chartered ตั้งเป้า $40B ให้ USDe [แหล่ง](https://www.cryptoprowl.com/releases/standard-chartered-puts-40b-target-on-usde-2-on-ena-7186?.tsrc=rss) (ไม่ใช่เป้าของหุ้นโดยตรง)
-- **ความเสี่ยงที่มีคนพูดถึง:** Ethena หยุด incentive ที่เกี่ยวกับ ENA [แหล่ง](https://news.google.com/rss/articles/CBMiXEFVX3lxTE1qaWRwRXVQSmgwMDNEaG1XakJwZHlKM2dweXk0MWs2aEdCUFZqWEF2RzJvN0xpTGE2cnZIekdzNlNIYXl4ZmZsQnVValktZnRQamV0S2dJVWJQbEhI?oc=5)
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** StablecoinX เป็นบริษัทจดทะเบียนที่ข่าวผูกกับระบบสเตเบิลคอยน์ USDe และเหรียญ ENA ของ Ethena
+**ตลาดสนใจอะไร:** Standard Chartered ตั้งเป้ามูลค่า USDe ที่ 4 หมื่นล้านดอลลาร์ และ ENA ที่ 2 ดอลลาร์ (30 ก.ย.) และ Binance กำหนดซื้อขาย tokenized stock ของบริษัท
+**ความเสี่ยง:** Ethena หยุดแรงจูงใจ ENA ที่เกี่ยวกับ USDe และการซื้อคืนยังไม่เริ่ม
+แหล่ง: [CryptoProwl](https://www.cryptoprowl.com/releases/standard-chartered-puts-40b-target-on-usde-2-on-ena-7186?.tsrc=rss) · [TokenPost](https://news.google.com/rss/articles/CBMiWEFVX3lxTFBrRDZhckJXZXU3NzRHR1Rtd2c0N1FwT1Bvc2o3MF95UFdQaHgyUGxRdXRNTkFDSVRqWDJ5ZGtLTm5IUHVYeU9HOFRoWDg4c3RQenNwOHY3QUg?oc=5) · [TechFlow](https://news.google.com/rss/articles/CBMiXEFVX3lxTE1qaWRwRXVQSmgwMDNEaG1XakJwZHlKM2dweXk0MWs2aEdCUFZqWEF2RzJvN0xpTGE2cnZIekdzNlNIYXl4ZmZsQnVValktZnRQamV0S2dJVWJQbEhI?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ USDE"_

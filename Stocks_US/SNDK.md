@@ -8,10 +8,13 @@ last_fetch: 2026-10-12
 # SNDK — Sandisk Corporation
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** พาดหัวระบุงบรายได้ดีกว่าคาดแรง [แหล่ง](https://news.google.com/rss/articles/CBMi8wFBVV95cUxOWDVGZVNwNnZDSHFmRjRwcWJWTFg5TzBSaUZFR0dqdHh4aFdtSzdyak5aZ2p0RG1OMFhlb3JtOEttQm5INUFKNXNYdmZ4UlozVHU0cmpwYnZVQ2ZUM2V4US1kbjhRM3ljRVFKcjZMc0FqYTY5T2RReGJHYnREMHR0c2ZmdEdrWE5Dc0t3UTBxQTNhUTc4dDdTZ0t4M3hrR09HQXM1aVM4NF9PcTVOZEdobmFjdlk1S0tqcUxPMkE5b2RRcEM3ZWc5SHVQSkN5SlVXX1RtUmp4Z0tPWTlseklRT196OHhyWjByc2pNUGs4NTZOQUU?oc=5)
-- **ความเห็น/กระแส:** Yahoo: บทความ 'หุ้น AI ที่ถูกลืม' ขึ้น 689% (พาดหัวไม่ระบุชื่อหุ้น) [แหล่ง](https://www.fool.com/investing/2026/10/10/this-forgotten-ai-stock-is-up-689-and-nobodys-talk/?.tsrc=rss)
-- **ความเสี่ยงที่มีคนพูดถึง:** หุ้นเคยร่วงเกิน 30% ใน 3 วันช่วงเซมิคอนดักเตอร์ขายหนัก [แหล่ง](https://news.google.com/rss/articles/CBMiyAFBVV95cUxNMC1zSFJycEgwLXVjdUg1SFRTMUwtTHJsTWdfZHRobGR2bWRaNVl1Zmo0ZVdBMFQ3WllWeFljRTV5eFJfVjNONms1NDE0MU1Yb1dfejlQaEU4VTdJQmNiYlBDdHlXZWJSZVZmRm5nd2VKQ2NrckRrbTA1R0gxYzlxbGloR0xDRVR0ZHhfeTJqVDBEN3JnX3o5cnRaUGl0dm5zMi04ZW1TbFFsRmlPWURzYU9KVlVQamJqMEZMd2lWamlNSktVbVB2cQ?oc=5)
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** Sandisk ผลิตหน่วยความจำแฟลช NAND และ SSD ใช้ในดาต้าเซ็นเตอร์ คอมพิวเตอร์ และมือถือ
+**ทำไมหุ้นขึ้นตอนนี้:** หุ้นขึ้นราว 500-800% ในปีนี้ตามรายงาน (เคยเป็นหุ้นที่ดีที่สุดใน S&P 500) เพราะความต้องการหน่วยความจำจาก AI และ Elon Musk บอกว่าความต้องการหน่วยความจำโต "200% ต่อปีหรือมากกว่า"
+**ตลาดสนใจอะไร:** ความขาดแคลนและต้นทุนที่สูงขึ้น (Amazon และ Apple เตือนเรื่องต้นทุนชิป) และงบที่ใกล้ประกาศ ซึ่งนักวิเคราะห์บางรายมองว่าตอนนี้ราคา "เผื่อข่าวดีไว้มาก"
+**กำลังรออะไร:** การประกาศงบไตรมาสถัดไปของบริษัท (ข่าวที่เก็บได้ไม่ระบุวันที่)
+**ความเสี่ยง:** หุ้นแกว่งแรง เช่น ร่วงเกิน 30% ใน 3 วันระหว่างที่หุ้นเซมิคอนดักเตอร์ถูกเทขาย และราคาหุ้นเกาหลีอย่าง SK Hynix กับ Samsung ที่ถอยลงฉุดกลุ่มหน่วยความจำ
+แหล่ง: [Stocktwits](https://news.google.com/rss/articles/CBMiyAFBVV95cUxNMC1zSFJycEgwLXVjdUg1SFRTMUwtTHJsTWdfZHRobGR2bWRaNVl1Zmo0ZVdBMFQ3WllWeFljRTV5eFJfVjNONms1NDE0MU1Yb1dfejlQaEU4VTdJQmNiYlBDdHlXZWJSZVZmRm5nd2VKQ2NrckRrbTA1R0gxYzlxbGloR0xDRVR0ZHhfeTJqVDBEN3JnX3o5cnRaUGl0dm5zMi04ZW1TbFFsRmlPWURzYU9KVlVQamJqMEZMd2lWamlNSktVbVB2cQ?oc=5) · [TradingKey](https://news.google.com/rss/articles/CBMi1AFBVV95cUxPUGktaU50QjhYb3FKOGNVdU1BRlRsYlRJWHRWbkVsTTJvQl9ScHFFMGV1T3JjTndZSm51NDc0a0dxVnJEbzNNXzBzaXNkT1dSUUdIWmhCRDVVRm5CdUVyREdsMXNYZUlXN1k5NkFsdmtON2Jzbm8tVVl4ckFjWHplSUxibmRZRHh0SFN4bUdoQzZuV0h6Tk9qTlJXVEhWczREUktmQkZiMHB3XzN3eG5lbDFfb3JxMFNMbDdkaVVSZUFMQ2dkQzJJUW1FM0VsQzVTVXA2SQ?oc=5) · [MarketBeat](https://news.google.com/rss/articles/CBMipgFBVV95cUxQTHZ3NFZVOGlnTERXQW9XUVBKdnp5djlZeUd0RFBsUUplc0poV1JaLVIxLW1rNWppRFY5SndGUldzRmp4S1E5NVJldVJPZV8zRXNqcGhreVd6ZzlRTkRoZTBKWUo4ODF3Rl81dzBMdVJ6clhFamhIRV9xYUQ2UnFSSk8tdjdzclhDejVQVUZnSGpwZi1rdVVFX0lMOVkyT0U5endkbTVR?oc=5) · [Stocktwits](https://news.google.com/rss/articles/CBMikAJBVV95cUxNZUw2dFowcUFKRVloMW1xeGVrZktpRlQ1MEFDRFpLRjl0aE83S3U4U2FhaTAwS0kzR1J1dVdJTGhMS0dRdDlVa0xNeUFaMm9ORC1oMzZ2X2lKai0tMUx0QlhJZ0VydDJFVExCMjRkdVlibnJRbFBlMXAzc0FPdjFqR0NWRmlKZE9MY2RaYjZma3ZET2xVcEJLUjJmT0xQcldCVF9jZ05PN0VieUlnZGthMUx5Ny0xZGtEOE9QZjNnWGZ5QzZZUk1wdGZaaGtrUmExYVpyNzQxbS1uV2F2SFo3UjNNRkFRUG14VS03czBFVGRuS182QnBWSklBQW5JXzZDQmdGU2REczVzaGpCVmZHUg?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ SNDK"_

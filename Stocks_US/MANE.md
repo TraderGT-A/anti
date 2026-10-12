@@ -8,10 +8,13 @@ last_fetch: 2026-10-12
 # MANE — Veradermics, Incorporated
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** ทำ high ใหม่ 12 เดือน และพุ่ง 14% ไปที่ $126.63 โดยพาดหัวไม่ระบุข่าวบริษัทชัดเจน [แหล่ง](https://news.google.com/rss/articles/CBMikAFBVV95cUxQQnhRZ1RiU2FoMk4zTnE1ZmxZcVdWNDIyQnFEU3RMNElDM1p4eTJVRFNFb0g4Yk1YXzA1d1VIYWhvd0p1aU1XcU1oQk40SWNrU2hMSEpqSGs0OF9mbVFuOVNQOUhlUWhZcTFydGI5eVBGZEI4ZG1tSHFMQ1BFcXBSV2pqMmE4UXZGRDdpV0lpSC0?oc=5)
-- **ความเห็น/กระแส:** TipRanks เล่าว่า Wall Street เชียร์ผลิตภัณฑ์รักษาผมร่วง [แหล่ง](https://news.google.com/rss/articles/CBMimAFBVV95cUxQdzR3NWpQUUdvcWVfcUdGYkpuYjVxODBoMmcyNGc3UDd0N2dWRTh3QnFEX3pkOFhJY0N6TkNKZW9aZ21VSk9SQklTU0tESlVxMWFmN2lOQVYxNUlwbHNGQkZOcnB0MHhGZHMtajJGbHdmelRIOGhOakVuSkF2T0NnZUUzYlNjajFtYnowNngtc2Jlalh3WXNzeQ?oc=5)
-- **ความเสี่ยงที่มีคนพูดถึง:** Seeking Alpha เตือนความเสี่ยงก่อนผลทดลอง H2 2026 [แหล่ง](https://news.google.com/rss/articles/CBMitwFBVV95cUxPN3VtYnpaN3RWdno4TjY5RVdxSDBFZkFjeTI2eU5uNi1FMlZ3djBPMXdOU1pGcFAyLWppSC1rMmlQUWd6UmFzcjU1Z3k1TWZHNkZxNXIwRXdoRE5DcnkwWk10cXY2REFTQXotRWlJY2o4YmNxNXByRFJXTHhsalFIbEN5OGE2NUNZMmo4T3RDLXJ0WjhMMFJXNndMcmE3V0ZiQ0NYRnhNV3VVcVJmNGJTSEpmUlpMbk0?oc=5)
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** Veradermics เป็นบริษัทไบโอเทคที่พัฒนายารักษาผมร่วง/ผมบางแบบรับประทาน
+**ทำไมหุ้นขึ้นตอนนี้:** วันที่ 9 ต.ค. หุ้นพุ่งราว 14% ไปที่ประมาณ 126.63 ดอลลาร์ ทำ high 12 เดือนใหม่ โดย TipRanks ระบุว่าเป็นผลของความหวังเรื่องผลรักษาผมร่วงที่ดี
+**ตลาดสนใจอะไร:** นักลงทุนเปรียบเทียบกับกระแสยาลดน้ำหนักอย่าง Ozempic และจับตาผลทดลองที่รออยู่
+**กำลังรออะไร:** ผลการทดลองที่คาดว่าจะประกาศในครึ่งหลังของปี 2026
+**ความเสี่ยง:** หุ้นผันผวน เช่น ร่วง 8.1% เมื่อ 6 ต.ค. และผลทดลองที่รออยู่เป็นเหตุการณ์สองด้าน
+แหล่ง: [TipRanks](https://news.google.com/rss/articles/CBMimgFBVV95cUxNbDQ2NkhQZGY3NUJjNzZrWlpFVjB4R21DSXEzb0tfQWtqXzBIRkx3RUk3UWFsLWlmamV4UG5ieGYwaEFKV2pIcEt6UGZyS0d0NVlqQU5qdS1oVnNuMWJvRmV2X1ZRUnUzb1RndzVtWEVVS1NDYk5ZZ1ItOXVFS0VzQ1I4NDNBeFBMcng0YkNZSi1zLUU1TkdCU1Jn?oc=5) · [Seeking Alpha](https://news.google.com/rss/articles/CBMitwFBVV95cUxPN3VtYnpaN3RWdno4TjY5RVdxSDBFZkFjeTI2eU5uNi1FMlZ3djBPMXdOU1pGcFAyLWppSC1rMmlQUWd6UmFzcjU1Z3k1TWZHNkZxNXIwRXdoRE5DcnkwWk10cXY2REFTQXotRWlJY2o4YmNxNXByRFJXTHhsalFIbEN5OGE2NUNZMmo4T3RDLXJ0WjhMMFJXNndMcmE3V0ZiQ0NYRnhNV3VVcVJmNGJTSEpmUlpMbk0?oc=5) · [Kalkine](https://news.google.com/rss/articles/CBMikAFBVV95cUxQQnhRZ1RiU2FoMk4zTnE1ZmxZcVdWNDIyQnFEU3RMNElDM1p4eTJVRFNFb0g4Yk1YXzA1d1VIYWhvd0p1aU1XcU1oQk40SWNrU2hMSEpqSGs0OF9mbVFuOVNQOUhlUWhZcTFydGI5eVBGZEI4ZG1tSHFMQ1BFcXBSV2pqMmE4UXZGRDdpV0lpSC0?oc=5) · [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/baldness-drug-stocks-veradermics-mane-002949530.html?.tsrc=rss)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ MANE"_

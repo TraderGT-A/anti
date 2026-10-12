@@ -8,10 +8,14 @@ last_fetch: 2026-10-12
 # MRNA — Moderna, Inc.
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** มีรายงานแผนโครงการวัคซีนมะเร็งระดับชาติของสหรัฐ [แหล่ง](https://finance.yahoo.com/markets/stocks/article/moderna-stock-hits-4-year-high-on-planned-national-cancer-vaccine-effort-201351554.html?.tsrc=rss); กลับเข้า Nasdaq-100 [แหล่ง](https://247wallst.com/investing/2026/10/09/moderna-climbs-5-on-nasdaq-100-entry-pfizer-inches-higher-biontech-ticks-up/?.tsrc=rss)
-- **ความเห็น/กระแส:** รายย่อยโยงกระแสไปยัง SLS/IBRX [แหล่ง](https://news.google.com/rss/articles/CBMixgFBVV95cUxPeWNrVTdqS191U3ppMUpFaDN2T3NCblpvZmJ6OWVPejAyamhjR3d3Q3JQSlFQQV9sbEZCNG03ZV9yRGRtWXZtbXJsZkZmWW05bG9xbGdqRHlqNlNTVlJXZ2l1MG5iQkRpWEkxTm9UNDNBRk9pQXVJYk4zWWxaTHdSZy1qMDNaeTJMbE5QXzNmLXIxZ1FGeE9hS2xrY0MzMFhlQ05QY2djbUtsREtodVZzUXVYNllWTUduNG9DQUNPSW9zUmd3MGc?oc=5)
-- **ความเสี่ยงที่มีคนพูดถึง:** ราคาสูงกว่าเป้านักวิเคราะห์เฉลี่ยราว 61% [แหล่ง](https://www.fool.com/investing/2026/10/10/moderna-now-trades-61-percent-above-price-target/?.tsrc=rss); อาจลงได้ 38% ตามนักวิเคราะห์ [แหล่ง](https://www.fool.com/investing/2026/10/09/this-stock-is-up-more-than-560-this-year-but-it-could-drop-by-36-according-to-wall-street/?.tsrc=rss)
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** Moderna เป็นบริษัทไบโอเทคที่พัฒนายาและวัคซีนจากเทคโนโลยี mRNA ที่คนรู้จักจากวัคซีนโควิด และกำลังรุกวัคซีนมะเร็งแบบเฉพาะบุคคลร่วมกับ Merck
+**กำลังทำอะไรอยู่:** ผลักดันวัคซีนมะเร็งเมลาโนมากับ Merck ซึ่งสื่อบอกว่าใกล้ประกาศผลฉบับเต็ม และมีการแต่งตั้ง COO คนใหม่เมื่อต้นเดือน ต.ค.
+**ทำไมหุ้นขึ้นตอนนี้:** วันที่ 9 ต.ค. มีรายงานว่าสหรัฐ (NIH) เตรียมโครงการวัคซีนมะเร็งระดับชาติ หุ้นพุ่งราว 11-14% ทำ high 4 ปี และก่อนหน้านั้นหุ้นกลับเข้าดัชนี Nasdaq-100 อีกครั้ง รวมสัปดาห์ขึ้นราว 18% และขึ้นประมาณ 560-600% ตั้งแต่ต้นปี
+**ตลาดสนใจอะไร:** ตลาดมองว่าความสำเร็จของวัคซีนมะเร็ง Moderna-Merck อาจเป็นข่าวดีต่อกลุ่มยามะเร็งทั้งกลุ่ม รายย่อยจึงโยงไปถึงหุ้นอย่าง SLS และ IBRX ด้วย
+**กำลังรออะไร:** ผลฉบับเต็มของการทดลองวัคซีนมะเร็งเมลาโนมา (ยังไม่ระบุวัน) และการประชุม FDA เกี่ยวกับวัคซีนที่สื่อยกเป็นประเด็นเสี่ยงสำคัญ
+**ความเสี่ยง:** ราคาสูงกว่าเป้านักวิเคราะห์เฉลี่ยราว 61% และมีบทวิเคราะห์ที่ชี้ว่าอาจลงได้ราว 38% Citi เคยปรับมุมมองเป็นลบหลังหุ้นวิ่งแรงมาทั้งปี
+แหล่ง: [Yahoo Finance](https://finance.yahoo.com/markets/stocks/article/moderna-stock-hits-4-year-high-on-planned-national-cancer-vaccine-effort-201351554.html?.tsrc=rss) · [24/7 Wall St.](https://247wallst.com/investing/2026/10/09/moderna-climbs-5-on-nasdaq-100-entry-pfizer-inches-higher-biontech-ticks-up/?.tsrc=rss) · [Motley Fool](https://www.fool.com/investing/2026/10/10/moderna-now-trades-61-percent-above-price-target/?.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/moderna-mrna-18-4-cancer-141247436.html?.tsrc=rss)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ MRNA"_

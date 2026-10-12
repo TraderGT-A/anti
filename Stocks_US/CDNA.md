@@ -8,10 +8,12 @@ last_fetch: 2026-10-12
 # CDNA — CareDx, Inc.
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** พาดหัวระบุปัจจัยบวกด้าน reimbursement และการปรับเป้านักวิเคราะห์ (รายละเอียดไม่อยู่ในพาดหัว) [แหล่ง](https://finance.yahoo.com/markets/stocks/articles/caredx-cdna-stock-gets-fair-002026721.html?.tsrc=rss)
-- **ความเห็น/กระแส:** นักวิเคราะห์ปรับเป้าราคา (ตามพาดหัวเดียวกัน) [แหล่ง](https://finance.yahoo.com/markets/stocks/articles/caredx-cdna-stock-gets-fair-002026721.html?.tsrc=rss)
-- **ความเสี่ยงที่มีคนพูดถึง:** หุ้นเคยร่วง 8.7% และมีรายงานว่ารอบขึ้นเย็นลงโดยไม่พบตัวเร่งใหม่ [แหล่ง](https://news.google.com/rss/articles/CBMiogFBVV95cUxQRUl4OE8xSzN5SnZkUXhSSHhUQm1UOTlabTluTnVVTGJ3WnZXdTN1MmtaTWY4SDJtTWhRMGdrUFJQQ2VNSmlBQjBEODA3TnBHRm1SdGJFNUFQanBOLXVzVl9ySTU5ejcxX0ZpVzdjMkNQY1ZJUmFSckt3OG9CbU96YUdSLXVKVHE1T3F2RUJZeTBwcDJPQTBVTXQyaEo4eklLMUE?oc=5)
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** CareDx ทำการตรวจเลือดและบริการข้อมูลเพื่อติดตามว่าร่างกายผู้ป่วยปลูกถ่ายอวัยวะ (เช่น ไต หัวใจ) กำลังต่อต้านอวัยวะใหม่หรือไม่
+**ทำไมหุ้นขึ้นตอนนี้:** ปลายเดือน ก.ย. หุ้นขึ้นราว 13-14% หลังมีเป้าราคานักวิเคราะห์ใหม่ที่ 74 ดอลลาร์ และต้นเดือน ต.ค. มีข่าวเรื่องการเบิกจ่ายค่าตรวจที่ดีขึ้นซึ่งทำให้มูลค่าที่เหมาะสมตามประมาณการขยับขึ้น
+**ตลาดสนใจอะไร:** ประเด็นหลักคือเรื่องการเบิกจ่ายค่าตรวจ (reimbursement) ที่ดีขึ้น และการปรับเป้าราคาของนักวิเคราะห์
+**ความเสี่ยง:** วันที่ 6 ต.ค. หุ้นร่วงราว 8.7% โดยสื่อระบุว่าแรงขึ้นอ่อนลงโดยไม่มีข่าวใหม่จากบริษัท จึงอาจผันผวนตามแรงเก็งกำไร
+แหล่ง: [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/caredx-cdna-stock-gets-fair-002026721.html?.tsrc=rss) · [TIKR](https://www.tikr.com/blog/caredx-14-on-fresh-74-analyst-price-target?ref=yahoofinance&.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/caredx-cdna-stock-jumps-13-071800723.html?.tsrc=rss)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ CDNA"_

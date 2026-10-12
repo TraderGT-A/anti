@@ -8,10 +8,10 @@ last_fetch: 2026-10-12
 # SILC — Silicom Ltd.
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** มีเพียงกำหนดแถลงงบ Q3 วันที่ 29 ต.ค. [แหล่ง](https://finance.yahoo.com/markets/stocks/articles/silicoms-third-quarter-2026-results-121500516.html?.tsrc=rss)
-- **ความเห็น/กระแส:** ไม่พบในข่าวที่เก็บได้
-- **ความเสี่ยงที่มีคนพูดถึง:** ไม่พบในข่าวที่เก็บได้
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** Silicom ของอิสราเอลทำการ์ดเครือข่ายและอุปกรณ์เชื่อมต่อสำหรับเซิร์ฟเวอร์และระบบสื่อสาร
+**กำลังรออะไร:** Silicom จะประกาศผลไตรมาส 3 ปี 2026 วันที่ 29 ต.ค. 2026
+แหล่ง: [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/silicoms-third-quarter-2026-results-121500516.html?.tsrc=rss) · [Barrons](https://news.google.com/rss/articles/CBMiowFBVV95cUxQd1dhTlowQnZpZVFkSUxyNVpPWm11WjBZUTBPRVNFejZGMi01ekJHWklmRFM4V2s3SWppeXdoWExyd2dodFQyZEZkSE9qWFBDTFh0cThVcXNzMHRNQ2lxcXlkR18teEhjNzFzbWhDQ2VYV3lpalM1OUxQYlJoN0xqTzJUVXZqcjhHbHJqYnl5ckwtdjNVdEJ6LWtQN2x3Q3ZDYU5Z?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ SILC"_

@@ -8,10 +8,12 @@ last_fetch: 2026-10-12
 # FEAM — 5E Advanced Materials, Inc.
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** ปิดดีลซื้อ Searles Valley Minerals [แหล่ง](https://finance.yahoo.com/markets/stocks/articles/5e-advanced-materials-completes-transformational-123000719.html?.tsrc=rss) เป้า EBITDA $40M
-- **ความเห็น/กระแส:** อยู่ในลิสต์หุ้นลิเทียมน่าจับตา [แหล่ง](https://finance.yahoo.com/markets/commodities/articles/top-3-lithium-stocks-watch-131623210.html?.tsrc=rss)
-- **ความเสี่ยงที่มีคนพูดถึง:** ไม่พบในข่าวที่เก็บได้
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** 5E Advanced Materials เดิมพัฒนาโครงการแร่โบรอนและลิเทียมที่ Fort Cady ในแคลิฟอร์เนีย ตอนนี้ขยับมาซื้อกิจการเหมืองและโรงงานแร่เพื่อให้มีรายได้เร็วขึ้น
+**กำลังทำอะไรอยู่:** ปิดดีลซื้อสินทรัพย์ของ Searles Valley Minerals (2 ต.ค.) ซึ่งตกลงกันไว้เมื่อ 15 ก.ย. ได้พนักงานราว 257 คนและโรงงานแปรรูป 3 แห่งในแคลิฟอร์เนีย บริษัทตั้งเป้ากำไร EBITDA ประมาณ 40 ล้านดอลลาร์
+**ทำไมหุ้นขึ้นตอนนี้:** การปิดดีลเปลี่ยนสถานะจากบริษัทพัฒนาโครงการเป็นผู้ผลิตที่มีสินทรัพย์ทำเงิน ขณะที่ CEO ซื้อหุ้นเพิ่มราว 2.5 หมื่นดอลลาร์ (9 ต.ค.)
+**ตลาดสนใจอะไร:** นักลงทุนดูว่าจะผสานธุรกิจใหม่ได้ราบรื่นแค่ไหน และตลาดลิเทียมที่คนหาหุ้นเกี่ยวข้องกันอยู่ บริษัทจัดประชุมนักลงทุนอธิบายเรื่องนี้เมื่อ 9 ต.ค.
+แหล่ง: [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/5e-advanced-materials-completes-transformational-123000719.html?.tsrc=rss) · [MarketBeat](https://www.marketbeat.com/instant-alerts/event-5e-advanced-materials-buys-searles-valley-targets-40m-ebitda-2026-10-07/?utm_source=yahoofinance&utm_medium=yahoofinance&.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/5e-advanced-materials-provides-additional-123000586.html?.tsrc=rss) · [Seeking Alpha](https://news.google.com/rss/articles/CBMirAFBVV95cUxOZ040Q3EwTnJ0YmluMlAyYUg3RGwwQU5scWVzS1pGMHEzUkZrMl82cFF2RzU2WG9aSFQ2UDVuR2wwNk9qX1cyUWNpVjhLY3ZjcUV5ZjFMMEFmUkd5cEJXSnFmTWEtU2w1c0w2OEhZU0xtbUhMYl9SbTVkOFpfQ3hGS3J4QjhtOFJ2Z1BxbjBMT0RWcVpxWkV5ZFZiZUw2c21xQXNpQXQxSWh3cEpK?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ FEAM"_

@@ -8,10 +8,13 @@ last_fetch: 2026-10-12
 # ATEX — Anterix Inc.
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** มีข่าวดี spectrum 800 MHz ของ SpaceX มูลค่า $8B ทำให้ spectrum ย่านต่ำถูกจับตา [แหล่ง](https://news.google.com/rss/articles/CBMitgFBVV95cUxQTDZqckwyYmRuQVZVY0Jya2VvMk1Mbm9SN3RJczFfNkp0c18tREd5YlJnZjBkOFZiMmFqYXAwR2VvZHpCV2tlcHNldkRzOGkwekcwS2gyMHZRaGVaMWFYUFhQSGkweHdWcTl2Qm1vY1ZaVG1EVVUtZTVIUVVBNXlqdVZfY2JXN3QycTJMdG1HdmZ3UnNMZHZEYnl3YVNvbEtkQXJLNmxzYUpIcWk3MjBoWU4zQjlLUQ?oc=5)
-- **ความเห็น/กระแส:** Roth Capital มองว่า ATEX อาจได้ประโยชน์จากดีลนี้ [แหล่ง](https://stocktwits.com/news-articles/markets/equity/atex-nn-gogo-stocks-can-be-winners-of-spacex-deal-says-roth/cZD6UasRBnL?.tsrc=rss)
-- **ความเสี่ยงที่มีคนพูดถึง:** ยังมีคำถามเรื่องการทำเงินจาก spectrum [แหล่ง](https://finance.yahoo.com/markets/stocks/articles/anterix-atex-could-6-undervalued-131425469.html?.tsrc=rss)
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** Anterix ถือสิทธิคลื่นความถี่ 900 MHz ทั่วสหรัฐ แล้วให้บริษัทสาธารณูปโภคและองค์กรขนาดใหญ่ใช้สร้างเครือข่ายไร้สายส่วนตัว
+**กำลังทำอะไรอยู่:** ปลายเดือน ก.ย. มีรายงานว่า iPhone รุ่นใหม่เป็นอุปกรณ์ Apple รุ่นแรกที่ทำงานบนเครือข่ายส่วนตัว 900 MHz ของ Anterix ซึ่งเป็นสัญญาณดีต่อระบบนิเวศอุปกรณ์
+**ทำไมหุ้นขึ้นตอนนี้:** วันที่ 9 ต.ค. มีข่าวดีลซื้อคลื่นความถี่ของ SpaceX มูลค่าราว 8 พันล้านดอลลาร์ Roth Capital มองว่าอาจทำให้คลื่นย่านความถี่ต่ำอย่างของ Anterix มีมูลค่าสูงขึ้น หุ้นจึงถูกซื้อตาม
+**ตลาดสนใจอะไร:** นักลงทุนอยากรู้ว่าบริษัทจะเปลี่ยนคลื่นที่ถืออยู่เป็นรายได้หรือขายได้ในราคาเท่าไร ซึ่งยังมีข้อถกเถียงเรื่องการสร้างรายได้จากคลื่น (spectrum monetization)
+**ความเสี่ยง:** หุ้นยังผันผวนตามข่าวดีลของคนอื่น (หุ้นเกี่ยวข้องอย่าง ASTS ร่วง 13% ในวันเดียวกัน) และมีเอกสารว่าผู้บริหารเสนอขายหุ้น 4,981 หุ้นราว 4 แสนดอลลาร์
+แหล่ง: [Stocktwits](https://stocktwits.com/news-articles/markets/equity/atex-nn-gogo-stocks-can-be-winners-of-spacex-deal-says-roth/cZD6UasRBnL?.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/technology/articles/iphone-models-first-apple-devices-110000366.html?.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/anterix-atex-could-6-undervalued-131425469.html?.tsrc=rss)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ ATEX"_

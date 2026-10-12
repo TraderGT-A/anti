@@ -8,10 +8,12 @@ last_fetch: 2026-10-12
 # PDSB — PDS Biotechnology Corp.
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** ตีพิมพ์ผล Phase 2 VERSATILE-002 [แหล่ง](https://finance.yahoo.com/healthcare/articles/pds-biotech-announces-publication-versatile-120000075.html?.tsrc=rss)
-- **ความเห็น/กระแส:** Timothy Sykes: ข้อมูล Phase 2 และดีล Nant ทำให้หุ้นพุ่ง [แหล่ง](https://news.google.com/rss/articles/CBMihgFBVV95cUxPRkdSb19Na2xvNXpaaHctUElwcURReEYwSk9CTFZmUG43YjBhLUg1bzVpZHlJZkthVlBGRm5EWjNoYno4YlE1QTNGcTNZWWZIM3E3MXdDSUQxOW5tVlFpVXRCMkRzVEtMaXJsaHluX1huOWYwcFlzbHlfLTRuMVJLc0Rma0U3Zw?oc=5)
-- **ความเสี่ยงที่มีคนพูดถึง:** นักวิเคราะห์ลดมูลค่า และมีข้อกังวลเรื่องการระดมทุน [แหล่ง](https://finance.yahoo.com/markets/stocks/articles/pds-biotechnology-pdsb-stock-fair-211230200.html?.tsrc=rss)
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** PDS Biotechnology พัฒนาภูมิคุ้มกันบำบัดมะเร็ง ยาหลักคือ PDS0101 ใช้ร่วมกับ pembrolizumab กับมะเร็งที่เกี่ยวข้องกับไวรัส HPV16 และ PDS0301 สำหรับมะเร็งลำไส้ใหญ่ที่แพร่ไปตับ
+**กำลังทำอะไรอยู่:** ผลทดลองระยะ 2 VERSATILE-002 ถูกตีพิมพ์เมื่อ 22 ก.ย. และบริษัทจัดงานให้ผู้เชี่ยวชาญ (KOL) พูดเรื่อง PDS0301 โดยมีนักวิจัยจากสถาบันมะเร็งแห่งชาติสหรัฐร่วม
+**ทำไมหุ้นขึ้นตอนนี้:** ปลายเดือน ก.ย. หุ้นพุ่งตามความสนใจหลังมีมหาเศรษฐีหนุน (ข่าวระบุดีลเกี่ยวกับ Nant) และช่วงล่าสุดมีข่าวข้อมูลระยะ 2 ที่ดีและดีลที่ทำให้ภาพรวมเปลี่ยนไป
+**ความเสี่ยง:** นักวิเคราะห์เคยลดมูลค่าที่เหมาะสมลงและมีเสียงเฝ้าติดตามเรื่องการระดมทุน (18 ก.ย.) ซึ่งสำคัญสำหรับบริษัทเล็กที่เงินสดจำกัด
+แหล่ง: [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/pds-biotech-host-key-opinion-120000134.html?.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/pds-biotech-announces-publication-versatile-120000075.html?.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/pds-biotechnology-pdsb-stock-fair-211230200.html?.tsrc=rss) · [Stocktwits](https://stocktwits.com/news-articles/markets/equity/this-tiny-biotech-beating-mrna-iova-sls-billionaire-september-rally/cZtrimKRB5X?.tsrc=rss)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ PDSB"_

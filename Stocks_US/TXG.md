@@ -8,10 +8,13 @@ last_fetch: 2026-10-12
 # TXG — 10x Genomics Inc Class A
 
 ## ทำไมติด Top20
-_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่การพิสูจน์สาเหตุ_
-- **ข้อเท็จจริง/ตัวเร่ง:** จับมือ Fred Hutch ด้านมะเร็ง [แหล่ง](https://finance.yahoo.com/healthcare/articles/10x-genomics-fred-hutch-join-132100363.html?.tsrc=rss)
-- **ความเห็น/กระแส:** Barclays ขึ้นเป้าเป็น $110 [แหล่ง](https://news.google.com/rss/articles/CBMilwFBVV95cUxNajl6bmp4V194V3V2bmdFM2hSMWY4d0szS2s1eXVfdnowM3lOdE1OUGQyRWlJUlpFNXFqY2o4RWRKaXJmbmNUNmp0X24tdnE5VkN4VFVrWmx5UVRkVm5ZZ1JmTVBQMHpWNi1Uc0RmZ0JkTzA2c2JFdjBod2ljdkprUXg3UXdPZmJTY2FGUjV0Y3VUUEJvejU0?oc=5)
-- **ความเสี่ยงที่มีคนพูดถึง:** หุ้นเคยลงเมื่อแรงส่งหลังเปิดตัวสินค้าเย็นลง [แหล่ง](https://news.google.com/rss/articles/CBMiowFBVV95cUxNVGxhT0ppd19jcGZEb2ZnWWVJc2wwQ1BSbEtUR0kyOWZUZmlmTml0T1lMbXBFRm84SWZwUzBhd1hHRGFUdmxxTzd5WThGd3JuLVJWczdwNEdTeFA4TXptenZ2bmp1X1Zkb0dSWENYakNYZ3dZdDhKV0YzX0xkRWpUUlVrVTlwOEpWMXRBOHhMMjB0MzU0M25nc0ZUWHFXdXJTbUpZ?oc=5)
+_อัปเดต 2026-10-12 · อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย_
+**บริษัททำอะไร:** 10x Genomics ผลิตเครื่องมือและสารเคมีสำหรับวิเคราะห์ยีนระดับเซลล์เดี่ยวและแบบระบุตำแหน่งในเนื้อเยื่อ (single-cell และ spatial biology)
+**กำลังทำอะไรอยู่:** เริ่มส่งมอบเครื่อง Atera ทั่วโลก (29 ก.ย.), เปิดตัวแพลตฟอร์มวิเคราะห์ Sentira และร่วมงานกับ Fred Hutch (7-8 ต.ค.) ด้านงานวิจัยไบโอมาร์กเกอร์มะเร็ง
+**ทำไมหุ้นขึ้นตอนนี้:** หุ้นทำ high 52 สัปดาห์ที่ราว 95 ดอลลาร์ จากเครื่องใหม่และความร่วมมือ และวันที่ 10 ต.ค. มีข่าวหุ้นพุ่งอีกครั้ง
+**ตลาดสนใจอะไร:** Barclays ขึ้นเป้าราคาเป็น 110 ดอลลาร์ และ ARK ถือหุ้นเกิน 5%
+**ความเสี่ยง:** มูลค่าสูงมากเมื่อเทียบกับเกณฑ์ประเมินบางแบบ และเคยอ่อนลง 6 ต.ค. เมื่อแรงจากการเปิดตัวสินค้าอ่อนแรง
+แหล่ง: [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/10x-genomics-begins-global-shipments-130000195.html?.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/healthcare/articles/10x-genomics-fred-hutch-join-132100363.html?.tsrc=rss) · [Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/why-10x-genomics-txg-shares-002710214.html?.tsrc=rss) · [GuruFocus](https://news.google.com/rss/articles/CBMilwFBVV95cUxNajl6bmp4V194V3V2bmdFM2hSMWY4d0szS2s1eXVfdnowM3lOdE1OUGQyRWlJUlpFNXFqY2o4RWRKaXJmbmNUNmp0X24tdnE5VkN4VFVrWmx5UVRkVm5ZZ1JmTVBQMHpWNi1Uc0RmZ0JkTzA2c2JFdjBod2ljdkprUXg3UXdPZmJTY2FGUjV0Y3VUUEJvejU0?oc=5)
 
 ## มุมมองจาก X
 _ยังไม่มี — สั่ง "ดู X ของ TXG"_
