@@ -74,8 +74,11 @@ export async function fetchCikMap(secUA, fetchFn = fetch) {
 
 const defaultSleep = (ms) => new Promise((res) => setTimeout(res, ms));
 
-export async function fetchTicker(ticker, { sinceISO, cikMap = new Map(), secUA = '', fetchFn = fetch, sleep = defaultSleep } = {}) {
-  const sym = symbolFor(ticker), items = [], errors = [];
+/* InfoQuest: ผลค้นหามีรายงานรวมทั้งตลาด (NVDR, ชอร์ตเซล, ปฏิทินหุ้น ฯลฯ) → เก็บเฉพาะข่าวที่หัวข้อมีชื่อหุ้นเป็นคำเดี่ยว */
+const tickerInTitle = (ticker, title) => new RegExp(`(^|[^A-Za-z0-9])${String(ticker).replace(/[.\-]/g, '\\$&')}(?![A-Za-z0-9])`).test(title);
+
+export async function fetchTicker(ticker, { sinceISO, market = 'america', cikMap = new Map(), secUA = '', fetchFn = fetch, sleep = defaultSleep } = {}) {
+  const TH = market === 'thailand', sym = symbolFor(ticker), items = [], errors = [];
   const get = async (name, url, headers, parse) => {
     try {
       await sleep(1000);
@@ -84,6 +87,12 @@ export async function fetchTicker(ticker, { sinceISO, cikMap = new Map(), secUA 
       items.push(...parse(await r.text()));
     } catch (e) { errors.push(`${name}: ${e.message}`); }
   };
+  if (TH) {   // หุ้นไทย: InfoQuest + Google News ภาษาไทย + Yahoo (.BK) — ไม่มี SEC/Reddit
+    await get('infoquest', `https://www.infoquest.co.th/feed?s=${encodeURIComponent(ticker)}`, { 'User-Agent': UA }, (t) => parseRss(t, { ticker, source: 'infoquest' }).filter((x) => tickerInTitle(ticker, x.title)));
+    await get('gnews', `https://news.google.com/rss/search?q=%22${encodeURIComponent(ticker)}%22+%E0%B8%AB%E0%B8%B8%E0%B9%89%E0%B8%99+when:7d&hl=th&gl=TH&ceid=TH:th`, { 'User-Agent': UA }, (t) => parseRss(t, { ticker, source: 'gnews' }));
+    await get('yahoo', `https://feeds.finance.yahoo.com/rss/2.0/headline?s=${encodeURIComponent(ticker + '.BK')}&region=US&lang=en-US`, { 'User-Agent': UA }, (t) => parseRss(t, { ticker, source: 'yahoo' }));
+    return { items: items.filter((x) => x.published >= sinceISO), errors };
+  }
   await get('yahoo', `https://feeds.finance.yahoo.com/rss/2.0/headline?s=${encodeURIComponent(sym)}&region=US&lang=en-US`, { 'User-Agent': UA }, (t) => parseRss(t, { ticker, source: 'yahoo' }));
   await get('gnews', `https://news.google.com/rss/search?q=%22${encodeURIComponent(sym)}%22+stock+when:7d&hl=en-US&gl=US&ceid=US:en`, { 'User-Agent': UA }, (t) => parseRss(t, { ticker, source: 'gnews' }));
   const cik = cikMap.get(sym.toUpperCase());

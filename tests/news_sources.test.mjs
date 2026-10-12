@@ -110,3 +110,22 @@ test('[review I5] ทุก request มี timeout (AbortSignal)', async () => {
   await fetchTicker('NVDA', { sinceISO: '2026-09-01', cikMap: new Map(), secUA: '', fetchFn: f, sleep: noSleep });
   assert.ok(inits.length > 0 && inits.every((i) => i && i.signal instanceof AbortSignal));
 });
+
+test('[TH] fetchTicker market=thailand: Yahoo .BK + Google News ภาษาไทย, ไม่เรียก SEC/Reddit', async () => {
+  const calls = [];
+  const f = async (url) => { calls.push(url); return { ok: true, status: 200, text: async () => fx('gnews.xml') }; };
+  const out = await fetchTicker('SMT', { sinceISO: '2026-09-01', market: 'thailand', secUA: 'x y@z', fetchFn: f, sleep: noSleep });
+  assert.ok(calls.some((u) => u.includes('s=SMT.BK')));
+  assert.ok(calls.some((u) => u.includes('news.google.com') && u.includes('hl=th') && u.includes('ceid=TH:th') && u.includes('%22SMT%22')));
+  assert.ok(!calls.some((u) => u.includes('sec.gov') || u.includes('reddit.com')));
+  assert.deepEqual(out.errors, []);
+});
+
+test('[TH] InfoQuest: เก็บเฉพาะข่าวที่มีชื่อหุ้นในหัวข้อ (ตัดรายงาน NVDR/ข่าวทั้งตลาด/ชื่อคล้าย)', async () => {
+  const calls = [];
+  const f = async (url) => { calls.push(url); return { ok: true, status: 200, text: async () => (url.includes('infoquest') ? fx('infoquest.xml') : '') }; };
+  const out = await fetchTicker('SMT', { sinceISO: '2026-09-01', market: 'thailand', fetchFn: f, sleep: noSleep });
+  assert.ok(calls.some((u) => u === 'https://www.infoquest.co.th/feed?s=SMT'));
+  const iq = out.items.filter((x) => x.source === 'infoquest').map((x) => x.title);
+  assert.deepEqual(iq, ['ตลท.สั่ง SMT ใช้เกณฑ์ Cash Balance ตั้งแต่ 12 ต.ค.ถึง 30 ต.ค.', 'HILITE: หยวนต้าชู HANA-SMT เด่นรับ AI']);
+});

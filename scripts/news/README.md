@@ -1,4 +1,4 @@
-# ข่าว "ทำไมหุ้นติด Top20" — หุ้น US
+# ข่าว "ทำไมหุ้นติด Top20" — หุ้น US และหุ้นไทย
 
 คู่มือนี้สำหรับผู้ใช้, Claude และ Antigravity ใช้ทำงานต่อ
 Spec: `docs/superpowers/specs/2026-10-12-us-top20-news-design.md`
@@ -9,6 +9,8 @@ Spec: `docs/superpowers/specs/2026-10-12-us-top20-news-design.md`
 - Task Scheduler: **"THUSHOUSE News US"** อังคาร–เสาร์ 06:30 (เวลาไทย) → `scripts/news/run_news.cmd`
 - รายชื่อหุ้น = Top20 YTD ∪ Top20 RS จาก `rsdashclean.vercel.app/api/scan?market=america&universe=all&v=2`
 - แหล่งข่าว: Yahoo Finance RSS, Google News RSS, SEC EDGAR (ต้องตั้ง `NEWS_SEC_UA`), Reddit Atom (r/stocks+wallstreetbets+investing; อาจโดน 429 บางวัน)
+- หุ้นไทย (`--market thailand`): InfoQuest (เฉพาะข่าวที่หัวข้อมีชื่อหุ้น), Google News ภาษาไทย (ทันหุ้น, ข่าวหุ้นธุรกิจ, Hoonsmart ฯลฯ), Yahoo (.BK) → `Stocks_TH/`, state `data/news_state_th.json`
+- คำอธิบายบริษัท 🏢 (ทุกตัวใน rsdash, อังกฤษจาก Yahoo): `node scripts/news/fetch_profiles.mjs` (ดึงเฉพาะที่ยังไม่มี) หรือ `--refresh` เดือนละครั้ง แล้ว deploy rsdash
 - ผลลัพธ์:
   - `Stocks_US/<TICKER>.md` — Feed ใหม่สุดอยู่บน, จัดหัวข้อตามวันที่เผยแพร่
   - `Stocks_US/_Top20.md` — ตารางรายชื่อปัจจุบัน + หุ้นที่หลุดแล้ว
@@ -24,7 +26,7 @@ node scripts/news/fetch_news.mjs --summary-only  # push เฉพาะส่ว
 schtasks /Run /TN "THUSHOUSE News US"            # สั่ง job ให้รันทันที
 ```
 
-## คำสั่ง "สรุป Top20 US" (ทำเมื่อผู้ใช้สั่ง)
+## คำสั่ง "สรุป Top20 US" / "สรุป Top20 ไทย" (ไทย: ใช้ Stocks_TH/ และ --market thailand) (ทำเมื่อผู้ใช้สั่ง)
 1. อ่าน `Stocks_US/_Top20.md` เพื่อดูรายชื่อปัจจุบัน
 2. ทำเฉพาะหุ้นที่ Feed มีหัวข้อวันที่ใหม่กว่าบรรทัด `_อัปเดต YYYY-MM-DD` ใต้ "ทำไมติด Top20" (หรือที่ยังเป็น `_ยังไม่มีสรุป_`) — ถ้าผู้ใช้สั่ง "สรุปใหม่ทั้งหมด" ให้ทำทุกตัว
 3. อ่าน Feed ของหุ้นตัวนั้น (เปิดบทความสำคัญได้ไม่เกิน 3 ลิงก์ต่อตัวเพื่อเอารายละเอียด) แล้ว**เขียนทับเฉพาะเนื้อหาใต้ `## ทำไมติด Top20`** ด้วยแม่แบบนี้ (ผู้ใช้กำหนด 2026-10-12):

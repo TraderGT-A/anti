@@ -1002,10 +1002,10 @@ let topMk='thailand', topSortKey='pYTD', topSortDir=1, topRows=[], p2yCache={}; 
 let topView='table', topCharts={};   // topView = 'table' | 'card' ; topCharts = cache กราฟการ์ด
 let topUniverse='all', topAllData={}, topAllLoading={};   // 'all' | 'rs' | 'idx'  (default = หุ้นสามัญทั้งตลาด)
 let topRSEligible=new Set();   // เซ็ตหุ้นที่ "ผ่านเกณฑ์ RS หลัก" (Val + rs≥70) — ใช้ติดป้ายในโหมดทั้งหมด
-// 📰 ทำไมติด Top20 (ตาราง stock_notes จาก scripts/news) — ตอนนี้มีเฉพาะ US
+// 📰 ทำไมติด Top20 (/api/notes จาก scripts/news) — US และไทย
 let notesData={}, notesLoading={};
 function ensureNotes(m){   // คืน true เมื่อเพิ่งโหลดเสร็จครั้งแรก (ให้ผู้เรียก render ใหม่)
-  if(m!=='america' || notesData[m]) return Promise.resolve(false);
+  if(notesData[m]) return Promise.resolve(false);
   if(notesLoading[m]) return notesLoading[m];
   notesLoading[m]=(async()=>{
     try{ const r=await fetch(API+'/api/notes?market='+m); const j=await r.json(); notesData[m]=new Map(((j&&j.data)||[]).map(x=>[x.ticker,x])); }

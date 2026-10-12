@@ -155,3 +155,12 @@ test('[review I6] state file เสีย → เริ่ม state ใหม่
   assert.deepEqual(loadState(p), newState());
   assert.ok(readdirSync(dir).some((f) => f.startsWith('state.json.corrupt-')));
 });
+
+test('[TH] frontmatter market + หัว _Top20 ตามตลาด', () => {
+  const md = upsertStockMd(null, { ...meta, ticker: 'SMT', market: 'thailand' }, null);
+  assert.match(md, /\nmarket: thailand\n/);
+  const s = newState();
+  updateMembership(s, [{ ticker: 'SMT', name: 'Stars', lists: ['YTD'] }], '2026-10-12');
+  assert.match(renderIndexMd(s, '2026-10-12', 'thailand'), /# Top20 หุ้นไทย/);
+  assert.match(renderIndexMd(s, '2026-10-12'), /# Top20 หุ้น US/);
+});

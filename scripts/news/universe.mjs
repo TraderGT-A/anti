@@ -13,8 +13,8 @@ export function pickUniverse(rows, n = 20) {
   return [...out.values()];
 }
 
-export async function fetchUniverse(base, fetchFn = fetch) {
-  const r = await fetchFn(`${base}/api/scan?market=america&universe=all&v=2`, { signal: AbortSignal.timeout(60000) });
+export async function fetchUniverse(base, fetchFn = fetch, market = 'america') {
+  const r = await fetchFn(`${base}/api/scan?market=${market}&universe=all&v=2`, { signal: AbortSignal.timeout(60000) });
   if (!r.ok) throw new Error(`scan HTTP ${r.status}`);
   const j = await r.json();
   const data = (j && j.data) || [];

@@ -39,3 +39,9 @@ test('fetchUniverse reject เมื่อ data ว่าง', async () => {
   const fake = async () => ({ ok: true, status: 200, json: async () => ({ data: [] }) });
   await assert.rejects(fetchUniverse('https://x', fake));
 });
+
+test('[TH] fetchUniverse market=thailand', async () => {
+  let called = '';
+  await fetchUniverse('https://x', async (u) => { called = u; return { ok: true, status: 200, json: async () => ({ data: rows }) }; }, 'thailand');
+  assert.equal(called, 'https://x/api/scan?market=thailand&universe=all&v=2');
+});

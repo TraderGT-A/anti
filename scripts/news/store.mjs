@@ -76,6 +76,7 @@ export const fileNameFor = (ticker) => String(ticker).replace(/\./g, '-') + '.md
 export const sourceLabel = (it) => {
   const m = it.meta || {};
   if (it.source === 'yahoo') return 'Yahoo';
+  if (it.source === 'infoquest') return 'InfoQuest';
   if (it.source === 'gnews') return m.publisher || 'Google News';
   if (it.source === 'sec') return `SEC ${m.form || ''}`.trim();
   if (it.source === 'reddit') return `Reddit r/${m.sub}` + (m.score ? ` ▲${m.score}` : '');
@@ -92,7 +93,7 @@ const OWN_KEYS = new Set(['ticker', 'market', 'in_top20_since', 'lists', 'last_f
 
 /* เขียนเฉพาะ key ของสคริปต์ — property อื่นที่ผู้ใช้เพิ่ม (tags ฯลฯ) เก็บไว้ตามเดิม */
 function frontmatter(meta, oldBody) {
-  const lines = [`ticker: ${meta.ticker}`, 'market: america', `in_top20_since: ${meta.since}`, `lists: [${(meta.lists || []).join(', ')}]`, `last_fetch: ${meta.lastFetch}`];
+  const lines = [`ticker: ${meta.ticker}`, `market: ${meta.market || 'america'}`, `in_top20_since: ${meta.since}`, `lists: [${(meta.lists || []).join(', ')}]`, `last_fetch: ${meta.lastFetch}`];
   if (meta.left) lines.push(`left_top20: ${meta.left}`);
   let skip = false;
   for (const l of String(oldBody || '').split(/\r?\n/)) {
@@ -124,12 +125,12 @@ export function upsertStockMd(existing, meta, block) {
 
 const cell = (s) => String(s == null ? '' : s).replace(/\|/g, '\\|');
 
-export function renderIndexMd(state, today) {
+export function renderIndexMd(state, today, market = 'america') {
   const d7 = addDays(today, -7), active = [], gone = [];
   for (const [t, m] of Object.entries(state.members)) (m.left ? gone : active).push([t, m]);
   const link = (t) => `[[${fileNameFor(t).slice(0, -3)}]]`;
   const cnt = (t, reddit) => (state.recent[t] || []).filter((x) => x.published >= d7 && (x.source === 'reddit') === reddit).length;
-  let md = `---\nlast_fetch: ${today}\n---\n# Top20 หุ้น US (YTD ∪ RS)\n\n_อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย · อัปเดตอัตโนมัติจาก scripts/news_\n\n`;
+  let md = `---\nlast_fetch: ${today}\n---\n# Top20 ${market === 'thailand' ? 'หุ้นไทย' : 'หุ้น US'} (YTD ∪ RS)\n\n_อธิบายย้อนหลัง ไม่ใช่สัญญาณซื้อขาย · อัปเดตอัตโนมัติจาก scripts/news_\n\n`;
   md += '| หุ้น | ชื่อ | List | เข้าเมื่อ | ข่าว 7 วัน | Reddit 7 วัน |\n|---|---|---|---|---|---|\n';
   for (const [t, m] of active.sort((a, b) => a[1].since.localeCompare(b[1].since) || a[0].localeCompare(b[0]))) md += `| ${link(t)} | ${cell(m.name)} | ${(m.lists || []).join('+')} | ${m.since} | ${cnt(t, false)} | ${cnt(t, true)} |\n`;
   if (gone.length) {

@@ -79,3 +79,11 @@ test('[review I5] network error ตอน push → ok:false ไม่ throw', as
   assert.equal(out.ok, false);
   assert.equal(out.status, 0);
 });
+
+test('[TH] buildRow/pushRows ตามตลาด', async () => {
+  const r = buildRow('SMT', member, items, null, '2026-10-12', 'thailand');
+  assert.equal(r.market, 'thailand');
+  let url;
+  await pushRows([r], { base: 'https://rs', key: 'K', market: 'thailand', fetchFn: async (u) => { url = u; return { ok: true, status: 200 }; } });
+  assert.equal(url, 'https://rs/api/notes?market=thailand');
+});
