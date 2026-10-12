@@ -28,3 +28,11 @@ data/bt_cache/
 
 research_py/.venv/
 __pycache__/
+
+# scripts/news — secrets, state, log
+scripts/news/.env
+data/news_state.json
+data/news_state.json.tmp
+data/news_log.txt
+.superpowers/
+data/news_run.txt

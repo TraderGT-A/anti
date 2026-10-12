@@ -25,7 +25,7 @@
 [Windows Task Scheduler 06:30 น. อ–ส]
         │
         ▼
-scripts/news/fetch_news.py ──► rsdash /api/scan?market=america  (หารายชื่อ Top20)
+scripts/news/fetch_news.mjs ──► rsdash /api/scan?market=america  (หารายชื่อ Top20)
         │                ──► RSS/JSON ฟรี: Yahoo Finance, Google News, SEC EDGAR, Reddit
         ├──► Stocks_US/<TICKER>.md   (ต่อท้าย feed ใหม่, ไม่ซ้ำ)
         ├──► Stocks_US/_Top20.md     (ตารางรายชื่อปัจจุบัน + วันที่เข้า/ออก)
@@ -41,15 +41,15 @@ rsdash หน้า Top20 ◄── /api/notes ◄────────┘
 md ต้องลง vault บนเครื่องโดยตรง; Actions จะ commit ชนกับ working copy บน Google Drive; Vercel เขียนไฟล์ไม่ได้
 ข้อแลก: เครื่องต้องเปิดตอน 06:30 — ถ้าไม่เปิด รอบถัดไปจะเก็บย้อนให้ (dedupe ด้วย state ไม่หาย)
 
-## 3. ตัวดึงข่าวอัตโนมัติ — `scripts/news/`
+## 3. ตัวดึงข่าวอัตโนมัติ — `scripts/news/` (Node 24 ไม่มี dependency — เครื่องนี้ไม่มี Python ใน PATH)
 
 | ไฟล์ | หน้าที่ |
 |---|---|
-| `universe.py` | เรียก `https://rsdashclean.vercel.app/api/scan?market=america` → Top20 ตาม `pYTD` ∪ Top20 ตาม `score` (หุ้นสามัญ, ตัวกรองเดียวกับหน้า Top20 "ทั้งหมด") |
-| `sources.py` | ตัวดึงแต่ละแหล่ง คืน `Item{ticker, source, title, url, published, summary?}` |
-| `store.py` | state (`data/news_state.json`: url-hash ที่เห็นแล้ว, วันเข้า/ออก Top20), เขียน md |
-| `push.py` | upsert แถวลง Supabase `stock_notes` |
-| `fetch_news.py` | entry point: universe → sources → dedupe → md → push; log ไป `data/news_log.txt` |
+| `universe.mjs` | เรียก `https://rsdashclean.vercel.app/api/scan?market=america&universe=all&v=2` → Top20 ตาม `pYTD` ∪ Top20 ตาม `score` (หุ้นสามัญ, ตัวกรองเดียวกับหน้า Top20 "ทั้งหมด") |
+| `sources.mjs` | ตัวดึงแต่ละแหล่ง คืน `Item{ticker, source, title, url, published, summary?}` |
+| `store.mjs` | state (`data/news_state.json`: url-hash ที่เห็นแล้ว, วันเข้า/ออก Top20), เขียน md |
+| `push.mjs` | upsert แถวลง Supabase `stock_notes` |
+| `fetch_news.mjs` | entry point: universe → sources → dedupe → md → push; log ไป `data/news_log.txt` |
 
 ### แหล่งข่าว (ฟรี ไม่ต้องใช้ key)
 | แหล่ง | URL | ใช้ทำอะไร |
@@ -97,7 +97,7 @@ _อัปเดต 2026-10-14 · อธิบายย้อนหลัง ไ
 
 ## 5. ส่วนที่สั่งเอง (ใช้โควตาแพ็กเกจ Claude ที่มีอยู่ ไม่มีค่าใช้จ่ายเพิ่ม)
 
-**"สรุป Top20 US"** — Claude อ่าน Feed ของแต่ละตัว → เขียน "ทำไมติด Top20" แยก ข้อเท็จจริง / ความเห็น / ความเสี่ยง ทุกข้อมีลิงก์แหล่งที่มา → `push.py --summary` ขึ้น rsdash
+**"สรุป Top20 US"** — Claude อ่าน Feed ของแต่ละตัว → เขียน "ทำไมติด Top20" แยก ข้อเท็จจริง / ความเห็น / ความเสี่ยง ทุกข้อมีลิงก์แหล่งที่มา → `fetch_news.mjs --summary-only` ขึ้น rsdash
 ทำเฉพาะตัวที่มีข่าวใหม่ตั้งแต่สรุปครั้งก่อน (ประหยัดโควตา)
 
 **"ดู X ของ <TICKER>"** — ผ่าน Claude in Chrome (บัญชีที่ผู้ใช้ล็อกอินเอง, ผู้ใช้อยู่หน้าเครื่อง):
@@ -112,7 +112,7 @@ _อัปเดต 2026-10-14 · อธิบายย้อนหลัง ไ
 `ticker text, market text, PK(ticker, market)`, `in_top20_since date`, `news_7d int`, `reddit_7d int`, `headlines jsonb` (5 ล่าสุด: title,url,source,date), `summary text`, `summary_at timestamptz`, `updated_at timestamptz`
 - RLS: anon อ่านได้อย่างเดียว; สคริปต์เขียนด้วย service-role key ที่เก็บใน `.env` บนเครื่อง (gitignored) — ผู้ใช้ใส่ key เอง
 
-**API** `rsdash/api/notes.js`: `GET /api/notes?market=america` → แถวทั้งหมดของตลาดนั้น (cache 5 นาที)
+**API** `rsdash/api/notes.js`: `GET /api/notes?market=america&universe=all&v=2` → แถวทั้งหมดของตลาดนั้น (cache 5 นาที)
 
 **UI** หน้า Top20 (US): แต่ละแถว/การ์ดมีปุ่ม 📰 + จำนวนข่าว 7 วัน; แตะ → กางสรุป "ทำไมติด" + หัวข่าว 5 อัน (ลิงก์ออก) + วันที่อัปเดต
 ไม่มีข้อมูล → ไม่แสดงปุ่ม (ไม่ error) · แก้ทั้ง `rsdash/index.html` และ `rsdash_clean_deploy` ตามที่ deploy จริง
@@ -124,7 +124,7 @@ _อัปเดต 2026-10-14 · อธิบายย้อนหลัง ไ
 - Task Scheduler รันไม่สำเร็จ → `news_log.txt` บรรทัดสุดท้ายบอกสถานะ; `_Top20.md` แสดง `last_fetch`
 
 ## 8. Testing
-- unit (pytest, ใช้ fixture RSS/JSON ที่บันทึกไว้ ไม่ยิงเน็ตจริง): parse แต่ละแหล่ง, dedupe, เลือก universe, เขียน md แบบต่อท้ายไม่ทับส่วนสรุป, state เข้า/ออก Top20
+- unit (node --test, ใช้ fixture RSS/JSON ที่บันทึกไว้ ไม่ยิงเน็ตจริง): parse แต่ละแหล่ง, dedupe, เลือก universe, เขียน md แบบต่อท้ายไม่ทับส่วนสรุป, state เข้า/ออก Top20
 - smoke: รันจริง 1 รอบด้วย `--limit 3` แล้วตรวจไฟล์
 - rsdash: `/api/notes` คืน JSON ถูก; UI ตรวจด้วยเบราว์เซอร์ในแอปทั้งจอมือถือและเดสก์ท็อป
 

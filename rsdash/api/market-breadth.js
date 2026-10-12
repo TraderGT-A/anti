@@ -1,5 +1,5 @@
 // /api/market-breadth — ตาราง Breadth (MA50/MA200) ตลาดที่เรามีจริง (ไทย+US), ไม่มโน HK/JP/KR/CN
-import { getLiveBreadth } from "./lib/scan.js";
+import { getLiveBreadth } from "./_lib/scan.js";
 
 const mk = { thailand: "TH", america: "US" };
 

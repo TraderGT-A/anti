@@ -38,7 +38,7 @@ async function yahoo(sym, adj) {
 // 1) จักรวาล (หุ้นสามัญ US ที่จดทะเบียนอยู่ — จาก TradingView scan เดียวกับ dashboard)
 const UF = path.join(OUT, "universe.json");
 if (!fs.existsSync(UF)) {
-  const { scanMarket } = await import(pathToFileURL(path.join(ROOT, "rsdash/api/lib/scan.js")).href);
+  const { scanMarket } = await import(pathToFileURL(path.join(ROOT, "rsdash/api/_lib/scan.js")).href);
   const { raw } = await scanMarket("america");
   const list = raw.filter((s) => !s.isDR && (s.mcap || 0) >= 5e7).map((s) => ({ tk: s.ticker, name: s.name, industry: s.industry, sector: s.sector, mcap: s.mcap }));
   fs.writeFileSync(UF, JSON.stringify(list)); log(`universe ${list.length} (raw ${raw.length})`);

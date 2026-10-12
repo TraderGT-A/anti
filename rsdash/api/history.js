@@ -22,9 +22,9 @@
 //   max_days= (โหมด track) จำกัดจำนวนวันย้อนหลัง (ค่าเริ่มต้น 120, สูงสุด 250)
 //
 // กติกาเดียวกับ Dashboard: หุ้นที่ไม่มีค่า metric = ไม่ผ่าน → ตัดออกจากการจัดอันดับ
-import { buildCompare, rankOf, METRICS, METRIC_LABEL, RS_TOP_TH } from "./lib/history.js";
-import { loadSnapshotDates, loadSnapshotRows, loadSnapshotRaw } from "./lib/supabase.js";
-import { backfillBase, loadBackfillIndex, loadBackfillDay } from "./lib/backfill.js";
+import { buildCompare, rankOf, METRICS, METRIC_LABEL, RS_TOP_TH } from "./_lib/history.js";
+import { loadSnapshotDates, loadSnapshotRows, loadSnapshotRaw } from "./_lib/supabase.js";
+import { backfillBase, loadBackfillIndex, loadBackfillDay } from "./_lib/backfill.js";
 
 const YMD = /^\d{4}-\d{2}-\d{2}$/;
 

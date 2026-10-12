@@ -1,7 +1,7 @@
 // /api/breadth — Breadth History: %Above MA50/MA200 ย้อนหลัง (จาก snapshot รายวันใน Supabase)
 // วิธีการจัดเก็บ: collector (breadth_collector.py) หลังตลาดปิด → POST มาที่นี่ → upsert ลง Supabase
 // + GET อ่านย้อนหลัง (เหมือน benchmark ภาพ) — แยก market ได้
-import { supabase } from "./lib/supabase.js";
+import { supabase } from "./_lib/supabase.js";
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");

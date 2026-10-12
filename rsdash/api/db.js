@@ -1,5 +1,5 @@
 // /api/db — list daily snapshots stored in Supabase (proves persistence)
-import { supabase } from "./lib/supabase.js";
+import { supabase } from "./_lib/supabase.js";
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
