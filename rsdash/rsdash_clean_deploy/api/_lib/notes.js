@@ -17,3 +17,6 @@ export const validRows = (rows) => Array.isArray(rows) && rows.length <= 100 && 
 // แล้วอ่านแถวล่าสุดด้วยการเรียง dt จากมากไปน้อย
 export const notesPrefix = (market) => 'notes|' + (market === 'thailand' ? 'thailand' : 'america') + '|';
 export const notesRowKey = (market, ms = Date.now()) => notesPrefix(market) + String(ms).padStart(15, '0');
+
+// แถวเก่าที่ควรลบ: เก็บ keep แถวล่าสุด (กันตารางโตเรื่อย ๆ — ทุกครั้งที่ push เพิ่ม ~90KB)
+export const toPrune = (dts, keep = 3) => [...dts].sort().reverse().slice(keep);

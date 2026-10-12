@@ -3,7 +3,7 @@
 //   POST ?market=america  header x-write-key = env NOTES_WRITE_KEY, body { rows: row[] } → แทนที่ชุดแถว (เก็บ summary เดิมถ้าแถวใหม่ไม่มี)
 // เก็บในตาราง snapshots เดิม — แต่ละครั้งที่เขียนเป็นแถวใหม่ (dt = "notes|<market>|<ms>") เพราะ RLS ไม่ให้ anon แก้แถวเดิม; อ่านแถวล่าสุด
 import { supabase } from "./_lib/supabase.js";
-import { mergeNotes, validRows, notesPrefix, notesRowKey } from "./_lib/notes.js";
+import { mergeNotes, validRows, notesPrefix, notesRowKey, toPrune } from "./_lib/notes.js";
 
 async function latest(db, prefix) {
   const { data, error } = await db.from("snapshots").select("payload").like("dt", prefix + "%").order("dt", { ascending: false }).limit(1);
@@ -29,7 +29,14 @@ export default async function handler(req, res) {
       const rows = mergeNotes(await latest(db, prefix), body.rows);
       const { error } = await db.from("snapshots").insert({ dt: notesRowKey(market), created_at: new Date().toISOString(), payload: { rows } });
       if (error) throw new Error(error.message);
-      return res.status(200).json({ ok: true, rows: rows.length });
+      // ลบแถวเก่า (เก็บ 3 ล่าสุด) — ถ้า RLS ไม่ให้ลบก็แค่ลบไม่ได้ ไม่ทำให้การบันทึกล้ม
+      let pruned = 0;
+      try {
+        const { data: keys } = await db.from("snapshots").select("dt").like("dt", prefix + "%");
+        const old = toPrune((keys || []).map((k) => k.dt), 3);
+        if (old.length) { const { data: del } = await db.from("snapshots").delete().in("dt", old).select("dt"); pruned = (del || []).length; }
+      } catch (e) { /* ignore */ }
+      return res.status(200).json({ ok: true, rows: rows.length, pruned });
     } catch (e) {
       return res.status(500).json({ error: String(e.message || e) });
     }

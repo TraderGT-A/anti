@@ -32,3 +32,10 @@ test('[RLS] notesRowKey: เพิ่มแถวใหม่ทุกครั�
   assert.ok(a.startsWith('notes|america|') && b > a && a.length === b.length);
   assert.ok(notesRowKey('america', 999) < notesRowKey('america', 1791800000000));   // zero-pad ให้เรียงแบบข้อความได้
 });
+
+test('toPrune: เก็บ N แถวล่าสุด (เรียงตาม dt) ที่เหลือคืนไว้ลบ', async () => {
+  const { toPrune } = await import('../rsdash/api/_lib/notes.js');
+  const dts = ['notes|america|000000000000003', 'notes|america|000000000000001', 'notes|america|000000000000004', 'notes|america|000000000000002'];
+  assert.deepEqual(toPrune(dts, 3), ['notes|america|000000000000001']);
+  assert.deepEqual(toPrune(dts.slice(0, 2), 3), []);
+});
