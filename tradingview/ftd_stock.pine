@@ -1,0 +1,103 @@
+//@version=5
+indicator("FTD รายตัว (Follow-Through Day)", overlay=true, max_labels_count=500, max_bars_back=500)
+
+// ---------- Inputs ----------
+grpMa   = "MA / เทรนด์"
+midLen  = input.int(50, "MA กลาง", minval=1, group=grpMa)
+slowLen = input.int(200, "MA ช้า", minval=1, group=grpMa)
+showMa  = input.bool(false, "แสดงเส้น MA บนกราฟ", group=grpMa)
+
+grpCor   = "การย่อ (Correction)"
+peakLen  = input.int(50, "จุดสูงล่าสุดดูย้อนหลังกี่แท่ง ณ วันเริ่มย่อ", minval=5, group=grpCor, tooltip="ใช้วัดความลึกของการย่อ: (จุดสูง − Low ต่ำสุด) ÷ จุดสูง")
+depthMul = input.float(2.0, "ต้องย่อลึกอย่างน้อย (เท่าของ ADR%)", minval=0.0, step=0.5, group=grpCor, tooltip="0 = ไม่กรองความลึก")
+
+grpFtd   = "Rally Attempt / FTD (นับเป็น 'แท่ง' ตามไทม์เฟรมที่เปิดอยู่)"
+raMin    = input.int(4, "FTD เกิดได้ตั้งแต่ RA แท่งที่", minval=2, group=grpFtd)
+raMax    = input.int(10, "ถึง RA แท่งที่ (เกินนี้ลำดับหมดอายุ)", minval=2, group=grpFtd)
+strongDay = input.int(5, "FTD ถือว่า 'ไว/แข็งแกร่ง' ถ้าเกิดภายใน RA แท่งที่", minval=2, group=grpFtd, tooltip="ยิ่งขึ้นไว ยิ่งแข็งแกร่ง: ภายในค่านี้ = ป้ายสีเข้ม เกินกว่านี้ = สีอ่อน")
+adrLen   = input.int(20, "ADR% เฉลี่ยกี่แท่ง", minval=2, group=grpFtd)
+gainMul  = input.float(1.5, "ปิดบวกอย่างน้อย (เท่าของ ADR%)", minval=0.1, step=0.1, group=grpFtd, tooltip="ADR% = ค่าเฉลี่ยของ (High/Low − 1) ของหุ้นตัวนั้น ใช้ ADR% ของแท่งก่อนหน้าเพื่อไม่ให้แท่ง FTD เองไปดันเกณฑ์")
+useVolPrev = input.bool(true, "Vol ต้องมากกว่าแท่งก่อนหน้า", group=grpFtd)
+useVolAvg  = input.bool(true, "Vol ต้องมากกว่าค่าเฉลี่ยด้วย", group=grpFtd)
+volAvgLen  = input.int(50, "ค่าเฉลี่ย Vol กี่แท่ง", minval=2, group=grpFtd)
+useClosePos = input.bool(true, "ต้องปิดในครึ่งบนของแท่ง", group=grpFtd)
+closePosMin = input.float(0.5, "ตำแหน่งปิดขั้นต่ำในแท่ง (0=Low, 1=High)", minval=0.0, maxval=1.0, step=0.05, group=grpFtd)
+
+grpVis     = "ป้าย FTD"
+lblSizeStr = input.string("normal", "ขนาดป้าย", options=["tiny", "small", "normal", "large", "huge"], group=grpVis)
+showDay    = input.bool(true, "แสดงเลข RA แท่งที่เกิด FTD ในป้าย (เช่น FTD d4)", group=grpVis)
+strongCol  = input.color(color.green, "สีป้าย FTD ไว (แข็งแกร่ง)", group=grpVis)
+weakCol    = input.color(color.new(color.green, 60), "สีป้าย FTD ช้ากว่า", group=grpVis)
+txtCol     = input.color(color.white, "สีตัวอักษรป้าย", group=grpVis)
+
+sizeOf(s) =>
+    s == "tiny" ? size.tiny : s == "small" ? size.small : s == "large" ? size.large : s == "huge" ? size.huge : size.normal
+
+lblSz = sizeOf(lblSizeStr)
+
+// ---------- ข้อมูลพื้นฐาน ----------
+maM = ta.sma(close, midLen)
+maS = ta.sma(close, slowLen)
+plot(showMa ? maM : na, "MA กลาง", color=color.new(color.orange, 0), linewidth=2)
+plot(showMa ? maS : na, "MA ช้า", color=color.new(color.purple, 0), linewidth=2)
+
+trendOk    = maM > maS
+adrPct     = 100 * (ta.sma(high / low, adrLen) - 1)
+adrPrev    = adrPct[1]
+volAvgPrev = ta.sma(volume, volAvgLen)[1]
+peakNow    = ta.highest(high, peakLen)
+gainPct    = (close / close[1] - 1) * 100
+closePos   = high > low ? (close - low) / (high - low) : 0.5
+
+// ---------- State machine ----------
+var bool  active   = false
+var float corrLow  = na
+var float corrPeak = na
+var int   raStart  = na
+
+bool ftd    = false
+int  raDay  = 0
+int  ftdDay = 0
+
+if not trendOk
+    // ต้องเป็นขาขึ้น (MA50 > MA200) เท่านั้น: ผิดเงื่อนไข = ยกเลิกทั้งลำดับ
+    active := false
+    corrLow := na
+    corrPeak := na
+    raStart := na
+else
+    if not active
+        if close < maM
+            active := true
+            corrLow := low
+            raStart := na
+            corrPeak := peakNow
+    else
+        if low < corrLow
+            // ทำ Low ใหม่ → อัปเดต Low และเริ่มนับ RA ใหม่
+            corrLow := low
+            raStart := na
+        else if na(raStart) and close > close[1]
+            raStart := bar_index   // RA แท่งที่ 1 = ปิดบวกแท่งแรกหลังทำ Low
+
+        raDay := na(raStart) ? 0 : bar_index - raStart + 1
+        depthPct = (corrPeak - corrLow) / corrPeak * 100
+        depthOk  = depthMul <= 0 or depthPct >= depthMul * adrPrev
+        volOk    = (not useVolPrev or volume > volume[1]) and (not useVolAvg or volume > volAvgPrev)
+        posOk    = not useClosePos or closePos >= closePosMin
+
+        if raDay >= raMin and raDay <= raMax and gainPct >= gainMul * adrPrev and volOk and posOk and depthOk
+            ftd := true
+            ftdDay := raDay
+            active := false
+            raStart := na
+        else if raDay > raMax
+            active := false
+            raStart := na
+
+// ---------- ป้าย FTD ----------
+if ftd
+    strong = ftdDay <= strongDay
+    label.new(bar_index, na, showDay ? "FTD d" + str.tostring(ftdDay) : "FTD", yloc=yloc.belowbar, style=label.style_label_up, color=strong ? strongCol : weakCol, textcolor=txtCol, size=lblSz)
+
+alertcondition(ftd, "FTD", "Follow-Through Day เกิดขึ้น")

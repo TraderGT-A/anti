@@ -1,0 +1,142 @@
+//@version=5
+indicator("Squeeze Box + MA10 Reclaim", overlay=true, max_boxes_count=500, max_labels_count=500, max_bars_back=500)
+
+// ---------- Inputs ----------
+grpMa   = "MA"
+fastLen = input.int(10, "MA เร็ว (จุดเข้า)", minval=1, group=grpMa)
+midLen  = input.int(50, "MA กลาง (เทรนด์)", minval=1, group=grpMa)
+slowLen = input.int(200, "MA ช้า (เทรนด์)", minval=1, group=grpMa)
+showMa  = input.bool(true, "แสดงเส้น MA", group=grpMa)
+
+grpSq    = "กรอบบีบตัว (ATR เร็ว / ATR ช้า)"
+atrFast  = input.int(10, "ATR เร็ว", minval=1, group=grpSq)
+atrSlow  = input.int(50, "ATR ช้า", minval=2, group=grpSq)
+ratioMin = input.float(0.0, "สัดส่วน ATR เร็ว/ช้า ตั้งแต่", step=0.01, minval=0.0, group=grpSq, tooltip="กรอบ = วันที่ ATR10/ATR50 อยู่ระหว่างค่าต่ำสุดถึงสูงสุดนี้ (สูตรเดิมของเรา = 0 ถึง 0.85)")
+ratioMax = input.float(0.85, "สัดส่วน ATR เร็ว/ช้า ถึง", step=0.01, minval=0.0, group=grpSq)
+tightOn  = input.bool(true, "เปิดตัวกรองช่วงราคาแคบ (ช่วงราคา N วัน ÷ ATR ช้า)", group=grpSq, tooltip="ตัดกรณีที่ ATR ลดลงแต่ราคายังไหลเป็นทางยาว ให้เหลือเฉพาะช่วงที่ราคาแคบจริงเมื่อเทียบกับความผันผวนของหุ้นตัวนั้น")
+tightMode = input.string("Percentile ของตัวเอง", "วิธีกำหนดความแคบ", options=["Percentile ของตัวเอง", "k × ATR ช้า"], group=grpSq)
+tightLen = input.int(10, "ช่วงราคา N วัน", minval=2, group=grpSq)
+pctThr   = input.float(20.0, "แคบเมื่ออยู่ใน % ล่างสุดของประวัติตัวเอง", minval=1.0, maxval=100.0, step=1.0, group=grpSq)
+pctLen   = input.int(250, "ประวัติย้อนหลังสำหรับ Percentile (แท่ง)", minval=20, group=grpSq)
+kVal     = input.float(3.0, "k (ใช้เมื่อเลือกโหมด k × ATR ช้า)", minval=0.1, step=0.1, group=grpSq, tooltip="แคบเมื่อ (High สูงสุด − Low ต่ำสุดของ N วัน) ≤ k × ATR ช้า")
+minBars  = input.int(5, "กรอบต้องยาวอย่างน้อยกี่แท่ง (ใช้ทั้งวาดกล่องและให้ลูกศรขึ้น)", minval=1, group=grpSq)
+gapBars  = input.int(0, "ยอมให้หลุดกรอบได้กี่แท่งแล้วยังนับเป็นกรอบเดิม", minval=0, group=grpSq, tooltip="0 = เคร่งตามสูตร: วันไหนสัดส่วนออกนอกช่วง กรอบจบทันที")
+boxColor = input.color(color.new(color.red, 85), "สีกล่อง", group=grpSq)
+boxBord  = input.color(color.new(color.red, 60), "สีขอบกล่อง", group=grpSq)
+
+grpAr    = "ลูกศร (สามเหลี่ยม)"
+arSize   = input.string("normal", "ขนาดสามเหลี่ยม", options=["tiny", "small", "normal", "large", "huge"], group=grpAr)
+upColor  = input.color(color.green, "สีขึ้น", group=grpAr)
+dnColor  = input.color(color.red, "สีลง", group=grpAr)
+
+grpTb     = "ตาราง ATR"
+showTb    = input.bool(true, "แสดงตาราง ATR", group=grpTb)
+tbPosStr  = input.string("Top Right", "ตำแหน่งตาราง", options=["Top Left", "Top Center", "Top Right", "Middle Left", "Middle Center", "Middle Right", "Bottom Left", "Bottom Center", "Bottom Right"], group=grpTb)
+tbSizeStr = input.string("normal", "ขนาดตัวอักษรตาราง", options=["tiny", "small", "normal", "large", "huge"], group=grpTb)
+
+tbPos = tbPosStr == "Top Left" ? position.top_left : tbPosStr == "Top Center" ? position.top_center : tbPosStr == "Top Right" ? position.top_right : tbPosStr == "Middle Left" ? position.middle_left : tbPosStr == "Middle Center" ? position.middle_center : tbPosStr == "Middle Right" ? position.middle_right : tbPosStr == "Bottom Left" ? position.bottom_left : tbPosStr == "Bottom Center" ? position.bottom_center : position.bottom_right
+
+sizeOf(s) =>
+    s == "tiny" ? size.tiny : s == "small" ? size.small : s == "large" ? size.large : s == "huge" ? size.huge : size.normal
+
+arSz = sizeOf(arSize)
+tbSz = sizeOf(tbSizeStr)
+
+// ---------- MA ----------
+maF = ta.sma(close, fastLen)
+maM = ta.sma(close, midLen)
+maS = ta.sma(close, slowLen)
+plot(showMa ? maF : na, "MA เร็ว", color=color.new(color.aqua, 0), linewidth=1)
+plot(showMa ? maM : na, "MA กลาง", color=color.new(color.orange, 0), linewidth=2)
+plot(showMa ? maS : na, "MA ช้า", color=color.new(color.purple, 0), linewidth=2)
+
+// ขึ้น: MA10 > MA200 และ MA50 > MA200 / ลง: สลับกัน
+upTrend = maF > maS and maM > maS
+dnTrend = maF < maS and maM < maS
+
+// ---------- ATR (ค่าเฉลี่ยธรรมดาของ True Range เหมือน trendlib.js) ----------
+atrF  = ta.sma(ta.tr(true), atrFast)
+atrS  = ta.sma(ta.tr(true), atrSlow)
+ratio = atrS > 0 ? atrF / atrS : na
+ratioOk = not na(ratio) and ratio >= ratioMin and ratio <= ratioMax
+
+// ช่วงราคา N วัน หน่วยเป็น ATR ช้า และอันดับ (Percentile) เทียบประวัติของหุ้นตัวนั้นเอง (ต่ำ = แคบ)
+rngN   = ta.highest(high, tightLen) - ta.lowest(low, tightLen)
+rngAtr = atrS > 0 ? rngN / atrS : na
+pctRk  = ta.percentrank(rngAtr, pctLen)
+tightOk = not tightOn or (tightMode == "k × ATR ช้า" ? (not na(rngAtr) and rngAtr <= kVal) : (not na(pctRk) and pctRk <= pctThr))
+
+sqz   = ratioOk and tightOk
+
+// ---------- กรอบ + กล่อง ----------
+var box bx = na
+var int startBar = na
+var float hi = na
+var float lo = na
+var int lastSqzBar = na
+var bool firedUp = false  // ลูกศรขึ้นของกรอบนี้ถูกใช้ไปแล้วหรือยัง
+var bool firedDn = false
+
+if sqz
+    if na(startBar)
+        startBar := bar_index
+        hi := high
+        lo := low
+        firedUp := false   // กรอบใหม่ → เริ่มนับ "ครั้งแรก" ใหม่
+        firedDn := false
+    else
+        hi := math.max(hi, high)
+        lo := math.min(lo, low)
+    lastSqzBar := bar_index
+else if not na(lastSqzBar) and bar_index - lastSqzBar > gapBars
+    startBar := na
+    bx := na
+    lastSqzBar := na
+
+if not na(startBar) and bar_index - startBar + 1 >= minBars
+    if na(bx)
+        bx := box.new(startBar, hi, bar_index, lo, border_color=boxBord, bgcolor=boxColor)
+    else
+        box.set_top(bx, hi)
+        box.set_bottom(bx, lo)
+        box.set_right(bx, bar_index)
+
+// ลูกศรขึ้นได้เฉพาะวันที่ยังอยู่ในกรอบจริง (สัดส่วนอยู่ในช่วงที่ตั้ง) และกรอบยาวพอจะถูกวาดเป็นกล่อง
+inFrame = sqz and not na(startBar) and bar_index - startBar + 1 >= minBars
+
+// ---------- ลูกศร ----------
+// ขึ้น: วันก่อนปิดต่ำกว่า MA10 แล้ววันนี้ปิดเหนือ MA10 (ครั้งแรกในกรอบ) + MA10>MA200 และ MA50>MA200
+// ลง : วันก่อนปิดเหนือ MA10 แล้ววันนี้ปิดต่ำกว่า MA10 (ครั้งแรกในกรอบ) + MA10<MA200 และ MA50<MA200
+crossUp = close[1] < maF[1] and close > maF
+crossDn = close[1] > maF[1] and close < maF
+
+arrowUp = inFrame and upTrend and crossUp and not firedUp
+arrowDn = inFrame and dnTrend and crossDn and not firedDn
+
+if arrowUp
+    firedUp := true
+    label.new(bar_index, na, "", yloc=yloc.belowbar, style=label.style_triangleup, color=upColor, size=arSz)
+if arrowDn
+    firedDn := true
+    label.new(bar_index, na, "", yloc=yloc.abovebar, style=label.style_triangledown, color=dnColor, size=arSz)
+
+alertcondition(arrowUp, "ลูกศรขึ้น", "ปิดเหนือ MA10 ครั้งแรกในกรอบ (MA10>MA200, MA50>MA200)")
+alertcondition(arrowDn, "ลูกศรลง", "ปิดต่ำกว่า MA10 ครั้งแรกในกรอบ (MA10<MA200, MA50<MA200)")
+
+// ---------- ตาราง ATR ----------
+var table tb = table.new(tbPos, 2, 7, bgcolor=color.new(color.black, 25), border_color=color.new(color.gray, 40), border_width=1)
+if showTb and barstate.islast
+    table.cell(tb, 0, 0, "ATR" + str.tostring(atrFast), text_color=color.white, text_size=tbSz)
+    table.cell(tb, 1, 0, str.tostring(atrF, format.mintick), text_color=color.white, text_size=tbSz)
+    table.cell(tb, 0, 1, "ATR" + str.tostring(atrSlow), text_color=color.white, text_size=tbSz)
+    table.cell(tb, 1, 1, str.tostring(atrS, format.mintick), text_color=color.white, text_size=tbSz)
+    table.cell(tb, 0, 2, "ATR" + str.tostring(atrFast) + "/ATR" + str.tostring(atrSlow), text_color=color.white, text_size=tbSz)
+    table.cell(tb, 1, 2, na(ratio) ? "-" : str.tostring(ratio, "#.###"), text_color=sqz ? color.lime : color.white, text_size=tbSz)
+    table.cell(tb, 0, 3, "ATR" + str.tostring(atrFast) + " % ราคา", text_color=color.white, text_size=tbSz)
+    table.cell(tb, 1, 3, str.tostring(atrF / close * 100, "#.##") + "%", text_color=color.white, text_size=tbSz)
+    table.cell(tb, 0, 4, "ช่วงราคา " + str.tostring(tightLen) + "ว ÷ ATR" + str.tostring(atrSlow), text_color=color.white, text_size=tbSz)
+    table.cell(tb, 1, 4, na(rngAtr) ? "-" : str.tostring(rngAtr, "#.##"), text_color=color.white, text_size=tbSz)
+    table.cell(tb, 0, 5, "Percentile (ต่ำ=แคบ)", text_color=color.white, text_size=tbSz)
+    table.cell(tb, 1, 5, na(pctRk) ? "-" : str.tostring(pctRk, "#") + "%", text_color=color.white, text_size=tbSz)
+    table.cell(tb, 0, 6, "อยู่ในกรอบ", text_color=color.white, text_size=tbSz)
+    table.cell(tb, 1, 6, sqz ? "ใช่" : "ไม่", text_color=sqz ? color.lime : color.gray, text_size=tbSz)
