@@ -175,11 +175,20 @@
 
                   <!-- 🏆 ผู้นำหุ้นไทย: near52wHigh + โมเมนตัม 12-1 Top20 รายเดือน + Gate (ผลสำรวจ in-sample) -->
                   <div id="leadersPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
-                    <div class="flex flex-wrap items-center gap-2 mb-2"><h2 class="text-sm font-bold flex items-center gap-2">🏆 ผู้นำหุ้นไทยรายเดือน — ใกล้จุดสูง 52 สัปดาห์ + โมเมนตัม 12-1 <span class="mk-chip mk-tag"></span></h2> <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('leaders','copy',this)">📋 TV</button><button class="tf-chip" onclick="wlExport('leaders','file',this)">⬇ .txt</button></span></div>
+                    <div class="flex flex-wrap items-center gap-2 mb-2"><h2 class="text-sm font-bold flex items-center gap-2">🏆 ผู้นำรายเดือน — ขึ้นมากสุดเดือนนี้ · ขาขึ้น MA50>MA200 · ผ่านสภาพคล่อง <span class="mk-chip mk-tag"></span></h2> <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('leaders','copy',this)">📋 TV</button><button class="tf-chip" onclick="wlExport('leaders','file',this)">⬇ .txt</button></span></div>
                     <div id="ldWarn" class="rounded-lg border border-amber-700/60 bg-amber-900/10 text-amber-200 px-3 py-2 text-[11px] leading-relaxed mb-2">⚠️ <b>ผลวิจัยในอดีต (in-sample) ยังไม่พิสูจน์ edge — ไม่ใช่คำแนะนำการลงทุน</b> · ตลาดสหรัฐฯ ไม่พบ edge จากแนวทางนี้ (หน้านี้ใช้กับตลาดไทยเท่านั้น)</div>
                     <div id="ldGate" class="mb-2"></div>
-                    <div class="text-xs font-bold mb-1">รายชื่อตามกฎ ณ ข้อมูลล่าสุด (Top 20 · น้ำหนักเท่ากัน × สัดส่วนหุ้นตาม Gate)</div>
-                    <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-[10px] uppercase text-slate-500 border-b border-[#1e2634]"><tr><th class="p-2">#</th><th class="p-2">หุ้น</th><th class="p-2">ราคา</th><th class="p-2" title="ราคาปัจจุบัน ÷ high 52 สัปดาห์">ใกล้จุดสูง</th><th class="p-2" title="ผลตอบแทน 12 เดือนไม่รวมเดือนล่าสุด">โมเมนตัม 12-1</th><th class="p-2">คะแนน</th><th class="p-2">น้ำหนัก</th></tr></thead><tbody id="ldBody"></tbody></table></div>
+                    <div id="ldNote" class="text-[11px] text-slate-400 mb-1.5 leading-relaxed"></div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+                      <div class="text-xs font-bold">ผู้นำเดือนนี้ <span id="ldShown" class="text-slate-400 font-normal"></span></div>
+                      <label class="text-[11px] text-slate-400 flex items-center gap-1.5">แสดง
+                        <select id="ldLimit" onchange="ldApply()" class="bg-[#0a0f16] border border-[#243044] rounded px-2 py-1 text-[11px]">
+                          <option value="20" selected>20 ตัว</option><option value="30">30 ตัว</option><option value="50">50 ตัว</option><option value="999">ทั้งหมด</option>
+                        </select>
+                        · <span class="text-slate-500">กดหัวคอลัมน์เพื่อเรียง</span>
+                      </label>
+                    </div>
+                    <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-[10px] uppercase text-slate-500 border-b border-[#1e2634]"><tr><th class="p-2">#</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('ticker')" title="กดเพื่อเรียง">หุ้น</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('mtd')" title="กดเพื่อเรียง — ผลตอบแทนตั้งแต่ปิดเดือนก่อนถึงปิดล่าสุด">เดือนนี้</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('rs')" title="กดเพื่อเรียง — คะแนนความแข็งแกร่ง 1–99">RS</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('price')" title="กดเพื่อเรียง">ราคา</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('val')" title="กดเพื่อเรียง — มูลค่าซื้อขายต่อวัน">มูลค่า/วัน</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p3m')" title="กดเพื่อเรียง">3M</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p6m')" title="กดเพื่อเรียง">6M</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p1y')" title="กดเพื่อเรียง">1Y</th><th class="p-2 text-slate-500" title="เส้นค่าเฉลี่ย 50 วัน vs 200 วัน — ขาขึ้นเมื่อ MA50 > MA200">MA50/200</th></tr></thead><tbody id="ldBody"></tbody></table></div>
                     <div id="ldHow" class="text-[11px] text-slate-400 mt-3 leading-relaxed"></div>
                   </div>
 
@@ -455,7 +464,7 @@
     <div class="mb-2 pr-10">
           <div class="flex items-center gap-2 flex-wrap">
             <span id="modalLogo"></span>
-            <span id="modalTicker" class="text-2xl font-black shrink-0"></span><span id="modalTag"></span><span id="modalDrLabel"></span><span id="modalRS" class="shrink-0"></span>
+            <span id="modalTicker" class="text-2xl font-black shrink-0"></span><span id="modalTag"></span><span id="modalDrLabel"></span><span id="modalRS" class="shrink-0"></span><span id="modalIpo" class="shrink-0 text-[11px] text-slate-400" title="อายุ IPO นับจากวันแรกที่ซื้อขายได้ (Yahoo)"></span>
             <span id="modalCap"></span><span id="modalDRBadge"></span><span id="modalRank"></span>
             <span id="modalRVOL"></span>
             <span id="modalVol"></span><span id="modalCrowd"></span><span id="modalTheme" class="shrink-0"></span>
@@ -469,7 +478,7 @@
           <button class="tf-chip" onclick="changeModalTF('1d')">1D</button>
           <button class="tf-chip" onclick="changeModalTF('1wk')">1W</button>
           <button class="tf-chip" onclick="changeModalTF('1mo')">1M</button>
-          <button class="tf-chip active" onclick="changeModalTF('1y')">1Y</button>
+          <button class="tf-chip active" onclick="changeModalTF('1y')">3Y</button>
         </div>
         <div id="modalLegend" class="mb-1"></div>
     <div id="modalChart" class="w-full h-[420px] rounded-lg bg-[#05070b] border border-[#1e2634]"></div>
@@ -507,6 +516,7 @@ function loadDrUs(){   // เรียกหลัง API ถูก define แ�
           if(curPage==='stocks'){ renderView(); }
           else if(curPage==='overview'){ if(typeof summaryData!=='undefined') renderSummary(summaryData); }
           else if(curPage==='top20'){ renderTop20(); }
+          else if(curPage==='leaders'){ ldNoteApply(); ldApply(); }
         }
         renderTopGL();   // GL มีทั้งสองตลาด
       }catch(e){}
@@ -712,7 +722,7 @@ let currentMarket = 'thailand';
 let curPage = 'overview';
 function setPage(pg){
   curPage = pg;
-  try{ localStorage.setItem('rsd_curPage', pg); }catch(e){}   // จำหน้าสุดท้ายไว้ (ข้อ ก บอส)
+  try{ localStorage.setItem('rsd_curPage', pg); localStorage.setItem('rsd_curMarket', currentMarket); }catch(e){}   // จำหน้า+ตลาดสุดท้ายไว้ (บอส)
   const ov = ['marketBriefPanel','indexBar','marketSummaryPanel','megatrendPanel','flowPanel','themesPanel','topglPanel'];
   const st = ['searchBar','progressPanel','cardsView','tableView'];
   ov.forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display = (pg==='overview') ? '' : 'none'; });
@@ -866,7 +876,73 @@ async function wlExport(kind, how, btn){
     wlFlash(btn,'ดาวน์โหลด '+syms.length+' ตัวแล้ว');
   }
 }
+// ===== 🏆 ผู้นำรายเดือน (ไทย): ขึ้นมากสุดเดือนนี้ + ขาขึ้น MA50>MA200 + ผ่านสภาพคล่อง =====
+// ข้อมูลจาก monthly_leaders_th.json (gen_monthly_leaders.py) — ตลาดสหรัฐฯ ใช้รายชื่อแบบเดิม (renderLeadersUS)
+let ldRows=[], ldSortKey='mtd', ldSortDir=-1, ldMarket='thailand';
+function ldSortBy(k){
+  if(ldSortKey===k){ ldSortDir=-ldSortDir; } else { ldSortKey=k; ldSortDir=(k==='ticker'||k==='name')?1:-1; }
+  ldApply();
+}
+/* ---------- ป้าย SSF (ไทย) / DR (หุ้นเมกา) ในตารางผู้นำรายเดือน ---------- */
+function ldTags(tk){
+  if(!tk) return '';
+  if(ldMarket==='thailand'){
+    return hasSSF(tk) ? '<span class="text-[9px] font-bold text-emerald-400 border border-emerald-500/40 rounded px-1 ml-0.5 align-middle whitespace-nowrap" title="SSF — มี Single Stock Future ที่ TFEX (สัญญาซื้อขายรายตัว)">SSF</span>' : '';
+  }
+  return drLabel(tk,'america');   // ตลาดสหรัฐฯ: ป้าย (DR) ของหุ้นที่ซื้อในไทยได้ผ่านตราสารแสดงสิทธิ
+}
+/* ---------- 📌 Note สรุปว่าในรายชื่อนี้มี SSF / DR กี่ตัว + รายชื่อ ---------- */
+function ldNoteApply(){
+  const el=document.getElementById('ldNote');
+  if(!el || !ldRows || !ldRows.length) return;
+  const isUs = ldMarket==='america';
+  const all = ldRows.map(p=>p.ticker);
+  const hit = all.filter(tk => isUs ? Boolean(drList(tk)) : hasSSF(tk));
+  el.innerHTML='📌 <b>'+(isUs?'(DR)':'SSF')+'</b> = '+(isUs?'ซื้อในไทยได้ผ่านตราสารแสดงสิทธิ (DR)':'มี Single Stock Future ที่ TFEX (สัญญารายตัว)')
+    +' · ใน <b>'+all.length+'</b> ตัวนี้มี <b>'+hit.length+'</b> ตัว: '+(hit.join(', ')||'-');
+}
+function ldApply(){
+  const body=document.getElementById('ldBody'); if(!body) return;
+  const sel=document.getElementById('ldLimit');
+  const n=sel?Number(sel.value)||20:20;
+  const fx=v=>Number.isFinite(v)?Number(v).toFixed(2):'-';
+  const fb=v=>{ const x=Number(v); return Number.isFinite(x)?(x>=1e9?(x/1e9).toFixed(2)+'B':(x/1e6).toFixed(1)+'M'):'-'; };
+  const rows=[...ldRows].sort((a,b)=>{
+    const x=a[ldSortKey], y=b[ldSortKey];
+    const c=(typeof x==='string')?String(x).localeCompare(String(y)):(Number(x)||0)-(Number(y)||0);
+    return c*ldSortDir;
+  });
+  const show=rows.slice(0,n);
+  const lbl={mtd:'เดือนนี้',rs:'RS',ticker:'ตัวอักษร',price:'ราคา',val:'มูลค่า',p3m:'3M',p6m:'6M',p1y:'1Y'}[ldSortKey]||ldSortKey;
+  const sh=document.getElementById('ldShown');
+  if(sh) sh.textContent='— แสดง '+show.length+' จาก '+rows.length+' ตัว · เรียงตาม'+lbl+' '+(ldSortDir<0?'มาก→น้อย':'น้อย→มาก');
+  body.innerHTML=show.map((p,i)=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')"><td class="p-2 text-slate-400">'+(i+1)+'</td><td class="p-2"><b class="text-sky-400">'+p.ticker+'</b>'+ldTags(p.ticker)+' <span class="text-[10px] text-slate-500">'+p.name+'</span></td><td class="p-2"><b class="pos">+'+p.mtd.toFixed(1)+'%</b></td><td class="p-2"><span class="'+rsColor(p.rs)+' font-bold">'+p.rs+'</span></td><td class="p-2">'+fx(p.price)+'</td><td class="p-2">'+fb(p.val)+'</td><td class="p-2 '+(p.p3m>=0?'pos':'neg')+'">'+p.p3m.toFixed(1)+'%</td><td class="p-2 '+(p.p6m>=0?'pos':'neg')+'">'+p.p6m.toFixed(1)+'%</td><td class="p-2 '+(p.p1y>=0?'pos':'neg')+'">'+p.p1y.toFixed(1)+'%</td><td class="p-2 text-[11px] text-slate-400" title="MA50 '+fx(p.sma50)+' เหนือ MA200 '+fx(p.sma200)+'">'+fx(p.sma50)+'/'+fx(p.sma200)+'</td></tr>').join('')||'<tr><td colspan="10" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
+}
 async function renderLeaders(){
+  const isUs = currentMarket==='america';
+  const gEl=document.getElementById('ldGate'), body=document.getElementById('ldBody'), how=document.getElementById('ldHow');
+  if(!gEl) return;
+  if(ldBusy) return; ldBusy=true; gEl.innerHTML='<div class="text-slate-400 text-xs animate-pulse">กำลังโหลดผู้นำรายเดือน...</div>';
+  try{
+    const r=await fetch(API+'/'+(isUs?'monthly_leaders_us.json':'monthly_leaders_th.json')+'?t='+Date.now());
+    if(!r.ok) throw new Error('ยังไม่มีไฟล์ข้อมูล');
+    const j=await r.json(); if(j.error) throw new Error(j.error);
+    const ml=document.getElementById('ldMtdLabel'); if(ml) ml.textContent=j.metric_label||'เดือนนี้';
+    ldMarket = currentMarket;
+    window._wl_leaders=(j.data||[]).map(p=>({ticker:p.ticker, tv:p.tv||(isUs?'NASDAQ:':'SET:')+p.ticker, name:p.name}));
+    ldRows=(j.data||[]).map(p=>({ticker:p.ticker, name:p.name||'', mtd:+p.mtd||0, rs:+p.rs||0, price:+p.price||0, val:+p.val||0, p3m:+p.p3m||0, p6m:+p.p6m||0, p1y:+p.p1y||0, sma50:+p.sma50||0, sma200:+p.sma200||0}));
+    const warn=document.getElementById('ldWarn');
+    if(warn) warn.innerHTML='📌 <b>เกณฑ์:</b> '+(j.criteria||'')+'<br>ข้อมูล <b>'+j.asOf+'</b>'+(j.base?(' · เทียบกับปิด <b>'+j.base+'</b>'):'')+' · ผ่านทั้งหมด <b>'+j.count+' ตัว</b> · '+(j.rs_formula||'');
+    const fx=v=>Number.isFinite(v)?Number(v).toFixed(2):'-';
+    const fb=v=>{ const n=Number(v); return Number.isFinite(n)?(n>=1e9?(n/1e9).toFixed(2)+'B':(n/1e6).toFixed(1)+'M'):'-'; };
+    gEl.innerHTML='<div class="rounded-lg border border-emerald-700/50 bg-emerald-900/10 px-3 py-2 text-xs"><b class="text-sm">📈 '+j.count+' ตัวเป็นผู้นำรายเดือน ('+j.metric_label+')</b><div class="opacity-80 mt-0.5">เรียงตาม'+(j.metric_label||'เดือนนี้')+' จากมากไปน้อย · ทุกตัวเป็นขาขึ้น (MA50 &gt; MA200) และผ่านสภาพคล่อง · ข้อมูล ณ '+j.asOf+'</div></div>';
+    ldApply();
+    ldNoteApply();
+    how.innerHTML='<b>วิธีอ่าน:</b> "'+(j.metric_label||'เดือนนี้')+'" = '+(j.base?('ผลตอบแทนจากปิดเดือนก่อน ('+j.base+') ถึงปิดล่าสุด ('+j.asOf+')'):'ผลตอบแทนย้อนหลัง 1 เดือน (TradingView)')+' · RS คือคะแนนความแข็งแกร่ง 1–99 ตามสูตรของเว็บ · หุ้นที่มูลค่าซื้อขายต่ำระวังเลือน<br><b>หมายเหตุ:</b> ข้อมูลประกอบการคัดกรองเท่านั้น ไม่ใช่คำแนะนำซื้อขาย';
+  }catch(e){ gEl.innerHTML='<div class="text-rose-400 text-xs">โหลดไม่สำเร็จ: '+e.message+'</div>'; }
+  finally{ ldBusy=false; }
+}
+async function renderLeadersUS(){
   const gEl=document.getElementById('ldGate'), body=document.getElementById('ldBody'), how=document.getElementById('ldHow');
   if(!gEl) return;
   if(ldBusy) return; ldBusy=true; gEl.innerHTML='<div class="text-slate-400 text-xs animate-pulse">กำลังโหลด...</div>';
@@ -1256,7 +1332,7 @@ async function loadTop20Charts(rows, m){
       const key=m+'_'+s.ticker;
       if(topCharts[key]){ drawWhenSized(el, patchedBars(topCharts[key], s.ticker, m)); return; }
       try{
-        const r = await fetch(API+'/api/chart?market='+m+'&symbol='+encodeURIComponent(s.ticker)+'&interval=1d&range=1y');
+        const r = await fetch(API+'/api/chart?market='+m+'&symbol='+encodeURIComponent(s.ticker)+'&interval=1d&range=3y');
         const j = await r.json();
         if(j.data && j.data.length){ topCharts[key]=j.data; drawWhenSized(el, patchedBars(j.data, s.ticker, m)); }
         else el.innerHTML='<div class="flex items-center justify-center h-full text-[11px] text-slate-500">ไม่มีกราฟ</div>';
@@ -1344,6 +1420,9 @@ function switchMarket(mk){
   if(rpUs) rpUs.classList.toggle('active', mk==='america');
   if(curPage === 'report') loadReportInit();
 
+  // 3b) ซิงค์ผู้นำรายเดือนให้ตรงตลาดหลัก — ไม่งั้นจะเห็นข้อมูลของตลาดเก่าค้างอยู่
+  if(curPage === 'leaders') renderLeaders();
+
   // 4) ซิงค์หน่วยหัวตาราง & ท้ายหน้า
   const thVal = document.getElementById('thValHeader');
   if(thVal) thVal.innerHTML = `Value(${mk==='america'?'$M':'฿M'}) <span class="sort-icon">↕</span>`;
@@ -1366,9 +1445,14 @@ async function loadPageCharts(stocks){
     if(!el) return;
     if(preloadedCharts[x.ticker]){ drawWhenSized(el, patchedBars(preloadedCharts[x.ticker], x.ticker, currentMarket)); return; }
     try{
-      const r = await fetch(API+'/api/chart?market='+currentMarket+'&symbol='+encodeURIComponent(x.ticker)+'&interval=1d&range=1y');
+      const r = await fetch(API+'/api/chart?market='+currentMarket+'&symbol='+encodeURIComponent(x.ticker)+'&interval=1d&range=3y');
       const j = await r.json();
-      if(j.data && j.data.length){ preloadedCharts[x.ticker]=j.data; drawWhenSized(el, patchedBars(j.data, x.ticker, currentMarket)); }
+      if(j.data && j.data.length){
+        preloadedCharts[x.ticker]=j.data;
+        if(j.firstTradeDate) chartFirstDate[x.ticker]=j.firstTradeDate;
+        fillIpo(x.ticker);
+        drawWhenSized(el, patchedBars(j.data, x.ticker, currentMarket));
+      }
       else el.innerHTML='<div class="flex items-center justify-center h-full text-[11px] text-slate-500">ไม่มีกราฟ</div>';
     }catch(e){
       drawWhenSized(el, []); // fallback แสดงข้อความผ่าน drawChart เปล่า
@@ -1383,6 +1467,23 @@ async function loadPageCharts(stocks){
 let LOGO_ID = {};   // key "market:TICKER" → TradingView logoid
 function setLogoIds(mk, rows){
   (rows||[]).forEach(x=>{ if(x && x.logoId) LOGO_ID[mk+':'+x.ticker]=x.logoId; });
+}
+/* ===== อายุ IPO: /api/chart คืน firstTradeDate (Yahoo meta) มาด้วย ===== */
+let chartFirstDate = {};   // ticker → วันแรกที่ซื้อขายได้ (YYYY-MM-DD)
+function ipoAge(fd){
+  if(!fd) return '';
+  const ms = Date.now() - new Date(fd + 'T00:00:00Z').getTime();
+  if(!(ms > 0)) return '';
+  const days = ms / 86400000;
+  if(days < 60) return 'IPO มาแล้ว ' + Math.round(days) + ' วัน';
+  if(days < 365) return 'IPO มาแล้ว ' + Math.max(1, Math.round(days / 30.44)) + ' เดือน';
+  return 'IPO มาแล้ว ' + (days / 365.25).toFixed(1) + ' ปี';
+}
+function fillIpo(tk){
+  const t = ipoAge(chartFirstDate[tk]);
+  if(!t) return;
+  const e = document.getElementById('ipo_' + tk);
+  if(e) e.textContent = t;
 }
 function tvLogoUrl(tk, mkt){
   const id = LOGO_ID[mkt+':'+tk];
@@ -1446,12 +1547,13 @@ function buildCard(tk, nm, grp, ind, rs, px, ch, vol, val, p3, xn, rd, isDR, rv)
       <span class="text-slate-400" title="มูลค่าซื้อขาย">${fBil(val||0)}</span>
     </div>
     <div class="flex items-center gap-1 mt-1 overflow-hidden flex-nowrap whitespace-nowrap">${volBadge(tk)}${ntag}${rdx}${drBadge}${fRVOL(rv)}</div>
+    <span id="ipo_${tk}" class="block text-[10px] text-slate-500 mt-0.5"></span>
     ${currentMarket==='america' ? `<div class="mt-1 flex flex-wrap items-center gap-1">${drShort(tk)}</div>` : ''}
     ${maLegendHTML()}
     <div class="relative mt-1">
           <div id="${cid}" class="chart"></div>
       <div class="absolute bottom-1 left-2 flex gap-1" title="กดเพื่อสลับช่วงกราฟ">
-        <button class="tf-chip active" onclick="changeCardTF('${tk}','1d')">1y</button>
+        <button class="tf-chip active" onclick="changeCardTF('${tk}','1d')">3Y</button>
       </div>
     </div>
   </div>`;
@@ -2199,7 +2301,7 @@ async function runUpdate(force){
     for(let i=0;i<top10.length;i++){
       if(mk0!==currentMarket) break;   // สลับตลาดแล้ว หยุดโหลดกราฟตลาดเก่า (กัน preloadedCharts ปนข้ามตลาด)
       setProgress(80+Math.round((i+1)/top10.length*15),'📊 '+top10[i].ticker+' ('+(i+1)+'/'+top10.length+')');
-      try{ const c=await fetch(API+'/api/chart?market='+mk0+'&symbol='+encodeURIComponent(top10[i].ticker)+'&interval=1d&range=1y'); const j=await c.json(); if(j.data&&j.data.length&&mk0===currentMarket) preloadedCharts[top10[i].ticker]=j.data; }catch(e){}
+      try{ const c=await fetch(API+'/api/chart?market='+mk0+'&symbol='+encodeURIComponent(top10[i].ticker)+'&interval=1d&range=3y'); const j=await c.json(); if(j.data&&j.data.length&&mk0===currentMarket){ preloadedCharts[top10[i].ticker]=j.data; if(j.firstTradeDate) chartFirstDate[top10[i].ticker]=j.firstTradeDate; } }catch(e){}
     }
     setProgress(100,'✅ เสร็จ'); stopTimer();
   }catch(e){
@@ -2444,7 +2546,7 @@ async function changeCardTF(tk,iv){
   const el=document.getElementById('chart_'+tk.replace(/[^a-z0-9]/gi,'_'));
   if(!el)return;
   el.innerHTML='<div class="flex items-center justify-center h-full text-[11px] text-sky-400 animate-pulse">โหลด '+iv+'...</div>';
-  try{ const r=await fetch(API+'/api/chart?market='+currentMarket+'&symbol='+encodeURIComponent(tk)+'&interval='+iv+'&range='+({['30m']:'1mo',['1wk']:'2y'}[iv]||'1y')); const j=await r.json(); drawChart(el,j.data||[]); }catch(e){ el.innerHTML='<div class="text-center text-rose-400 text-[11px]">โหลดไม่สำเร็จ</div>'; }
+  try{ const r=await fetch(API+'/api/chart?market='+currentMarket+'&symbol='+encodeURIComponent(tk)+'&interval='+iv+'&range='+({['30m']:'1mo',['1wk']:'2y',['1d']:'3y'}[iv]||'3y')); const j=await r.json(); if(j.firstTradeDate) chartFirstDate[tk]=j.firstTradeDate; fillIpo(tk); drawChart(el,j.data||[]); }catch(e){ el.innerHTML='<div class="text-center text-rose-400 text-[11px]">โหลดไม่สำเร็จ</div>'; }
 }
 
 // เปิดป็อปอัปกราฟจาก ticker อย่างเดียว (หา name/ตลาด เอง) — ใช้กับลิสต์ที่ไม่มีชื่อกำกับ / ไม่ต้อง escape ชื่อ
@@ -2522,8 +2624,10 @@ function changeModalTF(iv){ [...document.querySelectorAll('#chartModal .tf-chip'
 async function fetchModal(iv){
   const el=document.getElementById('modalChart'); el.innerHTML='<div class="flex items-center justify-center h-full text-sky-400 animate-pulse text-sm">กำลังโหลด...</div>';
   try{
-    const r=await fetch(API+'/api/chart?market='+activeMarket+'&symbol='+encodeURIComponent(activeTicker)+'&interval='+(iv==='1y'?'1d':iv)+'&range='+({['30m']:'1mo',['1mo']:'5y',['1wk']:'2y',['1y']:'1y'}[iv]||'1y'));
-    const j=await r.json(); let data=(j.data||[]).sort((a,b)=>typeof a.time==='number'?(a.time-b.time):String(a.time).localeCompare(String(b.time)));
+    const r=await fetch(API+'/api/chart?market='+activeMarket+'&symbol='+encodeURIComponent(activeTicker)+'&interval='+(iv==='1y'?'1d':iv)+'&range='+({['30m']:'1mo',['1mo']:'5y',['1wk']:'2y',['1y']:'3y'}[iv]||'3y'));
+    const j=await r.json(); if(j.firstTradeDate) chartFirstDate[activeTicker]=j.firstTradeDate;
+    const _mi=document.getElementById('modalIpo'); if(_mi) _mi.textContent=ipoAge(chartFirstDate[activeTicker]);
+    let data=(j.data||[]).sort((a,b)=>typeof a.time==='number'?(a.time-b.time):String(a.time).localeCompare(String(b.time)));
     if(!data.length) throw new Error('no data');
     if(iv==='1y'||iv==='1d') data=patchedBars(data, activeTicker, activeMarket);
     try{ if(iv==='1y'||iv==='1d') renderModalTT(data); else { const tt=document.getElementById('modalTT'); if(tt) tt.innerHTML=''; } }catch(e){}
@@ -2585,10 +2689,15 @@ document.addEventListener('DOMContentLoaded',()=>{ try{
   fillGroupOptions(currentMarket);
   glGroupOptions(currentMarket);
   applyMarketIdentity(currentMarket);
-  try{ localStorage.removeItem('rsd_curPage'); }catch(e){}
+  // กลับไปหน้า + ตลาดที่เข้าล่าสุด (บอสสั่ง 16 ต.ค. 69) — ไม่ให้กลับไปหน้าภาพรวมทุกรอบ
+  let _pg='overview', _mk='thailand';
+  try{ _pg=localStorage.getItem('rsd_curPage')||'overview'; _mk=localStorage.getItem('rsd_curMarket')||'thailand'; }catch(e){}
+  if(!['overview','stocks','top20','scanner','leaders','report'].includes(_pg)) _pg='overview';
+  if(_mk!=='thailand'&&_mk!=='america') _mk='thailand';
   loadUsIndexes();   // สมาชิก index สหรัฐฯ สดจาก TradingView
   loadDrUs();   // โหลดข้อมูล DR ไทยที่อ้างอิงหุ้นเมกา (แสดงเฉพาะหน้าหุ้นเมกา)
-  setPage('overview');   // หน้าแรก = ภาพรวมตลาด (บอสสั่ง)
+  if(_mk!==currentMarket) switchMarket(_mk);   // ซิงค์หน้าต่างๆ + สแกนตลาดนั้นให้พร้อม
+  setPage(_pg);   // กลับไปหน้าที่เข้าล่าสุด
   runUpdate(true);   // ทุกครั้งเข้าเว็บ: บังคับ Update ข้อมูลสดเสมอ (ข้าม cache)
   toggleAutoRefresh(); // เริ่มต้นเปิดอัปเดตสดอัตโนมัติต่อเนื่อง
 }catch(e){} });
