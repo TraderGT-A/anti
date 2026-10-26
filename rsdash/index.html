@@ -465,7 +465,7 @@
           <div class="flex items-center gap-2 flex-wrap">
             <span id="modalLogo"></span>
             <span id="modalTicker" class="text-2xl font-black shrink-0"></span><span id="modalTag"></span><span id="modalDrLabel"></span><span id="modalRS" class="shrink-0"></span><span id="modalIpo" class="shrink-0 text-[11px] text-slate-400" title="อายุ IPO นับจากวันแรกที่ซื้อขายได้ (Yahoo)"></span>
-            <span id="modalCap"></span><span id="modalDRBadge"></span><span id="modalRank"></span>
+            <span id="modalCap"></span><span id="modalSSF"></span><span id="modalDRBadge"></span><span id="modalRank"></span>
             <span id="modalRVOL"></span>
             <span id="modalVol"></span><span id="modalCrowd"></span><span id="modalTheme" class="shrink-0"></span>
             <span id="modalName" class="text-xs text-slate-400 ml-1 truncate"></span>
@@ -1208,6 +1208,11 @@ const GROUP_COLOR = { 'SET50':'text-amber-300','SET100':'text-sky-300','mai/Smal
 const TH_SSF = ["AAV","ADVANC","AEONTS","AMATA","AOT","AP","AWC","BA","BAM","BANPU","BAY","BBL","BCH","BCP","BCPG","BDMS","BEAUTY","BEC","BEM","BGRIM","BH","BJC","BLA","BLAND","BPP","BSRC","BTS","CBG","CENTEL","CHG","CK","CKP","COM7","CPALL","CPF","CPN","CRC","DELTA","EA","EASTW","EGCO","EPG","ERW","GFPT","GLOBAL","GPSC","GULF","GUNKUL","HANA","HMPRO","ICHI","IRPC","ITD","IVL","JAS","JMT","KBANK","KCE","KKP","KTB","KTC","LH","LPN","M","MAJOR","MBK","MEGA","MINT","MTC","OR","ORI","OSP","PLANB","PRM","PSH","PSL","PTG","PTT","PTTEP","PTTGC","QH","RATCH","RS","S","SAMART","SAWAD","SCB","SCC","SCGP","SGP","SIRI","SPALI","SPCG","SPRC","STA","STECON","STGT","STPI","SUPER","TASCO","TCAP","THAI","THANI","THCOM","THG","TISCO","TKN","TOA","TOP","TPIPL","TPIPP","TQM","TRUE","TTA","TTB","TTCL","TTW","TU","TVO","UNIQ","VGI","VNG","WHA","WHAUP"];
 const GL_SHORT = {"sp500":"S&P500","nasdaq100":"Nasdaq100","dow30":"Dow30","russell2000":"R2000"};
 function hasSSF(tk){ return TH_SSF.indexOf((tk||'').toUpperCase())>-1; }
+// ป้าย SSF สำหรับหน้า Top20 (หุ้นไทยเท่านั้น) — การ์ด + ตาราง + ป็อปอัปใช้ตัวเดียวกัน
+function ssfBadge(tk, m){
+  if(m!=='thailand' || !tk) return '';
+  return hasSSF(tk) ? '<span class="text-[9px] font-bold text-emerald-400 border border-emerald-500/40 rounded px-1 ml-0.5 align-middle whitespace-nowrap" title="SSF — มี Single Stock Future ที่ TFEX (สัญญาซื้อขายรายตัว)">SSF</span>' : '';
+}
 function idxBadge(tk, mk){
   if(mk!=='america') return '';
   const idx=inIndex(tk); if(!idx.length) return '';
@@ -1244,7 +1249,7 @@ function topTableHTML(rows, m){
     const has2=(p2yCache[p2yKey(m,s.ticker)]!==undefined);
     return '<tr class="border-b border-[#16202e] hover:bg-[#111827] cursor-pointer" onclick="openModal(\''+s.ticker+'\',\''+jq(s.name)+'\',\''+m+'\')">'+
       '<td class="p-1 text-slate-500">'+(i+1)+'</td>'+
-      '<td class="p-1 font-semibold">'+s.ticker+drLabel(s.ticker, m)+Notes.badgeHtml(noteOf(m,s.ticker),m,s.ticker)+'<span class="block text-[9px] text-slate-500 truncate max-w-[150px]">'+(s.name||'')+'</span></td>'+
+      '<td class="p-1 font-semibold">'+s.ticker+drLabel(s.ticker, m)+ssfBadge(s.ticker, m)+Notes.badgeHtml(noteOf(m,s.ticker),m,s.ticker)+'<span class="block text-[9px] text-slate-500 truncate max-w-[150px]">'+(s.name||'')+'</span></td>'+
       '<td class="p-1 text-right">'+topRSHTML(s)+'</td>'+
       '<td class="p-1 text-right">'+fPctExact(s.pYTD)+'</td>'+
       '<td class="p-1 text-right">'+fPctExact(s.p1y)+'</td>'+
@@ -1271,6 +1276,7 @@ function topCardItems(rows, m){
           <span class="text-[10px] font-bold text-slate-500">#${i+1}</span>
           ${logo}
           <button onclick="openModal('${tk}','${jq(s.name)}','${m}')" class="text-[15px] font-bold hover:text-sky-400 truncate" title="${(s.name||'')}">${tk}${drLabel(tk, m)}</button>
+          ${ssfBadge(tk, m)}
           <span class="tag-market" title="${m==='america'?'ตลาดสหรัฐฯ (US)':'ตลาดไทย'}">${m==='america'?'🇺🇸':'🇹🇭'}</span>
           <span class="text-[10px] text-slate-500 truncate max-w-[120px]">${s.name||''}</span>
           ${Notes.badgeHtml(noteOf(m,tk),m,tk)}
@@ -2593,6 +2599,8 @@ function openModal(tk,nm,mkt){
   // 1) ป้ายตลาด (🇹🇭/🇺🇸) เหมือน tag บนการ์ด
   document.getElementById('modalTag').innerHTML = `<span class="tag-market" title="${mk==='america'?'ตลาดสหรัฐฯ (US)':(grp==='mai/Small'?'ตลาด mai':'ตลาด SET')}">${mk==='america'?'🇺🇸':(grp==='mai/Small'?'🚩':'🇹🇭')}</span>`;
   // 2) ป้าย DR (ถ้าเป็นตราสารแสดงสิทธิ)
+  const _ssf = document.getElementById('modalSSF');
+  if(_ssf) _ssf.innerHTML = ssfBadge(tk, mk);
   const _drd = document.getElementById('modalDRBadge');
   if(_drd) _drd.innerHTML = (found && found.isDR) ? '<span class="pill text-amber-400 border-amber-700/60" title="Depositary Receipt — ตราสารอ้างอิงหุ้นนอก">DR</span>' : '';
   // 3) อันดับ RS + การเปลี่ยนอันดับ (เหมือน pill บนการ์ด)
