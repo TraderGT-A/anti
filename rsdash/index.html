@@ -292,6 +292,7 @@ html .trs-table { width:100%; min-width:640px; border-collapse:collapse; font-va
 html .trs-table th { text-align:left; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:500; padding:12px 8px; }
 html .trs-table td { padding:11px 8px; border-top:1px solid var(--line); }
 html .trs-table .r { text-align:right; }
+@media (max-width:640px){ html .trs-table { min-width:0; } html .trs-table th:nth-child(6), html .trs-table td:nth-child(6) { display:none; } html .trs-table th, html .trs-table td { padding-left:4px; padding-right:4px; } }
 html .trs-rs { display:inline-flex; min-width:38px; height:28px; align-items:center; justify-content:center; border-radius:9px; font-weight:700; font-size:14px; background:var(--panel2); color:var(--gold); }
 html .trs-tk { font-weight:600; color:var(--text); text-decoration:none; } html .trs-tk:hover { color:var(--gold); }
 html .trs-grp { color:var(--muted); } html .trs-empty { color:var(--faint); padding:16px 8px; }
@@ -316,6 +317,15 @@ html .hover\:bg-emerald-900\/30:hover { background:var(--upbg); } html .hover\:b
 html .text-sky-400 { }
 :root, html[data-theme="light"] { --l1:#281237; --l2:#B08A45; } html[data-theme="dark"] { --l1:#DDCDF0; --l2:#D4B67A; }
 /* การ์ดหุ้น: ชื่อหุ้นเห็นชัด · ชื่อบริษัท · กลุ่ม/หมวด · คำอธิบายกราฟสั้น */
+/* สีตัวอักษรของ Tailwind ทุกเฉด/ทุกความโปร่งใส (เช่น text-emerald-300/60) → สีเข้มชัดตามธีม ไม่ให้ซีดบนพื้นสว่าง */
+html [class*="text-emerald-"], html [class*="text-green-"], html [class*="text-lime-"], html [class*="text-teal-"] { color:var(--up); }
+html [class*="text-rose-"], html [class*="text-red-"], html [class*="text-pink-"] { color:var(--down); }
+html [class*="text-amber-"], html [class*="text-yellow-"], html [class*="text-orange-"] { color:var(--gold); }
+html [class*="text-sky-"], html [class*="text-blue-"], html [class*="text-cyan-"], html [class*="text-indigo-"], html [class*="text-violet-"], html [class*="text-purple-"] { color:var(--link); }
+html [class*="text-gray-"], html [class*="text-zinc-"], html [class*="text-neutral-"] { color:var(--muted); }
+html [class*="text-white/"], html [class*="text-slate-300/"], html [class*="text-slate-400/"] { color:var(--muted); }
+html [class*="text-slate-5"], html [class*="text-slate-6"] { color:var(--faint); }
+html .opacity-80, html .opacity-75, html .opacity-70 { opacity:1; }
 /* กล่องสรุป/หัวข่าว: ข้อความยาวห้ามดันตารางกว้างเกินจอ */
 html [data-notes], html [data-notes] * { overflow-wrap:anywhere; word-break:break-word; white-space:normal; }
 html td[data-notes] { max-width:calc(100vw - 48px); min-width:0; }
