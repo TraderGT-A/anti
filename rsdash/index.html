@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RS Dashboard — หุ้นไทย</title>
+<link rel="icon" type="image/png" href="/brand/thus-symbol-color.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('rsd_theme')==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}</script>
 <script src="/vendor/lightweight-charts.4.1.1.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
@@ -114,6 +118,179 @@
   #indexBar:empty, #themeList:empty, #flowBars:empty { min-height:64px; border-radius:12px; background:linear-gradient(90deg,#0c121b 25%,#121b29 37%,#0c121b 63%); background-size:400% 100%; animation:shimmer 1.4s ease infinite; }
   @keyframes shimmer { 0%{background-position:100% 50%} 100%{background-position:0 50%} }
   @media (prefers-reduced-motion:reduce){ *,*::before,*::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; } }
+
+/* ================= THUS theme (ม่วงคู่ทอง · สว่าง/มืด) — ชั้นเดียว override ของเดิม ไม่แตะตรรกะ ================= */
+:root, html[data-theme="light"] {
+  --bg:#EFEEE9; --panel:#FAF9F6; --panel2:#F0ECE6; --line:#DED9D0; --line2:#CFC8BC; --side:#F6F4EF; --navon:#EAE4F0;
+  --text:#1F1A24; --body:#3B3342; --muted:#5E5468; --faint:#6B6275;
+  --accent:#281237; --onaccent:#FFFFFF; --link:#281237; --gold:#7A5C24; --goldline:#C9A86A; --goldbg:#F4ECDC;
+  --up:#0B6E70; --down:#A63B27; --upbg:#E3F1F0; --downbg:#F7E3DE; --mk:#5B3F78;
+  --shadow:0 1px 2px rgba(40,18,55,.04);
+}
+html[data-theme="dark"] {
+  --bg:#0B0910; --panel:#15101B; --panel2:#1D1724; --line:#2A2233; --line2:#3A3044; --side:#100C15; --navon:#221B2A;
+  --text:#F1EDF5; --body:#D9D2E0; --muted:#A597AD; --faint:#9183A0;
+  --accent:#DDCDF0; --onaccent:#2D183C; --link:#DDCDF0; --gold:#D4B67A; --goldline:#D4B67A; --goldbg:rgba(212,182,122,.14);
+  --up:#5CC6C8; --down:#F59A8C; --upbg:rgba(92,198,200,.14); --downbg:rgba(245,154,140,.14); --mk:#D4B67A;
+  --shadow:none;
+}
+html { color-scheme: light; } html[data-theme="dark"] { color-scheme: dark; }
+html body { background:var(--bg); color:var(--text); font-family:Inter,"IBM Plex Sans Thai","Leelawadee UI","Noto Sans Thai",system-ui,sans-serif; }
+html ::selection { background:var(--accent); color:var(--onaccent); }
+html :focus-visible { outline:2px solid var(--goldline); outline-offset:2px; }
+html * { scrollbar-color:var(--line2) transparent; }
+html ::-webkit-scrollbar-thumb { background:var(--line2); }
+html .pos { color:var(--up); } html .neg { color:var(--down); }
+
+
+/* ---------- สีของ Tailwind เดิม → ตัวแปรธีม ---------- */
+html .text-white, html .text-slate-100, html .text-slate-200, html .text-gray-200 { color:var(--text); }
+html .text-slate-300 { color:var(--body); }
+html .text-slate-400 { color:var(--muted); }
+html .text-slate-500, html .text-slate-600 { color:var(--faint); }
+html [class*="bg-emerald-6"], html [class*="bg-sky-6"], html [class*="bg-blue-6"], html [class*="bg-violet-6"], html [class*="bg-rose-6"], html [class*="bg-amber-6"], html [class*="bg-indigo-6"] { color:#fff; }
+html .text-sky-300, html .text-sky-400, html .text-blue-300, html .text-blue-400 { color:var(--link); }
+html .text-emerald-300, html .text-emerald-400, html .text-green-400 { color:var(--up); }
+html .text-rose-300, html .text-rose-400, html .text-red-400 { color:var(--down); }
+html .text-amber-200, html .text-amber-300, html .text-amber-400, html .text-yellow-300, html .text-yellow-400 { color:var(--gold); }
+html [class*="bg-emerald-9"] { background:var(--upbg); } html [class*="bg-rose-9"] { background:var(--downbg); } html [class*="bg-amber-9"] { background:var(--goldbg); }
+html [class*="border-emerald-"] { border-color:color-mix(in srgb,var(--up) 45%,transparent); }
+html [class*="border-rose-"] { border-color:color-mix(in srgb,var(--down) 45%,transparent); }
+html [class*="border-amber-"] { border-color:color-mix(in srgb,var(--goldline) 70%,transparent); }
+html [class*="border-sky-"], html [class*="border-slate-"] { border-color:var(--line2); }
+html .bg-slate-700, html .bg-slate-800 { background:var(--line2); }
+html [class*="bg-[#0d1219]"], html [class*="bg-[#0f1622]"], html [class*="bg-[#0f1520]"], html [class*="bg-[#111827]"], html [class*="bg-[#0d1521]"] { background:var(--panel); }
+html [class*="bg-[#0a0f16]"], html [class*="bg-[#101724]"], html [class*="bg-[#161d29]"] { background:var(--panel2); }
+html [class*="bg-[#05070b]"] { background:var(--bg); }
+html [class*="bg-[#1a0f12"] { background:var(--downbg); } html [class*="bg-[#0f1a12"] { background:var(--upbg); }
+html [class*="border-[#1e2634]"], html [class*="border-[#243044]"], html [class*="border-[#16202e]"], html [class*="border-[#161d29]"], html [class*="border-[#151c26]"], html [class*="border-[#1a2332]"] { border-color:var(--line); }
+html .border-slate-700, html .border-slate-800 { border-color:var(--line); }
+html .divide-y > * + * { border-color:var(--line); }
+html hr { border-color:var(--line); }
+
+/* ---------- ชิป / ปุ่ม / ฟอร์ม ---------- */
+html .tf-chip { background:transparent; color:var(--muted); border:1px solid var(--line2); border-radius:999px; padding:5px 14px; min-height:34px; font-weight:600; font-size:13px; box-shadow:none; }
+html .tf-chip:hover { background:var(--panel2); color:var(--text); border-color:var(--line2); }
+html .tf-chip.active { background:var(--accent); color:var(--onaccent); border-color:var(--accent); box-shadow:none; }
+html .pill { background:var(--panel2); color:var(--muted); border:1px solid var(--line); }
+html .tag-market { background:var(--panel2); color:var(--body); border:1px solid var(--line); }
+html .mk-chip { color:var(--mk); border-color:color-mix(in srgb,var(--mk) 50%,transparent); background:transparent; font-weight:600; }
+html select, html input[type=text], html input[type=search], html input[type=number], html input[type=date], html textarea, html #searchInput {
+  background:var(--panel2); color:var(--text); border:1px solid var(--line); border-radius:999px; min-height:40px; padding:0 14px; }
+html select:hover, html #searchInput:hover { border-color:var(--line2); }
+html select:focus, html #searchInput:focus { border-color:var(--goldline); box-shadow:0 0 0 3px color-mix(in srgb,var(--goldline) 30%,transparent); }
+html select option { background:var(--panel); color:var(--text); }
+html input[type=range], html input[type=checkbox] { accent-color:var(--accent); }
+html[data-theme="dark"] input[type=range], html[data-theme="dark"] input[type=checkbox] { accent-color:var(--gold); }
+html #btnUpdate { background:var(--accent); color:var(--onaccent); box-shadow:none; border-radius:999px; font-weight:600; }
+html #btnUpdate:hover { filter:brightness(1.12); }
+html th.sortable:hover { color:var(--gold); }
+html a { text-underline-offset:3px; }
+
+/* ---------- แผงและการ์ด ---------- */
+html #marketBriefPanel, html #marketSummaryPanel, html #megatrendPanel, html #flowPanel, html #themesPanel, html #topglPanel, html #reportPanel, html #top20Panel,
+html #scannerPanel, html #leadersPanel { background:var(--panel); border:1px solid var(--line); border-radius:24px; padding:22px 24px; margin-bottom:22px; box-shadow:var(--shadow); }
+html #marketBriefPanel h2, html #marketSummaryPanel h2, html #megatrendPanel h2, html #flowPanel h2, html #themesPanel h2, html #topglPanel h2, html #reportPanel h2, html #top20Panel h2, html #scannerPanel h2, html #leadersPanel h2 { font-size:17px; font-weight:600; }
+@media (max-width:640px){ html #marketBriefPanel, html #marketSummaryPanel, html #megatrendPanel, html #flowPanel, html #themesPanel, html #topglPanel, html #reportPanel, html #top20Panel, html #scannerPanel, html #leadersPanel { padding:16px; border-radius:20px; } }
+html .scard { background:var(--panel); border:1px solid var(--line); border-radius:22px; box-shadow:var(--shadow); }
+html .scard:hover { border-color:var(--goldline); box-shadow:none; transform:none; }
+html #indexBar { gap:16px; margin-bottom:22px; }
+html #indexBar > div { background:var(--panel); border:1px solid var(--line); border-radius:22px; padding:18px 20px; box-shadow:var(--shadow); }
+html #megatrendBody > div, html #marketModeCard { background:var(--panel2); border:1px solid var(--line); border-radius:16px; }
+html #indexBar:empty, html #themeList:empty, html #flowBars:empty { background:linear-gradient(90deg,var(--panel) 25%,var(--panel2) 37%,var(--panel) 63%); background-size:400% 100%; }
+html .tip > .tipbox { background:var(--panel); color:var(--body); border:1px solid var(--line2); box-shadow:0 8px 24px rgba(0,0,0,.18); }
+
+/* ---------- ตาราง ---------- */
+html table { border-color:var(--line); }
+html #tableView { background:var(--panel); border:1px solid var(--line); border-radius:24px; }
+html #tableView thead { background:var(--panel2); }
+html #tableView thead th, html table thead th { color:var(--muted); letter-spacing:.06em; font-weight:500; }
+html table tbody tr { border-color:var(--line); }
+html #tableView tbody tr:nth-child(even) { background:transparent; }
+html #tableView tbody tr:hover, html table tbody tr:hover { background:color-mix(in srgb,var(--panel2) 70%,transparent); }
+html table td, html table th { border-color:var(--line); }
+html #tableView td { font-variant-numeric:tabular-nums; }
+
+/* ---------- Modal ---------- */
+html #chartModal, html #groupModal { background:rgba(20,10,30,.55); backdrop-filter:blur(6px); }
+html #chartModal > div, html #groupModal > div { background:var(--panel); border:1px solid var(--line2); border-radius:26px; box-shadow:0 24px 70px rgba(20,10,30,.35); }
+
+/* ---------- แถบบน (มือถือ/แท็บเล็ต) ---------- */
+html #topbar { background:color-mix(in srgb,var(--bg) 88%,transparent); border-bottom:1px solid var(--line); }
+html #topbar h1 { font-size:18px; font-weight:600; letter-spacing:0; }
+html #topbar .brand-logo { display:none; }
+html #topbar .pillseg, html #topbar .seg { display:inline-flex; gap:3px; background:transparent; padding:3px; border-radius:999px; border:1px solid var(--line); }
+html #topbar .tf-chip .nav-ico { display:none; }
+html #themeToggle { width:40px; height:40px; min-height:40px; padding:0; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; background:transparent; color:var(--text); border:1px solid var(--line2); cursor:pointer; }
+html #themeToggle:hover { background:var(--panel2); }
+html #themeToggle .t-moon { display:block; } html #themeToggle .t-sun { display:none; }
+html[data-theme="dark"] #themeToggle .t-moon { display:none; } html[data-theme="dark"] #themeToggle .t-sun { display:block; }
+html #topbar .lbl-s { display:none; }
+html #lastUpdateText { color:var(--faint); }
+
+/* ---------- เดสก์ท็อป: เมนูซ้ายแบบ THUS Journal ---------- */
+@media (min-width:1024px){
+  html body { padding:0 !important; }
+  html .max-w-7xl { max-width:none !important; margin:0 !important; padding:28px 40px 64px 288px !important; width:100%; }
+  html #topbar { position:fixed !important; left:0; top:0; bottom:0; width:248px; margin:0 !important; padding:24px 16px !important; overflow-y:auto; background:var(--side); border-right:1px solid var(--line); border-bottom:none; backdrop-filter:none; -webkit-backdrop-filter:none; display:flex; flex-direction:column; gap:20px; z-index:50; }
+  html #topbar > div:first-child { display:flex; flex-direction:column; align-items:stretch; gap:14px; margin:0; }
+  html #topbar .brand-logo { width:124px; height:auto; margin:0 8px; }
+  html #topbar h1 { font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:var(--gold); padding:0 8px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-weight:500; }
+  html #topbar h1 > .text-slate-400 { text-transform:none; letter-spacing:0; font-size:12px; color:var(--faint); }
+  html #topbar h1 #mkChip { text-transform:none; letter-spacing:0; font-size:11px; }
+  html #topbar > div:first-child > div { display:flex; flex-direction:column; align-items:stretch; gap:12px; }
+  html #topbar .pillseg { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  html #topbar .pillseg .tf-chip { justify-content:center; text-align:center; }
+  html #topbar .zoom-seg { display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)); }
+  html #lastUpdateText { text-align:center; font-size:12px; }
+  html #topbar .nav-row { margin:0; display:block; }
+  html #topbar .seg { display:flex; flex-direction:column; gap:4px; border:none; padding:0; border-radius:0; width:100%; }
+  html #topbar .seg .tf-chip { width:100%; justify-content:flex-start; text-align:left; display:flex; align-items:center; gap:12px; min-height:46px; padding:0 14px; border:none; border-radius:14px; background:transparent; color:var(--muted); font-weight:400; font-size:14.5px; }
+  html #topbar .seg .tf-chip .nav-ico { display:block; flex:none; color:currentColor; }
+  html #topbar .seg .tf-chip:hover { background:var(--panel2); color:var(--text); }
+  html #topbar .seg .tf-chip.active { background:var(--navon); color:var(--text); font-weight:600; }
+  html #topbar .seg .tf-chip.active .nav-ico { color:var(--gold); }
+  html #themeToggle { width:100%; border-radius:999px; gap:10px; font-size:14px; font-weight:500; } html #themeToggle .t-text { display:inline; }
+}
+
+/* ---------- มือถือ: เมนูแถบล่าง ---------- */
+@media (max-width:767px){
+  html body { padding-bottom:84px !important; }
+  html #topbar { position:relative !important; top:auto; margin:-12px -8px 14px !important; padding:12px 14px 10px !important; background:var(--bg); backdrop-filter:none; -webkit-backdrop-filter:none; }
+  html #topbar .brand-logo { width:84px; height:auto; }
+  html #topbar > div:first-child { display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; margin:0; }
+  html #topbar > div:first-child > div { display:flex; align-items:center; gap:8px; margin-left:auto; flex-wrap:nowrap; }
+  html #topbar > div:first-child > div #lastUpdateText { display:none; }
+  html #topbar h1 { order:3; flex:1 1 100%; font-size:12.5px; font-weight:500; color:var(--muted); flex-wrap:wrap; gap:4px 8px; }
+  html #topbar h1 .tip { display:none; }
+  html #topbar .pillseg { padding:2px; } html #topbar .pillseg .tf-chip { min-height:32px; padding:0 12px; font-size:13px; }
+  html #topbar .nav-row { position:fixed; left:0; right:0; bottom:0; z-index:60; margin:0 !important; padding:6px 6px calc(10px + env(safe-area-inset-bottom)); background:var(--side); border-top:1px solid var(--line); overflow:visible; }
+  html #topbar .seg { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:2px; border:none; padding:0; border-radius:0; width:100%; }
+  html #topbar .seg .tf-chip { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; min-height:52px; padding:4px 0; border:none; border-radius:14px; background:transparent; color:var(--faint); font-size:10.5px; font-weight:500; white-space:nowrap; }
+  html #topbar .seg .tf-chip .nav-ico { display:block; }
+  html #topbar .seg .tf-chip .lbl { display:none; } html #topbar .seg .tf-chip .lbl-s { display:inline; }
+  html #topbar .seg .tf-chip.active { background:var(--navon); color:var(--text); font-weight:600; }
+  html #topbar .seg .tf-chip.active .nav-ico { color:var(--gold); }
+  html #topbar .zoom-seg { display:none !important; }
+}
+
+html body[data-market], html body:not([data-market]) { --mk:#5B3F78; }
+html[data-theme="dark"] body[data-market], html[data-theme="dark"] body:not([data-market]) { --mk:#D4B67A; }
+/* แถบความกว้าง (gradient เดิม → สีเรียบตามธีม) */
+html .bg-gradient-to-r { background-image:none !important; }
+html .from-emerald-600, html [class*="from-emerald-"] { background-color:var(--up); }
+html [class*="from-sky-6"] { background-color:var(--accent); }
+html[data-theme="dark"] [class*="from-sky-6"] { background-color:var(--gold); }
+html [class*="from-rose-"] { background-color:var(--down); }
+html #progressBar { background-color:var(--goldline); }
+html #themeToggle .t-text { display:none; }
+html #topbar .brand-logo { display:none; }
+@media (max-width:767px), (min-width:1024px){
+  html #topbar .logo-l { display:block; }
+  html[data-theme="dark"] #topbar .logo-l { display:none; }
+  html[data-theme="dark"] #topbar .logo-d { display:block; }
+}
+@media (min-width:1024px){ html #themeToggle .t-text { display:inline; } }
 </style>
 </head>
 <body class="py-3 sm:py-4 md:py-6">
@@ -121,6 +298,7 @@
 <div id="topbar">
 
   <div class="flex items-center justify-between flex-wrap gap-3 mb-1">
+    <img class="brand-logo logo-l" src="/brand/thus-logo-color.png" alt="THUS House of Traders" width="124" height="53"><img class="brand-logo logo-d" src="/brand/thus-logo-white.png" alt="THUS House of Traders" width="124" height="53">
     <h1 class="text-lg md:text-xl font-bold flex items-center gap-2">
       RS Dashboard <span class="text-slate-400 font-semibold">· <span id="stockCount">…</span></span> <span id="mkChip" class="mk-chip" title="ตลาดที่กำลังดู — ทุกแผงในหน้านี้แสดงข้อมูลของตลาดนี้เท่านั้น">🇹🇭 ตลาดไทย · SET + mai · ฿</span> <span class="tip text-[10px] text-slate-500">ⓘ<span class="tipbox">ตัวบนสุดของชื่อ = ผ่านเกณฑ์ขั้นต่ำลงตาราง (value/ราคา/mcap/volume) · ทั้งกระดาน = หุ้นผ่านเกณฑ์คำนวณ RS (ตัด junk)</span></span>
     </h1>
@@ -132,10 +310,11 @@
             <button onclick="fontZoom(0)" class="tf-chip" title="คืนค่าปกติ">↺</button>
           </div>
           <!-- ตลาดสลับไทย/US -->
-          <div class="flex gap-1 bg-[#0a0f16] p-1 rounded-lg border border-[#243044]">
+          <div class="pillseg flex gap-1 bg-[#0a0f16] p-1 rounded-lg border border-[#243044]">
             <button id="tabTh" class="tf-chip active" onclick="switchMarket('thailand')">🇹🇭 ไทย</button>
             <button id="tabUs" class="tf-chip" onclick="switchMarket('america')">🇺🇸 US</button>
           </div>
+      <button id="themeToggle" type="button" onclick="toggleTheme()" aria-label="สลับโหมดมืด/สว่าง" title="สลับโหมดมืด/สว่าง"><svg class="t-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="t-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span class="t-text">สลับโหมดมืด/สว่าง</span></button>
       <span id="lastUpdateText" class="text-slate-300 text-sm"></span>
             <span id="marketBadge" class="bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 rounded">RS Dashboard · หุ้นไทย</span>
           </div>
@@ -143,12 +322,12 @@
 
         <!-- Navigation: แยกหน้า ภาพรวมตลาด / หุ้น (Cards-Table) -->
         <div class="nav-row"><div class="seg">
-          <button id="navOverview" class="tf-chip active" onclick="setPage('overview')">🌐 ภาพรวม</button>
-                    <button id="navStocks" class="tf-chip" onclick="setPage('stocks')">📊 หุ้น</button>
-                    <button id="navTop20" class="tf-chip" onclick="setPage('top20')">🏆 Top20</button>
-                    <button id="navScanner" class="tf-chip" onclick="setPage('scanner')">🎯 Scanner</button>
-                    <button id="navLeaders" class="tf-chip" onclick="setPage('leaders')">🏆 ผู้นำรายเดือน</button>
-                    <button id="navReport" class="tf-chip" onclick="setPage('report')">📅 Report</button>
+          <button id="navOverview" class="tf-chip active" onclick="setPage('overview')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="lbl">ภาพรวม</span><span class="lbl-s">ภาพรวม</span></button>
+                    <button id="navStocks" class="tf-chip" onclick="setPage('stocks')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="lbl">หุ้น · จัดอันดับ RS</span><span class="lbl-s">หุ้น</span></button>
+                    <button id="navTop20" class="tf-chip" onclick="setPage('top20')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><span class="lbl">Top20 ผลตอบแทน</span><span class="lbl-s">Top20</span></button>
+                    <button id="navScanner" class="tf-chip" onclick="setPage('scanner')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span class="lbl">Scanner</span><span class="lbl-s">Scanner</span></button>
+                    <button id="navLeaders" class="tf-chip" onclick="setPage('leaders')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/></svg><span class="lbl">ผู้นำรายเดือน</span><span class="lbl-s">ผู้นำ</span></button>
+                    <button id="navReport" class="tf-chip" onclick="setPage('report')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5"/></svg><span class="lbl">Report เทียบอันดับ</span><span class="lbl-s">Report</span></button>
                   </div></div></div><!-- /topbar -->
 
                   <!-- 🎯 Scanner: Trend Template + พักตัวแคบ (สไตล์ Minervini / Qullamaggie) + Market Gate -->
@@ -699,7 +878,11 @@ function setSortSecondary(key){
 
 /* ===== สลับตลาด ไทย / US ===== */
 /* ปุ่ม A−/A+/↺ — ปรับขนาดตัวหนังสือทั่วเว็บ (scale wrapper = ลำดับตัวอักษร + ช่องว่างให้ใหญ่ตาม) */
-function fontZoom(delta){
+/* ===== ธีม THUS (สว่าง/มืด) ===== */
+function thusC(){ const d=document.documentElement.getAttribute('data-theme')==='dark'; return d
+  ? {up:'#5CC6C8',down:'#F59A8C',text:'#A597AD',vup:'rgba(92,198,200,.42)',vdown:'rgba(245,154,140,.42)',l1:'#DDCDF0',l2:'#D4B67A',bg:'#15101B'}
+  : {up:'#0B6E70',down:'#A63B27',text:'#5E5468',vup:'rgba(11,110,112,.34)',vdown:'rgba(166,59,39,.34)',l1:'#281237',l2:'#B08A45',bg:'#FAF9F6'}; }
+function toggleTheme(){ const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; try{ localStorage.setItem('rsd_theme',n); }catch(e){} location.reload(); }function fontZoom(delta){
   const base=parseFloat(localStorage.getItem('rsd_zoom')||'1');
   let z=delta===0?1:(delta>0?base+0.12:base-0.12);
   z=Math.max(0.8, Math.min(1.5, +z.toFixed(2)));
@@ -1900,7 +2083,7 @@ function renderSummary(sum){
           // ทำให้กราฟเล็กค้างอยู่ในกล่องกว้าง ~1000px (มีช่องว่างด้านขวาเยอะ). รอสูงสุด ~1.2 วิ.
           let _w = el.clientWidth, _tries = 0;
           while(_w < 60 && _tries < 12){ await new Promise(r=>setTimeout(r,100)); _w = el.clientWidth; _tries++; }
-          const chart=LightweightCharts.createChart(el,{width:_w||320,height:300,layout:{background:{color:'transparent'},textColor:'#6b7787'},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:false},timeScale:{borderVisible:false}});
+          const chart=LightweightCharts.createChart(el,{width:_w||320,height:300,layout:{background:{color:'transparent'},textColor:thusC().text},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:false},timeScale:{borderVisible:false}});
           el.__lwc = chart;   // เก็บ handle ไว้ให้ขยับตามขนาดหน้าต่าง
           if(!window.__lwcResize){
             window.__lwcResize = 1;
@@ -1914,8 +2097,8 @@ function renderSummary(sum){
           }
           const mk=(x)=>({time:x.date, value:x.pctAboveMA50});
                     const mk2=(x)=>({time:x.date, value:x.pctAboveMA200});
-                    chart.addLineSeries({color:'#3d8bff',lineWidth:2,lastValueVisible:false,priceLineVisible:true,priceLineColor:'#3d8bff',priceFormat:{type:'custom',formatter:v=>Math.round(v)+'%',minMove:1},autoscaleInfoProvider:()=>({priceRange:{minValue:0,maxValue:100}})}).setData(plot.map(mk));
-                                                            chart.addLineSeries({color:'#ff9f0a',lineWidth:2,lastValueVisible:false,priceLineVisible:true,priceLineColor:'#ff9f0a',priceFormat:{type:'custom',formatter:v=>Math.round(v)+'%',minMove:1},autoscaleInfoProvider:()=>({priceRange:{minValue:0,maxValue:100}})}).setData(plot.map(mk2));
+                    chart.addLineSeries({color:thusC().l1,lineWidth:2,lastValueVisible:false,priceLineVisible:true,priceLineColor:thusC().l1,priceFormat:{type:'custom',formatter:v=>Math.round(v)+'%',minMove:1},autoscaleInfoProvider:()=>({priceRange:{minValue:0,maxValue:100}})}).setData(plot.map(mk));
+                                                            chart.addLineSeries({color:thusC().l2,lineWidth:2,lastValueVisible:false,priceLineVisible:true,priceLineColor:thusC().l2,priceFormat:{type:'custom',formatter:v=>Math.round(v)+'%',minMove:1},autoscaleInfoProvider:()=>({priceRange:{minValue:0,maxValue:100}})}).setData(plot.map(mk2));
                     // lock หน้าต่าง 1Y (ไม่เลื่อนตามข้อมูลใหม่) — คงมุมมองคงที่
                     chart.timeScale().setVisibleLogicalRange({from:0, to:Math.max(plot.length-1,1)});
                 // legend อยู่บนกราฟ (ก่อน chart) ไม่ทับเส้น
@@ -2526,18 +2709,18 @@ function drawChartW(el, raw, w){
   const data=[...raw].sort((a,b)=>typeof a.time==='number'?(a.time-b.time):String(a.time).localeCompare(String(b.time)));
   // ความสูงอัตโนมัติตามความกว้าง (ไม่ fix 240) — กว้างมากก็สูงสุด 240, แคบ (3 คอลัมน์) จะสั้นตาม
   const hgt = Math.max(150, Math.min(240, Math.round(w * 0.62)));
-  const chart=LightweightCharts.createChart(el,{width:w,height:hgt,layout:{background:{color:'transparent'},textColor:'#6b7787'},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:false},timeScale:{borderVisible:false}});
-  chart.addCandlestickSeries({upColor:'#30d158',downColor:'#ff453a',borderVisible:false,wickUpColor:'#30d158',wickDownColor:'#ff453a'}).setData(data);
+  const chart=LightweightCharts.createChart(el,{width:w,height:hgt,layout:{background:{color:'transparent'},textColor:thusC().text},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:false},timeScale:{borderVisible:false}});
+  chart.addCandlestickSeries({upColor:thusC().up,downColor:thusC().down,borderVisible:false,wickUpColor:thusC().up,wickDownColor:thusC().down}).setData(data);
   const hasVol=data.some(d=>d.volume>0);
   if(hasVol){
-    chart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol'}).setData(data.map(d=>({time:d.time,value:d.volume,color:d.close>=d.open?'rgba(48,209,88,.45)':'rgba(255,69,58,.45)'})));
+    chart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol'}).setData(data.map(d=>({time:d.time,value:d.volume,color:d.close>=d.open?thusC().vup:thusC().vdown})));
     chart.priceScale('vol').applyOptions({scaleMargins:{top:.82,bottom:0}});
   }
   const sma=(n,color)=>{ if(data.length<n)return; const o=[]; for(let i=n-1;i<data.length;i++){let s=0;for(let j=0;j<n;j++)s+=data[i-j].close;o.push({time:data[i].time,value:s/n});} chart.addLineSeries({color,lineWidth:1,crosshairMarkerVisible:false}).setData(o); };
-  sma(20,'#3d8bff'); sma(50,'#ff9f0a');
+  sma(20,thusC().l1); sma(50,thusC().l2);
   const last=data[data.length-1];
   if(last){
-    chart.addLineSeries({color:'#30d158',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dotted,crosshairMarkerVisible:false}).setData([{time:last.time,value:last.close}]);
+    chart.addLineSeries({color:thusC().up,lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dotted,crosshairMarkerVisible:false}).setData([{time:last.time,value:last.close}]);
   }
   // ห่างขอบขวาให้เหมาะกับความกว้าง (3 คอลัมน์ = แคบต้องห่างเยอะขึ้น) + ให้แท่งล่าสุดไม่ชิดขวา
     chart.timeScale().applyOptions({ rightOffset: w < 420 ? 18 : (w < 620 ? 14 : 12) });
@@ -2653,15 +2836,15 @@ async function fetchModal(iv){
     nextFrame().then(()=>{
       const w=el.clientWidth||el.parentElement.clientWidth||700;
       el.innerHTML='';
-      const ch=LightweightCharts.createChart(el,{width:w,height:420,autoSize:true,layout:{background:{color:'#05070b'},textColor:'#6b7787'},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:false},timeScale:{borderVisible:false}});
-      ch.addCandlestickSeries({upColor:'#30d158',downColor:'#ff453a',borderVisible:false,wickUpColor:'#30d158',wickDownColor:'#ff453a'}).setData(data);
+      const ch=LightweightCharts.createChart(el,{width:w,height:420,autoSize:true,layout:{background:{color:thusC().bg},textColor:thusC().text},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:false},timeScale:{borderVisible:false}});
+      ch.addCandlestickSeries({upColor:thusC().up,downColor:thusC().down,borderVisible:false,wickUpColor:thusC().up,wickDownColor:thusC().down}).setData(data);
       const hasVol=data.some(d=>d.volume>0);
       if(hasVol){
-        ch.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol'}).setData(data.map(d=>({time:d.time,value:d.volume,color:d.close>=d.open?'rgba(48,209,88,.4)':'rgba(255,69,58,.4)'})));
+        ch.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol'}).setData(data.map(d=>({time:d.time,value:d.volume,color:d.close>=d.open?thusC().vup:thusC().vdown})));
         ch.priceScale('vol').applyOptions({scaleMargins:{top:.8,bottom:0}});
       }
       const sma=(n,color)=>{ if(data.length<n)return; const o=[]; for(let i=n-1;i<data.length;i++){let s=0;for(let j=0;j<n;j++)s+=data[i-j].close;o.push({time:data[i].time,value:s/n});} ch.addLineSeries({color,lineWidth:1,crosshairMarkerVisible:false}).setData(o); };
-      sma(20,'#3d8bff'); sma(50,'#ff9f0a'); ch.timeScale().fitContent(); ch.timeScale().applyOptions({ rightOffset: 12 });
+      sma(20,thusC().l1); sma(50,thusC().l2); ch.timeScale().fitContent(); ch.timeScale().applyOptions({ rightOffset: 12 });
     });
   }catch(e){ el.innerHTML='<div class="text-center text-rose-400 text-sm">โหลดไม่สำเร็จ</div>'; }
 }
