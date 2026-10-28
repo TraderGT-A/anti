@@ -276,6 +276,46 @@ html #lastUpdateText { color:var(--faint); }
 
 html body[data-market], html body:not([data-market]) { --mk:#5B3F78; }
 html[data-theme="dark"] body[data-market], html[data-theme="dark"] body:not([data-market]) { --mk:#D4B67A; }
+/* ---------- ส่วนหัวหน้า + Top RS + ไอคอนหัวข้อ + การ์ดดัชนี (ตามแบบ THUS Journal) ---------- */
+html #pageHead { display:flex; flex-direction:column; gap:6px; margin:4px 0 22px; }
+html .ph-eyebrow { font-size:12px; letter-spacing:.24em; text-transform:uppercase; color:var(--gold); font-weight:500; }
+html .ph-title { font-size:34px; line-height:1.15; font-weight:400; letter-spacing:-.01em; color:var(--text); }
+@media (max-width:640px){ html .ph-title { font-size:26px; } }
+html .h-ic { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; flex:none; border-radius:11px; border:1px solid var(--line2); color:var(--gold); background:transparent; }
+html .b-ic { display:inline-block; vertical-align:-2px; margin-right:4px; }
+html h2 { display:flex; align-items:center; gap:12px; }
+html #topRsPanel { background:var(--panel); border:1px solid var(--goldline); border-radius:24px; padding:22px 24px; margin-bottom:22px; }
+html .trs-head { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px; }
+html .trs-eyebrow { font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); }
+html .trs-title { font-size:20px; font-weight:500; margin-top:4px; }
+html .trs-table { width:100%; min-width:640px; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+html .trs-table th { text-align:left; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:500; padding:12px 8px; }
+html .trs-table td { padding:11px 8px; border-top:1px solid var(--line); }
+html .trs-table .r { text-align:right; }
+html .trs-rs { display:inline-flex; min-width:38px; height:28px; align-items:center; justify-content:center; border-radius:9px; font-weight:700; font-size:14px; background:var(--panel2); color:var(--gold); }
+html .trs-tk { font-weight:600; color:var(--text); text-decoration:none; } html .trs-tk:hover { color:var(--gold); }
+html .trs-grp { color:var(--muted); } html .trs-empty { color:var(--faint); padding:16px 8px; }
+html .idx-card { padding:20px 22px; display:flex; flex-direction:column; gap:10px; }
+html #indexBar > div.idx-card { padding:20px 22px; }
+html .idx-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+html .idx-name { font-size:13px; letter-spacing:.08em; color:var(--muted); font-weight:600; }
+html .idx-live { font-size:11px; margin-left:6px; font-weight:600; letter-spacing:0; }
+html .idx-pct { font-size:14px; font-weight:600; font-variant-numeric:tabular-nums; }
+html .idx-num { font-size:36px; font-weight:400; letter-spacing:-.02em; line-height:1.05; font-variant-numeric:tabular-nums; color:var(--text); }
+html .idx-dec { font-size:20px; color:var(--muted); }
+html .idx-sub { display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; color:var(--faint); font-variant-numeric:tabular-nums; }
+html .idx-sub b { font-weight:600; color:var(--body); } html .idx-sub b.text-emerald-400 { color:var(--up); } html .idx-sub b.text-rose-400 { color:var(--down); }
+html .mb-quote { position:relative; font-size:21px; line-height:1.5; font-weight:400; color:var(--text); padding:2px 0 14px; display:flex; gap:10px; }
+html .mb-q-mark { font-size:38px; line-height:.9; color:var(--goldline); font-family:Georgia,serif; }
+html #scannerPanel > div.flex.flex-wrap.items-end { background:var(--panel2); border:1px solid var(--line); border-radius:20px; padding:18px 20px; gap:18px 28px; margin-bottom:14px; font-size:13px; }
+html #scannerPanel #scGate > div, html #leadersPanel #ldGate > div { border-radius:18px; }
+html #scannerPanel #scSummary, html #leadersPanel #ldNote { font-size:13px; }
+html #leadersPanel #ldWarn { border-radius:18px; padding:12px 16px; }
+html .gdot { display:inline-block; width:9px; height:9px; border-radius:99px; margin-right:6px; vertical-align:1px; background:var(--faint); }
+html .gdot.g { background:var(--up); } html .gdot.y { background:var(--goldline); } html .gdot.r { background:var(--down); }
+html #marketBriefPanel { border-color:var(--goldline); }
+html #marketBriefBody > div.grid > div { background:var(--panel2); border:1px solid var(--line); border-radius:18px; padding:16px 18px; }
+html #marketModeCard { padding:16px 20px; border-radius:20px; margin-top:4px; }
 /* แถบความกว้าง (gradient เดิม → สีเรียบตามธีม) */
 html .bg-gradient-to-r { background-image:none !important; }
 html .from-emerald-600, html [class*="from-emerald-"] { background-color:var(--up); }
@@ -300,7 +340,7 @@ html #topbar .brand-logo { display:none; }
   <div class="flex items-center justify-between flex-wrap gap-3 mb-1">
     <img class="brand-logo logo-l" src="/brand/thus-logo-color.png" alt="THUS House of Traders" width="124" height="53"><img class="brand-logo logo-d" src="/brand/thus-logo-white.png" alt="THUS House of Traders" width="124" height="53">
     <h1 class="text-lg md:text-xl font-bold flex items-center gap-2">
-      RS Dashboard <span class="text-slate-400 font-semibold">· <span id="stockCount">…</span></span> <span id="mkChip" class="mk-chip" title="ตลาดที่กำลังดู — ทุกแผงในหน้านี้แสดงข้อมูลของตลาดนี้เท่านั้น">🇹🇭 ตลาดไทย · SET + mai · ฿</span> <span class="tip text-[10px] text-slate-500">ⓘ<span class="tipbox">ตัวบนสุดของชื่อ = ผ่านเกณฑ์ขั้นต่ำลงตาราง (value/ราคา/mcap/volume) · ทั้งกระดาน = หุ้นผ่านเกณฑ์คำนวณ RS (ตัด junk)</span></span>
+      RS Dashboard <span class="text-slate-400 font-semibold">· <span id="stockCount">…</span></span> <span id="mkChip" class="mk-chip" title="ตลาดที่กำลังดู — ทุกแผงในหน้านี้แสดงข้อมูลของตลาดนี้เท่านั้น">ตลาดไทย · SET + mai · ฿</span> <span class="tip text-[10px] text-slate-500">ⓘ<span class="tipbox">ตัวบนสุดของชื่อ = ผ่านเกณฑ์ขั้นต่ำลงตาราง (value/ราคา/mcap/volume) · ทั้งกระดาน = หุ้นผ่านเกณฑ์คำนวณ RS (ตัด junk)</span></span>
     </h1>
     <div class="flex items-center gap-3">
           <!-- ปุ่มปรับขนาดตัวหนังสือ (zoom เว็บ) -->
@@ -311,8 +351,8 @@ html #topbar .brand-logo { display:none; }
           </div>
           <!-- ตลาดสลับไทย/US -->
           <div class="pillseg flex gap-1 bg-[#0a0f16] p-1 rounded-lg border border-[#243044]">
-            <button id="tabTh" class="tf-chip active" onclick="switchMarket('thailand')">🇹🇭 ไทย</button>
-            <button id="tabUs" class="tf-chip" onclick="switchMarket('america')">🇺🇸 US</button>
+            <button id="tabTh" class="tf-chip active" onclick="switchMarket('thailand')">ไทย</button>
+            <button id="tabUs" class="tf-chip" onclick="switchMarket('america')">US</button>
           </div>
       <button id="themeToggle" type="button" onclick="toggleTheme()" aria-label="สลับโหมดมืด/สว่าง" title="สลับโหมดมืด/สว่าง"><svg class="t-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="t-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span class="t-text">สลับโหมดมืด/สว่าง</span></button>
       <span id="lastUpdateText" class="text-slate-300 text-sm"></span>
@@ -330,10 +370,18 @@ html #topbar .brand-logo { display:none; }
                     <button id="navReport" class="tf-chip" onclick="setPage('report')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5"/></svg><span class="lbl">Report เทียบอันดับ</span><span class="lbl-s">Report</span></button>
                   </div></div></div><!-- /topbar -->
 
+                  <header id="pageHead"><span class="ph-eyebrow" id="phEyebrow"></span><span class="ph-title" id="phTitle" role="heading" aria-level="1"></span></header>
+
+                  <!-- 🥇 Top RS วันนี้ (หน้าภาพรวม): หุ้น RS สูงสุด — กดชื่อเปิดกราฟเหมือนหน้าหุ้น -->
+                  <div id="topRsPanel">
+                    <div class="trs-head"><div><span class="trs-eyebrow">Top RS วันนี้</span><div class="trs-title">หุ้นแกร่งที่สุดของตลาด</div></div><button type="button" class="tf-chip" onclick="setPage('stocks')">ดูทั้งหมด →</button></div>
+                    <div class="overflow-x-auto"><table class="trs-table"><thead><tr><th>RS</th><th>หุ้น</th><th class="r">ราคา</th><th class="r">วันนี้</th><th class="r">3 เดือน</th><th>กลุ่ม</th></tr></thead><tbody id="topRsBody"></tbody></table></div>
+                  </div>
+
                   <!-- 🎯 Scanner: Trend Template + พักตัวแคบ (สไตล์ Minervini / Qullamaggie) + Market Gate -->
                   <div id="scannerPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
                     <div class="flex flex-wrap items-center gap-2 mb-2">
-                      <h2 class="text-sm font-bold flex items-center gap-2">🎯 Scanner — หุ้นแกร่งที่กำลังพักตัวแคบ <span class="mk-chip mk-tag"></span></h2> <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('scanner','copy',this)">📋 TV</button><button class="tf-chip" onclick="wlExport('scanner','file',this)">⬇ .txt</button></span>
+                      <h2 class="text-sm font-bold flex items-center gap-2"><span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></span> Scanner — หุ้นแกร่งที่กำลังพักตัวแคบ <span class="mk-chip mk-tag"></span></h2> <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('scanner','copy',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg> TV</button><button class="tf-chip" onclick="wlExport('scanner','file',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> .txt</button></span>
                     </div>
                     <div id="scGate" class="mb-2"></div>
                     <div class="flex flex-wrap items-end gap-x-4 gap-y-2 mb-2 text-[11px] text-slate-300">
@@ -349,13 +397,13 @@ html #topbar .brand-logo { display:none; }
                     <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-[10px] uppercase text-slate-500 border-b border-[#1e2634]"><tr>
                       <th class="p-2">Setup</th><th class="p-2">หุ้น</th><th class="p-2">RS</th><th class="p-2">ราคา</th><th class="p-2" title="ห่างจุดสูง 52 สัปดาห์">จากจุดสูง</th><th class="p-2" title="ATR14 ÷ ราคา — ยิ่งต่ำยิ่งนิ่ง">ATR%</th><th class="p-2" title="ATR10 ÷ ATR50 จากแท่งรายวัน (ต่ำกว่า 0.85 = บีบตัว)">บีบตัว</th><th class="p-2">TT</th><th class="p-2">RVOL</th><th class="p-2">3M</th>
                     </tr></thead><tbody id="scBody"></tbody></table></div>
-                    <div class="text-[10px] text-slate-500 mt-2 leading-relaxed">⚠️ เกณฑ์นี้ตีความจากแนวทางของ Minervini/Qullamaggie (แหล่งรอง) และ <b>backtest ของเรา (ไทย 2015–26, US 2015–26) ไม่พบ edge ที่พิสูจน์ได้</b> — ใช้คัดหุ้นที่ควรเปิดดูกราฟเท่านั้น ไม่ใช่สัญญาณซื้อ · ข้อ 3 ของ Trend Template (SMA200 ชี้ขึ้น) ในตารางเป็นค่าประมาณ ยืนยันจริงได้ในหน้าต่างหุ้น · บีบตัว = ATR10/ATR50 ≤ 0.85 (คำนวณจากแท่งรายวัน เฉพาะหุ้นที่ผ่านด่านแรก ~60 ตัว แคช 6 ชม.) · คะแนน Setup = RS 30 + Trend Template 25 + ใกล้จุดสูง 15 + บีบตัว 20 + ปริมาณแห้ง 10 แล้วคูณ Market Gate (เขียว×1 / เหลือง×0.7 / แดง×0.4)</div>
+                    <div class="text-[10px] text-slate-500 mt-2 leading-relaxed">⚠ เกณฑ์นี้ตีความจากแนวทางของ Minervini/Qullamaggie (แหล่งรอง) และ <b>backtest ของเรา (ไทย 2015–26, US 2015–26) ไม่พบ edge ที่พิสูจน์ได้</b> — ใช้คัดหุ้นที่ควรเปิดดูกราฟเท่านั้น ไม่ใช่สัญญาณซื้อ · ข้อ 3 ของ Trend Template (SMA200 ชี้ขึ้น) ในตารางเป็นค่าประมาณ ยืนยันจริงได้ในหน้าต่างหุ้น · บีบตัว = ATR10/ATR50 ≤ 0.85 (คำนวณจากแท่งรายวัน เฉพาะหุ้นที่ผ่านด่านแรก ~60 ตัว แคช 6 ชม.) · คะแนน Setup = RS 30 + Trend Template 25 + ใกล้จุดสูง 15 + บีบตัว 20 + ปริมาณแห้ง 10 แล้วคูณ Market Gate (เขียว×1 / เหลือง×0.7 / แดง×0.4)</div>
                   </div>
 
                   <!-- 🏆 ผู้นำหุ้นไทย: near52wHigh + โมเมนตัม 12-1 Top20 รายเดือน + Gate (ผลสำรวจ in-sample) -->
                   <div id="leadersPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
-                    <div class="flex flex-wrap items-center gap-2 mb-2"><h2 class="text-sm font-bold flex items-center gap-2">🏆 ผู้นำรายเดือน — ขึ้นมากสุดเดือนนี้ · ขาขึ้น MA50>MA200 · ผ่านสภาพคล่อง <span class="mk-chip mk-tag"></span></h2> <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('leaders','copy',this)">📋 TV</button><button class="tf-chip" onclick="wlExport('leaders','file',this)">⬇ .txt</button></span></div>
-                    <div id="ldWarn" class="rounded-lg border border-amber-700/60 bg-amber-900/10 text-amber-200 px-3 py-2 text-[11px] leading-relaxed mb-2">⚠️ <b>ผลวิจัยในอดีต (in-sample) ยังไม่พิสูจน์ edge — ไม่ใช่คำแนะนำการลงทุน</b> · ตลาดสหรัฐฯ ไม่พบ edge จากแนวทางนี้ (หน้านี้ใช้กับตลาดไทยเท่านั้น)</div>
+                    <div class="flex flex-wrap items-center gap-2 mb-2"><h2 class="text-sm font-bold flex items-center gap-2"><span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/></svg></span> ผู้นำรายเดือน — ขึ้นมากสุดเดือนนี้ · ขาขึ้น MA50>MA200 · ผ่านสภาพคล่อง <span class="mk-chip mk-tag"></span></h2> <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('leaders','copy',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg> TV</button><button class="tf-chip" onclick="wlExport('leaders','file',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> .txt</button></span></div>
+                    <div id="ldWarn" class="rounded-lg border border-amber-700/60 bg-amber-900/10 text-amber-200 px-3 py-2 text-[11px] leading-relaxed mb-2">⚠ <b>ผลวิจัยในอดีต (in-sample) ยังไม่พิสูจน์ edge — ไม่ใช่คำแนะนำการลงทุน</b> · ตลาดสหรัฐฯ ไม่พบ edge จากแนวทางนี้ (หน้านี้ใช้กับตลาดไทยเท่านั้น)</div>
                     <div id="ldGate" class="mb-2"></div>
                     <div id="ldNote" class="text-[11px] text-slate-400 mb-1.5 leading-relaxed"></div>
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
@@ -374,9 +422,9 @@ html #topbar .brand-logo { display:none; }
                   <!-- 📅 Report: เทียบอันดับ Top-N ระหว่าง 2 วัน (ข้อมูลจาก /api/history) -->
                   <div id="reportPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
                     <div class="flex flex-wrap items-center gap-2 mb-2">
-                      <h2 class="text-sm font-bold flex items-center gap-2">📅 Report — เทียบอันดับ Top <span class="mk-chip mk-tag"></span></h2>
-                      <button id="rpTh" class="tf-chip active" onclick="setRpMk('thailand')">🇹🇭 ไทย</button>
-                      <button id="rpUs" class="tf-chip" onclick="setRpMk('america')">🇺🇸 อเมริกา</button>
+                      <h2 class="text-sm font-bold flex items-center gap-2"><span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span> Report — เทียบอันดับ Top <span class="mk-chip mk-tag"></span></h2>
+                      <button id="rpTh" class="tf-chip active" onclick="setRpMk('thailand')">ไทย</button>
+                      <button id="rpUs" class="tf-chip" onclick="setRpMk('america')">อเมริกา</button>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 mb-2 text-[11px] text-slate-300">
                       <span>เรียงตาม</span>
@@ -400,7 +448,7 @@ html #topbar .brand-logo { display:none; }
                         <option value="50">50</option>
                         <option value="100">100</option>
                       </select>
-                      <button class="tf-chip" onclick="loadReportInit()">🔄 โหลดใหม่</button>
+                      <button class="tf-chip" onclick="loadReportInit()"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.300 5.700M20 4v7h-7"/></svg> โหลดใหม่</button>
                     </div>
                     <div id="rpStatus" class="text-[10px] text-slate-400 mb-2"></div>
                     <div id="rpSummary"></div>
@@ -410,19 +458,19 @@ html #topbar .brand-logo { display:none; }
                   <!-- 🏆 Top 20 ผลตอบแทน (YTD / 1 ปี / 2 ปี) — แยกไทย/เมกา -->
                   <div id="top20Panel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
                     <div class="flex flex-wrap items-center gap-2 mb-1">
-                      <h2 class="text-sm font-bold flex items-center gap-2">🏆 Top 20 ผลตอบแทน <span class="mk-chip mk-tag"></span></h2>
-                      <button id="tpTh" class="tf-chip active" onclick="setTopMk('thailand')">🇹🇭 ไทย</button>
-                      <button id="tpUs" class="tf-chip" onclick="setTopMk('america')">🇺🇸 อเมริกา</button>
-                      <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('top20','copy',this)">📋 TV</button><button class="tf-chip" onclick="wlExport('top20','file',this)">⬇ .txt</button></span> <span class="flex items-center gap-1 ml-auto">
-                        <button id="tpViewTable" class="tf-chip active" onclick="setTopView('table')">📋 ตาราง</button>
-                        <button id="tpViewCard" class="tf-chip" onclick="setTopView('card')">🗂️ การ์ด</button>
+                      <h2 class="text-sm font-bold flex items-center gap-2"><span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/></svg></span> Top 20 ผลตอบแทน <span class="mk-chip mk-tag"></span></h2>
+                      <button id="tpTh" class="tf-chip active" onclick="setTopMk('thailand')">ไทย</button>
+                      <button id="tpUs" class="tf-chip" onclick="setTopMk('america')">อเมริกา</button>
+                      <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('top20','copy',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg> TV</button><button class="tf-chip" onclick="wlExport('top20','file',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> .txt</button></span> <span class="flex items-center gap-1 ml-auto">
+                        <button id="tpViewTable" class="tf-chip active" onclick="setTopView('table')">ตาราง</button>
+                        <button id="tpViewCard" class="tf-chip" onclick="setTopView('card')">การ์ด</button>
                       </span>
                     </div>
                     <div class="flex flex-wrap items-center gap-1 mb-1">
                       <span class="text-[10px] text-slate-500">Universe:</span>
                       <button id="tpUniAll" class="tf-chip active" onclick="setTopUniverse('all')">ทั้งหมด (หุ้นสามัญ)</button>
                       <button id="tpUniRS" class="tf-chip" onclick="setTopUniverse('rs')">ผ่านเกณฑ์ RS</button>
-                      <button id="tpUniDR" class="tf-chip" onclick="setTopUniverse('dr')" style="display:none">🇹🇭 มี DR ไทย</button>
+                      <button id="tpUniDR" class="tf-chip" onclick="setTopUniverse('dr')" style="display:none">มี DR ไทย</button>
                       <button id="tpUniIdx" class="tf-chip" onclick="setTopUniverse('idx')">แบ่งกลุ่ม Index</button>
                     </div>
                     <div class="flex flex-wrap items-center gap-1 mb-2">
@@ -436,42 +484,42 @@ html #topbar .brand-logo { display:none; }
                     <div id="top20Main"></div>
                   </div>
 
-    <!-- 📊 Index bar บนสุด (SET/SET50/SET100/mai: เปิด/ปิด/เปลี่ยน) -->
+    <!-- Index bar บนสุด (SET/SET50/SET100/mai: เปิด/ปิด/เปลี่ยน) -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3" id="indexBar"></div>
-  <!-- 📰 Market Brief: สรุป Breadth เทียบวาน/สัปดาห์ + แนวโน้มเข้าใจง่าย -->
+  <!-- Market Brief: สรุป Breadth เทียบวาน/สัปดาห์ + แนวโน้มเข้าใจง่าย -->
     <div class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-4 mb-3" id="marketBriefPanel">
       <div class="flex items-center justify-between mb-2">
         <h2 class="text-sm font-bold flex items-center gap-2">
-          📰 Market Brief
+          <span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h13"/></svg></span> Market Brief
           <span class="text-slate-500 font-normal text-xs">การเปลี่ยนแปลง Breadth เทียบวาน / เทียบสัปดาห์</span>
-          <span class="tip text-slate-500">ⓘ<span class="tipbox" style="width:300px">📰 ตัวเลข = %หุ้นที่ปิดสูงกว่าเส้นค่าเฉลี่ย (Breadth) แยก MA50(ระยะสั้น) / MA200(ระยะยาว)<br>
+          <span class="tip text-slate-500">ⓘ<span class="tipbox" style="width:300px">ตัวเลข = %หุ้นที่ปิดสูงกว่าเส้นค่าเฉลี่ย (Breadth) แยก MA50(ระยะสั้น) / MA200(ระยะยาว)<br>
 · Δ1D = เทียบวันก่อน · Δ1W = เทียบ 5 วันทำการก่อน (▲=กว้างขึ้น ▼=แคบลง)<br>
 · อ่านคู่ MA50 vs MA200: ต่างกันมาก = แรงส่งระยะสั้นไม่ตามระยะยาว (ระวัง)<br>
 · สีป้ายใต้ card ชี้โทน: เขียว=กว้างพอ/ฟื้น, แดง=แคบ/อ่อน, เหลือง=กลาง</span></span>
         </h2>
-        <button onclick="renderMarketBrief()" class="tf-chip">🔄</button>
+        <button onclick="renderMarketBrief()" class="tf-chip"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.300 5.700M20 4v7h-7"/></svg></button>
       </div>
       <div id="marketBriefBody" class="text-[13px] text-slate-400">โหลด...</div>
     </div>
 
 
-  <!-- 📈 สรุปตลาด + คำแนะนำ -->
+  <!-- สรุปตลาด + คำแนะนำ -->
   <div class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-4 mb-4" id="marketSummaryPanel">
     <div class="flex items-center justify-between mb-3">
       <h2 class="text-sm font-bold flex items-center gap-2">
-        📋 สรุปตลาด &amp; คำแนะนำ
+        <span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1zM8 6H6a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-2M9 12h6M9 16h4"/></svg></span> สรุปตลาด &amp; คำแนะนำ
         <span class="tip text-slate-500">ⓘ<span class="tipbox">อิงแนวทาง O'Neil/CANSLIM: ดูแนวโน้มตลาด (M) + Breadth (กว้างของการขึ้น) + มูลค่าซื้อขายหุ้นขึ้น/ลง (1D) + ผู้นำ (RS≥90) + ธีมแข็งแกร่ง</span></span>
       </h2>
-      <button onclick="loadSummary()" class="tf-chip">🔄 โหลดสรุป</button>
+      <button onclick="loadSummary()" class="tf-chip"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.300 5.700M20 4v7h-7"/></svg> โหลดสรุป</button>
     </div>
     <div id="marketSummaryBody" class="space-y-2 text-sm"></div>
   </div>
 
-  <!-- 📊 สรุป Megatrend (จาก research รายเดือน) -->
+  <!-- สรุป Megatrend (จาก research รายเดือน) -->
     <div id="megatrendPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-4 mb-4">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
       <h2 class="text-sm font-bold flex items-center gap-2">
-        📊 Megatrend ประจำเดือน
+        <span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span> Megatrend ประจำเดือน
         <span class="text-slate-500 font-normal text-xs">จากงานวิจัยรายเดือน (US+ไทย)</span>
         <button class="text-slate-500 tip hover:text-sky-400">ⓘ<span class="tipbox">สรุปธีม megatrend จากงานวิจัย (Morgan Stanley / BlackRock / KGI / กสิกร ฯลฯ) อัปเดตเดือนละครั้ง — ใช้เป็นไอเดียดูกลุ่มหุ้น ไม่ใช่เกณฑ์จริง (เกณฑ์จริงคือ RS≥80 + กลุ่มเดียวกัน)</span></button>
       </h2>
@@ -481,7 +529,7 @@ html #topbar .brand-logo { display:none; }
   </div>
 
   <div id="searchBar" class="flex flex-wrap items-center gap-2 my-4">
-    <input id="searchInput" placeholder="🔍 ค้นหาหุ้น..." class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white w-44 focus:border-sky-600">
+    <input id="searchInput" placeholder="ค้นหาหุ้น..." class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white w-44 focus:border-sky-600">
     <select id="groupFilter" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white">
           <option value="ALL">ทุกกลุ่ม</option>
         </select>
@@ -496,7 +544,7 @@ html #topbar .brand-logo { display:none; }
             <option value="80">RS ≥ 80</option>
             <option value="90">RS ≥ 90</option>
     </select>
-    <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('stocks','copy',this)">📋 TV</button><button class="tf-chip" onclick="wlExport('stocks','file',this)">⬇ .txt</button></span>
+    <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('stocks','copy',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg> TV</button><button class="tf-chip" onclick="wlExport('stocks','file',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> .txt</button></span>
     <select id="perPageSel" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white">
           <option value="10" selected>แสดง 10</option>
           <option value="20">แสดง 20</option>
@@ -527,8 +575,8 @@ html #topbar .brand-logo { display:none; }
               <option value="ticker">เรียงตาม Ticker</option>
             </select>
                 <div class="flex-1"></div>
-    <button id="btnUpdate" onclick="runUpdate(true)" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-4 py-2 rounded-lg">🔄 Update</button>
-    <button onclick="runUpdate(false)" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold px-4 py-2 rounded-lg">♻️ แคช</button>
+    <button id="btnUpdate" onclick="runUpdate(true)" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-4 py-2 rounded-lg"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.300 5.700M20 4v7h-7"/></svg> Update</button>
+    <button onclick="runUpdate(false)" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold px-4 py-2 rounded-lg">แคช</button>
     <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer select-none bg-[#0a0f16] px-2.5 py-1.5 rounded-lg border border-[#243044]" title="โหลดราคาใหม่ทุก 45 วินาทีอัตโนมัติ (แบบเบา ไม่วาดกราฟใหม่) — ดึงราคาล่าสุดสดจากกระดาน">
       <input id="autoRefresh" type="checkbox" class="accent-emerald-500 cursor-pointer" checked onchange="toggleAutoRefresh()">
       <span id="autoRefreshLabel" class="flex items-center gap-1.5 text-xs"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> อัปเดตสดอัตโนมัติ (45วิ)</span>
@@ -547,7 +595,7 @@ html #topbar .brand-logo { display:none; }
     <div id="flowPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-4 mb-4">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
       <h2 class="text-sm font-bold flex items-center gap-2">
-        💰 มูลค่าซื้อขาย หุ้นขึ้น/ลง <span class="text-slate-500 font-normal text-xs" id="flowUnitText">(วันนี้ · บาท ฿)</span>
+        <span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.5 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1 2-2.5 2c-1.100 0-2.100-.5-2.600-1.500M12 6.500V8M12 16v1.500"/></svg></span> มูลค่าซื้อขาย หุ้นขึ้น/ลง <span class="text-slate-500 font-normal text-xs" id="flowUnitText">(วันนี้ · บาท ฿)</span>
         <span class="tip text-slate-500">ⓘ<span class="tipbox">= มูลค่าซื้อขายรวมของหุ้นที่ราคาขึ้น(ช่อง เขียว)/ลง(ช่อง แดง) วันนี้ล่าสุด ใช้ทิศทางราคาเป็นตัวแทน ไม่ใช่ เงินไหลสุทธิจริง (ไม่มีข้อมูล net-flow)</span></span>
       </h2>
       <div class="flex gap-1 bg-[#0a0f16] p-1 rounded-lg border border-[#243044]">
@@ -562,7 +610,7 @@ html #topbar .brand-logo { display:none; }
     <div id="themesPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-4 mb-4">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
       <h2 class="text-sm font-bold flex items-center gap-2">
-        🎯 Themes จาก RS แข็งแกร่ง
+        <span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></span> Themes จาก RS แข็งแกร่ง
         <span class="text-slate-500 font-normal text-xs">กลุ่มหุ้น RS≥80 ใน Industry เดียวกัน เรียงอันดับ</span>
         <button class="text-slate-500 tip hover:text-sky-400">ⓘ<span class="tipbox">ธีม = Industry ที่มีหุ้น RS≥80 อย่างน้อย 2 ตัว เรียงจากผลรวมค่า RS + มูลค่าซื้อขาย ดูว่าหุ้นแรงกระจุกตัวกลุ่มไหน</span></button>
       </h2>
@@ -570,17 +618,17 @@ html #topbar .brand-logo { display:none; }
     <div id="themeList" class="grid grid-cols-1 md:grid-cols-2 gap-2"></div>
       </div>
 
-      <!-- 🚀 TOP GAIN / LOSS แยก TH/US + logo + ชื่อ + val filter + เลือกกลุ่ม -->
+      <!-- TOP GAIN / LOSS แยก TH/US + logo + ชื่อ + val filter + เลือกกลุ่ม -->
       <div id="topglPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-4 mb-4">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
               <h2 class="text-sm font-bold flex items-center gap-2">
-                🚀 TOP GAIN / LOSS <span class="mk-chip mk-tag"></span> <span class="text-slate-500 font-normal text-xs">ตามตลาดที่เลือกด้านบน</span>
+                <span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></span> TOP GAIN / LOSS <span class="mk-chip mk-tag"></span> <span class="text-slate-500 font-normal text-xs">ตามตลาดที่เลือกด้านบน</span>
                 <span class="tip text-slate-500">ⓘ<span class="tipbox">เรียง % เปลี่ยนวันนี้สูงสุด (Gain) / ต่ำสุด (Loss) · val ขั้นต่ำเลือกได้ (ไทย=บาท, อเมริกา=ดอลลาร์)</span></span>
               </h2>
               <div class="flex flex-wrap items-center gap-1.5 text-xs">
                 <div class="flex gap-1 bg-[#0a0f16] p-1 rounded-lg border border-[#243044]">
-                  <button id="glmTh" class="tf-chip active" onclick="switchGLMarket('thailand')">🇹🇭 ไทย</button>
-                  <button id="glmUs" class="tf-chip" onclick="switchGLMarket('america')">🇺🇸 อเมริกา</button>
+                  <button id="glmTh" class="tf-chip active" onclick="switchGLMarket('thailand')">ไทย</button>
+                  <button id="glmUs" class="tf-chip" onclick="switchGLMarket('america')">อเมริกา</button>
                 </div>
                 <select id="glGroup" onchange="renderTopGL()" class="bg-[#0a0f16] border border-[#243044] rounded-lg px-2 py-1 text-xs outline-none text-white"></select>
                 <select id="glVal" onchange="renderTopGL()" class="bg-[#0a0f16] border border-[#243044] rounded-lg px-2 py-1 text-xs outline-none text-white">
@@ -634,7 +682,7 @@ html #topbar .brand-logo { display:none; }
     </table>
   </div>
 
-  <div id="footerText" class="text-center text-slate-500 text-[11px] mt-6">rsdashclean.vercel.app • ข้อมูลไทย • 📈 RS เต็มตลาด</div>
+  <div id="footerText" class="text-center text-slate-500 text-[11px] mt-6">rsdashclean.vercel.app • ข้อมูลไทย • RS เต็มตลาด</div>
 </div>
 
 <div id="chartModal" class="fixed inset-0 z-50 hidden items-start justify-center p-4 bg-black/80 overflow-y-auto">
@@ -684,7 +732,7 @@ function loadUsIndexes(){
 }
 function inIndex(sym){sym=(sym||'').toUpperCase();var r=[];for(var k in US_INDEXES){if(US_INDEXES[k].indexOf(sym)>-1)r.push(k);}return r;}
 
-/* ==== 🇹🇭 DR ไทยที่อ้างอิงหุ้นเมกา (โหลดครั้งเดียวจาก /dr_us.json) — แสดงในหน้าหุ้นเมกาเท่านั้น ==== */
+/* ==== DR ไทยที่อ้างอิงหุ้นเมกา (โหลดครั้งเดียวจาก /dr_us.json) — แสดงในหน้าหุ้นเมกาเท่านั้น ==== */
 let DR_US={};
 function loadDrUs(){   // เรียกหลัง API ถูก define แล้ว (ดูท้ายสคริปต์)
   if(DR_US && Object.keys(DR_US).length) return;      // โหลดครั้งเดียว
@@ -707,13 +755,13 @@ function drShort(tk){   // ป้ายย่อ: มี DR กี่ตัว +
   const L=drList(tk); if(!L||!L.length) return '';
   const iss=[...new Set(L.map(x=>drIssuerShort(x.i)))];
   const tip=L.map((x,k)=>`${x.t} · ${x.i} · Vol ${Number(x.vol||0).toLocaleString()}`).join(' | ');
-  return `<span class="pill text-rose-300 border-rose-700/60" title="🇹🇭 ซื้อในไทยได้ผ่าน DR ${L.length} ตัว — ${tip}">🇹🇭 DR ${L.length} · ${iss.slice(0,3).join('/')}${iss.length>3?' +'+(iss.length-3):''}</span>`;
+  return `<span class="pill text-rose-300 border-rose-700/60" title="ซื้อในไทยได้ผ่าน DR ${L.length} ตัว — ${tip}">DR ${L.length} · ${iss.slice(0,3).join('/')}${iss.length>3?' +'+(iss.length-3):''}</span>`;
 }
 function drLabel(tk, mk){   // (DR) ตัวกะทัดรัดติดข้างชื่อ — ทุกจุดในตลาดเมกา ตามบอส 6 ต.ค.
   const M = mk || currentMarket;
   if(M!=='america') return '';
   const L=drList(tk); if(!L||!L.length) return '';
-  return `<span class="text-[9px] font-bold text-amber-400/90 ml-0.5 align-middle" title="🇹🇭 ซื้อในไทยได้ผ่าน DR ${L.length} ตัว">(DR)</span>`;
+  return `<span class="text-[9px] font-bold text-amber-400/90 ml-0.5 align-middle" title="ซื้อในไทยได้ผ่าน DR ${L.length} ตัว">(DR)</span>`;
 }
 function drTableHTML(tk){   // ตารางเต็ม (ใน modal) เรียงตาม Vol มาก→น้อย
   const L=drList(tk); if(!L||!L.length) return '';
@@ -727,7 +775,7 @@ function drTableHTML(tk){   // ตารางเต็ม (ใน modal) เร
       <td class="p-1.5 text-right ${y>0?'text-emerald-400':(y<0?'text-rose-400':'text-slate-400')}">${Number.isFinite(y)?(y>0?'+':'')+y.toFixed(1)+'%':'-'}</td>
     </tr>`;}).join('');
   return `<div class="bg-[#0d1219] border border-[#1e2634] rounded-lg p-3">
-    <div class="text-xs font-bold text-rose-300 mb-1">🇹🇭 ซื้อหุ้นนี้ผ่าน DR ในตลาดไทยได้ — ${L.length} ตัว (เรียงตาม Volume มาก→น้อย)</div>
+    <div class="text-xs font-bold text-rose-300 mb-1">ซื้อหุ้นนี้ผ่าน DR ในตลาดไทยได้ — ${L.length} ตัว (เรียงตาม Volume มาก→น้อย)</div>
     <div class="overflow-x-auto"><table class="w-full text-[11px]">
       <thead><tr class="text-slate-400 border-b border-[#243044]"><th class="p-1.5 text-left text-[10px]">DR</th><th class="p-1.5 text-left text-[10px]">ค่ายผู้ออก</th><th class="p-1.5 text-right text-[10px]">Volume</th><th class="p-1.5 text-right text-[10px]">มูลค่าซื้อขาย</th><th class="p-1.5 text-right text-[10px]">YTD</th></tr></thead>
       <tbody>${rows}</tbody></table></div>
@@ -882,6 +930,22 @@ function setSortSecondary(key){
 function thusC(){ const d=document.documentElement.getAttribute('data-theme')==='dark'; return d
   ? {up:'#5CC6C8',down:'#F59A8C',text:'#A597AD',vup:'rgba(92,198,200,.42)',vdown:'rgba(245,154,140,.42)',l1:'#DDCDF0',l2:'#D4B67A',bg:'#15101B'}
   : {up:'#0B6E70',down:'#A63B27',text:'#5E5468',vup:'rgba(11,110,112,.34)',vdown:'rgba(166,59,39,.34)',l1:'#281237',l2:'#B08A45',bg:'#FAF9F6'}; }
+/* หัวหน้า (eyebrow + ชื่อหน้า) ตามหน้า/ตลาดที่เปิดอยู่ */
+function thusHead(pg){
+  const us=currentMarket==='america', mk=us?'US':'TH';
+  const H={ overview:['Market overview · '+mk,'ภาพรวมตลาด'+(us?'สหรัฐฯ':'ไทย')], stocks:['RS ranking · '+mk,'จัดอันดับความแข็งแกร่ง'], top20:['Top 20 · '+mk,'ขึ้นแรงที่สุด'], scanner:['Scanner · '+mk,'หุ้นแกร่งที่กำลังพักตัวแคบ'], leaders:['Monthly leaders · '+mk,'ผู้นำรายเดือน'], report:['Report · '+mk,'ใครเข้า ใครออก ระหว่างสองวัน'] };
+  const h=H[pg]||H.overview; const a=document.getElementById('phEyebrow'), b=document.getElementById('phTitle');
+  if(a) a.textContent=h[0]; if(b) b.textContent=h[1];
+}
+/* Top RS วันนี้: 8 ตัว RS สูงสุดของตลาดที่เปิดอยู่ (ข้อมูลชุดเดียวกับหน้าหุ้น) */
+function renderTopRs(){
+  const tb=document.getElementById('topRsBody'); if(!tb) return;
+  const list=(stockData||[]).filter(s=>Number.isFinite(s.rs)).slice().sort((a,b)=>(b.rs-a.rs)||((b.score||0)-(a.score||0))).slice(0,8);
+  if(!list.length){ tb.innerHTML='<tr><td colspan="6" class="trs-empty">กำลังโหลด…</td></tr>'; return; }
+  const pc=(v)=>Number.isFinite(v)?((v>=0?'+':'−')+Math.abs(v).toFixed(2)+'%'):'–';
+  const cl=(v)=>Number.isFinite(v)?(v>=0?'pos':'neg'):'';
+  tb.innerHTML=list.map(s=>`<tr><td><span class="trs-rs">${s.rs}</span></td><td><a href="#" class="trs-tk" onclick="openModalByTk('${String(s.ticker).replace(/'/g,"")}');return false;">${s.ticker}</a></td><td class="r">${Number(s.price).toFixed(2)}</td><td class="r ${cl(s.change)}">${pc(s.change)}</td><td class="r ${cl(s.p3m)}">${pc(s.p3m)}</td><td class="trs-grp">${s.industry||s.sector||''}</td></tr>`).join('');
+}
 function toggleTheme(){ const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; try{ localStorage.setItem('rsd_theme',n); }catch(e){} location.reload(); }function fontZoom(delta){
   const base=parseFloat(localStorage.getItem('rsd_zoom')||'1');
   let z=delta===0?1:(delta>0?base+0.12:base-0.12);
@@ -906,7 +970,8 @@ let curPage = 'overview';
 function setPage(pg){
   curPage = pg;
   try{ localStorage.setItem('rsd_curPage', pg); localStorage.setItem('rsd_curMarket', currentMarket); }catch(e){}   // จำหน้า+ตลาดสุดท้ายไว้ (บอส)
-  const ov = ['marketBriefPanel','indexBar','marketSummaryPanel','megatrendPanel','flowPanel','themesPanel','topglPanel'];
+  const ov = ['topRsPanel','marketBriefPanel','indexBar','marketSummaryPanel','megatrendPanel','flowPanel','themesPanel','topglPanel'];
+  try{ thusHead(pg); if(pg==='overview') renderTopRs(); }catch(e){}
   const st = ['searchBar','progressPanel','cardsView','tableView'];
   ov.forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display = (pg==='overview') ? '' : 'none'; });
   st.forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display = (pg==='stocks') ? '' : 'none'; });
@@ -933,7 +998,7 @@ function setPage(pg){
     loadTop20(); }   // default: เรียง YTD จากมาก→น้อย (#1..20)
   if(pg==='report'){ loadReportInit(); }
 }
-// ===== 🎯 Scanner: Trend Template + พักตัวแคบ + Market Gate (คำนวณใน trendlib.js) =====
+// ===== Scanner: Trend Template + พักตัวแคบ + Market Gate (คำนวณใน trendlib.js) =====
 const SC_VAL = {
   thailand:[[0,'ทั้งหมด'],[5e6,'5 ล้านบาท'],[20e6,'20 ล้านบาท'],[50e6,'50 ล้านบาท'],[100e6,'100 ล้านบาท']],
   america:[[0,'ทั้งหมด'],[5e6,'$5M'],[20e6,'$20M'],[50e6,'$50M'],[100e6,'$100M']]
@@ -1021,12 +1086,12 @@ function renderModalTT(data){
   const chip=(ok,t)=>`<span class="${ok?'text-emerald-400':'text-slate-400'}">${t}</span>`;
   el.innerHTML = `<div class="rounded-lg border border-[#1e2634] bg-[#0a0f16] p-2.5">
     <div class="text-xs font-bold mb-1.5">Trend Template <span class="${r.tt===8?'text-emerald-400':(r.tt>=6?'text-amber-300':'text-slate-400')}">${r.tt}/8</span> <span class="text-[10px] font-normal text-slate-500">(คำนวณจากแท่งรายวัน · เกณฑ์ Minervini)</span></div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-0.5 text-[11px]">${r.rules.map(x=>`<div class="${x.ok?'text-emerald-400':(x.missing?'text-slate-500':'text-rose-400')}">${x.missing?'•':(x.ok?'✅':'❌')} ${x.label}${x.detail?` <span class="text-slate-500">· ${x.detail}</span>`:''}</div>`).join('')}</div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-0.5 text-[11px]">${r.rules.map(x=>`<div class="${x.ok?'text-emerald-400':(x.missing?'text-slate-500':'text-rose-400')}">${x.missing?'•':(x.ok?'✓':'✕')} ${x.label}${x.detail?` <span class="text-slate-500">· ${x.detail}</span>`:''}</div>`).join('')}</div>
     <div class="text-[11px] text-slate-400 mt-2 pt-1.5 border-t border-[#1e2634]">ความนิ่งก่อนทะลุ: ${chip(c.atrRatio<0.85,'ATR10/ATR50 = '+c.atrRatio.toFixed(2))} (บีบตัวเมื่อ &lt; 0.85) · ${chip(c.range10Pct<=8,'ช่วงราคา 10 วัน '+c.range10Pct.toFixed(1)+'%')} · ${c.volDry==null?'ปริมาณ -':chip(c.volDry<0.8,'ปริมาณ 5 วัน/50 วัน = '+c.volDry.toFixed(2))} (แห้งเมื่อ &lt; 0.8)</div>
   </div>`;
 }
 
-// ===== 🏆 ผู้นำหุ้นไทยรายเดือน (ข้อมูลจาก /api/scan?universe=leaders) =====
+// ===== ผู้นำหุ้นไทยรายเดือน (ข้อมูลจาก /api/scan?universe=leaders) =====
 let ldBusy = false;
 function ldSpark(nav){
   if(!nav || nav.length<2) return '';
@@ -1059,7 +1124,7 @@ async function wlExport(kind, how, btn){
     wlFlash(btn,'ดาวน์โหลด '+syms.length+' ตัวแล้ว');
   }
 }
-// ===== 🏆 ผู้นำรายเดือน (ไทย): ขึ้นมากสุดเดือนนี้ + ขาขึ้น MA50>MA200 + ผ่านสภาพคล่อง =====
+// ===== ผู้นำรายเดือน (ไทย): ขึ้นมากสุดเดือนนี้ + ขาขึ้น MA50>MA200 + ผ่านสภาพคล่อง =====
 // ข้อมูลจาก monthly_leaders_th.json (gen_monthly_leaders.py) — ตลาดสหรัฐฯ ใช้รายชื่อแบบเดิม (renderLeadersUS)
 let ldRows=[], ldSortKey='mtd', ldSortDir=-1, ldMarket='thailand';
 function ldSortBy(k){
@@ -1074,14 +1139,14 @@ function ldTags(tk){
   }
   return drLabel(tk,'america');   // ตลาดสหรัฐฯ: ป้าย (DR) ของหุ้นที่ซื้อในไทยได้ผ่านตราสารแสดงสิทธิ
 }
-/* ---------- 📌 Note สรุปว่าในรายชื่อนี้มี SSF / DR กี่ตัว + รายชื่อ ---------- */
+/* ---------- Note สรุปว่าในรายชื่อนี้มี SSF / DR กี่ตัว + รายชื่อ ---------- */
 function ldNoteApply(){
   const el=document.getElementById('ldNote');
   if(!el || !ldRows || !ldRows.length) return;
   const isUs = ldMarket==='america';
   const all = ldRows.map(p=>p.ticker);
   const hit = all.filter(tk => isUs ? Boolean(drList(tk)) : hasSSF(tk));
-  el.innerHTML='📌 <b>'+(isUs?'(DR)':'SSF')+'</b> = '+(isUs?'ซื้อในไทยได้ผ่านตราสารแสดงสิทธิ (DR)':'มี Single Stock Future ที่ TFEX (สัญญารายตัว)')
+  el.innerHTML='<b>'+(isUs?'(DR)':'SSF')+'</b> = '+(isUs?'ซื้อในไทยได้ผ่านตราสารแสดงสิทธิ (DR)':'มี Single Stock Future ที่ TFEX (สัญญารายตัว)')
     +' · ใน <b>'+all.length+'</b> ตัวนี้มี <b>'+hit.length+'</b> ตัว: '+(hit.join(', ')||'-');
 }
 function ldApply(){
@@ -1115,10 +1180,10 @@ async function renderLeaders(){
     window._wl_leaders=(j.data||[]).map(p=>({ticker:p.ticker, tv:p.tv||(isUs?'NASDAQ:':'SET:')+p.ticker, name:p.name}));
     ldRows=(j.data||[]).map(p=>({ticker:p.ticker, name:p.name||'', mtd:+p.mtd||0, rs:+p.rs||0, price:+p.price||0, val:+p.val||0, p3m:+p.p3m||0, p6m:+p.p6m||0, p1y:+p.p1y||0, sma50:+p.sma50||0, sma200:+p.sma200||0}));
     const warn=document.getElementById('ldWarn');
-    if(warn) warn.innerHTML='📌 <b>เกณฑ์:</b> '+(j.criteria||'')+'<br>ข้อมูล <b>'+j.asOf+'</b>'+(j.base?(' · เทียบกับปิด <b>'+j.base+'</b>'):'')+' · ผ่านทั้งหมด <b>'+j.count+' ตัว</b> · '+(j.rs_formula||'');
+    if(warn) warn.innerHTML='<b>เกณฑ์:</b> '+(j.criteria||'')+'<br>ข้อมูล <b>'+j.asOf+'</b>'+(j.base?(' · เทียบกับปิด <b>'+j.base+'</b>'):'')+' · ผ่านทั้งหมด <b>'+j.count+' ตัว</b> · '+(j.rs_formula||'');
     const fx=v=>Number.isFinite(v)?Number(v).toFixed(2):'-';
     const fb=v=>{ const n=Number(v); return Number.isFinite(n)?(n>=1e9?(n/1e9).toFixed(2)+'B':(n/1e6).toFixed(1)+'M'):'-'; };
-    gEl.innerHTML='<div class="rounded-lg border border-emerald-700/50 bg-emerald-900/10 px-3 py-2 text-xs"><b class="text-sm">📈 '+j.count+' ตัวเป็นผู้นำรายเดือน ('+j.metric_label+')</b><div class="opacity-80 mt-0.5">เรียงตาม'+(j.metric_label||'เดือนนี้')+' จากมากไปน้อย · ทุกตัวเป็นขาขึ้น (MA50 &gt; MA200) และผ่านสภาพคล่อง · ข้อมูล ณ '+j.asOf+'</div></div>';
+    gEl.innerHTML='<div class="rounded-lg border border-emerald-700/50 bg-emerald-900/10 px-3 py-2 text-xs"><b class="text-sm">'+j.count+' ตัวเป็นผู้นำรายเดือน ('+j.metric_label+')</b><div class="opacity-80 mt-0.5">เรียงตาม'+(j.metric_label||'เดือนนี้')+' จากมากไปน้อย · ทุกตัวเป็นขาขึ้น (MA50 &gt; MA200) และผ่านสภาพคล่อง · ข้อมูล ณ '+j.asOf+'</div></div>';
     ldApply();
     ldNoteApply();
     how.innerHTML='<b>วิธีอ่าน:</b> "'+(j.metric_label||'เดือนนี้')+'" = '+(j.base?('ผลตอบแทนจากปิดเดือนก่อน ('+j.base+') ถึงปิดล่าสุด ('+j.asOf+')'):'ผลตอบแทนย้อนหลัง 1 เดือน (TradingView)')+' · RS คือคะแนนความแข็งแกร่ง 1–99 ตามสูตรของเว็บ · หุ้นที่มูลค่าซื้อขายต่ำระวังเลือน<br><b>หมายเหตุ:</b> ข้อมูลประกอบการคัดกรองเท่านั้น ไม่ใช่คำแนะนำซื้อขาย';
@@ -1133,8 +1198,8 @@ async function renderLeadersUS(){
     const j=await (await fetch(API+'/api/scan?universe=leaders&market='+currentMarket)).json(); if(j.error) throw new Error(j.error);
     window._wl_leaders = (j.picks||[]).map(p=>({ticker:p.tk, tv:p.tv}));
     const US=(j.market==='america'), idxName=US?'S&P 500':'SET', warn=document.getElementById('ldWarn');
-    if(warn) warn.innerHTML = US ? '⚠️ <b>ตลาดสหรัฐฯ: ผลทดสอบย้อนหลัง 26 ปีไม่พบ edge จากกฎนี้</b> — รายชื่อด้านล่างเป็นเพียงข้อมูลประกอบสำหรับคัดกรองเอง (ผู้นำ ณ ปัจจุบันตามกฎเดียวกับตลาดไทย) <b>ไม่ใช่สัญญาณซื้อขาย</b>' : '⚠️ <b>ผลวิจัยในอดีต (in-sample) ยังไม่พิสูจน์ edge — ไม่ใช่คำแนะนำการลงทุน</b> · ตลาดสหรัฐฯ ไม่พบ edge จากแนวทางนี้ (สลับเป็นตลาดสหรัฐฯ เพื่อดูรายชื่อประกอบ)';
-    const g=j.gate||{state:'unknown',exposure:0.5}, col={green:'border-emerald-600/60 bg-emerald-900/10 text-emerald-300',yellow:'border-amber-600/60 bg-amber-900/10 text-amber-300',red:'border-rose-600/60 bg-rose-900/10 text-rose-300',unknown:'border-slate-600/60 text-slate-400'}[g.state], ic={green:'🟢',yellow:'🟡',red:'🔴',unknown:'⚪'}[g.state];
+    if(warn) warn.innerHTML = US ? '⚠ <b>ตลาดสหรัฐฯ: ผลทดสอบย้อนหลัง 26 ปีไม่พบ edge จากกฎนี้</b> — รายชื่อด้านล่างเป็นเพียงข้อมูลประกอบสำหรับคัดกรองเอง (ผู้นำ ณ ปัจจุบันตามกฎเดียวกับตลาดไทย) <b>ไม่ใช่สัญญาณซื้อขาย</b>' : '⚠ <b>ผลวิจัยในอดีต (in-sample) ยังไม่พิสูจน์ edge — ไม่ใช่คำแนะนำการลงทุน</b> · ตลาดสหรัฐฯ ไม่พบ edge จากแนวทางนี้ (สลับเป็นตลาดสหรัฐฯ เพื่อดูรายชื่อประกอบ)';
+    const g=j.gate||{state:'unknown',exposure:0.5}, col={green:'border-emerald-600/60 bg-emerald-900/10 text-emerald-300',yellow:'border-amber-600/60 bg-amber-900/10 text-amber-300',red:'border-rose-600/60 bg-rose-900/10 text-rose-300',unknown:'border-slate-600/60 text-slate-400'}[g.state], ic={green:'<span class="gdot g"></span>',yellow:'<span class="gdot y"></span>',red:'<span class="gdot r"></span>',unknown:'<span class="gdot u"></span>'}[g.state];
     const gi=j.gateIdx||{}, fx=v=>Number.isFinite(v)?Number(v).toFixed(2):'-';
     gEl.innerHTML='<div class="rounded-lg border '+col+' px-3 py-2 text-xs"><b class="text-sm">'+ic+' สัดส่วนหุ้นตาม Gate = '+Math.round(g.exposure*100)+'%</b> · '+idxName+' '+fx(gi.price)+' · SMA50 '+fx(gi.sma50)+' · SMA200 '+fx(gi.sma200)+'<div class="opacity-80 mt-0.5">เขียว ('+idxName+' > SMA50 > SMA200) 100% · เหลือง 50% · แดง ('+idxName+' ต่ำกว่า SMA200 ฯลฯ) 0% — ข้อมูล ณ '+j.asOf+' · พูล '+j.poolSize+' ตัว ('+(US?'ราคา ≥ USD 10 และมูลค่าซื้อขายเฉลี่ย ≥ USD 20M':'ครึ่งบนตามมูลค่าซื้อขาย')+')'+(US?' · <i>Gate ใช้เป็นข้อมูลประกอบ ไม่ได้ใช้ซื้อขาย</i>':'')+'</div></div>';
     body.innerHTML=(j.picks||[]).map(p=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.tk)+'\',\''+jq(p.name)+'\',\''+currentMarket+'\')"><td class="p-2 text-slate-400">'+p.rank+'</td><td class="p-2"><b class="text-sky-400">'+p.tk+'</b> <span class="text-[10px] text-slate-500">'+(p.name||'')+'</span></td><td class="p-2">'+fNum(p.close)+'</td><td class="p-2">'+((p.near52-1)*100).toFixed(1)+'%</td><td class="p-2 '+(p.mom>=0?'pos':'neg')+'">'+(p.mom*100).toFixed(0)+'%</td><td class="p-2">'+p.score.toFixed(2)+'</td><td class="p-2">'+(p.weight*100).toFixed(1)+'%</td></tr>').join('')||'<tr><td colspan="7" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
@@ -1143,7 +1208,7 @@ async function renderLeadersUS(){
   finally{ ldBusy=false; }
 }
 
-// ===== 📅 Report: เทียบอันดับ Top-N ระหว่าง 2 วัน (ใช้ /api/history) =====
+// ===== Report: เทียบอันดับ Top-N ระหว่าง 2 วัน (ใช้ /api/history) =====
 let rpMk='thailand', rpDates=[], rpBusy=false;
 function setRpMk(mk){
   rpMk = mk;
@@ -1164,7 +1229,7 @@ async function loadReportInit(){
   try{
     if(st) st.textContent='⏳ กำลังโหลดรายชื่อวัน...';
     const j = await (await fetch(API+'/api/history?mode=dates&market='+rpMk)).json();
-    if(j.error){ if(st) st.textContent='⚠️ '+j.error; return; }
+    if(j.error){ if(st) st.textContent='⚠ '+j.error; return; }
     rpDates = j.days || [];
     const f=document.getElementById('rpFrom'), t=document.getElementById('rpTo');
     if(f && t && rpDates.length){
@@ -1176,7 +1241,7 @@ async function loadReportInit(){
       f.value = pick; t.value = last;
     }
     await loadReport();
-  }catch(e){ if(st) st.textContent='⚠️ โหลดไม่สำเร็จ: '+e.message; }
+  }catch(e){ if(st) st.textContent='⚠ โหลดไม่สำเร็จ: '+e.message; }
   finally{ rpBusy = false; }
 }
 async function loadReport(){
@@ -1188,11 +1253,11 @@ async function loadReport(){
   if(st) st.textContent='⏳ กำลังเทียบ...';
   try{
     const j = await (await fetch(API+'/api/history?market='+rpMk+'&from='+f.value+'&to='+t.value+'&metric='+metric+'&n='+n+'&universe=rs')).json();
-    if(j.error){ if(st) st.textContent='⚠️ '+j.error; if(sum) sum.innerHTML=''; if(bd) bd.innerHTML=''; return; }
+    if(j.error){ if(st) st.textContent='⚠ '+j.error; if(sum) sum.innerHTML=''; if(bd) bd.innerHTML=''; return; }
     if(st) st.textContent='ตรวจแล้ว: universe '+(j.counts.universeFrom||0)+' → '+(j.counts.universeTo||0)+' ตัว (เกณฑ์ RS ≥ '+(j.rs_threshold||70)+') · เรียงตาม '+(j.label||metric)+' · Top '+(j.n||20);
     if(sum) sum.innerHTML = rpSummaryHTML(j);
     if(bd) bd.innerHTML = rpBodyHTML(j);
-  }catch(e){ if(st) st.textContent='⚠️ '+e.message; }
+  }catch(e){ if(st) st.textContent='⚠ '+e.message; }
 }
 function rpSummaryHTML(j){
   const c=j.counts||{};
@@ -1201,13 +1266,13 @@ function rpSummaryHTML(j){
   s+=box(j.resolved.from+' → '+j.resolved.to,'border-[#243044] bg-[#0a0f16] text-slate-300');
   s+='<span class="flex gap-1 items-center text-[10px]">'+rpSrcBadge(j.resolved.from_source)+'→'+rpSrcBadge(j.resolved.to_source)+'</span>';
   s+='</div><div class="flex flex-wrap gap-2 mb-2">';
-  s+=box('🆕 เข้าใหม่ '+c.entered,'border-emerald-500/40 text-emerald-300');
-  s+=box('🚪 หลุด '+c.exited,'border-rose-500/40 text-rose-300');
-  s+=box('🔼 ขึ้น '+c.up+' · 🔽 ลง '+c.down,'border-sky-500/40 text-sky-300');
+  s+=box('NEW เข้าใหม่ '+c.entered,'border-emerald-500/40 text-emerald-300');
+  s+=box('OUT หลุด '+c.exited,'border-rose-500/40 text-rose-300');
+  s+=box('▲ ขึ้น '+c.up+' · ▼ ลง '+c.down,'border-sky-500/40 text-sky-300');
   s+=box('⏸️ อยู่ครบ '+c.stayed,'border-slate-500/40 text-slate-300');
   s+='</div>';
-  s+='<div class="text-[10px] text-slate-400 mb-2">📘 <b>R = Return (ผลตอบแทน)</b> · ตัวเลขที่มี <b>%</b> = เปอร์เซ็นต์ · <b>RS</b> = คะแนนเปอร์เซ็นไทล์ (ไม่ใช่ %) · <b>ราคา = บาท (หุ้นไทย) / USD (หุ้น US)</b> · ชื่อคอลัมน์ <b>@วันที่</b> = ค่าของหุ้นตัวนั้น ณ วันนั้น (ต้นทาง = วันเริ่ม "จาก" · ปลายทาง = วันสิ้นสุด "ถึง")</div>';
-  (j.warnings||[]).forEach(w=>{ s+='<div class="text-[10px] text-amber-300 mb-1">⚠️ '+(w.message||w.code)+'</div>'; });
+  s+='<div class="text-[10px] text-slate-400 mb-2"><b>R = Return (ผลตอบแทน)</b> · ตัวเลขที่มี <b>%</b> = เปอร์เซ็นต์ · <b>RS</b> = คะแนนเปอร์เซ็นไทล์ (ไม่ใช่ %) · <b>ราคา = บาท (หุ้นไทย) / USD (หุ้น US)</b> · ชื่อคอลัมน์ <b>@วันที่</b> = ค่าของหุ้นตัวนั้น ณ วันนั้น (ต้นทาง = วันเริ่ม "จาก" · ปลายทาง = วันสิ้นสุด "ถึง")</div>';
+  (j.warnings||[]).forEach(w=>{ s+='<div class="text-[10px] text-amber-300 mb-1">⚠ '+(w.message||w.code)+'</div>'; });
   return s;
 }
 function rpD(d){   // 2026-10-05 → 5 ต.ค. 69
@@ -1223,7 +1288,7 @@ const RP_METRIC = {
 };
 function rpBodyHTML(j){
   const fm=v=>(v==null||v==='')?'—':(Math.round(v*100)/100);
-  const dl=d=>(d==null?'—':(d>0?'🔼 +'+d:(d<0?'🔽 '+d:'—')));
+  const dl=d=>(d==null?'—':(d>0?'▲ +'+d:(d<0?'▼ '+d:'—')));
   const mv=(document.getElementById('rpMetric')||{}).value||'p1y';
   const CUR=(rpMk==='america'?'USD':'บาท');   // หน่วยเงินตามตลาด (เดิมฮาร์ดโค้ด บาท แม้เป็นหุ้น US)
   const T0=RP_METRIC[mv]||{n:(j.label||'ค่า'),r:0,u:''};
@@ -1238,9 +1303,9 @@ function rpBodyHTML(j){
   const colsExit=[{l:'#',g:r=>'#'+r.rankFrom},{l:'หุ้น',g:r=>`<button onclick="openModalByTk('${r.ticker||''}','${rpMk}')" class="font-bold text-sky-400 hover:underline" title="กดดูกราฟ ${r.ticker||''}">${r.ticker||''}${drLabel(r.ticker, rpMk)}</button>`},{l:'ชื่อ',g:r=>'<span class="text-slate-400">'+String(r.name||'').slice(0,32)+'</span>'},{l:'กลุ่ม',g:r=>r.sector||''},{l:tt(dFrom),g:r=>dsp(r.metricFrom),a:1},{l:'RS @'+dFrom,g:r=>r.rsFrom??'',a:1},{l:'ราคา @'+dFrom+' ('+CUR+')',g:r=>r.price??'',a:1}];
   const colsMove=[{l:'หุ้น',g:r=>`<button onclick="openModalByTk('${r.ticker||''}','${rpMk}')" class="font-bold text-sky-400 hover:underline" title="กดดูกราฟ ${r.ticker||''}">${r.ticker||''}${drLabel(r.ticker, rpMk)}</button>`},{l:'อันดับ '+dFrom+' → '+dTo,g:r=>'#'+r.rankFrom+' → <b>#'+r.rankTo+'</b>'},{l:'Δอันดับ',g:r=>dl(r.deltaRank)},{l:tt(dFrom),g:r=>dsp(r.metricFrom),a:1},{l:tt(dTo),g:r=>dsp(r.metricTo),a:1},{l:'ΔRS',g:r=>(r.rsDelta==null?'—':((r.rsDelta>0?'+':'')+r.rsDelta)),a:1},{l:'กลุ่ม',g:r=>r.sector||''}];
   let h='';
-  h+=rpTable('🆕 เข้าใหม่ใน Top'+N+' — อยู่ที่ '+dTo+' แต่ไม่อยู่ที่ '+dFrom, j.entered, colsEnter);
-  h+=rpTable('🚪 หลุดจาก Top'+N+' — อยู่ที่ '+dFrom+' แต่ไม่อยู่ที่ '+dTo, j.exited, colsExit);
-  h+=rpTable('🔼🔽 เปลี่ยนอันดับภายใน Top'+N+' (ระหว่าง '+dFrom+' → '+dTo+')', j.movers, colsMove);
+  h+=rpTable('NEW เข้าใหม่ใน Top'+N+' — อยู่ที่ '+dTo+' แต่ไม่อยู่ที่ '+dFrom, j.entered, colsEnter);
+  h+=rpTable('OUT หลุดจาก Top'+N+' — อยู่ที่ '+dFrom+' แต่ไม่อยู่ที่ '+dTo, j.exited, colsExit);
+  h+=rpTable('▲▼ เปลี่ยนอันดับภายใน Top'+N+' (ระหว่าง '+dFrom+' → '+dTo+')', j.movers, colsMove);
   if(j.stayed && j.stayed.length) h+='<div class="text-[11px] text-slate-400 mb-1">⏸️ อยู่ครบ '+j.stayed.length+' ตัว (ติด Top'+N+' ทั้งสองวัน): '+j.stayed.map(r=>`<button onclick="openModalByTk('${r.ticker}','${rpMk}')" class="text-sky-400 hover:underline" title="กดดูกราฟ ${r.ticker}">${r.ticker}${drLabel(r.ticker, rpMk)}</button>`).join(', ')+'</div>';
   return h;
 }
@@ -1255,13 +1320,13 @@ function rpTable(title, rows, cols){
     h+='</tr>'; });
   return h+'</tbody></table></div></div>';
 }
-// ---- 🏆 Top 20 ผลตอบแทน (YTD / 1 ปี / 2 ปี) แยกไทย/เมกา ----
+// ---- Top 20 ผลตอบแทน (YTD / 1 ปี / 2 ปี) แยกไทย/เมกา ----
 const TOP20_MK = ['thailand','america'];
 let topMk='thailand', topSortKey='pYTD', topSortDir=1, topRows=[], p2yCache={};   // dir=1 => เรียงจากมาก→น้อย (#1 มากสุด)
 let topView='table', topCharts={};   // topView = 'table' | 'card' ; topCharts = cache กราฟการ์ด
 let topUniverse='all', topAllData={}, topAllLoading={};   // 'all' | 'rs' | 'idx'  (default = หุ้นสามัญทั้งตลาด)
 let topRSEligible=new Set();   // เซ็ตหุ้นที่ "ผ่านเกณฑ์ RS หลัก" (Val + rs≥70) — ใช้ติดป้ายในโหมดทั้งหมด
-// 📰 ทำไมติด Top20 (/api/notes จาก scripts/news) — US และไทย
+// ทำไมติด Top20 (/api/notes จาก scripts/news) — US และไทย
 let notesData={}, notesLoading={};
 function ensureNotes(m){   // คืน true เมื่อเพิ่งโหลดเสร็จครั้งแรก (ให้ผู้เรียก render ใหม่)
   if(notesData[m]) return Promise.resolve(false);
@@ -1350,7 +1415,7 @@ async function loadTop20(){
   Object.keys(_idsU).forEach(k=>{ const e=document.getElementById(_idsU[k]); if(e) e.classList.toggle('active', k===topUniverse); });
   
   // โหลดชุดหุ้นที่ผ่านเกณฑ์ RS หลักไว้เสมอ เพื่อให้ติดป้ายและกรองได้อย่างถูกต้อง
-  ensureNotes(topMk).then(fresh=>{ if(fresh && curPage==='top20') renderTop20(); });   // ไม่รอ: ปุ่ม 📰 โผล่ตามมาเมื่อโหลดเสร็จ
+  ensureNotes(topMk).then(fresh=>{ if(fresh && curPage==='top20') renderTop20(); });   // ไม่รอ: ปุ่ม โผล่ตามมาเมื่อโหลดเสร็จ
   const rsClean = await ensureTopRS(topMk);
   topRSEligible = new Set((rsClean||[]).filter(s => s && !s.isDR && (s.rs||0) >= RS_TOP_TH).map(s => s.ticker));
 
@@ -1460,7 +1525,7 @@ function topCardItems(rows, m){
           ${logo}
           <button onclick="openModal('${tk}','${jq(s.name)}','${m}')" class="text-[15px] font-bold hover:text-sky-400 truncate" title="${(s.name||'')}">${tk}${drLabel(tk, m)}</button>
           ${ssfBadge(tk, m)}
-          <span class="tag-market" title="${m==='america'?'ตลาดสหรัฐฯ (US)':'ตลาดไทย'}">${m==='america'?'🇺🇸':'🇹🇭'}</span>
+          <span class="tag-market" title="${m==='america'?'ตลาดสหรัฐฯ (US)':'ตลาดไทย'}">${m==='america'?'US':'TH'}</span>
           <span class="text-[10px] text-slate-500 truncate max-w-[120px]">${s.name||''}</span>
           ${Notes.badgeHtml(noteOf(m,tk),m,tk)}
         </div>
@@ -1551,7 +1616,7 @@ async function fetchP2y(m, s){
     const sel=document.getElementById('groupFilter');
     if(!sel) return;
     const idx='<option value="IDX:sp500">S&amp;P 500</option><option value="IDX:nasdaq100">Nasdaq-100</option><option value="IDX:russell2000">Russell 2000</option><option value="IDX:dow30">Dow 30</option>';
-    const us='<option value="ALL">ทุกกลุ่ม</option><option value="DR">🇹🇭 มี DR ไทย (ซื้อผ่านตลาดไทยได้)</option>'+idx+'<option value="idx_other">อื่นๆ (นอก index หลัก)</option>';
+    const us='<option value="ALL">ทุกกลุ่ม</option><option value="DR">มี DR ไทย (ซื้อผ่านตลาดไทยได้)</option>'+idx+'<option value="idx_other">อื่นๆ (นอก index หลัก)</option>';
     const th='<option value="ALL">ทุกกลุ่ม</option><option value="SET50">SET50</option><option value="SET100">SET100</option><option value="mai/Small">mai &amp; Small</option><option value="SSF">SSF (มี Single Stock Future)</option>';
     sel.innerHTML = (mk==='america') ? us : th;
     sel.value='ALL';
@@ -1559,9 +1624,9 @@ async function fetchP2y(m, s){
 /* แยกตลาดให้ชัด: ป้ายตลาด + สีเน้น + title และล้างข้อมูลตลาดเก่าทันทีที่สลับ */
 function applyMarketIdentity(mk){
   document.body.setAttribute('data-market', mk);
-  document.querySelectorAll('.mk-tag').forEach(e=>{ e.textContent = mk==='america' ? '🇺🇸 สหรัฐฯ · USD' : '🇹🇭 ไทย · THB'; });
+  document.querySelectorAll('.mk-tag').forEach(e=>{ e.textContent = mk==='america' ? 'สหรัฐฯ · USD' : 'ไทย · THB'; });
   const chip=document.getElementById('mkChip');
-  if(chip) chip.textContent = mk==='america' ? '🇺🇸 ตลาดสหรัฐฯ · NYSE + NASDAQ + AMEX · $' : '🇹🇭 ตลาดไทย · SET + mai · ฿';
+  if(chip) chip.textContent = mk==='america' ? 'ตลาดสหรัฐฯ · NYSE + NASDAQ + AMEX · $' : 'ตลาดไทย · SET + mai · ฿';
   document.title = mk==='america' ? 'RS Dashboard — หุ้นสหรัฐฯ' : 'RS Dashboard — หุ้นไทย';
 }
 function clearMarketData(){
@@ -1616,7 +1681,7 @@ function switchMarket(mk){
   const thVal = document.getElementById('thValHeader');
   if(thVal) thVal.innerHTML = `Value(${mk==='america'?'$M':'฿M'}) <span class="sort-icon">↕</span>`;
   const foot = document.getElementById('footerText');
-  if(foot) foot.textContent = `rsdashclean.vercel.app • ข้อมูล${mk==='america'?'สหรัฐฯ (US)':'ไทย'} • 📈 RS เต็มตลาด`;
+  if(foot) foot.textContent = `rsdashclean.vercel.app • ข้อมูล${mk==='america'?'สหรัฐฯ (US)':'ไทย'} • RS เต็มตลาด`;
 
   page=1;
   preloadedCharts = {};
@@ -1723,7 +1788,7 @@ function buildCard(tk, nm, grp, ind, rs, px, ch, vol, val, p3, xn, rd, isDR, rv)
       <div class="flex items-center gap-2 min-w-0">
         ${logo}
         <button onclick="openModal('${tk}','${jq(nm)}','${currentMarket}')" class="text-[15px] font-bold hover:text-sky-400 truncate" title="${ind||''}${grp?(' · '+grp):''}">${tk}${drLabel(tk)}</button>
-        <span class="tag-market" title="${currentMarket==='america'?'ตลาดสหรัฐฯ (US)':(grp==='mai/Small'?'ตลาด mai':'ตลาด SET')}">${currentMarket==='america'?'🇺🇸':(grp==='mai/Small'?'🚩':'🇹🇭')}</span>
+        <span class="tag-market" title="${currentMarket==='america'?'ตลาดสหรัฐฯ (US)':(grp==='mai/Small'?'ตลาด mai':'ตลาด SET')}">${currentMarket==='america'?'US':(grp==='mai/Small'?'':'TH')}</span>
         ${cap}
         <span class="text-[10px] text-slate-500 truncate max-w-[130px]" title="${nm||''}">${nm||''}</span>
       </div>
@@ -1788,7 +1853,7 @@ function volBadge(tk, mk){
 }
 function crowdLine(tk, mk){
   const b = (VOLCORR[mk||currentMarket]||{best:{}}).best[tk]; if(!b || !b[0]) return '';
-  return `<span class="pill text-amber-300 border-amber-700/60" title="วิ่งพร้อมกันสูง (correlation 6 เดือน > 0.70) — ซื้อพร้อมกัน = เดิมพันซ้ำ ลดขนาดไม้หรือเลือกตัวเดียว">⚠️ วิ่งคู่ ${b[0]} (corr ${Number(b[1]).toFixed(2)})</span>`;
+  return `<span class="pill text-amber-300 border-amber-700/60" title="วิ่งพร้อมกันสูง (correlation 6 เดือน > 0.70) — ซื้อพร้อมกัน = เดิมพันซ้ำ ลดขนาดไม้หรือเลือกตัวเดียว">⚠ วิ่งคู่ ${b[0]} (corr ${Number(b[1]).toFixed(2)})</span>`;
 }
 function loadVolCorr(){
   [['thailand','th'],['america','us']].forEach(([mk,sfx])=>{
@@ -1832,15 +1897,16 @@ async function loadIndex(){
       const up = x.changePct >= 0;
       const c = up ? 'text-emerald-400' : 'text-rose-400';
       const sign = up ? '+' : '';
-      return `<div class="bg-[#101724] border border-[#1e2634] rounded-lg p-2.5">
-        <div class="flex justify-between items-center">
-          <span class="text-[10px] font-bold text-slate-300">${x.label}
-            <span class="${x.live?'text-emerald-400':'text-slate-500'} normal-case font-semibold ml-1">${x.live?'● LIVE':'ปิด'}</span>
+      const _p=fIdx(x.price).split('.'); const _arrow=up?'▴':'▾';
+      return `<div class="idx-card bg-[#101724] border border-[#1e2634] rounded-lg p-2.5">
+        <div class="idx-top">
+          <span class="idx-name">${x.label}
+            <span class="idx-live ${x.live?'text-emerald-400':'text-slate-500'}">${x.live?'● LIVE':'ปิด'}</span>
           </span>
-          <span class="text-sm font-extrabold ${c}">${sign}${x.changePct.toFixed(2)}%</span>
+          <span class="idx-pct ${c}">${_arrow} ${sign}${x.changePct.toFixed(2)}%</span>
         </div>
-        <div class="text-base font-black text-white leading-tight">${fIdx(x.price)}</div>
-        <div class="text-[9px] text-slate-500 mt-1">เปิด <b>${fIdx(x.open)}</b> · ปิด <b class="${c}">${fIdx(x.close)}</b> · เปลี่ยน <span class="${c}">${sign}${fIdx(x.change)}</span></div>
+        <div class="idx-num">${_p[0]}${_p[1]!=null?'<span class="idx-dec">.'+_p[1]+'</span>':''}</div>
+        <div class="idx-sub"><span>เปิด <b>${fIdx(x.open)}</b></span><span>ปิด <b class="${c}">${fIdx(x.close)}</b></span><span>เปลี่ยน <b class="${c}">${sign}${fIdx(x.change)}</b></span></div>
       </div>`;
     }).join('');
         renderMarketMode();
@@ -1859,7 +1925,7 @@ async function loadIndex(){
         const labelName = isUs ? 'S&P 500' : 'SET';
         const drift = (x.price/x.sma20-1)*100;
         const mode = drift>0.5?'up':(drift<-0.5?'down':'flat');
-        const txt = mode==='up'?'📈 ตลาดขาขึ้น':(mode==='down'?'📉 ตลาดขาลง':'➖ ตลาดนิ่ง');
+        const txt = mode==='up'?'ตลาดขาขึ้น':(mode==='down'?'ตลาดขาลง':'– ตลาดนิ่ง');
         const color = mode==='up'?'text-emerald-400':(mode==='down'?'text-rose-400':'text-slate-300');
         const rel = (n,v)=> Number.isFinite(v) ? `<span class="${x.price>=v?'text-emerald-400':'text-rose-400'}">${x.price>=v?'▲ เหนือ':'▼ ต่ำกว่า'} ${n} ${fIdx(v)}</span>` : '';
         const el=document.getElementById('indexBar'); if(!el) return;
@@ -1874,7 +1940,7 @@ async function loadIndex(){
     }
 
     /* ===== (#สรุปตลาด) render จาก data.scan marketSummary ===== */
-/* 📰 Market Brief: Breadth Δเทียบวาน/สัปดาห์ + แนวโน้มเข้าใจง่าย (จาก /api/market-brief) */
+/* Market Brief: Breadth Δเทียบวาน/สัปดาห์ + แนวโน้มเข้าใจง่าย (จาก /api/market-brief) */
 function deltaHtml(d, unit){
   if(d==null) return '<span class="text-slate-500">–</span>';
   const cls = d>0.4?'text-emerald-400':(d<-0.4?'text-rose-400':'text-slate-400');
@@ -1932,7 +1998,7 @@ async function renderMarketBrief(){
       advise = 'ภาพรวม '+nm+': '+verdict;
     }
     body.innerHTML = `
-          <div class="text-[12px] text-slate-300 mb-2 flex items-start gap-1.5"><span>💡</span><span>${advise}</span></div>
+          <div class="mb-quote"><span class="mb-q-mark" aria-hidden="true">“</span><span>${advise}</span></div>
           <div class="grid ${ms.length>1?'grid-cols-1 sm:grid-cols-2':'grid-cols-1'} gap-2">${cards}</div>`;
   }catch(e){ body.innerHTML='<div class="text-slate-500">โหลด Market Brief ไม่ได้</div>'; }
 }
@@ -1990,12 +2056,12 @@ function renderSummary(sum){
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 items-stretch">
       <div class="lg:col-span-1 space-y-2 flex flex-col">
         <div class="bg-[#101724] rounded-lg p-2 flex-1 flex flex-col min-h-[150px]">
-          <div class="text-[10px] font-bold text-sky-300 mb-1.5">🌍 Market Breadth — % เหนือ MA</div>
+          <div class="text-[10px] font-bold text-sky-300 mb-1.5">Market Breadth — % เหนือ MA</div>
           <div id="marketBreadthBox" class="flex-1 flex flex-col"><div class="text-[10px] text-slate-500">โหลด...</div></div>
         </div>
         <div class="bg-[#101724] rounded-lg p-2">
           <div class="flex items-center justify-between text-[10px] text-slate-500 mb-1">
-            <span>💰 มูลค่าซื้อขาย 1D <span class="${dir?'text-emerald-400':'text-rose-400'} font-bold">${dir?'เข้า':'ออก'} ${fBil(m.net)}</span></span>
+            <span>มูลค่าซื้อขาย 1D <span class="${dir?'text-emerald-400':'text-rose-400'} font-bold">${dir?'เข้า':'ออก'} ${fBil(m.net)}</span></span>
             <span class="text-[9px]">ขึ้น ${fBil(m.in)} · ลง ${fBil(m.out)}</span>
           </div>
           <div class="flex h-2.5 rounded-full overflow-hidden">
@@ -2008,31 +2074,31 @@ function renderSummary(sum){
           </div>
         </div>
       </div>
-      <div class="lg:col-span-2 bg-[#101724] rounded-lg p-2" id="breadthHistWrap"><div class="text-[11px] font-bold text-sky-300 mb-1">📈 Breadth History — % เหนือ SMA50 / SMA200</div><div id="breadthHistChart" style="height:100%"></div></div>
+      <div class="lg:col-span-2 bg-[#101724] rounded-lg p-2" id="breadthHistWrap"><div class="text-[11px] font-bold text-sky-300 mb-1">Breadth History — % เหนือ SMA50 / SMA200</div><div id="breadthHistChart" style="height:100%"></div></div>
     </div>
   ${ (strong.length || weak.length)?`
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
     <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
-      <div class="text-[11px] font-bold text-emerald-400 mb-1">💪 ผู้นำ / สนใจ (RS≥90) — กำลังแข็งแกร่ง</div>
+      <div class="text-[11px] font-bold text-emerald-400 mb-1">ผู้นำ / สนใจ (RS≥90) — กำลังแข็งแกร่ง</div>
       <div class="flex flex-wrap gap-1.5">${strong.map(s=>`<button onclick="openModal('${s.ticker}','${jq(s.name)}','${currentMarket}')" class="pill hover:bg-emerald-900/30">${s.ticker}${drLabel(s.ticker)} <b class="text-emerald-400">${s.rs}</b><span class="ml-1.5 text-[9px] text-emerald-400/70">${themeDisplay(s.industry)}</span></button>`).join('')}</div>
       <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS สูง + อยู่ในธีมแข็งแกร่ง — แต่เช็ค Breadth/มูลค่าซื้อขาย + ไม่ไล่ซื้อตอน RS 99 นาน/ราคาไกลฐาน</div>
     </div>
     ${ weak.length?`
     <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
-      <div class="text-[11px] font-bold text-rose-400 mb-1">⚠️ อ่อนตัว / ระวัง (RS&lt;50 + วันนี้ลง&gt;3%) — มีประเด็น</div>
+      <div class="text-[11px] font-bold text-rose-400 mb-1">⚠ อ่อนตัว / ระวัง (RS&lt;50 + วันนี้ลง&gt;3%) — มีประเด็น</div>
       <div class="flex flex-wrap gap-1.5">${weak.map(s=>`<button onclick="openModal('${s.ticker}','${jq(s.name)}','${currentMarket}')" class="pill border-rose-800 text-rose-300">${s.ticker}${drLabel(s.ticker)}${s.isDR?' <b class="text-amber-400">DR</b>':''} RS${s.rs} ${fPct(s.change)}<span class="ml-1.5 text-[9px] text-rose-300/70">${themeDisplay(s.industry)}</span></button>`).join('')}</div>
     </div>`:''}
     </div>`:''}
   ${ (sum.upComing&&sum.upComing.length || sum.downComing&&sum.downComing.length)?`
   <div class="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-2">
   <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
-    <div class="text-[11px] font-bold text-yellow-300 mb-1">🚀 UPCOMING (กำลังขึ้น) — RS กลาง ยังไม่พีค มีโอกาส</div>
+    <div class="text-[11px] font-bold text-yellow-300 mb-1">UPCOMING (กำลังขึ้น) — RS กลาง ยังไม่พีค มีโอกาส</div>
     <div class="flex flex-wrap gap-1.5">${sum.upComing.map(s=>`<button onclick="openModal('${s.ticker}','${jq(s.name)}','${currentMarket}')" class="pill border-yellow-700 text-yellow-200" title="${s.industry}: 1M ${fPct2(s.p1m)} · 1W ${fPct2(s.p1w)}">${s.ticker}${drLabel(s.ticker)}${s.isDR?' <b class="text-amber-400">DR</b>':''} <b>${s.rs}</b> ${fPct2(s.p1m)}<span class="ml-1.5 text-[9px] text-yellow-200/70">${themeDisplay(s.industry)}</span></button>`).join('')}</div>
     <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS 70+ (ยังไม่พีค, ไม่ใช่ท็อปแรงสุด) + กำลังเร่ง 1M/1W >0 — จับตา breakout ยังทันลุ้น leader</div>
   </div>
   ${ sum.downComing&&sum.downComing.length?`
   <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
-    <div class="text-[11px] font-bold text-rose-400 mb-1">📉 DOWNCOMING (กำลังอ่อนแรง) — เคยแรงแต่เริ่มลง</div>
+    <div class="text-[11px] font-bold text-rose-400 mb-1">DOWNCOMING (กำลังอ่อนแรง) — เคยแรงแต่เริ่มลง</div>
     <div class="flex flex-wrap gap-1.5">${sum.downComing.map(s=>`<button onclick="openModal('${s.ticker}','${jq(s.name)}','${currentMarket}')" class="pill border-rose-800 text-rose-300" title="${s.industry}: 1M ${fPct2(s.p1m)} · 1W ${fPct2(s.p1w)}">${s.ticker}${drLabel(s.ticker)}${s.isDR?' <b class="text-amber-400">DR</b>':''} <b>${s.rs}</b> ${fPct2(s.p1m)}<span class="ml-1.5 text-[9px] text-rose-300/70">${themeDisplay(s.industry)}</span></button>`).join('')}</div>
     <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS ยังสูง (RS≥70) แต่ 1M ลบ/แรงขายเริ่ม — กำลัง distribution ระวังถอย/ตรวจ 52w สูงพัง</div>
       </div>
@@ -2041,12 +2107,12 @@ function renderSummary(sum){
   ${ (sum.rank_up&&sum.rank_up.length || sum.rank_down&&sum.rank_down.length)?`
   <div class="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-2">
   <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
-    <div class="text-[11px] font-bold text-emerald-400 mb-1">⬆️ ขึ้นอันดับมากสุด (Rank Change สูงสุด)</div>
+    <div class="text-[11px] font-bold text-emerald-400 mb-1">▲️ ขึ้นอันดับมากสุด (Rank Change สูงสุด)</div>
     <div class="flex flex-wrap gap-1.5">${(sum.rank_up||[]).map(s=>`<button onclick="openModal('${s.ticker}','${jq(s.name)}','${currentMarket}')" class="pill border-emerald-700 text-emerald-200" title="${s.name||''}: rank ${s.rT} · ขึ้น ${s.rD} อันดับ">${s.ticker}${drLabel(s.ticker)} <b>${s.rD>0?'+'+s.rD:s.rD}</b> RS${s.rs} ${fPct(s.change)}</button>`).join('')}</div>
     <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS ไต่ขึ้นเร็วจากเมื่อวาน - อันดับดีขึ้น ยังไม่พีค จับ tier พึ่งขึ้น</div>
   </div>
   <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
-    <div class="text-[11px] font-bold text-rose-400 mb-1">⬇️ ลงอันดับมากสุด (Rank Change ต่ำสุด)</div>
+    <div class="text-[11px] font-bold text-rose-400 mb-1">▼️ ลงอันดับมากสุด (Rank Change ต่ำสุด)</div>
     <div class="flex flex-wrap gap-1.5">${(sum.rank_down||[]).map(s=>`<button onclick="openModal('${s.ticker}','${jq(s.name)}','${currentMarket}')" class="pill border-rose-800 text-rose-300" title="${s.name||''}: rank ${s.rT} · ลง ${s.rD} อันดับ">${s.ticker}${drLabel(s.ticker)} <b>${s.rD}</b> RS${s.rs} ${fPct(s.change)}</button>`).join('')}</div>
     <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS ร่วงเร็วจากเมื่อวาน - อันดับหล่น ระวังจุดอ่อน/เทขาย ตรวจสาเหตุ</div>
   </div>
@@ -2054,9 +2120,9 @@ function renderSummary(sum){
 
 
   ${ sum.themes_top&&sum.themes_top.length?`
-  <div class="mt-3"><div class="text-[11px] font-bold text-sky-400 mb-1">🎯 กลุ่มที่ "หุ้นขึ้น" (มูลค่าซื้อขายมากสุด) 1D — กดดูหุ้นในกลุ่ม</div>
+  <div class="mt-3"><div class="text-[11px] font-bold text-sky-400 mb-1">กลุ่มที่ "หุ้นขึ้น" (มูลค่าซื้อขายมากสุด) 1D — กดดูหุ้นในกลุ่ม</div>
     <div class="flex flex-wrap gap-1.5">${(sum.inflows1d||[]).map(n=>`<button onclick="openIndustry('${jq(n)}')" class="pill cursor-pointer hover:bg-emerald-900/30">${n}</button>`).join('')||'<span class="text-slate-500">-</span>'}</div></div>
-  <div class="mt-1"><div class="text-[11px] font-bold text-rose-400 mb-1">📉 กลุ่มที่ "หุ้นลง" (มูลค่าซื้อขายมากสุด) 1D — กดดูหุ้นในกลุ่ม</div>
+  <div class="mt-1"><div class="text-[11px] font-bold text-rose-400 mb-1">กลุ่มที่ "หุ้นลง" (มูลค่าซื้อขายมากสุด) 1D — กดดูหุ้นในกลุ่ม</div>
     <div class="flex flex-wrap gap-1.5">${(sum.outflows1d||[]).map(n=>`<button onclick="openIndustry('${jq(n)}')" class="pill cursor-pointer hover:bg-rose-900/30">${n}</button>`).join('')||'<span class="text-slate-500">-</span>'}</div></div>`:''}
   <div class="text-[9px] text-slate-600 mt-2">* คำแนะนำอัตโนมัติจากตัวเลข ใช้ประกอบการตัดสินใจ ไม่ใช่การชี้ชวนซื้อขาย · ${(sum.generated_at||'').replace('T',' ').slice(0,16)}</div>
     `;
@@ -2079,7 +2145,7 @@ function renderSummary(sum){
           hist = hist.slice(-252);          // เอาแค่ 1 ปีทำการหลังสุด
           const plot = hist.slice(0, -1);   // ตัดจุดล่าสุดออก (ไม่ plot ตัวท้ายสุด)
           el.innerHTML='';
-          // 🔧 fix 5 ต.ค. 2026: รอให้กล่องมีความกว้างจริงก่อนวาด — เดิมวัดตอนกล่องกว้าง 0 แล้วยึด width 320px
+          // fix 5 ต.ค. 2026: รอให้กล่องมีความกว้างจริงก่อนวาด — เดิมวัดตอนกล่องกว้าง 0 แล้วยึด width 320px
           // ทำให้กราฟเล็กค้างอยู่ในกล่องกว้าง ~1000px (มีช่องว่างด้านขวาเยอะ). รอสูงสุด ~1.2 วิ.
           let _w = el.clientWidth, _tries = 0;
           while(_w < 60 && _tries < 12){ await new Promise(r=>setTimeout(r,100)); _w = el.clientWidth; _tries++; }
@@ -2125,7 +2191,7 @@ function startTimer(){
 function stopTimer(){ clearInterval(timerId); setTimeout(()=>document.getElementById('progressPanel').classList.add('hidden'),3000); }
 
 /* ===== Money Flow render (แยก in/out ต่อ TF) ===== */
-/* 🚀 TOP GAIN / LOSS แยก TH/US — logo+ชื่อ+val filter+เลือกกลุ่ม */
+/* TOP GAIN / LOSS แยก TH/US — logo+ชื่อ+val filter+เลือกกลุ่ม */
 let glMarket='thailand';
 // จำ filter แยกตลาด (ไทย/อเมกา มี group/val/count เป็นของตัวเองไม่ปนกัน)
 let glPref = { thailand:{grp:'ALL',val:'5',cnt:'10'}, america:{grp:'ALL',val:'5',cnt:'10'} };
@@ -2133,7 +2199,7 @@ function glGroupOptions(mk){
   const g=document.getElementById('glGroup'); if(!g) return;
   const O=(v,l)=>`<option value="${v}">${l}</option>`;
   g.innerHTML = (mk==='america')
-    ? O('ALL','หุ้นสามัญทั้งหมด (ทุกกลุ่ม)')+O('has_rs','เฉพาะหุ้นที่มีค่า RS')+O('DR','🇹🇭 มี DR ไทย')+O('sp500','S&amp;P 500')+O('nasdaq100','Nasdaq-100')+O('dow30','Dow 30')+O('russell2000','Russell 2000')+O('idx_other','อื่นๆ (นอก index หลัก)')
+    ? O('ALL','หุ้นสามัญทั้งหมด (ทุกกลุ่ม)')+O('has_rs','เฉพาะหุ้นที่มีค่า RS')+O('DR','มี DR ไทย')+O('sp500','S&amp;P 500')+O('nasdaq100','Nasdaq-100')+O('dow30','Dow 30')+O('russell2000','Russell 2000')+O('idx_other','อื่นๆ (นอก index หลัก)')
     : O('ALL','หุ้นสามัญทั้งหมด (ทุกกลุ่ม)')+O('has_rs','เฉพาะหุ้นที่มีค่า RS')+O('SET50','SET50')+O('SET100','SET100')+O('mai/Small','mai &amp; Small')+O('SSF','SSF (มี Single Stock Future)');
 }
 function applyGLPref(mk){
@@ -2159,7 +2225,7 @@ async function renderTopGL(){
   const topN=Number(document.getElementById('glCount').value||10);
   glPref[glMarket]={grp:document.getElementById('glGroup').value, val:document.getElementById('glVal').value||'5', cnt:document.getElementById('glCount').value||'10'};
   const isTh = glMarket==='thailand';
-  const mkLabel = isTh?'ไทย 🇹🇭':'อเมริกา 🇺🇸';
+  const mkLabel = isTh?'ไทย TH':'อเมริกา US';
   const curSymbol = isTh?'฿':'$';
   body.innerHTML='<div class="text-slate-400">โหลด...</div>';
   try{
@@ -2264,7 +2330,7 @@ function openIndustry(indName){
     .sort((a,b)=>b.rs-a.rs);
   const grp = (stockData||[]).find(s=>(s.industry||s.sector||'Other')===indName);
   const tagg = grp ? (grp.group||'') : '';
-  document.getElementById('groupModalTitle').innerHTML = `🏢 ${indName} <span class="text-xs text-slate-400 font-normal">${tagg} · ${list.length} ตัว</span>`;
+  document.getElementById('groupModalTitle').innerHTML = `${indName} <span class="text-xs text-slate-400 font-normal">${tagg} · ${list.length} ตัว</span>`;
   document.getElementById('groupModalBody').innerHTML =
     list.map(s=>{
       // มูลค่าซื้อขาย(val) วันนี้ + ทิศราคา (change) — กำกับชัด ไม่ใช่ "เงินไหลสุทธิจริง"
@@ -2459,11 +2525,11 @@ async function runUpdate(force){
   preloadedCharts = {};   // reset chart cache on fresh update
   loadVolCorr();   // โหลดความผันผวน + คู่ที่วิ่งพร้อมกัน (static) → ป้ายใน card/modal
   try{
-    setProgress(15,'🔍 สแกน '+(currentMarket==='america'?'ตลาดอเมริกา (US)':'ตลาดไทย')+' (TradingView)...');
+    setProgress(15,'สแกน '+(currentMarket==='america'?'ตลาดอเมริกา (US)':'ตลาดไทย')+' (TradingView)...');
     const mk0=currentMarket;   // จำตลาดตอนยิง — ถ้าผู้ใช้สลับตลาดระหว่างรอ ห้ามเอาผลของตลาดเก่ามาทับ
     const res=await fetch(API+'/api/scan?market='+mk0+(force?'&force=1':''));
     if(!res.ok) throw new Error('HTTP '+res.status);
-    setProgress(60,'🧮 คำนวณ RS / จัดกลุ่ม...');
+    setProgress(60,'คำนวณ RS / จัดกลุ่ม...');
     const data=await res.json(); if(data.error) throw new Error(data.error);
     stockDB[mk0]=data.data||[];
     topRSData[mk0]=data.data||[];
@@ -2480,21 +2546,22 @@ async function runUpdate(force){
             renderMarketBrief();
             renderTopGL();
             renderMegatrend();
+        try{ renderTopRs(); thusHead(curPage); }catch(e){}
         loadIndex();
     document.getElementById('stockCount').textContent=(data.count??0)+' ผ่านเกณฑ์ · '+(data.total_market??'')+' ทั้งกระดาน';
     document.getElementById('lastUpdateText').textContent='อัปเดตล่าสุด: '+new Date().toLocaleTimeString('th-TH',{timeZone:'Asia/Bangkok'})+' น.';
-    setProgress(80,'📈 กำลังโหลดกราฟ...');
+    setProgress(80,'กำลังโหลดกราฟ...');
     renderView();
     if(curPage==='scanner') renderScanner(); if(curPage==='leaders') renderLeaders();
     const top10=stockData.slice(0,10);
     for(let i=0;i<top10.length;i++){
       if(mk0!==currentMarket) break;   // สลับตลาดแล้ว หยุดโหลดกราฟตลาดเก่า (กัน preloadedCharts ปนข้ามตลาด)
-      setProgress(80+Math.round((i+1)/top10.length*15),'📊 '+top10[i].ticker+' ('+(i+1)+'/'+top10.length+')');
+      setProgress(80+Math.round((i+1)/top10.length*15),''+top10[i].ticker+' ('+(i+1)+'/'+top10.length+')');
       try{ const c=await fetch(API+'/api/chart?market='+mk0+'&symbol='+encodeURIComponent(top10[i].ticker)+'&interval=1d&range=3y'); const j=await c.json(); if(j.data&&j.data.length&&mk0===currentMarket){ preloadedCharts[top10[i].ticker]=j.data; if(j.firstTradeDate) chartFirstDate[top10[i].ticker]=j.firstTradeDate; } }catch(e){}
     }
-    setProgress(100,'✅ เสร็จ'); stopTimer();
+    setProgress(100,'✓ เสร็จ'); stopTimer();
   }catch(e){
-    setProgress(100,'❌ '+e.message); stopTimer(); console.error(e);
+    setProgress(100,'✕ '+e.message); stopTimer(); console.error(e);
   }finally{ btn.disabled=false; }
 }
 
@@ -2744,7 +2811,7 @@ function openModalByTk(tk, mkt){
   const f = (mk==='america'?(stockDB.america||[]):(stockDB.thailand||[])).find(x=>x.ticker===tk);
   openModal(tk, f ? (f.name||'') : '', mk);
 }
-// 🏢 เกี่ยวกับบริษัท (desc/<us|th>/<shard>.json จาก scripts/news/fetch_profiles.mjs) — โหลดเฉพาะ shard ที่ต้องใช้ แคชไว้
+// เกี่ยวกับบริษัท (desc/<us|th>/<shard>.json จาก scripts/news/fetch_profiles.mjs) — โหลดเฉพาะ shard ที่ต้องใช้ แคชไว้
 const aboutShards={};
 async function loadAbout(tk, mk){
   const el=document.getElementById('modalAbout'); if(!el) return;
@@ -2779,8 +2846,8 @@ function openModal(tk,nm,mkt){
       ? `<span class="text-xl font-black ml-1.5 ${rsColor(Number(found.rs))}" title="RS เปอร์เซ็นต์ไทล์ เทียบทั้งตลาด">RS ${found.rs}</span>` : '';
   document.getElementById('modalTheme').innerHTML = theme ? `<span class="pill text-sky-300 border-sky-700/60">${theme}</span>` : '';
   // ---- เพิ่มให้ป็อปอัปมีข้อมูลครบเท่าการ์ด (5 ต.ค. 2026: GT สั่ง) ----
-  // 1) ป้ายตลาด (🇹🇭/🇺🇸) เหมือน tag บนการ์ด
-  document.getElementById('modalTag').innerHTML = `<span class="tag-market" title="${mk==='america'?'ตลาดสหรัฐฯ (US)':(grp==='mai/Small'?'ตลาด mai':'ตลาด SET')}">${mk==='america'?'🇺🇸':(grp==='mai/Small'?'🚩':'🇹🇭')}</span>`;
+  // 1) ป้ายตลาด (TH/US) เหมือน tag บนการ์ด
+  document.getElementById('modalTag').innerHTML = `<span class="tag-market" title="${mk==='america'?'ตลาดสหรัฐฯ (US)':(grp==='mai/Small'?'ตลาด mai':'ตลาด SET')}">${mk==='america'?'US':(grp==='mai/Small'?'':'TH')}</span>`;
   // 2) ป้าย DR (ถ้าเป็นตราสารแสดงสิทธิ)
   const _ssf = document.getElementById('modalSSF');
   if(_ssf) _ssf.innerHTML = ssfBadge(tk, mk);
@@ -2807,7 +2874,7 @@ function openModal(tk,nm,mkt){
   const _ml = document.getElementById('modalLegend');
   if(_ml) _ml.innerHTML = maLegendHTML();
   const _drEl=document.getElementById('modalDR');
-  if(_drEl) _drEl.innerHTML = (mk==='america') ? drTableHTML(tk) : '';   // 🇹🇭 DR ไทย (เฉพาะหุ้นเมกา)
+  if(_drEl) _drEl.innerHTML = (mk==='america') ? drTableHTML(tk) : '';   // DR ไทย (เฉพาะหุ้นเมกา)
   document.getElementById('chartModal').classList.remove('hidden'); document.getElementById('chartModal').classList.add('flex'); fetchModal('1y');
 }
 function closeModal(){ document.getElementById('chartModal').classList.add('hidden'); document.getElementById('chartModal').classList.remove('flex'); activeTicker=''; }
@@ -2830,7 +2897,7 @@ async function fetchModal(iv){
       if(Math.abs(Number(f.price)-last.close) < 1e-6) return;
       const n=document.createElement('div'); n.id='modalPriceNote';
       n.className='text-[11px] mt-1 mb-1 px-2 py-1 rounded-md border border-amber-700/60 text-amber-300 bg-amber-900/10';
-      n.textContent='⚠️ กราฟล่าสุดถึง '+last.time+' (ปิด '+fNumFull(last.close)+') · ราคาปัจจุบัน '+fNumFull(f.price)+' มาจาก TradingView — แหล่งข้อมูลกราฟอัปเดตช้ากว่า 1 วันทำการ';
+      n.textContent='⚠ กราฟล่าสุดถึง '+last.time+' (ปิด '+fNumFull(last.close)+') · ราคาปัจจุบัน '+fNumFull(f.price)+' มาจาก TradingView — แหล่งข้อมูลกราฟอัปเดตช้ากว่า 1 วันทำการ';
       const lg=document.getElementById('modalLegend'); if(lg) lg.after(n);
     })();
     nextFrame().then(()=>{
