@@ -2945,10 +2945,10 @@ function drawChartW(el, raw, w){
   chart.addCandlestickSeries({upColor:thusC().up,downColor:thusC().down,borderVisible:false,wickUpColor:thusC().up,wickDownColor:thusC().down}).setData(data);
   const hasVol=data.some(d=>d.volume>0);
   if(hasVol){
-    chart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol'}).setData(data.map(d=>({time:d.time,value:d.volume,color:d.close>=d.open?thusC().vup:thusC().vdown})));
+    chart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol',priceLineVisible:false}).setData(data.map(d=>({time:d.time,value:d.volume,color:d.close>=d.open?thusC().vup:thusC().vdown})));
     chart.priceScale('vol').applyOptions({scaleMargins:{top:.82,bottom:0}});
   }
-  const sma=(n,color)=>{ if(data.length<n)return; const o=[]; for(let i=n-1;i<data.length;i++){let s=0;for(let j=0;j<n;j++)s+=data[i-j].close;o.push({time:data[i].time,value:s/n});} chart.addLineSeries({color,lineWidth:1,crosshairMarkerVisible:false}).setData(o); };
+  const sma=(n,color)=>{ if(data.length<n)return; const o=[]; for(let i=n-1;i<data.length;i++){let s=0;for(let j=0;j<n;j++)s+=data[i-j].close;o.push({time:data[i].time,value:s/n});} chart.addLineSeries({color,lineWidth:1,crosshairMarkerVisible:false,priceLineVisible:false}).setData(o); };
   sma(50,thusC().l1); sma(200,thusC().l2);
   const last=data[data.length-1];
   if(last){
@@ -3077,10 +3077,10 @@ async function fetchModal(iv){
       ch.addCandlestickSeries({upColor:thusC().up,downColor:thusC().down,borderVisible:false,wickUpColor:thusC().up,wickDownColor:thusC().down}).setData(data);
       const hasVol=data.some(d=>d.volume>0);
       if(hasVol){
-        ch.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol'}).setData(data.map(d=>({time:d.time,value:d.volume,color:d.close>=d.open?thusC().vup:thusC().vdown})));
+        ch.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol',priceLineVisible:false}).setData(data.map(d=>({time:d.time,value:d.volume,color:d.close>=d.open?thusC().vup:thusC().vdown})));
         ch.priceScale('vol').applyOptions({scaleMargins:{top:.8,bottom:0}});
       }
-      const sma=(n,color)=>{ if(data.length<n)return; const o=[]; for(let i=n-1;i<data.length;i++){let s=0;for(let j=0;j<n;j++)s+=data[i-j].close;o.push({time:data[i].time,value:s/n});} ch.addLineSeries({color,lineWidth:1,crosshairMarkerVisible:false}).setData(o); };
+      const sma=(n,color)=>{ if(data.length<n)return; const o=[]; for(let i=n-1;i<data.length;i++){let s=0;for(let j=0;j<n;j++)s+=data[i-j].close;o.push({time:data[i].time,value:s/n});} ch.addLineSeries({color,lineWidth:1,crosshairMarkerVisible:false,priceLineVisible:false}).setData(o); };
       sma(50,thusC().l1); sma(200,thusC().l2); ((iv==='1y'||iv==='1d')?thusRange(ch,data.length,126):ch.timeScale().fitContent()); ch.timeScale().applyOptions({ rightOffset: 12 });
     });
   }catch(e){ el.innerHTML='<div class="text-center text-rose-400 text-sm">โหลดไม่สำเร็จ</div>'; }
