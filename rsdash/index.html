@@ -326,6 +326,41 @@ html [class*="text-gray-"], html [class*="text-zinc-"], html [class*="text-neutr
 html [class*="text-white/"], html [class*="text-slate-300/"], html [class*="text-slate-400/"] { color:var(--muted); }
 html [class*="text-slate-5"], html [class*="text-slate-6"] { color:var(--faint); }
 html .opacity-80, html .opacity-75, html .opacity-70 { opacity:1; }
+/* ผู้นำรายเดือน: การ์ดสรุป 3 ใบด้านบน (กล่องเขียว/โน้ตเดิมที่ซ้ำกันซ่อนไว้ ข้อมูลอยู่ในการ์ดแล้ว) */
+html .ld-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin:4px 0 18px; }
+html .ld-card { background:var(--panel2); border:1px solid var(--line); border-radius:22px; padding:18px 20px; display:flex; flex-direction:column; gap:6px; }
+html .ld-card.first { border-color:var(--goldline); }
+html .ld-k { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+html .ld-v { font-size:38px; font-weight:400; letter-spacing:-.02em; line-height:1.1; font-variant-numeric:tabular-nums; color:var(--text); }
+html .ld-card.first .ld-v { color:var(--gold); }
+html .ld-v small { font-size:15px; color:var(--muted); letter-spacing:0; }
+html .ld-v.ld-date { font-size:26px; }
+html .ld-s { font-size:13px; color:var(--muted); line-height:1.5; }
+html #ldCards:not(:empty) ~ #ldGate { display:none; }
+html #leadersPanel table { font-size:14px; } html #leadersPanel table td, html #leadersPanel table th { padding:11px 10px; border-color:var(--line); }
+html #leadersPanel table thead th { font-size:11px; letter-spacing:.08em; color:var(--muted); font-weight:500; white-space:nowrap; }
+/* Report: คอลัมน์ "เข้าใหม่" กับ "หลุด" เทียบกันสองฝั่งบนจอกว้าง */
+html .rp-sub { display:block; font-size:12px; color:var(--muted); font-weight:400; margin-top:2px; max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+@media (min-width:1200px){
+  html #rpBody { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:20px; align-items:start; }
+  html #rpBody > div:nth-child(n+3) { grid-column:1 / -1; }
+  html #rpBody > div:nth-child(-n+2) table { font-size:12.5px; }
+  html #rpBody > div:nth-child(-n+2) table th, html #rpBody > div:nth-child(-n+2) table td { padding:9px 6px; }
+  html #rpBody > div:nth-child(-n+2) thead th { white-space:normal; line-height:1.3; vertical-align:bottom; }
+  html #rpBody > div:nth-child(-n+2) .rp-sub { max-width:170px; }
+}
+/* หน้าหุ้น (ตาราง) บนมือถือ: เหลือคอลัมน์หลักให้พอดีจอ — ที่ซ่อน (Value, RVOL, ΔRank, Theme) ดูได้ในป๊อปอัปเมื่อกดชื่อหุ้น */
+@media (max-width:640px){
+  html #tableView table th:nth-child(5), html #tableView table td:nth-child(5),
+  html #tableView table th:nth-child(6), html #tableView table td:nth-child(6),
+  html #tableView table th:nth-child(8), html #tableView table td:nth-child(8),
+  html #tableView table th:nth-child(9), html #tableView table td:nth-child(9) { display:none; }
+  html #tableView table th, html #tableView table td { padding:12px 8px; }
+  html #tableView table { font-size:14px; }
+  html #tableView table thead th { font-size:10.5px; letter-spacing:.02em; padding:12px 6px; white-space:nowrap; }
+  html #tableView table thead th .sort-icon { display:none; }
+  html #tableView .tf-chip { min-height:30px; padding:2px 10px; font-size:12.5px; }
+}
 /* Scanner: ป้ายสไลเดอร์อยู่บรรทัดเดียว (ค่า + หน่วย) แล้วแถบเลื่อนเต็มกว้างด้านล่าง */
 html #scannerPanel > div.flex.flex-wrap.items-end label.flex-col { flex-direction:row; flex-wrap:wrap; align-items:baseline; column-gap:6px; row-gap:8px; }
 html #scannerPanel > div.flex.flex-wrap.items-end label.flex-col input[type=range], html #scannerPanel > div.flex.flex-wrap.items-end label.flex-col select { flex:1 0 100%; }
@@ -479,6 +514,7 @@ html #topbar .brand-logo { display:none; }
                   <!-- 🏆 ผู้นำหุ้นไทย: near52wHigh + โมเมนตัม 12-1 Top20 รายเดือน + Gate (ผลสำรวจ in-sample) -->
                   <div id="leadersPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
                     <div class="flex flex-wrap items-center gap-2 mb-2"><h2 class="text-sm font-bold flex items-center gap-2"><span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/></svg></span> ผู้นำรายเดือน — ขึ้นมากสุดเดือนนี้ · ขาขึ้น MA50>MA200 · ผ่านสภาพคล่อง <span class="mk-chip mk-tag"></span></h2> <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('leaders','copy',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg> TV</button><button class="tf-chip" onclick="wlExport('leaders','file',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> .txt</button></span></div>
+                    <div id="ldCards"></div>
                     <div id="ldWarn" class="rounded-lg border border-amber-700/60 bg-amber-900/10 text-amber-200 px-3 py-2 text-[11px] leading-relaxed mb-2">⚠ <b>ผลวิจัยในอดีต (in-sample) ยังไม่พิสูจน์ edge — ไม่ใช่คำแนะนำการลงทุน</b> · ตลาดสหรัฐฯ ไม่พบ edge จากแนวทางนี้ (หน้านี้ใช้กับตลาดไทยเท่านั้น)</div>
                     <div id="ldGate" class="mb-2"></div>
                     <div id="ldNote" class="text-[11px] text-slate-400 mb-1.5 leading-relaxed"></div>
@@ -1225,6 +1261,20 @@ function ldNoteApply(){
   el.innerHTML='<b>'+(isUs?'(DR)':'SSF')+'</b> = '+(isUs?'ซื้อในไทยได้ผ่านตราสารแสดงสิทธิ (DR)':'มี Single Stock Future ที่ TFEX (สัญญารายตัว)')
     +' · ใน <b>'+all.length+'</b> ตัวนี้มี <b>'+hit.length+'</b> ตัว: '+(hit.join(', ')||'-');
 }
+/* การ์ดสรุปด้านบนหน้าผู้นำรายเดือน: จำนวนผู้นำ · มี SSF/DR กี่ตัว · วันที่ข้อมูลและฐานเทียบ */
+function ldCardsApply(j){
+  const el=document.getElementById('ldCards'); if(!el || !ldRows || !ldRows.length) return;
+  const isUs = ldMarket==='america';
+  const all = ldRows.map(p=>p.ticker);
+  const hit = all.filter(tk => isUs ? Boolean(drList(tk)) : hasSSF(tk));
+  const lbl = j.metric_label || 'เดือนนี้';
+  el.innerHTML =
+    '<div class="ld-cards">'+
+    '<div class="ld-card first"><span class="ld-k">ผู้นำ'+lbl+'</span><span class="ld-v">'+j.count+'<small> ตัว</small></span><span class="ld-s">ขาขึ้น (MA50 &gt; MA200) และผ่านสภาพคล่องทุกตัว</span></div>'+
+    '<div class="ld-card"><span class="ld-k">'+(isUs?'ซื้อในไทยได้ผ่าน DR':'มี Single Stock Future')+'</span><span class="ld-v">'+hit.length+'<small> ตัว</small></span><span class="ld-s">'+(isUs?'ในรายการที่แสดง ':'เทรดสัญญารายตัวที่ TFEX ได้ ')+'จาก '+all.length+' ตัว</span></div>'+
+    '<div class="ld-card"><span class="ld-k">ข้อมูล ณ</span><span class="ld-v ld-date">'+(j.asOf||'–')+'</span><span class="ld-s">'+(j.base?('เทียบกับปิด '+j.base):'ผลตอบแทนย้อนหลัง 1 เดือน')+'</span></div>'+
+    '</div>';
+}
 function ldApply(){
   const body=document.getElementById('ldBody'); if(!body) return;
   const sel=document.getElementById('ldLimit');
@@ -1262,6 +1312,7 @@ async function renderLeaders(){
     gEl.innerHTML='<div class="rounded-lg border border-emerald-700/50 bg-emerald-900/10 px-3 py-2 text-xs"><b class="text-sm">'+j.count+' ตัวเป็นผู้นำรายเดือน ('+j.metric_label+')</b><div class="opacity-80 mt-0.5">เรียงตาม'+(j.metric_label||'เดือนนี้')+' จากมากไปน้อย · ทุกตัวเป็นขาขึ้น (MA50 &gt; MA200) และผ่านสภาพคล่อง · ข้อมูล ณ '+j.asOf+'</div></div>';
     ldApply();
     ldNoteApply();
+    try{ ldCardsApply(j); }catch(e){}
     how.innerHTML='<b>วิธีอ่าน:</b> "'+(j.metric_label||'เดือนนี้')+'" = '+(j.base?('ผลตอบแทนจากปิดเดือนก่อน ('+j.base+') ถึงปิดล่าสุด ('+j.asOf+')'):'ผลตอบแทนย้อนหลัง 1 เดือน (TradingView)')+' · RS คือคะแนนความแข็งแกร่ง 1–99 ตามสูตรของเว็บ · หุ้นที่มูลค่าซื้อขายต่ำระวังเลือน<br><b>หมายเหตุ:</b> ข้อมูลประกอบการคัดกรองเท่านั้น ไม่ใช่คำแนะนำซื้อขาย';
   }catch(e){ gEl.innerHTML='<div class="text-rose-400 text-xs">โหลดไม่สำเร็จ: '+e.message+'</div>'; }
   finally{ ldBusy=false; }
@@ -1375,8 +1426,8 @@ function rpBodyHTML(j){
   const H=L+' @'+(T.u?(''):'');                  // ชื่อคอลัมน์ = R 1 ปี @วัน (หน่วย) ด้านล่าง
   const tt=x=>H+x+(T.u?' ('+T.u+')':'');
   const dFrom=rpD(j.resolved.from), dTo=rpD(j.resolved.to), N=(j.n||20);
-  const colsEnter=[{l:'#',g:r=>'#'+r.rankTo},{l:'หุ้น',g:r=>`<button onclick="openModalByTk('${r.ticker||''}','${rpMk}')" class="font-bold text-sky-400 hover:underline" title="กดดูกราฟ ${r.ticker||''}">${r.ticker||''}${drLabel(r.ticker, rpMk)}</button>`},{l:'ชื่อ',g:r=>'<span class="text-slate-400">'+String(r.name||'').slice(0,32)+'</span>'},{l:'กลุ่ม',g:r=>r.sector||''},{l:tt(dTo),g:r=>dsp(r.metricTo),a:1},{l:'RS @'+dTo,g:r=>r.rs??'',a:1},{l:'ราคา @'+dTo+' ('+CUR+')',g:r=>r.price??'',a:1}];
-  const colsExit=[{l:'#',g:r=>'#'+r.rankFrom},{l:'หุ้น',g:r=>`<button onclick="openModalByTk('${r.ticker||''}','${rpMk}')" class="font-bold text-sky-400 hover:underline" title="กดดูกราฟ ${r.ticker||''}">${r.ticker||''}${drLabel(r.ticker, rpMk)}</button>`},{l:'ชื่อ',g:r=>'<span class="text-slate-400">'+String(r.name||'').slice(0,32)+'</span>'},{l:'กลุ่ม',g:r=>r.sector||''},{l:tt(dFrom),g:r=>dsp(r.metricFrom),a:1},{l:'RS @'+dFrom,g:r=>r.rsFrom??'',a:1},{l:'ราคา @'+dFrom+' ('+CUR+')',g:r=>r.price??'',a:1}];
+  const colsEnter=[{l:'#',g:r=>'#'+r.rankTo},{l:'หุ้น',g:r=>`<button onclick="openModalByTk('${r.ticker||''}','${rpMk}')" class="font-bold text-sky-400 hover:underline" title="กดดูกราฟ ${r.ticker||''}">${r.ticker||''}${drLabel(r.ticker, rpMk)}</button><span class="rp-sub" title="${String(r.name||'').replace(/"/g,'')}">${String(r.name||'').slice(0,40)}${r.sector?' · '+r.sector:''}</span>`},{l:tt(dTo),g:r=>dsp(r.metricTo),a:1},{l:'RS @'+dTo,g:r=>r.rs??'',a:1},{l:'ราคา @'+dTo+' ('+CUR+')',g:r=>r.price??'',a:1}];
+  const colsExit=[{l:'#',g:r=>'#'+r.rankFrom},{l:'หุ้น',g:r=>`<button onclick="openModalByTk('${r.ticker||''}','${rpMk}')" class="font-bold text-sky-400 hover:underline" title="กดดูกราฟ ${r.ticker||''}">${r.ticker||''}${drLabel(r.ticker, rpMk)}</button><span class="rp-sub" title="${String(r.name||'').replace(/"/g,'')}">${String(r.name||'').slice(0,40)}${r.sector?' · '+r.sector:''}</span>`},{l:tt(dFrom),g:r=>dsp(r.metricFrom),a:1},{l:'RS @'+dFrom,g:r=>r.rsFrom??'',a:1},{l:'ราคา @'+dFrom+' ('+CUR+')',g:r=>r.price??'',a:1}];
   const colsMove=[{l:'หุ้น',g:r=>`<button onclick="openModalByTk('${r.ticker||''}','${rpMk}')" class="font-bold text-sky-400 hover:underline" title="กดดูกราฟ ${r.ticker||''}">${r.ticker||''}${drLabel(r.ticker, rpMk)}</button>`},{l:'อันดับ '+dFrom+' → '+dTo,g:r=>'#'+r.rankFrom+' → <b>#'+r.rankTo+'</b>'},{l:'Δอันดับ',g:r=>dl(r.deltaRank)},{l:tt(dFrom),g:r=>dsp(r.metricFrom),a:1},{l:tt(dTo),g:r=>dsp(r.metricTo),a:1},{l:'ΔRS',g:r=>(r.rsDelta==null?'—':((r.rsDelta>0?'+':'')+r.rsDelta)),a:1},{l:'กลุ่ม',g:r=>r.sector||''}];
   let h='';
   h+=rpTable('NEW เข้าใหม่ใน Top'+N+' — อยู่ที่ '+dTo+' แต่ไม่อยู่ที่ '+dFrom, j.entered, colsEnter);
