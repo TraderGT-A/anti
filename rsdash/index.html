@@ -1133,8 +1133,9 @@ function ernGrow(label, y, q){
   const ttl = label+'ไตรมาสล่าสุดเทียบ'+(qoq?'ไตรมาสก่อน':'ไตรมาสเดียวกันของปีก่อน')+' · '+(v>0?'+':'')+v+'%';
   return '<span class="ern '+cls+'" title="'+ttl+'">'+label+' '+(v>0?'▲':(v<0?'▼':'•'))+' '+t+'% <small style="opacity:.75;font-weight:500">'+(qoq?'QoQ':'YoY')+'</small></span>';
 }
-function ernChips(s, mk){
+function ernChips(s, mk, compact){
   const i=ernInfo(s, mk); if(!i) return '';
+  if(compact && i.st==='out') return '';   // โหมดย่อ (Top20/ผู้นำ): เตือนเฉพาะ "งบกำลังจะออก" — งบที่ออกแล้วดูในป็อปอัปของหุ้น
   if(i.st==='soon') return '<span class="ern soon'+(i.d===i.tn?' today':'')+'" title="วันประกาศงบ (ข้อมูล TradingView อาจคลาดเคลื่อน 1 วัน)">งบ '+ernLbl(i.d,i.tn)+'</span>';
   if(i.st==='pend') return '<span class="ern pend" title="ถึงกำหนดแล้ว รอ TradingView อัปเดตตัวเลข">งบครบกำหนด '+ernLbl(i.d,i.tn)+' · รอตัวเลข</span>';
   return '<span class="ern" title="ประกาศงบแล้ว">งบออกแล้ว '+ernLbl(i.d,i.tn)+'</span>'+ernGrow('กำไร',s.niY,s.niQ)+ernGrow('รายได้',s.rvY,s.rvQ);
@@ -1144,10 +1145,10 @@ function lg(tk, mk, px){
   px=px||16; const m=mk||currentMarket, t=String(tk==null?'':tk); if(!t) return '';
   return '<img class="lgo" src="'+logoUrlM(t,m)+'" alt="" loading="lazy" style="width:'+px+'px;height:'+px+'px" onerror="logoErr(this,\''+jq(t)+'\',\''+m+'\')" />';
 }
-function ernBy(tk, mk){
+function ernBy(tk, mk, compact){
   const arr=(mk==='america'?stockDB.america:stockDB.thailand)||[];
   const s=arr.find(x=>x.ticker===tk) || (stockData||[]).find(x=>x.ticker===tk);
-  return ernChips(s, mk);
+  return ernChips(s, mk, compact);
 }
 let earnTab='soon', earnGroup='day';
 function setEarnTab(t){ earnTab=t; renderEarnPanel(); }
@@ -1430,7 +1431,7 @@ function ldApply(){
   const lbl={mtd:'เดือนนี้',rs:'RS',ticker:'ตัวอักษร',price:'ราคา',val:'มูลค่า',p3m:'3M',p6m:'6M',p1y:'1Y'}[ldSortKey]||ldSortKey;
   const sh=document.getElementById('ldShown');
   if(sh) sh.textContent='— แสดง '+show.length+' จาก '+rows.length+' ตัว · เรียงตาม'+lbl+' '+(ldSortDir<0?'มาก→น้อย':'น้อย→มาก');
-  body.innerHTML=show.map((p,i)=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')"><td class="p-2 text-slate-400">'+(i+1)+'</td><td class="p-2">'+lg(p.ticker,ldMarket,18)+'<b class="text-sky-400">'+p.ticker+'</b>'+ldTags(p.ticker)+' <span class="ld-nm text-[10px] text-slate-500">'+p.name+'</span>'+(ernBy(p.ticker,ldMarket)?'<div class="ern-wrap">'+ernBy(p.ticker,ldMarket)+'</div>':'')+'</td><td class="p-2"><b class="pos">+'+p.mtd.toFixed(1)+'%</b></td><td class="p-2"><span class="'+rsColor(p.rs)+' font-bold">'+p.rs+'</span></td><td class="p-2">'+fx(p.price)+'</td><td class="p-2">'+fb(p.val)+'</td><td class="p-2 '+(p.p3m>=0?'pos':'neg')+'">'+p.p3m.toFixed(1)+'%</td><td class="p-2 '+(p.p6m>=0?'pos':'neg')+'">'+p.p6m.toFixed(1)+'%</td><td class="p-2 '+(p.p1y>=0?'pos':'neg')+'">'+p.p1y.toFixed(1)+'%</td><td class="p-2 text-[11px] text-slate-400" title="MA50 '+fx(p.sma50)+' เหนือ MA200 '+fx(p.sma200)+'">'+fx(p.sma50)+'/'+fx(p.sma200)+'</td></tr>').join('')||'<tr><td colspan="10" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
+  body.innerHTML=show.map((p,i)=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')"><td class="p-2 text-slate-400">'+(i+1)+'</td><td class="p-2">'+lg(p.ticker,ldMarket,18)+'<b class="text-sky-400">'+p.ticker+'</b>'+ldTags(p.ticker)+' <span class="ld-nm text-[10px] text-slate-500">'+p.name+'</span>'+(ernBy(p.ticker,ldMarket,true)?'<div class="ern-wrap">'+ernBy(p.ticker,ldMarket,true)+'</div>':'')+'</td><td class="p-2"><b class="pos">+'+p.mtd.toFixed(1)+'%</b></td><td class="p-2"><span class="'+rsColor(p.rs)+' font-bold">'+p.rs+'</span></td><td class="p-2">'+fx(p.price)+'</td><td class="p-2">'+fb(p.val)+'</td><td class="p-2 '+(p.p3m>=0?'pos':'neg')+'">'+p.p3m.toFixed(1)+'%</td><td class="p-2 '+(p.p6m>=0?'pos':'neg')+'">'+p.p6m.toFixed(1)+'%</td><td class="p-2 '+(p.p1y>=0?'pos':'neg')+'">'+p.p1y.toFixed(1)+'%</td><td class="p-2 text-[11px] text-slate-400" title="MA50 '+fx(p.sma50)+' เหนือ MA200 '+fx(p.sma200)+'">'+fx(p.sma50)+'/'+fx(p.sma200)+'</td></tr>').join('')||'<tr><td colspan="10" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
 }
 async function renderLeaders(){
   const isUs = currentMarket==='america';
@@ -1764,7 +1765,7 @@ function topTableHTML(rows, m){
     const has2=(p2yCache[p2yKey(m,s.ticker)]!==undefined);
     return '<tr class="border-b border-[#16202e] hover:bg-[#111827] cursor-pointer" onclick="openModal(\''+s.ticker+'\',\''+jq(s.name)+'\',\''+m+'\')">'+
       '<td class="p-1 text-slate-500">'+(i+1)+'</td>'+
-      '<td class="p-1 font-semibold">'+lg(s.ticker,m,18)+s.ticker+drLabel(s.ticker, m)+ssfBadge(s.ticker, m)+Notes.badgeHtml(noteOf(m,s.ticker),m,s.ticker)+'<span class="block text-[9px] text-slate-500 truncate max-w-[150px]">'+(s.name||'')+'</span>'+(ernChips(s,m)?'<span class="ern-wrap block">'+ernChips(s,m)+'</span>':'')+'</td>'+
+      '<td class="p-1 font-semibold">'+lg(s.ticker,m,18)+s.ticker+drLabel(s.ticker, m)+ssfBadge(s.ticker, m)+Notes.badgeHtml(noteOf(m,s.ticker),m,s.ticker)+'<span class="block text-[9px] text-slate-500 truncate max-w-[150px]">'+(s.name||'')+'</span>'+(ernChips(s,m,true)?'<span class="ern-wrap block">'+ernChips(s,m,true)+'</span>':'')+'</td>'+
       '<td class="p-1 text-right">'+topRSHTML(s)+'</td>'+
       '<td class="p-1 text-right">'+fPctExact(s.pYTD)+'</td>'+
       '<td class="p-1 text-right">'+fPctExact(s.p1y)+'</td>'+
@@ -1805,7 +1806,7 @@ function topCardItems(rows, m){
         <div class="flex justify-between"><span class="text-slate-500">ราคา</span><span class="text-white">${fmtPx(s.price)}</span></div>
       </div>
       <div class="text-[10px] text-slate-500 mt-0.5 truncate">${s.industry||''}</div>
-      ${ernChips(s,m)?`<div class="ern-wrap mt-1">${ernChips(s,m)}</div>`:''}
+      ${ernChips(s,m,true)?`<div class="ern-wrap mt-1">${ernChips(s,m,true)}</div>`:''}
       <div class="relative mt-1"><div id="${cid}" class="chart" style="height:150px"></div></div>
       ${notesPanel(m,tk,'card')}
     </div>`;
@@ -1852,7 +1853,7 @@ function topPodiumHTML(rows, m){
     const keys=['pYTD','p1y','p2y'].filter(k=>k!==topSortKey);
     return '<div class="tpod'+(i===0?' first':'')+'" onclick="openModal(\''+s.ticker+'\',\''+jq(s.name)+'\',\''+m+'\')" role="button" tabindex="0">'+
       '<div class="tpod-top"><span class="tpod-n">อันดับ '+(i+1)+'</span><span class="tpod-rs">'+((s.rs!=null)?s.rs:'-')+'</span></div>'+
-      '<div class="tpod-tk">'+lg(s.ticker,m,26)+s.ticker+'</div><div class="tpod-nm">'+(s.name||'')+'</div>'+(ernChips(s,m)?'<div class="ern-wrap">'+ernChips(s,m)+'</div>':'')+
+      '<div class="tpod-tk">'+lg(s.ticker,m,26)+s.ticker+'</div><div class="tpod-nm">'+(s.name||'')+'</div>'+(ernChips(s,m,true)?'<div class="ern-wrap">'+ernChips(s,m,true)+'</div>':'')+
       '<div class="tpod-big">'+val(s,topSortKey)+'<span>'+cur+'</span></div>'+
       '<div class="tpod-sub"><span><i>'+sortLabel(keys[0])+'</i>'+val(s,keys[0])+'</span><span><i>'+sortLabel(keys[1])+'</i>'+val(s,keys[1])+'</span><span><i>ราคา</i>'+fmtPx(s.price)+'</span></div></div>';
   }).join('');
