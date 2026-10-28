@@ -326,6 +326,35 @@ html [class*="text-gray-"], html [class*="text-zinc-"], html [class*="text-neutr
 html [class*="text-white/"], html [class*="text-slate-300/"], html [class*="text-slate-400/"] { color:var(--muted); }
 html [class*="text-slate-5"], html [class*="text-slate-6"] { color:var(--faint); }
 html .opacity-80, html .opacity-75, html .opacity-70 { opacity:1; }
+/* Scanner: ป้ายสไลเดอร์อยู่บรรทัดเดียว (ค่า + หน่วย) แล้วแถบเลื่อนเต็มกว้างด้านล่าง */
+html #scannerPanel > div.flex.flex-wrap.items-end label.flex-col { flex-direction:row; flex-wrap:wrap; align-items:baseline; column-gap:6px; row-gap:8px; }
+html #scannerPanel > div.flex.flex-wrap.items-end label.flex-col input[type=range], html #scannerPanel > div.flex.flex-wrap.items-end label.flex-col select { flex:1 0 100%; }
+/* Report: แต่ละตารางเป็นการ์ด + ตารางโปร่งขึ้น + ป้ายสรุปเป็นแคปซูล */
+html #rpBody > div { background:var(--panel2); border:1px solid var(--line); border-radius:20px; padding:16px 18px; margin-bottom:16px; }
+html #rpBody table { font-size:13px; } html #rpBody table th, html #rpBody table td { padding:10px 8px; border-color:var(--line); }
+html #rpBody table thead th { font-size:11px; letter-spacing:.06em; color:var(--muted); font-weight:500; white-space:nowrap; }
+html #rpBody > div > div:first-child { font-size:15px; font-weight:600; margin-bottom:8px; }
+html #rpSummary span.px-2 { border-radius:999px; padding:6px 14px; font-size:13px; background:transparent; }
+html #rpStatus { font-size:13px; color:var(--muted); }
+/* Top20: การ์ด 3 อันดับแรก + ตารางโปร่งขึ้น */
+html .tpod-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin:6px 0 20px; }
+html .tpod { background:var(--panel); border:1px solid var(--line); border-radius:22px; padding:18px 20px; display:flex; flex-direction:column; gap:8px; cursor:pointer; }
+html .tpod.first { border-color:var(--goldline); }
+html .tpod:hover { border-color:var(--goldline); }
+html .tpod-top { display:flex; justify-content:space-between; align-items:center; }
+html .tpod-n { font-size:11px; letter-spacing:.2em; color:var(--gold); }
+html .tpod-rs { min-width:34px; height:26px; padding:0 6px; border-radius:8px; background:var(--panel2); color:var(--gold); font-weight:700; font-size:13px; display:inline-flex; align-items:center; justify-content:center; }
+html .tpod-tk { font-size:26px; font-weight:600; letter-spacing:-.01em; }
+html .tpod-nm { font-size:13px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:-4px; }
+html .tpod-big { font-size:32px; font-weight:400; letter-spacing:-.02em; color:var(--up); font-variant-numeric:tabular-nums; }
+html .tpod-big span { font-size:12px; color:var(--muted); margin-left:8px; letter-spacing:0; }
+html .tpod-sub { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-radius:14px; background:var(--panel2); overflow:hidden; font-size:13px; font-variant-numeric:tabular-nums; }
+html .tpod-sub span { padding:9px 10px; display:flex; flex-direction:column; gap:2px; } html .tpod-sub span + span { border-left:1px solid var(--line); }
+html .tpod-sub i { font-style:normal; font-size:11px; color:var(--muted); }
+html #top20Main table { font-size:14px; }
+html #top20Main table td, html #top20Main table th { padding:12px 10px; }
+html #top20Main table thead th { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:500; }
+html #top20Main table td .text-\[9px\], html #top20Main table td span.block { font-size:12px; }
 /* กล่องสรุป/หัวข่าว: ข้อความยาวห้ามดันตารางกว้างเกินจอ */
 html [data-notes], html [data-notes] * { overflow-wrap:anywhere; word-break:break-word; white-space:normal; }
 html td[data-notes] { max-width:calc(100vw - 48px); min-width:0; }
@@ -346,6 +375,15 @@ html .ma-leg { display:flex; gap:14px; font-size:12px; color:var(--muted); margi
 html .ma-leg i { display:inline-block; width:14px; height:2px; margin-right:6px; vertical-align:3px; border-radius:2px; }
 html .ma-leg .lg1 { background:var(--l1); } html .ma-leg .lg2 { background:var(--l2); }
 html #scannerPanel > div.flex.flex-wrap.items-end { background:var(--panel2); border:1px solid var(--line); border-radius:20px; padding:18px 20px; gap:18px 28px; margin-bottom:14px; font-size:13px; }
+/* Scanner: เงื่อนไขเป็นการ์ดซ้าย + ผลลัพธ์ขวา (จอกว้าง) */
+@media (min-width:1100px){
+  html #scannerPanel:not([style*="display: none"]):not([style*="display:none"]) { display:grid !important; grid-template-columns:320px minmax(0,1fr); column-gap:24px; align-items:start; }
+  html #scannerPanel > div:nth-child(1), html #scannerPanel > #scGate { grid-column:1 / -1; }
+  html #scannerPanel > div.flex.flex-wrap.items-end { grid-column:1; grid-row:3 / span 4; flex-direction:column; align-items:stretch; flex-wrap:nowrap; position:sticky; top:20px; margin-bottom:0; }
+  html #scannerPanel > div.flex.flex-wrap.items-end label { width:100%; }
+  html #scannerPanel > div.flex.flex-wrap.items-end input[type=range] { width:100%; }
+  html #scannerPanel > #scSummary, html #scannerPanel > div.overflow-x-auto, html #scannerPanel > div:last-child { grid-column:2; }
+}
 html #scannerPanel #scGate > div, html #leadersPanel #ldGate > div { border-radius:18px; }
 html #scannerPanel #scSummary, html #leadersPanel #ldNote { font-size:13px; }
 html #leadersPanel #ldWarn { border-radius:18px; padding:12px 16px; }
@@ -1610,8 +1648,23 @@ function renderTop20(){
     return;
   }
   const rows=topRows.slice(0, TOP20_N);
-  el.innerHTML = ((topView==='card') ? topCardsGrid(rows,m) : topTableHTML(rows,m)) + note;
+  el.innerHTML = ((topView==='card') ? topCardsGrid(rows,m) : (topPodiumHTML(rows.slice(0,3),m) + topTableHTML(rows,m))) + note;
   if(topView==='card') loadTop20Charts(rows, m);
+}
+/* 3 อันดับแรกเป็นการ์ดเด่น (อันดับ 1 ขอบทอง) — ข้อมูลชุดเดียวกับตาราง กดแล้วเปิดกราฟเต็มเหมือนเดิม */
+function topPodiumHTML(rows, m){
+  if(!rows || !rows.length) return '';
+  const cur=sortLabel(topSortKey);
+  const val=(s,k)=> k==='p2y' ? (p2yCache[p2yKey(m,s.ticker)]!==undefined ? fPctExact(p2yCache[p2yKey(m,s.ticker)]) : '–') : fPctExact(s[k]);
+  const cards=rows.map((s,i)=>{
+    const keys=['pYTD','p1y','p2y'].filter(k=>k!==topSortKey);
+    return '<div class="tpod'+(i===0?' first':'')+'" onclick="openModal(\''+s.ticker+'\',\''+jq(s.name)+'\',\''+m+'\')" role="button" tabindex="0">'+
+      '<div class="tpod-top"><span class="tpod-n">อันดับ '+(i+1)+'</span><span class="tpod-rs">'+((s.rs!=null)?s.rs:'-')+'</span></div>'+
+      '<div class="tpod-tk">'+s.ticker+'</div><div class="tpod-nm">'+(s.name||'')+'</div>'+
+      '<div class="tpod-big">'+val(s,topSortKey)+'<span>'+cur+'</span></div>'+
+      '<div class="tpod-sub"><span><i>'+sortLabel(keys[0])+'</i>'+val(s,keys[0])+'</span><span><i>'+sortLabel(keys[1])+'</i>'+val(s,keys[1])+'</span><span><i>ราคา</i>'+fmtPx(s.price)+'</span></div></div>';
+  }).join('');
+  return '<div class="tpod-grid">'+cards+'</div>';
 }
 function sortLabel(k){ return k==='pYTD' ? 'ปีนี้ (YTD)' : (k==='p1y' ? '1 ปี' : '2 ปี'); }
 async function loadTop20Charts(rows, m){
