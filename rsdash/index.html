@@ -307,6 +307,29 @@ html .idx-sub { display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12px; colo
 html .idx-sub b { font-weight:600; color:var(--body); } html .idx-sub b.text-emerald-400 { color:var(--up); } html .idx-sub b.text-rose-400 { color:var(--down); }
 html .mb-quote { position:relative; font-size:21px; line-height:1.5; font-weight:400; color:var(--text); padding:2px 0 14px; display:flex; gap:10px; }
 html .mb-q-mark { font-size:38px; line-height:.9; color:var(--goldline); font-family:Georgia,serif; }
+/* พื้นสีเข้มที่หลงเหลือ + hover ที่ยังเป็นสีเข้ม → ตามธีม (แก้ข้อความมองไม่เห็นในโหมดสว่าง) */
+html [class*="bg-[#0b1018]"], html [class*="bg-[#080c12]"] { background:var(--panel2); }
+html [class*="hover:bg-[#111827]"]:hover, html [class*="hover:bg-[#161d29]"]:hover, html [class*="hover:bg-[#101724]"]:hover { background:var(--panel2); }
+html .hover\:text-white:hover, html .hover\:text-slate-300:hover { color:var(--text); }
+html .hover\:text-sky-400:hover { color:var(--gold); }
+html .hover\:bg-emerald-900\/30:hover { background:var(--upbg); } html .hover\:bg-rose-900\/30:hover { background:var(--downbg); }
+html .text-sky-400 { }
+:root, html[data-theme="light"] { --l1:#281237; --l2:#B08A45; } html[data-theme="dark"] { --l1:#DDCDF0; --l2:#D4B67A; }
+/* การ์ดหุ้น: ชื่อหุ้นเห็นชัด · ชื่อบริษัท · กลุ่ม/หมวด · คำอธิบายกราฟสั้น */
+html .c-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+html .c-id { display:flex; align-items:center; gap:8px; min-width:0; }
+html .c-id img { width:20px; height:20px; }
+html .c-tk { font-size:18px; font-weight:600; color:var(--text); letter-spacing:-.005em; background:none; border:none; padding:0; cursor:pointer; text-align:left; }
+html .c-tk:hover { color:var(--gold); }
+html .c-rs { font-size:22px; font-weight:500; font-variant-numeric:tabular-nums; flex:none; }
+html .c-name { font-size:12.5px; color:var(--muted); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+html .c-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+html .c-ind { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+html .c-price { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px; margin-top:10px; font-size:14px; font-variant-numeric:tabular-nums; }
+html .c-price b { font-size:20px; font-weight:500; }
+html .ma-leg { display:flex; gap:14px; font-size:12px; color:var(--muted); margin:8px 0 2px; }
+html .ma-leg i { display:inline-block; width:14px; height:2px; margin-right:6px; vertical-align:3px; border-radius:2px; }
+html .ma-leg .lg1 { background:var(--l1); } html .ma-leg .lg2 { background:var(--l2); }
 html #scannerPanel > div.flex.flex-wrap.items-end { background:var(--panel2); border:1px solid var(--line); border-radius:20px; padding:18px 20px; gap:18px 28px; margin-bottom:14px; font-size:13px; }
 html #scannerPanel #scGate > div, html #leadersPanel #ldGate > div { border-radius:18px; }
 html #scannerPanel #scSummary, html #leadersPanel #ldNote { font-size:13px; }
@@ -927,7 +950,7 @@ function setSortSecondary(key){
 /* ===== สลับตลาด ไทย / US ===== */
 /* ปุ่ม A−/A+/↺ — ปรับขนาดตัวหนังสือทั่วเว็บ (scale wrapper = ลำดับตัวอักษร + ช่องว่างให้ใหญ่ตาม) */
 /* ===== ธีม THUS (สว่าง/มืด) ===== */
-function thusC(){ const d=document.documentElement.getAttribute('data-theme')==='dark'; return d
+function thusRange(c,n,bars){ try{ c.timeScale().setVisibleLogicalRange({from:Math.max(0,n-bars),to:n-1+6}); }catch(e){ try{ c.timeScale().fitContent(); }catch(_){} } }function thusC(){ const d=document.documentElement.getAttribute('data-theme')==='dark'; return d
   ? {up:'#5CC6C8',down:'#F59A8C',text:'#A597AD',vup:'rgba(92,198,200,.42)',vdown:'rgba(245,154,140,.42)',l1:'#DDCDF0',l2:'#D4B67A',bg:'#15101B'}
   : {up:'#0B6E70',down:'#A63B27',text:'#5E5468',vup:'rgba(11,110,112,.34)',vdown:'rgba(166,59,39,.34)',l1:'#281237',l2:'#B08A45',bg:'#FAF9F6'}; }
 /* หัวหน้า (eyebrow + ชื่อหน้า) ตามหน้า/ตลาดที่เปิดอยู่ */
@@ -1784,19 +1807,16 @@ function buildCard(tk, nm, grp, ind, rs, px, ch, vol, val, p3, xn, rd, isDR, rv)
     const logo = `<img src="${logoUrl(tk)}" alt="" loading="lazy" onerror="logoErr(this,'${tk}','${currentMarket}')" class="w-4 h-4 rounded-full object-cover shrink-0" />`;
   return `
   <div class="scard p-2.5">
-    <div class="flex items-start justify-between">
-      <div class="flex items-center gap-2 min-w-0">
+    <div class="c-head">
+      <div class="c-id">
         ${logo}
-        <button onclick="openModal('${tk}','${jq(nm)}','${currentMarket}')" class="text-[15px] font-bold hover:text-sky-400 truncate" title="${ind||''}${grp?(' · '+grp):''}">${tk}${drLabel(tk)}</button>
-        <span class="tag-market" title="${currentMarket==='america'?'ตลาดสหรัฐฯ (US)':(grp==='mai/Small'?'ตลาด mai':'ตลาด SET')}">${currentMarket==='america'?'US':(grp==='mai/Small'?'':'TH')}</span>
-        ${cap}
-        <span class="text-[10px] text-slate-500 truncate max-w-[130px]" title="${nm||''}">${nm||''}</span>
+        <button onclick="openModal('${tk}','${jq(nm)}','${currentMarket}')" class="c-tk" title="${ind||''}${grp?(' · '+grp):''}">${tk}${drLabel(tk)}</button>
       </div>
-      <div class="text-right shrink-0 flex items-center gap-1">
-        <span class="text-base font-extrabold ${rsColor(Number(rs))}" title="RS เปอร์เซ็นต์ไทล์ เทียบทั้งตลาด">${rs}</span>
-      </div>
+      <span class="c-rs ${rsColor(Number(rs))}" title="RS เปอร์เซ็นต์ไทล์ เทียบทั้งตลาด">${rs}</span>
     </div>
-    <div class="text-xs mt-1 flex flex-wrap items-center gap-x-2">
+    <div class="c-name" title="${nm||''}">${nm||''}</div>
+    <div class="c-tags">${cap}${ind?`<span class="pill c-ind" title="กลุ่ม/หมวด">${ind}</span>`:''}</div>
+    <div class="c-price">
       <b id="price_${tk}" class="text-white">${fNum(px)}</b> <span id="chg_${tk}">${fPct(ch)}</span>
       <span class="text-slate-400" title="มูลค่าซื้อขาย">${fBil(val||0)}</span>
     </div>
@@ -1807,7 +1827,7 @@ function buildCard(tk, nm, grp, ind, rs, px, ch, vol, val, p3, xn, rd, isDR, rv)
     <div class="relative mt-1">
           <div id="${cid}" class="chart"></div>
       <div class="absolute bottom-1 left-2 flex gap-1" title="กดเพื่อสลับช่วงกราฟ">
-        <button class="tf-chip active" onclick="changeCardTF('${tk}','1d')">3Y</button>
+        <button class="tf-chip active" onclick="changeCardTF('${tk}','1d')">1D</button>
       </div>
     </div>
   </div>`;
@@ -1815,11 +1835,9 @@ function buildCard(tk, nm, grp, ind, rs, px, ch, vol, val, p3, xn, rd, isDR, rv)
 
 // คำอธิบายเส้นในกราฟ — ใช้ชุดเดียวกันทั้งการ์ดและป็อปอัป (สีตรงกับที่วาดจริง)
 function maLegendHTML(){
-  return '<div class="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-slate-400 mb-1 leading-tight">'
-    + '<span><b class="text-sky-400">─ SMA20</b> เฉลี่ย 20 วัน (สั้น)</span>'
-    + '<span><b class="text-amber-400">─ SMA50</b> เฉลี่ย 50 วัน (กลาง)</span>'
-    + '<span><b class="text-emerald-400">┄</b> เส้นประ = ราคาปิดล่าสุด</span>'
-    + '<span>แท่งเทียน = ราคาเปิด-สูง-ต่ำ-ปิด · แท่งล่าง = ปริมาณซื้อขาย</span>'
+  return '<div class="ma-leg" title="แท่งเทียน = เปิด-สูง-ต่ำ-ปิด · แท่งล่าง = ปริมาณซื้อขาย · เส้นประ = ราคาปิดล่าสุด">'
+    + '<span><i class="lg1"></i>SMA20</span>'
+    + '<span><i class="lg2"></i>SMA50</span>'
   + '</div>';
 }
 function fNum(n){ const v=Number(n); return Number.isFinite(v)?v.toFixed(2):'-'; }
@@ -2791,7 +2809,7 @@ function drawChartW(el, raw, w){
   }
   // ห่างขอบขวาให้เหมาะกับความกว้าง (3 คอลัมน์ = แคบต้องห่างเยอะขึ้น) + ให้แท่งล่าสุดไม่ชิดขวา
     chart.timeScale().applyOptions({ rightOffset: w < 420 ? 18 : (w < 620 ? 14 : 12) });
-    chart.timeScale().fitContent();
+    thusRange(chart,data.length,126);
     return chart;
   }
 
@@ -2911,7 +2929,7 @@ async function fetchModal(iv){
         ch.priceScale('vol').applyOptions({scaleMargins:{top:.8,bottom:0}});
       }
       const sma=(n,color)=>{ if(data.length<n)return; const o=[]; for(let i=n-1;i<data.length;i++){let s=0;for(let j=0;j<n;j++)s+=data[i-j].close;o.push({time:data[i].time,value:s/n});} ch.addLineSeries({color,lineWidth:1,crosshairMarkerVisible:false}).setData(o); };
-      sma(20,thusC().l1); sma(50,thusC().l2); ch.timeScale().fitContent(); ch.timeScale().applyOptions({ rightOffset: 12 });
+      sma(20,thusC().l1); sma(50,thusC().l2); ((iv==='1y'||iv==='1d')?thusRange(ch,data.length,126):ch.timeScale().fitContent()); ch.timeScale().applyOptions({ rightOffset: 12 });
     });
   }catch(e){ el.innerHTML='<div class="text-center text-rose-400 text-sm">โหลดไม่สำเร็จ</div>'; }
 }
