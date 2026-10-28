@@ -337,6 +337,25 @@ html .ld-v small { font-size:15px; color:var(--muted); letter-spacing:0; }
 html .ld-v.ld-date { font-size:26px; }
 html .ld-s { font-size:13px; color:var(--muted); line-height:1.5; }
 html #ldCards:not(:empty) ~ #ldGate { display:none; }
+/* โหมดคลีน: รายละเอียดยาว ๆ ซ่อนไว้ก่อน กดปุ่มเพื่อดู */
+html details.fold { margin:0 0 12px; }
+html details.fold > summary { list-style:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); padding:6px 12px; border:1px solid var(--line); border-radius:999px; background:var(--panel2); user-select:none; }
+html details.fold > summary::-webkit-details-marker { display:none; }
+html details.fold > summary::after { content:"▾"; font-size:11px; }
+html details.fold[open] > summary::after { content:"▴"; }
+html details.fold > .fold-body { margin-top:10px; }
+html #chartModal:not(.show-more) .mmore, html #chartModal:not(.show-more) #modalStats > span:nth-child(n+2) { display:none !important; }
+html #chartModal .mchips { display:contents; }
+html .mm-btn { font-size:12px; color:var(--muted); padding:6px 12px; border:1px solid var(--line); border-radius:999px; background:var(--panel2); cursor:pointer; margin:2px 0 6px; }
+@media (max-width:640px){
+  html .ld-cards { grid-template-columns:1fr 1fr; gap:10px; } html .ld-hd-more { display:none; }
+  html .ld-card { padding:14px 16px; } html .ld-k { letter-spacing:.06em; font-size:10px; } html .ld-v { font-size:30px; } html .ld-card .ld-s { display:none; }
+  html .ld-card:nth-child(3) { grid-column:1 / -1; flex-direction:row; align-items:baseline; justify-content:space-between; padding:10px 16px; }
+  html .ld-card:nth-child(3) .ld-v.ld-date { font-size:16px; }
+  html #leadersPanel table th:nth-child(1), html #leadersPanel table td:nth-child(1), html #leadersPanel table th:nth-child(n+8), html #leadersPanel table td:nth-child(n+8), html #leadersPanel table th:nth-child(6), html #leadersPanel table td:nth-child(6) { display:none; }
+  html #leadersPanel table .ld-nm { display:none; }
+  html #leadersPanel .ld-hint { display:none; }
+}
 html #leadersPanel table { font-size:14px; } html #leadersPanel table td, html #leadersPanel table th { padding:11px 10px; border-color:var(--line); }
 html #leadersPanel table thead th { font-size:11px; letter-spacing:.08em; color:var(--muted); font-weight:500; white-space:nowrap; }
 /* Report: คอลัมน์ "เข้าใหม่" กับ "หลุด" เทียบกันสองฝั่งบนจอกว้าง */
@@ -513,22 +532,24 @@ html #topbar .brand-logo { display:none; }
 
                   <!-- 🏆 ผู้นำหุ้นไทย: near52wHigh + โมเมนตัม 12-1 Top20 รายเดือน + Gate (ผลสำรวจ in-sample) -->
                   <div id="leadersPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
-                    <div class="flex flex-wrap items-center gap-2 mb-2"><h2 class="text-sm font-bold flex items-center gap-2"><span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/></svg></span> ผู้นำรายเดือน — ขึ้นมากสุดเดือนนี้ · ขาขึ้น MA50>MA200 · ผ่านสภาพคล่อง <span class="mk-chip mk-tag"></span></h2> <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('leaders','copy',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg> TV</button><button class="tf-chip" onclick="wlExport('leaders','file',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> .txt</button></span></div>
+                    <div class="flex flex-wrap items-center gap-2 mb-2"><h2 class="text-sm font-bold flex items-center gap-2"><span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/></svg></span> ผู้นำรายเดือน<span class="ld-hd-more"> — ขึ้นมากสุดเดือนนี้ · ขาขึ้น MA50>MA200 · ผ่านสภาพคล่อง</span> <span class="mk-chip mk-tag"></span></h2> <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('leaders','copy',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg> TV</button><button class="tf-chip" onclick="wlExport('leaders','file',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> .txt</button></span></div>
                     <div id="ldCards"></div>
-                    <div id="ldWarn" class="rounded-lg border border-amber-700/60 bg-amber-900/10 text-amber-200 px-3 py-2 text-[11px] leading-relaxed mb-2">⚠ <b>ผลวิจัยในอดีต (in-sample) ยังไม่พิสูจน์ edge — ไม่ใช่คำแนะนำการลงทุน</b> · ตลาดสหรัฐฯ ไม่พบ edge จากแนวทางนี้ (หน้านี้ใช้กับตลาดไทยเท่านั้น)</div>
                     <div id="ldGate" class="mb-2"></div>
+                    <details class="fold" id="ldFold"><summary>เกณฑ์ · SSF · ข้อจำกัด</summary><div class="fold-body">
+                    <div id="ldWarn" class="rounded-lg border border-amber-700/60 bg-amber-900/10 text-amber-200 px-3 py-2 text-[11px] leading-relaxed mb-2">⚠ <b>ผลวิจัยในอดีต (in-sample) ยังไม่พิสูจน์ edge — ไม่ใช่คำแนะนำการลงทุน</b> · ตลาดสหรัฐฯ ไม่พบ edge จากแนวทางนี้ (หน้านี้ใช้กับตลาดไทยเท่านั้น)</div>
                     <div id="ldNote" class="text-[11px] text-slate-400 mb-1.5 leading-relaxed"></div>
+                    <div id="ldHow" class="text-[11px] text-slate-400 mt-2 leading-relaxed"></div>
+                    </div></details>
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
                       <div class="text-xs font-bold">ผู้นำเดือนนี้ <span id="ldShown" class="text-slate-400 font-normal"></span></div>
                       <label class="text-[11px] text-slate-400 flex items-center gap-1.5">แสดง
                         <select id="ldLimit" onchange="ldApply()" class="bg-[#0a0f16] border border-[#243044] rounded px-2 py-1 text-[11px]">
                           <option value="20" selected>20 ตัว</option><option value="30">30 ตัว</option><option value="50">50 ตัว</option><option value="999">ทั้งหมด</option>
                         </select>
-                        · <span class="text-slate-500">กดหัวคอลัมน์เพื่อเรียง</span>
+                        <span class="ld-hint">· <span class="text-slate-500">กดหัวคอลัมน์เพื่อเรียง</span></span>
                       </label>
                     </div>
                     <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-[10px] uppercase text-slate-500 border-b border-[#1e2634]"><tr><th class="p-2">#</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('ticker')" title="กดเพื่อเรียง">หุ้น</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('mtd')" title="กดเพื่อเรียง — ผลตอบแทนตั้งแต่ปิดเดือนก่อนถึงปิดล่าสุด">เดือนนี้</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('rs')" title="กดเพื่อเรียง — คะแนนความแข็งแกร่ง 1–99">RS</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('price')" title="กดเพื่อเรียง">ราคา</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('val')" title="กดเพื่อเรียง — มูลค่าซื้อขายต่อวัน">มูลค่า/วัน</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p3m')" title="กดเพื่อเรียง">3M</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p6m')" title="กดเพื่อเรียง">6M</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p1y')" title="กดเพื่อเรียง">1Y</th><th class="p-2 text-slate-500" title="เส้นค่าเฉลี่ย 50 วัน vs 200 วัน — ขาขึ้นเมื่อ MA50 > MA200">MA50/200</th></tr></thead><tbody id="ldBody"></tbody></table></div>
-                    <div id="ldHow" class="text-[11px] text-slate-400 mt-3 leading-relaxed"></div>
                   </div>
 
                   <!-- 📅 Report: เทียบอันดับ Top-N ระหว่าง 2 วัน (ข้อมูลจาก /api/history) -->
@@ -803,10 +824,11 @@ html #topbar .brand-logo { display:none; }
     <div class="mb-2 pr-10">
           <div class="flex items-center gap-2 flex-wrap">
             <span id="modalLogo"></span>
-            <span id="modalTicker" class="text-2xl font-black shrink-0"></span><span id="modalTag"></span><span id="modalDrLabel"></span><span id="modalRS" class="shrink-0"></span><span id="modalIpo" class="shrink-0 text-[11px] text-slate-400" title="อายุ IPO นับจากวันแรกที่ซื้อขายได้ (Yahoo)"></span>
+            <span id="modalTicker" class="text-2xl font-black shrink-0"></span><span id="modalRS" class="shrink-0"></span>
+            <span class="mchips mmore"><span id="modalTag"></span><span id="modalDrLabel"></span><span id="modalIpo" class="shrink-0 text-[11px] text-slate-400" title="อายุ IPO นับจากวันแรกที่ซื้อขายได้ (Yahoo)"></span>
             <span id="modalCap"></span><span id="modalSSF"></span><span id="modalDRBadge"></span><span id="modalRank"></span>
             <span id="modalRVOL"></span>
-            <span id="modalVol"></span><span id="modalCrowd"></span><span id="modalTheme" class="shrink-0"></span>
+            <span id="modalVol"></span><span id="modalCrowd"></span><span id="modalTheme" class="shrink-0"></span></span>
             <span id="modalName" class="text-xs text-slate-400 ml-1 truncate"></span>
           </div>
           <!-- รายละเอียดชุดเดียวกับที่การ์ดโชว์ (ราคา/เปลี่ยน%/มูลค่าซื้อขาย/3M/กลุ่ม) -->
@@ -821,9 +843,10 @@ html #topbar .brand-logo { display:none; }
         </div>
         <div id="modalLegend" class="mb-1"></div>
     <div id="modalChart" class="w-full h-[420px] rounded-lg bg-[#05070b] border border-[#1e2634]"></div>
-    <div id="modalTT" class="mt-2"></div>
-    <div id="modalDR" class="mt-2"></div>
-    <div id="modalAbout" class="mt-2"></div>
+    <button class="mm-btn" id="modalMoreBtn" onclick="toggleModalMore()">รายละเอียด <span id="modalTTsum"></span> <span id="modalMoreArrow">▾</span></button>
+    <div id="modalTT" class="mt-2 mmore"></div>
+    <div id="modalDR" class="mt-2 mmore"></div>
+    <div id="modalAbout" class="mt-2 mmore"></div>
   </div>
 </div>
 
@@ -1195,6 +1218,7 @@ function renderModalTT(data){
   const r=TrendLib.fromBars(data, f&&f.rs!=null?f.rs:null, P.rsMin);
   if(!r){ el.innerHTML='<div class="text-[11px] text-slate-500">ข้อมูลไม่พอคำนวณ Trend Template (ต้องมี ≥ 200 แท่งรายวัน)</div>'; return; }
   const c=r.contraction;
+  const _s=document.getElementById('modalTTsum'); if(_s) _s.innerHTML='<span class="'+(r.tt===8?'pos':'text-slate-400')+'">· TT '+r.tt+'/8</span>';
   const chip=(ok,t)=>`<span class="${ok?'text-emerald-400':'text-slate-400'}">${t}</span>`;
   el.innerHTML = `<div class="rounded-lg border border-[#1e2634] bg-[#0a0f16] p-2.5">
     <div class="text-xs font-bold mb-1.5">Trend Template <span class="${r.tt===8?'text-emerald-400':(r.tt>=6?'text-amber-300':'text-slate-400')}">${r.tt}/8</span> <span class="text-[10px] font-normal text-slate-500">(คำนวณจากแท่งรายวัน · เกณฑ์ Minervini)</span></div>
@@ -1290,7 +1314,7 @@ function ldApply(){
   const lbl={mtd:'เดือนนี้',rs:'RS',ticker:'ตัวอักษร',price:'ราคา',val:'มูลค่า',p3m:'3M',p6m:'6M',p1y:'1Y'}[ldSortKey]||ldSortKey;
   const sh=document.getElementById('ldShown');
   if(sh) sh.textContent='— แสดง '+show.length+' จาก '+rows.length+' ตัว · เรียงตาม'+lbl+' '+(ldSortDir<0?'มาก→น้อย':'น้อย→มาก');
-  body.innerHTML=show.map((p,i)=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')"><td class="p-2 text-slate-400">'+(i+1)+'</td><td class="p-2"><b class="text-sky-400">'+p.ticker+'</b>'+ldTags(p.ticker)+' <span class="text-[10px] text-slate-500">'+p.name+'</span></td><td class="p-2"><b class="pos">+'+p.mtd.toFixed(1)+'%</b></td><td class="p-2"><span class="'+rsColor(p.rs)+' font-bold">'+p.rs+'</span></td><td class="p-2">'+fx(p.price)+'</td><td class="p-2">'+fb(p.val)+'</td><td class="p-2 '+(p.p3m>=0?'pos':'neg')+'">'+p.p3m.toFixed(1)+'%</td><td class="p-2 '+(p.p6m>=0?'pos':'neg')+'">'+p.p6m.toFixed(1)+'%</td><td class="p-2 '+(p.p1y>=0?'pos':'neg')+'">'+p.p1y.toFixed(1)+'%</td><td class="p-2 text-[11px] text-slate-400" title="MA50 '+fx(p.sma50)+' เหนือ MA200 '+fx(p.sma200)+'">'+fx(p.sma50)+'/'+fx(p.sma200)+'</td></tr>').join('')||'<tr><td colspan="10" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
+  body.innerHTML=show.map((p,i)=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')"><td class="p-2 text-slate-400">'+(i+1)+'</td><td class="p-2"><b class="text-sky-400">'+p.ticker+'</b>'+ldTags(p.ticker)+' <span class="ld-nm text-[10px] text-slate-500">'+p.name+'</span></td><td class="p-2"><b class="pos">+'+p.mtd.toFixed(1)+'%</b></td><td class="p-2"><span class="'+rsColor(p.rs)+' font-bold">'+p.rs+'</span></td><td class="p-2">'+fx(p.price)+'</td><td class="p-2">'+fb(p.val)+'</td><td class="p-2 '+(p.p3m>=0?'pos':'neg')+'">'+p.p3m.toFixed(1)+'%</td><td class="p-2 '+(p.p6m>=0?'pos':'neg')+'">'+p.p6m.toFixed(1)+'%</td><td class="p-2 '+(p.p1y>=0?'pos':'neg')+'">'+p.p1y.toFixed(1)+'%</td><td class="p-2 text-[11px] text-slate-400" title="MA50 '+fx(p.sma50)+' เหนือ MA200 '+fx(p.sma200)+'">'+fx(p.sma50)+'/'+fx(p.sma200)+'</td></tr>').join('')||'<tr><td colspan="10" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
 }
 async function renderLeaders(){
   const isUs = currentMarket==='america';
@@ -2960,8 +2984,13 @@ async function loadAbout(tk, mk){
     if(activeTicker===tk) el.innerHTML=About.aboutHtml(map[tk]);
   }catch(e){}
 }
+function toggleModalMore(){
+  const m=document.getElementById('chartModal'); const on=m.classList.toggle('show-more');
+  const a=document.getElementById('modalMoreArrow'); if(a) a.textContent=on?'▴':'▾';
+}
 function openModal(tk,nm,mkt){
   activeTicker=tk;
+  { const m=document.getElementById('chartModal'); m.classList.remove('show-more'); const a=document.getElementById('modalMoreArrow'); if(a) a.textContent='▾'; const s=document.getElementById('modalTTsum'); if(s) s.textContent=''; }
   document.getElementById('modalTicker').textContent=tk;
   document.getElementById('modalName').textContent=nm;
   // ใช้ตลาดที่ caller ส่งตรงๆ (ถูกตลาดเสมอ); ถ้าไม่มี => เดาเดิมจาก cache
