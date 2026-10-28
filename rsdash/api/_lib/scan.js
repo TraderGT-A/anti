@@ -62,7 +62,10 @@ export const TV_COLS = ["name", "description", "close", "change", "volume", "Val
   "Perf.W", "Perf.1M", "Perf.3M", "Perf.6M", "Perf.Y", "Perf.YTD", "market_cap_basic", "sector", "industry",
   "SMA50", "SMA200", "relative_volume_10d_calc", "average_volume_10d_calc", "type", "logoid",
   "open", "high", "low",
-  "SMA150", "EMA20", "price_52_week_high", "price_52_week_low", "ATR"];   // ชุดสำหรับ Trend Template / Scanner พักตัวแคบ (ต่อท้ายเสมอ)   // OHLC ของวันล่าสุด — ใช้เติมแท่งสุดท้ายของกราฟเมื่อ Yahoo ล่าช้า (ต่อท้ายเสมอ ห้ามแทรกกลาง เพราะ destructure ตามตำแหน่ง)
+  "SMA150", "EMA20", "price_52_week_high", "price_52_week_low", "ATR",
+  // วันประกาศงบ + การเติบโตงบไตรมาสล่าสุด (TradingView ช้ากว่าจริง ~1 วัน) — ต่อท้ายเสมอ
+  "earnings_release_next_date", "earnings_release_date",
+  "net_income_yoy_growth_fq", "total_revenue_yoy_growth_fq", "net_income_qoq_growth_fq", "total_revenue_qoq_growth_fq"];   // ชุดสำหรับ Trend Template / Scanner พักตัวแคบ (ต่อท้ายเสมอ)   // OHLC ของวันล่าสุด — ใช้เติมแท่งสุดท้ายของกราฟเมื่อ Yahoo ล่าช้า (ต่อท้ายเสมอ ห้ามแทรกกลาง เพราะ destructure ตามตำแหน่ง)
 
 // ==== Thai index membership (จริงจาก set.or.th PDF, point-in-time 2026H2) ====
 // เดิมใช้ mcap bucket (slice 0,50/0,100) = ผิด (KCE ขึ้น SET50, DR อย่าง MICRON01 ขึ้น SET50) —
@@ -135,7 +138,9 @@ export async function scanMarket(market = "thailand") {
     if (d.length < TV_COLS.length) continue;
     const [symbol, name, close, change, volume, val, p1w, p1m, p3, p6, p1, pYTD, mcap, sector, industry,
               sma50, sma200, relVol, avgVol, secType, logoId, dOpen, dHigh, dLow,
-              sma150, ema20, hi52, lo52, atr] = d;
+              sma150, ema20, hi52, lo52, atr,
+              eNext, eLast, niY, rvY, niQ, rvQ] = d;
+    const g1 = (v) => (typeof v === "number" && Number.isFinite(v) ? Math.round(v * 10) / 10 : null);
     // กรองด้วย type ตรง ๆ: เอาเฉพาะหุ้นสามัญ (ตัด ETF/fund/warrant/DR ทั้ง 2 ตลาด) — แม่นกว่าการเดาจากชื่อ
     // (ของเดิม: includes("ETF") ไปโดน "N-ETF-lix" → Netflix หาย; กฎ "CLASS A" → META/GOOGL/COIN หายทั้งบริษัท)
     if (secType && secType !== "stock") continue;
@@ -156,6 +161,9 @@ export async function scanMarket(market = "thailand") {
       relVol: relVol || null, avgVol: avgVol || null,
       sma150: sma150 || null, ema20: ema20 || null, hi52: hi52 || null, lo52: lo52 || null,
       atr: atr || null,   // ATR14 (หน่วยราคา) จาก TradingView
+      // งบ: eN = วันประกาศครั้งถัดไป, eL = ครั้งล่าสุด (วินาที unix) · niY/rvY = กำไร/รายได้ไตรมาสล่าสุดเทียบปีก่อน (%) · niQ/rvQ = เทียบไตรมาสก่อน (%)
+      eN: typeof eNext === "number" ? eNext : null, eL: typeof eLast === "number" ? eLast : null,
+      niY: g1(niY), rvY: g1(rvY), niQ: g1(niQ), rvQ: g1(rvQ),
       o: dOpen ?? null, h: dHigh ?? null, l: dLow ?? null,   // OHLC วันนี้จาก TradingView
       tv: r.s || "",               // สัญลักษณ์เต็มของ TradingView (EXCHANGE:SYMBOL) — ใช้ส่งออก Watchlist
       logoId: logoId || "",        // TradingView logoid → ใช้ดึงโลโก้จริงจาก s3-symbol-logo.tradingview.com

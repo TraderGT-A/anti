@@ -296,6 +296,20 @@ html .trs-table .r { text-align:right; }
 html .trs-rs { display:inline-flex; min-width:38px; height:28px; align-items:center; justify-content:center; border-radius:9px; font-weight:700; font-size:14px; background:var(--panel2); color:var(--gold); }
 html .trs-tk { font-weight:600; color:var(--text); text-decoration:none; } html .trs-tk:hover { color:var(--gold); }
 html .trs-grp { color:var(--muted); } html .trs-empty { color:var(--faint); padding:16px 8px; }
+/* งบ: ป้ายเตือนวันประกาศ + ปุ่มกำไร/รายได้ (เขียว=ดีขึ้น แดง=แย่ลง) */
+html #earnPanel { background:var(--panel); border:1px solid var(--line); border-radius:24px; padding:22px 24px; margin-bottom:22px; }
+html .ern { display:inline-flex; align-items:center; gap:4px; font-size:11px; line-height:1.25; padding:3px 9px; border-radius:999px; border:1px solid var(--line); background:var(--panel2); color:var(--muted); white-space:nowrap; margin:2px 4px 2px 0; }
+html .ern.soon { border-color:var(--goldline); color:var(--gold); }
+html .ern.today { background:var(--gold); color:var(--bg); border-color:var(--gold); font-weight:600; }
+html .ern.pend { border-style:dashed; }
+html .ern.up { border-color:var(--up); color:var(--up); background:color-mix(in srgb, var(--up) 14%, transparent); font-weight:600; }
+html .ern.dn { border-color:var(--down); color:var(--down); background:color-mix(in srgb, var(--down) 14%, transparent); font-weight:600; }
+html[data-theme="light"] .ern.up { color:color-mix(in srgb, var(--up) 68%, #000); } html[data-theme="light"] .ern.dn { color:color-mix(in srgb, var(--down) 68%, #000); }
+html .ern-wrap { display:flex; flex-wrap:wrap; align-items:center; }
+html .ern-day { font-size:12px; letter-spacing:.08em; color:var(--gold); margin:16px 0 2px; }
+html .ern-row { display:flex; flex-wrap:wrap; align-items:center; gap:4px 12px; padding:9px 0; border-top:1px solid var(--line); }
+html .ern-row .tk { font-weight:600; color:var(--text); cursor:pointer; min-width:64px; } html .ern-row .tk:hover { color:var(--gold); }
+html .ern-row .nm { color:var(--faint); font-size:12px; flex:1 1 140px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 html .idx-card { padding:20px 22px; display:flex; flex-direction:column; gap:10px; }
 html #indexBar > div.idx-card { padding:20px 22px; }
 html .idx-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
@@ -507,6 +521,13 @@ html #topbar .brand-logo { display:none; }
                   <div id="topRsPanel">
                     <div class="trs-head"><div><span class="trs-eyebrow">Top RS วันนี้</span><div class="trs-title">หุ้นแกร่งที่สุดของตลาด</div></div><button type="button" class="tf-chip" onclick="setPage('stocks')">ดูทั้งหมด →</button></div>
                     <div class="overflow-x-auto"><table class="trs-table"><thead><tr><th>RS</th><th>หุ้น</th><th class="r">ราคา</th><th class="r">วันนี้</th><th class="r">3 เดือน</th><th>กลุ่ม</th></tr></thead><tbody id="topRsBody"></tbody></table></div>
+                  </div>
+
+                  <!-- ปฏิทินงบ: หุ้น RS แข็งที่งบกำลังจะออก (สัปดาห์นี้+หน้า) / ออกแล้ว (14 วัน) พร้อมกำไร-รายได้ดีขึ้นหรือไม่ -->
+                  <div id="earnPanel">
+                    <div class="trs-head"><div><span class="trs-eyebrow">ปฏิทินงบ</span><div class="trs-title" id="earnTitle">งบที่กำลังจะออก</div></div>
+                      <span class="inline-flex gap-1"><button id="earnTabSoon" class="tf-chip active" onclick="setEarnTab('soon')">กำลังจะออก</button><button id="earnTabOut" class="tf-chip" onclick="setEarnTab('out')">ออกแล้ว</button></span></div>
+                    <div id="earnList"></div>
                   </div>
 
                   <!-- 🎯 Scanner: Trend Template + พักตัวแคบ (สไตล์ Minervini / Qullamaggie) + Market Gate -->
@@ -837,6 +858,7 @@ html #topbar .brand-logo { display:none; }
           </div>
           <!-- รายละเอียดชุดเดียวกับที่การ์ดโชว์ (ราคา/เปลี่ยน%/มูลค่าซื้อขาย/3M/กลุ่ม) -->
           <div id="modalStats" class="text-xs mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1"></div>
+          <div id="modalEarn" class="ern-wrap mt-1"></div>
         </div>
         <div class="flex gap-1.5 bg-[#0a0f16] p-1 rounded-lg border border-[#243044] w-fit mb-1">
           <button class="tf-chip" onclick="changeModalTF('30m')">30m</button>
@@ -1076,8 +1098,75 @@ function thusHead(pg){
   const h=H[pg]||H.overview; const a=document.getElementById('phEyebrow'), b=document.getElementById('phTitle');
   if(a) a.textContent=h[0]; if(b) b.textContent=h[1];
 }
+/* ===== งบ: ข้อมูลจาก TradingView (ช้ากว่าจริง ~1 วัน) =====
+   eN = วันประกาศครั้งถัดไป · eL = ครั้งล่าสุด · niY/rvY = กำไร/รายได้ไตรมาสล่าสุดเทียบปีก่อน · niQ/rvQ = เทียบไตรมาสก่อน
+   ช่วงเตือน: วันนี้ → ศุกร์ของสัปดาห์หน้า (ถ้าเป็นเสาร์-อาทิตย์ นับจากวันจันทร์ถัดไป) · "ออกแล้ว" = ออกภายใน 14 วันล่าสุด */
+const ERN_DOW=['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'], ERN_MON=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const ERN_DAY=86400;
+function ernDay(ts, off){ const d=new Date((ts+off*3600)*1000); return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate())/1000; }
+function ernLbl(d, tn){
+  if(d===tn) return 'วันนี้'; if(d===tn+ERN_DAY) return 'พรุ่งนี้';
+  const x=new Date(d*1000); return ERN_DOW[x.getUTCDay()]+' '+x.getUTCDate()+' '+ERN_MON[x.getUTCMonth()];
+}
+function ernInfo(s, mk){
+  if(!s || (s.eN==null && s.eL==null)) return null;
+  const off = mk==='america' ? -5 : 7;
+  const tn = ernDay(Math.floor(Date.now()/1000), off);
+  const dN = s.eN!=null ? ernDay(s.eN, off) : null, dL = s.eL!=null ? ernDay(s.eL, off) : null;
+  let base=tn; const wd=new Date(tn*1000).getUTCDay(); if(wd===6) base=tn+2*ERN_DAY; else if(wd===0) base=tn+ERN_DAY;
+  const end = base + (5-new Date(base*1000).getUTCDay())*ERN_DAY + 7*ERN_DAY;
+  if(dL!=null && dL<=tn && dL>=tn-14*ERN_DAY) return {st:'out', d:dL, tn};
+  if(dN!=null && dN<tn && dN>=tn-3*ERN_DAY && (dL==null || dL<dN)) return {st:'pend', d:dN, tn};
+  if(dN!=null && dN>=tn && dN<=end) return {st:'soon', d:dN, tn};
+  return null;
+}
+function ernGrow(label, y, q){
+  let v=y, qoq=false; if(v==null){ v=q; qoq=true; }
+  if(v==null) return '<span class="ern" title="ไม่มีข้อมูลเทียบ">'+label+' –</span>';
+  const cls = v>0 ? 'up' : (v<0 ? 'dn' : ''), a=Math.abs(v), t = a>=1000 ? '>999' : String(Math.round(a));
+  const ttl = label+'ไตรมาสล่าสุดเทียบ'+(qoq?'ไตรมาสก่อน (ไม่มีตัวเลขเทียบปีก่อน)':'ไตรมาสเดียวกันของปีก่อน')+' · '+(v>0?'+':'')+v+'%';
+  return '<span class="ern '+cls+'" title="'+ttl+'">'+label+' '+(v>0?'▲':(v<0?'▼':'•'))+' '+t+'% <small style="opacity:.75;font-weight:500">'+(qoq?'QoQ':'YoY')+'</small></span>';
+}
+function ernChips(s, mk){
+  const i=ernInfo(s, mk); if(!i) return '';
+  if(i.st==='soon') return '<span class="ern soon'+(i.d===i.tn?' today':'')+'" title="วันประกาศงบ (ข้อมูล TradingView อาจคลาดเคลื่อน 1 วัน)">งบ '+ernLbl(i.d,i.tn)+'</span>';
+  if(i.st==='pend') return '<span class="ern pend" title="ถึงกำหนดแล้ว รอ TradingView อัปเดตตัวเลข">งบครบกำหนด '+ernLbl(i.d,i.tn)+' · รอตัวเลข</span>';
+  return '<span class="ern" title="ประกาศงบแล้ว">งบออกแล้ว '+ernLbl(i.d,i.tn)+'</span>'+ernGrow('กำไร',s.niY,s.niQ)+ernGrow('รายได้',s.rvY,s.rvQ);
+}
+function ernBy(tk, mk){
+  const arr=(mk==='america'?stockDB.america:stockDB.thailand)||[];
+  const s=arr.find(x=>x.ticker===tk) || (stockData||[]).find(x=>x.ticker===tk);
+  return ernChips(s, mk);
+}
+let earnTab='soon';
+function setEarnTab(t){ earnTab=t; renderEarnPanel(); }
+function renderEarnPanel(){
+  const box=document.getElementById('earnList'); if(!box) return;
+  const mk=currentMarket, list=[];
+  (stockData||[]).forEach(s=>{ if(Number.isFinite(s.rs) && s.rs>=RS_TOP_TH){ const i=ernInfo(s,mk); if(i) list.push({s,i}); } });
+  const soon=list.filter(x=>x.i.st==='soon'||x.i.st==='pend'), out=list.filter(x=>x.i.st==='out');
+  const tS=document.getElementById('earnTabSoon'), tO=document.getElementById('earnTabOut');
+  if(tS){ tS.classList.toggle('active', earnTab==='soon'); tS.textContent='กำลังจะออก '+soon.length; }
+  if(tO){ tO.classList.toggle('active', earnTab==='out'); tO.textContent='ออกแล้ว '+out.length; }
+  const ttl=document.getElementById('earnTitle'); if(ttl) ttl.textContent = earnTab==='soon' ? 'งบสัปดาห์นี้และสัปดาห์หน้า · หุ้น RS ≥ '+RS_TOP_TH : 'งบที่ออกแล้วใน 14 วันล่าสุด · หุ้น RS ≥ '+RS_TOP_TH;
+  if(!(stockData||[]).length){ box.innerHTML='<div class="trs-empty">กำลังโหลด…</div>'; return; }
+  const arr = earnTab==='soon' ? soon : out;
+  arr.sort((a,b)=> earnTab==='soon' ? ((a.i.d-b.i.d)||(b.s.rs-a.s.rs)) : ((b.i.d-a.i.d)||(b.s.rs-a.s.rs)));
+  if(!arr.length){ box.innerHTML='<div class="trs-empty">'+(earnTab==='soon'?'ไม่มีหุ้น RS แข็งที่งบจะออกในช่วงนี้':'ยังไม่มีหุ้น RS แข็งที่ประกาศงบใน 14 วันล่าสุด')+'</div>'; return; }
+  const LIM=12, showAll = box.dataset.all==='1', rows=showAll?arr:arr.slice(0,LIM);
+  let html='', cur=null;
+  rows.forEach(({s,i})=>{
+    if(earnTab==='soon' && i.d!==cur){ cur=i.d; html+='<div class="ern-day">'+ernLbl(i.d,i.tn)+(i.st==='pend'?' · ถึงกำหนดแล้ว':'')+'</div>'; }
+    const tk=String(s.ticker).replace(/'/g,'');
+    html+='<div class="ern-row"><span class="tk" onclick="openModalByTk(\''+tk+'\')">'+s.ticker+'</span><span class="trs-rs">'+s.rs+'</span><span class="nm">'+(s.name||'')+'</span><span class="ern-wrap">'+((earnTab==='out'||i.st==='pend')?ernChips(s,mk):'')+'</span></div>';
+  });
+  if(arr.length>LIM) html+='<div style="margin-top:12px"><button class="tf-chip" onclick="document.getElementById(\'earnList\').dataset.all=\''+(showAll?'0':'1')+'\';renderEarnPanel()">'+(showAll?'ย่อ':'ดูทั้งหมด '+arr.length+' ตัว')+'</button></div>';
+  if(earnTab==='out') html+='<div class="trs-empty" style="padding:12px 0 0;font-size:11px">เขียว = ดีขึ้น · แดง = แย่ลง · YoY = เทียบไตรมาสเดียวกันของปีก่อน · QoQ = เทียบไตรมาสก่อน (ใช้เมื่อไม่มีตัวเลขเทียบปีก่อน เช่น ปีก่อนขาดทุน) · ข้อมูลจาก TradingView อาจช้า 1 วัน</div>';
+  box.innerHTML=html;
+}
 /* Top RS วันนี้: 8 ตัว RS สูงสุดของตลาดที่เปิดอยู่ (ข้อมูลชุดเดียวกับหน้าหุ้น) */
 function renderTopRs(){
+  try{ renderEarnPanel(); }catch(e){}
   const tb=document.getElementById('topRsBody'); if(!tb) return;
   const list=(stockData||[]).filter(s=>Number.isFinite(s.rs)).slice().sort((a,b)=>(b.rs-a.rs)||((b.score||0)-(a.score||0))).slice(0,8);
   if(!list.length){ tb.innerHTML='<tr><td colspan="6" class="trs-empty">กำลังโหลด…</td></tr>'; return; }
@@ -1109,7 +1198,7 @@ let curPage = 'overview';
 function setPage(pg){
   curPage = pg;
   try{ localStorage.setItem('rsd_curPage', pg); localStorage.setItem('rsd_curMarket', currentMarket); }catch(e){}   // จำหน้า+ตลาดสุดท้ายไว้ (บอส)
-  const ov = ['topRsPanel','marketBriefPanel','indexBar','marketSummaryPanel','megatrendPanel','flowPanel','themesPanel','topglPanel'];
+  const ov = ['topRsPanel','earnPanel','marketBriefPanel','indexBar','marketSummaryPanel','megatrendPanel','flowPanel','themesPanel','topglPanel'];
   try{ thusHead(pg); if(pg==='overview') renderTopRs(); }catch(e){}
   const st = ['searchBar','progressPanel','cardsView','tableView'];
   ov.forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display = (pg==='overview') ? '' : 'none'; });
@@ -1200,7 +1289,7 @@ function renderScanner(){
     const dim = gi.mult<1 ? ` <span class="text-[9px] text-slate-500" title="ลดคะแนนตาม Market Gate">(${r.raw}×${gi.mult})</span>` : '';
     return `<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal('${jq(s.ticker)}','${jq(s.name)}','${currentMarket}')">
       <td class="p-2 font-black ${r.score>=75?'text-emerald-400':(r.score>=60?'text-sky-300':'text-slate-300')}">${r.score}${dim}</td>
-      <td class="p-2"><b class="text-sky-400">${s.ticker}</b> <span class="text-[10px] text-slate-500">${themeDisplay(s.industry||s.sector)}</span></td>
+      <td class="p-2"><b class="text-sky-400">${s.ticker}</b> <span class="text-[10px] text-slate-500">${themeDisplay(s.industry||s.sector)}</span>${ernChips(s,currentMarket)?`<div class="ern-wrap">${ernChips(s,currentMarket)}</div>`:''}</td>
       <td class="p-2 font-bold ${rsColor(s.rs)}">${s.rs}</td>
       <td class="p-2">${fNum(s.price)} ${fPct(s.change)}</td>
       <td class="p-2">${r.pctFromHigh==null?'-':'-'+r.pctFromHigh.toFixed(1)+'%'}</td>
@@ -1318,7 +1407,7 @@ function ldApply(){
   const lbl={mtd:'เดือนนี้',rs:'RS',ticker:'ตัวอักษร',price:'ราคา',val:'มูลค่า',p3m:'3M',p6m:'6M',p1y:'1Y'}[ldSortKey]||ldSortKey;
   const sh=document.getElementById('ldShown');
   if(sh) sh.textContent='— แสดง '+show.length+' จาก '+rows.length+' ตัว · เรียงตาม'+lbl+' '+(ldSortDir<0?'มาก→น้อย':'น้อย→มาก');
-  body.innerHTML=show.map((p,i)=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')"><td class="p-2 text-slate-400">'+(i+1)+'</td><td class="p-2"><b class="text-sky-400">'+p.ticker+'</b>'+ldTags(p.ticker)+' <span class="ld-nm text-[10px] text-slate-500">'+p.name+'</span></td><td class="p-2"><b class="pos">+'+p.mtd.toFixed(1)+'%</b></td><td class="p-2"><span class="'+rsColor(p.rs)+' font-bold">'+p.rs+'</span></td><td class="p-2">'+fx(p.price)+'</td><td class="p-2">'+fb(p.val)+'</td><td class="p-2 '+(p.p3m>=0?'pos':'neg')+'">'+p.p3m.toFixed(1)+'%</td><td class="p-2 '+(p.p6m>=0?'pos':'neg')+'">'+p.p6m.toFixed(1)+'%</td><td class="p-2 '+(p.p1y>=0?'pos':'neg')+'">'+p.p1y.toFixed(1)+'%</td><td class="p-2 text-[11px] text-slate-400" title="MA50 '+fx(p.sma50)+' เหนือ MA200 '+fx(p.sma200)+'">'+fx(p.sma50)+'/'+fx(p.sma200)+'</td></tr>').join('')||'<tr><td colspan="10" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
+  body.innerHTML=show.map((p,i)=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')"><td class="p-2 text-slate-400">'+(i+1)+'</td><td class="p-2"><b class="text-sky-400">'+p.ticker+'</b>'+ldTags(p.ticker)+' <span class="ld-nm text-[10px] text-slate-500">'+p.name+'</span>'+(ernBy(p.ticker,ldMarket)?'<div class="ern-wrap">'+ernBy(p.ticker,ldMarket)+'</div>':'')+'</td><td class="p-2"><b class="pos">+'+p.mtd.toFixed(1)+'%</b></td><td class="p-2"><span class="'+rsColor(p.rs)+' font-bold">'+p.rs+'</span></td><td class="p-2">'+fx(p.price)+'</td><td class="p-2">'+fb(p.val)+'</td><td class="p-2 '+(p.p3m>=0?'pos':'neg')+'">'+p.p3m.toFixed(1)+'%</td><td class="p-2 '+(p.p6m>=0?'pos':'neg')+'">'+p.p6m.toFixed(1)+'%</td><td class="p-2 '+(p.p1y>=0?'pos':'neg')+'">'+p.p1y.toFixed(1)+'%</td><td class="p-2 text-[11px] text-slate-400" title="MA50 '+fx(p.sma50)+' เหนือ MA200 '+fx(p.sma200)+'">'+fx(p.sma50)+'/'+fx(p.sma200)+'</td></tr>').join('')||'<tr><td colspan="10" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
 }
 async function renderLeaders(){
   const isUs = currentMarket==='america';
@@ -1652,7 +1741,7 @@ function topTableHTML(rows, m){
     const has2=(p2yCache[p2yKey(m,s.ticker)]!==undefined);
     return '<tr class="border-b border-[#16202e] hover:bg-[#111827] cursor-pointer" onclick="openModal(\''+s.ticker+'\',\''+jq(s.name)+'\',\''+m+'\')">'+
       '<td class="p-1 text-slate-500">'+(i+1)+'</td>'+
-      '<td class="p-1 font-semibold">'+s.ticker+drLabel(s.ticker, m)+ssfBadge(s.ticker, m)+Notes.badgeHtml(noteOf(m,s.ticker),m,s.ticker)+'<span class="block text-[9px] text-slate-500 truncate max-w-[150px]">'+(s.name||'')+'</span></td>'+
+      '<td class="p-1 font-semibold">'+s.ticker+drLabel(s.ticker, m)+ssfBadge(s.ticker, m)+Notes.badgeHtml(noteOf(m,s.ticker),m,s.ticker)+'<span class="block text-[9px] text-slate-500 truncate max-w-[150px]">'+(s.name||'')+'</span>'+(ernChips(s,m)?'<span class="ern-wrap block">'+ernChips(s,m)+'</span>':'')+'</td>'+
       '<td class="p-1 text-right">'+topRSHTML(s)+'</td>'+
       '<td class="p-1 text-right">'+fPctExact(s.pYTD)+'</td>'+
       '<td class="p-1 text-right">'+fPctExact(s.p1y)+'</td>'+
@@ -1693,6 +1782,7 @@ function topCardItems(rows, m){
         <div class="flex justify-between"><span class="text-slate-500">ราคา</span><span class="text-white">${fmtPx(s.price)}</span></div>
       </div>
       <div class="text-[10px] text-slate-500 mt-0.5 truncate">${s.industry||''}</div>
+      ${ernChips(s,m)?`<div class="ern-wrap mt-1">${ernChips(s,m)}</div>`:''}
       <div class="relative mt-1"><div id="${cid}" class="chart" style="height:150px"></div></div>
       ${notesPanel(m,tk,'card')}
     </div>`;
@@ -1739,7 +1829,7 @@ function topPodiumHTML(rows, m){
     const keys=['pYTD','p1y','p2y'].filter(k=>k!==topSortKey);
     return '<div class="tpod'+(i===0?' first':'')+'" onclick="openModal(\''+s.ticker+'\',\''+jq(s.name)+'\',\''+m+'\')" role="button" tabindex="0">'+
       '<div class="tpod-top"><span class="tpod-n">อันดับ '+(i+1)+'</span><span class="tpod-rs">'+((s.rs!=null)?s.rs:'-')+'</span></div>'+
-      '<div class="tpod-tk">'+s.ticker+'</div><div class="tpod-nm">'+(s.name||'')+'</div>'+
+      '<div class="tpod-tk">'+s.ticker+'</div><div class="tpod-nm">'+(s.name||'')+'</div>'+(ernChips(s,m)?'<div class="ern-wrap">'+ernChips(s,m)+'</div>':'')+
       '<div class="tpod-big">'+val(s,topSortKey)+'<span>'+cur+'</span></div>'+
       '<div class="tpod-sub"><span><i>'+sortLabel(keys[0])+'</i>'+val(s,keys[0])+'</span><span><i>'+sortLabel(keys[1])+'</i>'+val(s,keys[1])+'</span><span><i>ราคา</i>'+fmtPx(s.price)+'</span></div></div>';
   }).join('');
@@ -1963,6 +2053,7 @@ function buildCard(tk, nm, grp, ind, rs, px, ch, vol, val, p3, xn, rd, isDR, rv)
     </div>
     <div class="c-name" title="${nm||''}">${nm||''}</div>
     <div class="c-tags">${cap}${ind?`<span class="pill c-ind" title="กลุ่ม/หมวด">${ind}</span>`:''}</div>
+    ${(()=>{ const e=ernBy(tk,currentMarket); return e?`<div class="ern-wrap mt-1">${e}</div>`:''; })()}
     <div class="c-price">
       <b id="price_${tk}" class="text-white">${fNum(px)}</b> <span id="chg_${tk}">${fPct(ch)}</span>
       <span class="text-slate-400" title="มูลค่าซื้อขาย">${fBil(val||0)}</span>
@@ -3053,6 +3144,7 @@ function openModal(tk,nm,mkt){
     + (found.p1m!=null ? `<span class="text-slate-400">1 เดือน <b class="${found.p1m>=0?'pos':'neg'}">${fPct2(found.p1m)}</b></span>` : '')
     + (found.industry ? `<span class="text-slate-400">กลุ่ม <b class="text-slate-200">${found.industry}</b></span>` : '')
   ) : '';
+  const _me=document.getElementById('modalEarn'); if(_me) _me.innerHTML = found ? ernChips(found, mk) : '';
   // 5) คำอธิบายเส้นกราฟ (MA) ชุดเดียวกับการ์ด
   const _ml = document.getElementById('modalLegend');
   if(_ml) _ml.innerHTML = maLegendHTML();

@@ -293,7 +293,7 @@ export default async function handler(req, res) {
     };
 
     // snapshot เก็บเฉพาะฟิลด์หลัก — ฟิลด์ Scanner (SMA150/EMA20/52w/ATR/vol) คำนวณสดทุกสแกน ไม่ต้องบวม DB
-    const SCANNER_ONLY = ["sma150", "ema20", "hi52", "lo52", "atr"];
+    const SCANNER_ONLY = ["sma150", "ema20", "hi52", "lo52", "atr", "eN", "eL", "niY", "rvY", "niQ", "rvQ"];
     await saveSnapshot({ ...payload, data: clean.map(s => { const c = { ...s }; SCANNER_ONLY.forEach(k => delete c[k]); return c; }) });   // persist to Supabase (แยก snapshot ต่อ market)
     if (!global.__scanCache) global.__scanCache = {};
     global.__scanCache[market] = { data: payload, ts: Date.now() };
