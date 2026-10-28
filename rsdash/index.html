@@ -2299,23 +2299,36 @@ function renderSummary(sum){
     const el=document.getElementById('breadthHistChart');
     if(!wrap || !el) return;
     const n=currentMarket==='america'?'america':'thailand';
+    const tok = el.__tok = (el.__tok||0) + 1;   // เรียกซ้อนกันได้ (สลับหน้า/ตลาด) → เอาเฉพาะรอบล่าสุด ไม่งั้นได้กราฟซ้อน 2 ชั้นและชั้นที่ไม่มีตัวปรับขนาดค้างครึ่งจอ
         try{
           const r=await fetch(API+'/api/breadth?market='+n+'&days=400');
           if(!r.ok) throw 0;
           const j=await r.json(); let hist=j.history||[];
+          if(el.__tok!==tok) return;
           // ตัดวันตลาดปิด (เสาร์-อาทิตย์) ออก — เทียบเฉพาะวันทำการ wider gap ถอย
           hist = hist.filter(x=>{ const dd=new Date(String(x.date||'').slice(0,10)+'T00:00:00Z').getUTCDay(); return dd!==0 && dd!==6; });
           if(hist.length<2){ el.innerHTML='<div class="text-[10px] text-slate-500 pt-4 text-center">ยังมีข้อมูลไม่พอ — จะสะสมจากที่บันทึกต่อวัน (เดี๋ยวมีกราฟขึ้น)</div>'; return; }
           // ตรึงหน้าต่าง 1 ปีทำการย้อนหลัง + ไม่แสดงจุดล่าสุด (ตัวท้ายสุด) ตามที่บอสสั่ง
           hist = hist.slice(-252);          // เอาแค่ 1 ปีทำการหลังสุด
           const plot = hist.slice(0, -1);   // ตัดจุดล่าสุดออก (ไม่ plot ตัวท้ายสุด)
-          el.innerHTML='';
           // fix 5 ต.ค. 2026: รอให้กล่องมีความกว้างจริงก่อนวาด — เดิมวัดตอนกล่องกว้าง 0 แล้วยึด width 320px
           // ทำให้กราฟเล็กค้างอยู่ในกล่องกว้าง ~1000px (มีช่องว่างด้านขวาเยอะ). รอสูงสุด ~1.2 วิ.
           let _w = el.clientWidth, _tries = 0;
           while(_w < 60 && _tries < 12){ await new Promise(r=>setTimeout(r,100)); _w = el.clientWidth; _tries++; }
+          if(el.__tok!==tok) return;
+          el.innerHTML='';
           const chart=LightweightCharts.createChart(el,{width:_w||320,height:300,layout:{background:{color:'transparent'},textColor:thusC().text},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:false},timeScale:{borderVisible:false}});
           el.__lwc = chart;   // เก็บ handle ไว้ให้ขยับตามขนาดหน้าต่าง
+          // กล่องที่เคยซ่อนอยู่ (อยู่คนละหน้า/ยังไม่จัดเลย์เอาต์) จะกว้าง 0 ตอนวาด → ตกไปใช้ 320px แล้วค้างครึ่งจอ
+          // ใช้ ResizeObserver ให้กราฟตามความกว้างกล่องทุกครั้งที่เปลี่ยน (รวมตอนกล่องเพิ่งโผล่) แล้วล็อกช่วงเวลาใหม่
+          if(window.ResizeObserver){
+            if(el.__ro) el.__ro.disconnect();
+            el.__ro = new ResizeObserver(function(){
+              var w2 = el.clientWidth;
+              if(w2 >= 60){ try{ chart.applyOptions({width:w2}); chart.timeScale().setVisibleLogicalRange({from:0, to:Math.max(plot.length-1,1)}); }catch(e){} }
+            });
+            el.__ro.observe(el);
+          }
           if(!window.__lwcResize){
             window.__lwcResize = 1;
             window.addEventListener('resize', function(){
