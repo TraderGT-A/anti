@@ -38,3 +38,10 @@ data/news_log.txt
 data/news_run.txt
 data/profiles_missing.json
 data/profiles_run.txt
+
+# rsdash — ขยะ build/backup/ข้อมูลชั่วคราว (บอสอนุมัติ 29 ต.ค. 2569; ห้ามลบไฟล์ที่มีอยู่)
+rsdash/__pycache__/
+rsdash/*.bak_*
+rsdash/api/_lib/*.bak_*
+rsdash/breadth_history.db
+rsdash/us_closes.json
