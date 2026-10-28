@@ -316,6 +316,11 @@ html .hover\:bg-emerald-900\/30:hover { background:var(--upbg); } html .hover\:b
 html .text-sky-400 { }
 :root, html[data-theme="light"] { --l1:#281237; --l2:#B08A45; } html[data-theme="dark"] { --l1:#DDCDF0; --l2:#D4B67A; }
 /* การ์ดหุ้น: ชื่อหุ้นเห็นชัด · ชื่อบริษัท · กลุ่ม/หมวด · คำอธิบายกราฟสั้น */
+/* กล่องสรุป/หัวข่าว: ข้อความยาวห้ามดันตารางกว้างเกินจอ */
+html [data-notes], html [data-notes] * { overflow-wrap:anywhere; word-break:break-word; white-space:normal; }
+html td[data-notes] { max-width:calc(100vw - 48px); min-width:0; }
+html #top20Main { overflow-x:auto; }
+@media (max-width:767px){ html td[data-notes] { max-width:none; } html td[data-notes] > div { position:sticky; left:0; width:calc(100vw - 72px); max-width:100%; box-sizing:border-box; } }
 html .c-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
 html .c-id { display:flex; align-items:center; gap:8px; min-width:0; }
 html .c-id img { width:20px; height:20px; }

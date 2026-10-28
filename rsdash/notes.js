@@ -9,6 +9,8 @@
   const panelId = (m, tk) => 'notes_' + m + '_' + String(tk).replace(/[^a-z0-9]/gi, '_');
 
   function mdLite(text) {   // escape แล้วค่อยแปลงเฉพาะรูปแบบที่ปลอดภัย
+    // สรุปที่ถูกตัดกลางลิงก์ (เช่น URL Google News ยาวมากแล้วโดนตัดที่ 2,500 ตัวอักษร) → ตัดหางที่ไม่ครบทิ้ง กันข้อความดิบยาวล้นหน้าจอ
+    text = String(text == null ? '' : text).replace(/\s*[·•]?\s*\[[^\]\n]*\]\(https?:[^)\s]*\s*$/, '').replace(/\s*\[[^\]\n]*\s*$/, '');
     return esc(text)
       .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_, t, u) => link(u, t))
       .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
