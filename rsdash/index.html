@@ -1979,8 +1979,8 @@ function buildCard(tk, nm, grp, ind, rs, px, ch, vol, val, p3, xn, rd, isDR, rv)
 // คำอธิบายเส้นในกราฟ — ใช้ชุดเดียวกันทั้งการ์ดและป็อปอัป (สีตรงกับที่วาดจริง)
 function maLegendHTML(){
   return '<div class="ma-leg" title="แท่งเทียน = เปิด-สูง-ต่ำ-ปิด · แท่งล่าง = ปริมาณซื้อขาย · เส้นประ = ราคาปิดล่าสุด">'
-    + '<span><i class="lg1"></i>SMA20</span>'
-    + '<span><i class="lg2"></i>SMA50</span>'
+    + '<span><i class="lg1"></i>SMA50</span>'
+    + '<span><i class="lg2"></i>SMA200</span>'
   + '</div>';
 }
 function fNum(n){ const v=Number(n); return Number.isFinite(v)?v.toFixed(2):'-'; }
@@ -2945,7 +2945,7 @@ function drawChartW(el, raw, w){
     chart.priceScale('vol').applyOptions({scaleMargins:{top:.82,bottom:0}});
   }
   const sma=(n,color)=>{ if(data.length<n)return; const o=[]; for(let i=n-1;i<data.length;i++){let s=0;for(let j=0;j<n;j++)s+=data[i-j].close;o.push({time:data[i].time,value:s/n});} chart.addLineSeries({color,lineWidth:1,crosshairMarkerVisible:false}).setData(o); };
-  sma(20,thusC().l1); sma(50,thusC().l2);
+  sma(50,thusC().l1); sma(200,thusC().l2);
   const last=data[data.length-1];
   if(last){
     chart.addLineSeries({color:thusC().up,lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dotted,crosshairMarkerVisible:false}).setData([{time:last.time,value:last.close}]);
@@ -3077,7 +3077,7 @@ async function fetchModal(iv){
         ch.priceScale('vol').applyOptions({scaleMargins:{top:.8,bottom:0}});
       }
       const sma=(n,color)=>{ if(data.length<n)return; const o=[]; for(let i=n-1;i<data.length;i++){let s=0;for(let j=0;j<n;j++)s+=data[i-j].close;o.push({time:data[i].time,value:s/n});} ch.addLineSeries({color,lineWidth:1,crosshairMarkerVisible:false}).setData(o); };
-      sma(20,thusC().l1); sma(50,thusC().l2); ((iv==='1y'||iv==='1d')?thusRange(ch,data.length,126):ch.timeScale().fitContent()); ch.timeScale().applyOptions({ rightOffset: 12 });
+      sma(50,thusC().l1); sma(200,thusC().l2); ((iv==='1y'||iv==='1d')?thusRange(ch,data.length,126):ch.timeScale().fitContent()); ch.timeScale().applyOptions({ rightOffset: 12 });
     });
   }catch(e){ el.innerHTML='<div class="text-center text-rose-400 text-sm">โหลดไม่สำเร็จ</div>'; }
 }
