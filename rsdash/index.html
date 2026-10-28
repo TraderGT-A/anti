@@ -305,6 +305,7 @@ html .ern.pend { border-style:dashed; }
 html .ern.up { border-color:var(--up); color:var(--up); background:color-mix(in srgb, var(--up) 14%, transparent); font-weight:600; }
 html .ern.dn { border-color:var(--down); color:var(--down); background:color-mix(in srgb, var(--down) 14%, transparent); font-weight:600; }
 html[data-theme="light"] .ern.up { color:color-mix(in srgb, var(--up) 68%, #000); } html[data-theme="light"] .ern.dn { color:color-mix(in srgb, var(--down) 68%, #000); }
+html .lgo { display:inline-block; border-radius:50%; object-fit:cover; vertical-align:-3px; margin-right:6px; flex:none; background:#fff; }
 html .ern-wrap { display:flex; flex-wrap:wrap; align-items:center; }
 html .ern-day { font-size:12px; letter-spacing:.08em; color:var(--gold); margin:16px 0 2px; }
 html .ern-row { display:flex; flex-wrap:wrap; align-items:center; gap:4px 12px; padding:9px 0; border-top:1px solid var(--line); }
@@ -527,6 +528,7 @@ html #topbar .brand-logo { display:none; }
                   <div id="earnPanel">
                     <div class="trs-head"><div><span class="trs-eyebrow">ปฏิทินงบ</span><div class="trs-title" id="earnTitle">งบที่กำลังจะออก</div></div>
                       <span class="inline-flex gap-1"><button id="earnTabSoon" class="tf-chip active" onclick="setEarnTab('soon')">กำลังจะออก</button><button id="earnTabOut" class="tf-chip" onclick="setEarnTab('out')">ออกแล้ว</button></span></div>
+                    <div class="inline-flex items-center gap-1 flex-wrap" style="margin:6px 14px 0 0"><span class="text-[11px]" style="color:var(--muted)">จัดกลุ่มตาม</span><button id="earnGrpDay" class="tf-chip active" onclick="setEarnGroup('day')">วัน</button><button id="earnGrpInd" class="tf-chip" onclick="setEarnGroup('ind')" title="กลุ่มอุตสาหกรรม">กลุ่มธุรกิจ</button></div>
                     <div class="inline-flex items-center gap-1" style="margin:6px 0 0"><span class="text-[11px]" style="color:var(--muted)">กำไร/รายได้เทียบกับ</span><button id="earnBasisYoY" class="tf-chip active" onclick="setErnBasis('yoy')" title="เทียบไตรมาสเดียวกันของปีก่อน">YoY</button><button id="earnBasisQoQ" class="tf-chip" onclick="setErnBasis('qoq')" title="เทียบไตรมาสก่อนหน้า">QoQ</button></div>
                     <div id="earnList"></div>
                   </div>
@@ -1137,13 +1139,19 @@ function ernChips(s, mk){
   if(i.st==='pend') return '<span class="ern pend" title="ถึงกำหนดแล้ว รอ TradingView อัปเดตตัวเลข">งบครบกำหนด '+ernLbl(i.d,i.tn)+' · รอตัวเลข</span>';
   return '<span class="ern" title="ประกาศงบแล้ว">งบออกแล้ว '+ernLbl(i.d,i.tn)+'</span>'+ernGrow('กำไร',s.niY,s.niQ)+ernGrow('รายได้',s.rvY,s.rvQ);
 }
+/* โลโก้บริษัทเล็ก ๆ ข้างชื่อหุ้น (TradingView → สำรอง LoadLogo → ไม่มีก็ซ่อน) */
+function lg(tk, mk, px){
+  px=px||16; const m=mk||currentMarket, t=String(tk==null?'':tk); if(!t) return '';
+  return '<img class="lgo" src="'+logoUrlM(t,m)+'" alt="" loading="lazy" style="width:'+px+'px;height:'+px+'px" onerror="logoErr(this,\''+jq(t)+'\',\''+m+'\')" />';
+}
 function ernBy(tk, mk){
   const arr=(mk==='america'?stockDB.america:stockDB.thailand)||[];
   const s=arr.find(x=>x.ticker===tk) || (stockData||[]).find(x=>x.ticker===tk);
   return ernChips(s, mk);
 }
-let earnTab='soon';
+let earnTab='soon', earnGroup='day';
 function setEarnTab(t){ earnTab=t; renderEarnPanel(); }
+function setEarnGroup(g){ earnGroup=g; renderEarnPanel(); }
 function renderEarnPanel(){
   const box=document.getElementById('earnList'); if(!box) return;
   const mk=currentMarket, list=[];
@@ -1157,14 +1165,23 @@ function renderEarnPanel(){
   const ttl=document.getElementById('earnTitle'); if(ttl) ttl.textContent = earnTab==='soon' ? 'งบสัปดาห์นี้และสัปดาห์หน้า · หุ้น RS ≥ '+RS_TOP_TH : 'งบที่ออกแล้วใน 14 วันล่าสุด · หุ้น RS ≥ '+RS_TOP_TH;
   if(!(stockData||[]).length){ box.innerHTML='<div class="trs-empty">กำลังโหลด…</div>'; return; }
   const arr = earnTab==='soon' ? soon : out;
-  arr.sort((a,b)=> earnTab==='soon' ? ((a.i.d-b.i.d)||(b.s.rs-a.s.rs)) : ((b.i.d-a.i.d)||(b.s.rs-a.s.rs)));
+  const gDay = earnGroup==='day';
+  const keyOf = x => gDay ? x.i.d : (x.s.industry||x.s.sector||'อื่น ๆ');
+  const cnt={}; arr.forEach(x=>{ const k=keyOf(x); cnt[k]=(cnt[k]||0)+1; });
+  const dirD = earnTab==='soon' ? 1 : -1;
+  arr.sort((a,b)=> gDay ? ((dirD*(a.i.d-b.i.d))||(b.s.rs-a.s.rs))
+                        : ((cnt[keyOf(b)]-cnt[keyOf(a)])||String(keyOf(a)).localeCompare(String(keyOf(b)))||(dirD*(a.i.d-b.i.d))||(b.s.rs-a.s.rs)));
+  const gD=document.getElementById('earnGrpDay'), gI=document.getElementById('earnGrpInd');
+  if(gD) gD.classList.toggle('active', gDay); if(gI) gI.classList.toggle('active', !gDay);
   if(!arr.length){ box.innerHTML='<div class="trs-empty">'+(earnTab==='soon'?'ไม่มีหุ้น RS แข็งที่งบจะออกในช่วงนี้':'ยังไม่มีหุ้น RS แข็งที่ประกาศงบใน 14 วันล่าสุด')+'</div>'; return; }
   const LIM=12, showAll = box.dataset.all==='1', rows=showAll?arr:arr.slice(0,LIM);
   let html='', cur=null;
   rows.forEach(({s,i})=>{
-    if(earnTab==='soon' && i.d!==cur){ cur=i.d; html+='<div class="ern-day">'+ernLbl(i.d,i.tn)+(i.st==='pend'?' · ถึงกำหนดแล้ว':'')+'</div>'; }
+    const k=keyOf({s,i});
+    if(k!==cur){ cur=k; html+='<div class="ern-day">'+(gDay ? ernLbl(i.d,i.tn)+(i.st==='pend'?' · ถึงกำหนดแล้ว':'') : themeDisplay(k))+' <span style="color:var(--faint)">· '+cnt[k]+' ตัว</span></div>'; }
     const tk=String(s.ticker).replace(/'/g,'');
-    html+='<div class="ern-row"><span class="tk" onclick="openModalByTk(\''+tk+'\')">'+s.ticker+'</span><span class="trs-rs">'+s.rs+'</span><span class="nm">'+(s.name||'')+'</span><span class="ern-wrap">'+((earnTab==='out'||i.st==='pend')?ernChips(s,mk):'')+'</span></div>';
+    const chips = (earnTab==='out'||i.st==='pend') ? ernChips(s,mk) : (gDay ? '' : '<span class="ern soon'+(i.d===i.tn?' today':'')+'">งบ '+ernLbl(i.d,i.tn)+'</span>');
+    html+='<div class="ern-row"><span class="tk" onclick="openModalByTk(\''+tk+'\')">'+lg(s.ticker,mk,20)+s.ticker+'</span><span class="trs-rs">'+s.rs+'</span><span class="nm">'+(s.name||'')+'</span><span class="ern-wrap">'+chips+'</span></div>';
   });
   if(arr.length>LIM) html+='<div style="margin-top:12px"><button class="tf-chip" onclick="document.getElementById(\'earnList\').dataset.all=\''+(showAll?'0':'1')+'\';renderEarnPanel()">'+(showAll?'ย่อ':'ดูทั้งหมด '+arr.length+' ตัว')+'</button></div>';
   if(earnTab==='out') html+='<div class="trs-empty" style="padding:12px 0 0;font-size:11px">เขียว = ดีขึ้น · แดง = แย่ลง · เทียบ'+(ernBasis==='qoq'?'ไตรมาสก่อน (QoQ)':'ไตรมาสเดียวกันของปีก่อน (YoY)')+' · "–" = ไม่มีตัวเลขเทียบ · ข้อมูลจาก TradingView อาจช้า 1 วัน</div>';
@@ -1178,7 +1195,7 @@ function renderTopRs(){
   if(!list.length){ tb.innerHTML='<tr><td colspan="6" class="trs-empty">กำลังโหลด…</td></tr>'; return; }
   const pc=(v)=>Number.isFinite(v)?((v>=0?'+':'−')+Math.abs(v).toFixed(2)+'%'):'–';
   const cl=(v)=>Number.isFinite(v)?(v>=0?'pos':'neg'):'';
-  tb.innerHTML=list.map(s=>`<tr><td><span class="trs-rs">${s.rs}</span></td><td><a href="#" class="trs-tk" onclick="openModalByTk('${String(s.ticker).replace(/'/g,"")}');return false;">${s.ticker}</a></td><td class="r">${Number(s.price).toFixed(2)}</td><td class="r ${cl(s.change)}">${pc(s.change)}</td><td class="r ${cl(s.p3m)}">${pc(s.p3m)}</td><td class="trs-grp">${s.industry||s.sector||''}</td></tr>`).join('');
+  tb.innerHTML=list.map(s=>`<tr><td><span class="trs-rs">${s.rs}</span></td><td><a href="#" class="trs-tk" onclick="openModalByTk('${String(s.ticker).replace(/'/g,"")}');return false;">${lg(s.ticker,currentMarket,20)}${s.ticker}</a></td><td class="r">${Number(s.price).toFixed(2)}</td><td class="r ${cl(s.change)}">${pc(s.change)}</td><td class="r ${cl(s.p3m)}">${pc(s.p3m)}</td><td class="trs-grp">${s.industry||s.sector||''}</td></tr>`).join('');
 }
 function toggleTheme(){ const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; try{ localStorage.setItem('rsd_theme',n); }catch(e){} location.reload(); }function fontZoom(delta){
   const base=parseFloat(localStorage.getItem('rsd_zoom')||'1');
@@ -1295,7 +1312,7 @@ function renderScanner(){
     const dim = gi.mult<1 ? ` <span class="text-[9px] text-slate-500" title="ลดคะแนนตาม Market Gate">(${r.raw}×${gi.mult})</span>` : '';
     return `<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal('${jq(s.ticker)}','${jq(s.name)}','${currentMarket}')">
       <td class="p-2 font-black ${r.score>=75?'text-emerald-400':(r.score>=60?'text-sky-300':'text-slate-300')}">${r.score}${dim}</td>
-      <td class="p-2"><b class="text-sky-400">${s.ticker}</b> <span class="text-[10px] text-slate-500">${themeDisplay(s.industry||s.sector)}</span>${ernChips(s,currentMarket)?`<div class="ern-wrap">${ernChips(s,currentMarket)}</div>`:''}</td>
+      <td class="p-2">${lg(s.ticker,currentMarket,18)}<b class="text-sky-400">${s.ticker}</b> <span class="text-[10px] text-slate-500">${themeDisplay(s.industry||s.sector)}</span>${ernChips(s,currentMarket)?`<div class="ern-wrap">${ernChips(s,currentMarket)}</div>`:''}</td>
       <td class="p-2 font-bold ${rsColor(s.rs)}">${s.rs}</td>
       <td class="p-2">${fNum(s.price)} ${fPct(s.change)}</td>
       <td class="p-2">${r.pctFromHigh==null?'-':'-'+r.pctFromHigh.toFixed(1)+'%'}</td>
@@ -1413,7 +1430,7 @@ function ldApply(){
   const lbl={mtd:'เดือนนี้',rs:'RS',ticker:'ตัวอักษร',price:'ราคา',val:'มูลค่า',p3m:'3M',p6m:'6M',p1y:'1Y'}[ldSortKey]||ldSortKey;
   const sh=document.getElementById('ldShown');
   if(sh) sh.textContent='— แสดง '+show.length+' จาก '+rows.length+' ตัว · เรียงตาม'+lbl+' '+(ldSortDir<0?'มาก→น้อย':'น้อย→มาก');
-  body.innerHTML=show.map((p,i)=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')"><td class="p-2 text-slate-400">'+(i+1)+'</td><td class="p-2"><b class="text-sky-400">'+p.ticker+'</b>'+ldTags(p.ticker)+' <span class="ld-nm text-[10px] text-slate-500">'+p.name+'</span>'+(ernBy(p.ticker,ldMarket)?'<div class="ern-wrap">'+ernBy(p.ticker,ldMarket)+'</div>':'')+'</td><td class="p-2"><b class="pos">+'+p.mtd.toFixed(1)+'%</b></td><td class="p-2"><span class="'+rsColor(p.rs)+' font-bold">'+p.rs+'</span></td><td class="p-2">'+fx(p.price)+'</td><td class="p-2">'+fb(p.val)+'</td><td class="p-2 '+(p.p3m>=0?'pos':'neg')+'">'+p.p3m.toFixed(1)+'%</td><td class="p-2 '+(p.p6m>=0?'pos':'neg')+'">'+p.p6m.toFixed(1)+'%</td><td class="p-2 '+(p.p1y>=0?'pos':'neg')+'">'+p.p1y.toFixed(1)+'%</td><td class="p-2 text-[11px] text-slate-400" title="MA50 '+fx(p.sma50)+' เหนือ MA200 '+fx(p.sma200)+'">'+fx(p.sma50)+'/'+fx(p.sma200)+'</td></tr>').join('')||'<tr><td colspan="10" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
+  body.innerHTML=show.map((p,i)=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')"><td class="p-2 text-slate-400">'+(i+1)+'</td><td class="p-2">'+lg(p.ticker,ldMarket,18)+'<b class="text-sky-400">'+p.ticker+'</b>'+ldTags(p.ticker)+' <span class="ld-nm text-[10px] text-slate-500">'+p.name+'</span>'+(ernBy(p.ticker,ldMarket)?'<div class="ern-wrap">'+ernBy(p.ticker,ldMarket)+'</div>':'')+'</td><td class="p-2"><b class="pos">+'+p.mtd.toFixed(1)+'%</b></td><td class="p-2"><span class="'+rsColor(p.rs)+' font-bold">'+p.rs+'</span></td><td class="p-2">'+fx(p.price)+'</td><td class="p-2">'+fb(p.val)+'</td><td class="p-2 '+(p.p3m>=0?'pos':'neg')+'">'+p.p3m.toFixed(1)+'%</td><td class="p-2 '+(p.p6m>=0?'pos':'neg')+'">'+p.p6m.toFixed(1)+'%</td><td class="p-2 '+(p.p1y>=0?'pos':'neg')+'">'+p.p1y.toFixed(1)+'%</td><td class="p-2 text-[11px] text-slate-400" title="MA50 '+fx(p.sma50)+' เหนือ MA200 '+fx(p.sma200)+'">'+fx(p.sma50)+'/'+fx(p.sma200)+'</td></tr>').join('')||'<tr><td colspan="10" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
 }
 async function renderLeaders(){
   const isUs = currentMarket==='america';
@@ -1549,9 +1566,9 @@ function rpBodyHTML(j){
   const H=L+' @'+(T.u?(''):'');                  // ชื่อคอลัมน์ = R 1 ปี @วัน (หน่วย) ด้านล่าง
   const tt=x=>H+x+(T.u?' ('+T.u+')':'');
   const dFrom=rpD(j.resolved.from), dTo=rpD(j.resolved.to), N=(j.n||20);
-  const colsEnter=[{l:'#',g:r=>'#'+r.rankTo},{l:'หุ้น',g:r=>`<button onclick="openModalByTk('${r.ticker||''}','${rpMk}')" class="font-bold text-sky-400 hover:underline" title="กดดูกราฟ ${r.ticker||''}">${r.ticker||''}${drLabel(r.ticker, rpMk)}</button><span class="rp-sub" title="${String(r.name||'').replace(/"/g,'')}">${String(r.name||'').slice(0,40)}${r.sector?' · '+r.sector:''}</span>`},{l:tt(dTo),g:r=>dsp(r.metricTo),a:1},{l:'RS @'+dTo,g:r=>r.rs??'',a:1},{l:'ราคา @'+dTo+' ('+CUR+')',g:r=>r.price??'',a:1}];
-  const colsExit=[{l:'#',g:r=>'#'+r.rankFrom},{l:'หุ้น',g:r=>`<button onclick="openModalByTk('${r.ticker||''}','${rpMk}')" class="font-bold text-sky-400 hover:underline" title="กดดูกราฟ ${r.ticker||''}">${r.ticker||''}${drLabel(r.ticker, rpMk)}</button><span class="rp-sub" title="${String(r.name||'').replace(/"/g,'')}">${String(r.name||'').slice(0,40)}${r.sector?' · '+r.sector:''}</span>`},{l:tt(dFrom),g:r=>dsp(r.metricFrom),a:1},{l:'RS @'+dFrom,g:r=>r.rsFrom??'',a:1},{l:'ราคา @'+dFrom+' ('+CUR+')',g:r=>r.price??'',a:1}];
-  const colsMove=[{l:'หุ้น',g:r=>`<button onclick="openModalByTk('${r.ticker||''}','${rpMk}')" class="font-bold text-sky-400 hover:underline" title="กดดูกราฟ ${r.ticker||''}">${r.ticker||''}${drLabel(r.ticker, rpMk)}</button>`},{l:'อันดับ '+dFrom+' → '+dTo,g:r=>'#'+r.rankFrom+' → <b>#'+r.rankTo+'</b>'},{l:'Δอันดับ',g:r=>dl(r.deltaRank)},{l:tt(dFrom),g:r=>dsp(r.metricFrom),a:1},{l:tt(dTo),g:r=>dsp(r.metricTo),a:1},{l:'ΔRS',g:r=>(r.rsDelta==null?'—':((r.rsDelta>0?'+':'')+r.rsDelta)),a:1},{l:'กลุ่ม',g:r=>r.sector||''}];
+  const colsEnter=[{l:'#',g:r=>'#'+r.rankTo},{l:'หุ้น',g:r=>`<button onclick="openModalByTk('${r.ticker||''}','${rpMk}')" class="font-bold text-sky-400 hover:underline" title="กดดูกราฟ ${r.ticker||''}">${lg(r.ticker||'',rpMk,18)}${r.ticker||''}${drLabel(r.ticker, rpMk)}</button><span class="rp-sub" title="${String(r.name||'').replace(/"/g,'')}">${String(r.name||'').slice(0,40)}${r.sector?' · '+r.sector:''}</span>`},{l:tt(dTo),g:r=>dsp(r.metricTo),a:1},{l:'RS @'+dTo,g:r=>r.rs??'',a:1},{l:'ราคา @'+dTo+' ('+CUR+')',g:r=>r.price??'',a:1}];
+  const colsExit=[{l:'#',g:r=>'#'+r.rankFrom},{l:'หุ้น',g:r=>`<button onclick="openModalByTk('${r.ticker||''}','${rpMk}')" class="font-bold text-sky-400 hover:underline" title="กดดูกราฟ ${r.ticker||''}">${lg(r.ticker||'',rpMk,18)}${r.ticker||''}${drLabel(r.ticker, rpMk)}</button><span class="rp-sub" title="${String(r.name||'').replace(/"/g,'')}">${String(r.name||'').slice(0,40)}${r.sector?' · '+r.sector:''}</span>`},{l:tt(dFrom),g:r=>dsp(r.metricFrom),a:1},{l:'RS @'+dFrom,g:r=>r.rsFrom??'',a:1},{l:'ราคา @'+dFrom+' ('+CUR+')',g:r=>r.price??'',a:1}];
+  const colsMove=[{l:'หุ้น',g:r=>`<button onclick="openModalByTk('${r.ticker||''}','${rpMk}')" class="font-bold text-sky-400 hover:underline" title="กดดูกราฟ ${r.ticker||''}">${lg(r.ticker||'',rpMk,18)}${r.ticker||''}${drLabel(r.ticker, rpMk)}</button>`},{l:'อันดับ '+dFrom+' → '+dTo,g:r=>'#'+r.rankFrom+' → <b>#'+r.rankTo+'</b>'},{l:'Δอันดับ',g:r=>dl(r.deltaRank)},{l:tt(dFrom),g:r=>dsp(r.metricFrom),a:1},{l:tt(dTo),g:r=>dsp(r.metricTo),a:1},{l:'ΔRS',g:r=>(r.rsDelta==null?'—':((r.rsDelta>0?'+':'')+r.rsDelta)),a:1},{l:'กลุ่ม',g:r=>r.sector||''}];
   let h='';
   h+=rpTable('NEW เข้าใหม่ใน Top'+N+' — อยู่ที่ '+dTo+' แต่ไม่อยู่ที่ '+dFrom, j.entered, colsEnter);
   h+=rpTable('OUT หลุดจาก Top'+N+' — อยู่ที่ '+dFrom+' แต่ไม่อยู่ที่ '+dTo, j.exited, colsExit);
@@ -1702,8 +1719,8 @@ const RS_TOP_TH = 70;   // เกณฑ์ RS ของ Top20 (ตรงกั�
 const GROUP_ORDER = { thailand: ['SET50','SET100','mai/Small'], america: ['sp500','nasdaq100','dow30','russell2000','idx_other'] };
 const GROUP_LABEL = { 'SET50':'SET50','SET100':'SET100','mai/Small':'mai & Small','sp500':'S&P 500','nasdaq100':'Nasdaq-100','dow30':'Dow 30','russell2000':'Russell 2000','idx_other':'อื่นๆ (ไม่อยู่ใน index หลัก)' };
 const GROUP_COLOR = { 'SET50':'text-amber-300','SET100':'text-sky-300','mai/Small':'text-slate-300','sp500':'text-amber-300','nasdaq100':'text-sky-300','dow30':'text-emerald-400','russell2000':'text-yellow-300','idx_other':'text-slate-400' };
-// TFEX Single Stock Futures underlyings (หุ้นไทยที่มี SSF) — แหล่ง KSECURITIES/TFEX 2026
-const TH_SSF = ["AAV","ADVANC","AEONTS","AMATA","AOT","AP","AWC","BA","BAM","BANPU","BAY","BBL","BCH","BCP","BCPG","BDMS","BEAUTY","BEC","BEM","BGRIM","BH","BJC","BLA","BLAND","BPP","BSRC","BTS","CBG","CENTEL","CHG","CK","CKP","COM7","CPALL","CPF","CPN","CRC","DELTA","EA","EASTW","EGCO","EPG","ERW","GFPT","GLOBAL","GPSC","GULF","GUNKUL","HANA","HMPRO","ICHI","IRPC","ITD","IVL","JAS","JMT","KBANK","KCE","KKP","KTB","KTC","LH","LPN","M","MAJOR","MBK","MEGA","MINT","MTC","OR","ORI","OSP","PLANB","PRM","PSH","PSL","PTG","PTT","PTTEP","PTTGC","QH","RATCH","RS","S","SAMART","SAWAD","SCB","SCC","SCGP","SGP","SIRI","SPALI","SPCG","SPRC","STA","STECON","STGT","STPI","SUPER","TASCO","TCAP","THAI","THANI","THCOM","THG","TISCO","TKN","TOA","TOP","TPIPL","TPIPP","TQM","TRUE","TTA","TTB","TTCL","TTW","TU","TVO","UNIQ","VGI","VNG","WHA","WHAUP"];
+// TFEX SSF underlyings — แหล่ง KSECURITIES/TFEX; อัปเดต 29 ต.ค. 2569: +GST (ใหม่), -THCOM (KS ถอดออกแล้ว)
+const TH_SSF = ["AAV","ADVANC","AEONTS","AMATA","AOT","AP","AWC","BA","BAM","BANPU","BAY","BBL","BCH","BCP","BCPG","BDMS","BEAUTY","BEC","BEM","BGRIM","BH","BJC","BLA","BLAND","BPP","BSRC","BTS","CBG","CENTEL","CHG","CK","CKP","COM7","CPALL","CPF","CPN","CRC","DELTA","EA","EASTW","EGCO","EPG","ERW","GFPT","GLOBAL","GPSC","GST","GULF","GUNKUL","HANA","HMPRO","ICHI","IRPC","ITD","IVL","JAS","JMT","KBANK","KCE","KKP","KTB","KTC","LH","LPN","M","MAJOR","MBK","MEGA","MINT","MTC","OR","ORI","OSP","PLANB","PRM","PSH","PSL","PTG","PTT","PTTEP","PTTGC","QH","RATCH","RS","S","SAMART","SAWAD","SCB","SCC","SCGP","SGP","SIRI","SPALI","SPCG","SPRC","STA","STECON","STGT","STPI","SUPER","TASCO","TCAP","THAI","THANI","THG","TISCO","TKN","TOA","TOP","TPIPL","TPIPP","TQM","TRUE","TTA","TTB","TTCL","TTW","TU","TVO","UNIQ","VGI","VNG","WHA","WHAUP"];
 const GL_SHORT = {"sp500":"S&P500","nasdaq100":"Nasdaq100","dow30":"Dow30","russell2000":"R2000"};
 function hasSSF(tk){ return TH_SSF.indexOf((tk||'').toUpperCase())>-1; }
 // ป้าย SSF สำหรับหน้า Top20 (หุ้นไทยเท่านั้น) — การ์ด + ตาราง + ป็อปอัปใช้ตัวเดียวกัน
@@ -1747,7 +1764,7 @@ function topTableHTML(rows, m){
     const has2=(p2yCache[p2yKey(m,s.ticker)]!==undefined);
     return '<tr class="border-b border-[#16202e] hover:bg-[#111827] cursor-pointer" onclick="openModal(\''+s.ticker+'\',\''+jq(s.name)+'\',\''+m+'\')">'+
       '<td class="p-1 text-slate-500">'+(i+1)+'</td>'+
-      '<td class="p-1 font-semibold">'+s.ticker+drLabel(s.ticker, m)+ssfBadge(s.ticker, m)+Notes.badgeHtml(noteOf(m,s.ticker),m,s.ticker)+'<span class="block text-[9px] text-slate-500 truncate max-w-[150px]">'+(s.name||'')+'</span>'+(ernChips(s,m)?'<span class="ern-wrap block">'+ernChips(s,m)+'</span>':'')+'</td>'+
+      '<td class="p-1 font-semibold">'+lg(s.ticker,m,18)+s.ticker+drLabel(s.ticker, m)+ssfBadge(s.ticker, m)+Notes.badgeHtml(noteOf(m,s.ticker),m,s.ticker)+'<span class="block text-[9px] text-slate-500 truncate max-w-[150px]">'+(s.name||'')+'</span>'+(ernChips(s,m)?'<span class="ern-wrap block">'+ernChips(s,m)+'</span>':'')+'</td>'+
       '<td class="p-1 text-right">'+topRSHTML(s)+'</td>'+
       '<td class="p-1 text-right">'+fPctExact(s.pYTD)+'</td>'+
       '<td class="p-1 text-right">'+fPctExact(s.p1y)+'</td>'+
@@ -1835,7 +1852,7 @@ function topPodiumHTML(rows, m){
     const keys=['pYTD','p1y','p2y'].filter(k=>k!==topSortKey);
     return '<div class="tpod'+(i===0?' first':'')+'" onclick="openModal(\''+s.ticker+'\',\''+jq(s.name)+'\',\''+m+'\')" role="button" tabindex="0">'+
       '<div class="tpod-top"><span class="tpod-n">อันดับ '+(i+1)+'</span><span class="tpod-rs">'+((s.rs!=null)?s.rs:'-')+'</span></div>'+
-      '<div class="tpod-tk">'+s.ticker+'</div><div class="tpod-nm">'+(s.name||'')+'</div>'+(ernChips(s,m)?'<div class="ern-wrap">'+ernChips(s,m)+'</div>':'')+
+      '<div class="tpod-tk">'+lg(s.ticker,m,26)+s.ticker+'</div><div class="tpod-nm">'+(s.name||'')+'</div>'+(ernChips(s,m)?'<div class="ern-wrap">'+ernChips(s,m)+'</div>':'')+
       '<div class="tpod-big">'+val(s,topSortKey)+'<span>'+cur+'</span></div>'+
       '<div class="tpod-sub"><span><i>'+sortLabel(keys[0])+'</i>'+val(s,keys[0])+'</span><span><i>'+sortLabel(keys[1])+'</i>'+val(s,keys[1])+'</span><span><i>ราคา</i>'+fmtPx(s.price)+'</span></div></div>';
   }).join('');
@@ -3012,7 +3029,7 @@ function renderView(){
           visible.forEach(x=>{
       tb.innerHTML+=`<tr id="row_${x.ticker}" class="hover:bg-[#111827] border-b border-[#1e2634]">
         <td class="p-4 text-left"><span class="text-base font-extrabold ${rsColor(x.rs)}">${x.rs}</span> <b class="ml-1 text-slate-300">#${x.rT}</b></td>
-        <td class="p-4 text-left"><button onclick="openModal('${x.ticker}','${jq(x.name)}','${currentMarket}')" class="font-bold text-sky-400 hover:underline">${x.ticker}</button>${drLabel(x.ticker)}${x.isDR?' <span class="text-[9px] font-bold text-amber-400 bg-amber-400/10 border border-amber-500/40 rounded px-1">DR</span>':''}${currentMarket==='america'?(' '+drShort(x.ticker)):''}</td>
+        <td class="p-4 text-left"><button onclick="openModal('${x.ticker}','${jq(x.name)}','${currentMarket}')" class="font-bold text-sky-400 hover:underline">${lg(x.ticker,currentMarket,20)}${x.ticker}</button>${drLabel(x.ticker)}${x.isDR?' <span class="text-[9px] font-bold text-amber-400 bg-amber-400/10 border border-amber-500/40 rounded px-1">DR</span>':''}${currentMarket==='america'?(' '+drShort(x.ticker)):''}</td>
         <td class="p-4 font-bold tprice">${fNum(x.price)}</td>
         <td class="p-4"><span class="tchg">${fPct(x.change)}</span></td>
         <td class="p-4 text-slate-300 tval">${x.val!=null?fVal(x.val):'-'}</td>
