@@ -527,6 +527,7 @@ html #topbar .brand-logo { display:none; }
                   <div id="earnPanel">
                     <div class="trs-head"><div><span class="trs-eyebrow">ปฏิทินงบ</span><div class="trs-title" id="earnTitle">งบที่กำลังจะออก</div></div>
                       <span class="inline-flex gap-1"><button id="earnTabSoon" class="tf-chip active" onclick="setEarnTab('soon')">กำลังจะออก</button><button id="earnTabOut" class="tf-chip" onclick="setEarnTab('out')">ออกแล้ว</button></span></div>
+                    <div class="inline-flex items-center gap-1" style="margin:6px 0 0"><span class="text-[11px]" style="color:var(--muted)">กำไร/รายได้เทียบกับ</span><button id="earnBasisYoY" class="tf-chip active" onclick="setErnBasis('yoy')" title="เทียบไตรมาสเดียวกันของปีก่อน">YoY</button><button id="earnBasisQoQ" class="tf-chip" onclick="setErnBasis('qoq')" title="เทียบไตรมาสก่อนหน้า">QoQ</button></div>
                     <div id="earnList"></div>
                   </div>
 
@@ -1120,11 +1121,14 @@ function ernInfo(s, mk){
   if(dN!=null && dN>=tn && dN<=end) return {st:'soon', d:dN, tn};
   return null;
 }
+/* เทียบกับอะไร: เลือกได้ที่แผงปฏิทินงบ (YoY = ไตรมาสเดียวกันปีก่อน · QoQ = ไตรมาสก่อน) ใช้ตัวที่เลือกอย่างเดียว ไม่สลับให้เอง */
+let ernBasis='yoy'; try{ if(localStorage.getItem('rsd_ern_basis')==='qoq') ernBasis='qoq'; }catch(e){}
+function setErnBasis(b){ try{ localStorage.setItem('rsd_ern_basis', b); }catch(e){} location.reload(); }
 function ernGrow(label, y, q){
-  let v=y, qoq=false; if(v==null){ v=q; qoq=true; }
-  if(v==null) return '<span class="ern" title="ไม่มีข้อมูลเทียบ">'+label+' –</span>';
+  const qoq = ernBasis==='qoq', v = qoq ? q : y;
+  if(v==null) return '<span class="ern" title="ไม่มีตัวเลข '+(qoq?'QoQ':'YoY')+' (เช่น ฐานเปรียบเทียบขาดทุน)">'+label+' – <small style="opacity:.75">'+(qoq?'QoQ':'YoY')+'</small></span>';
   const cls = v>0 ? 'up' : (v<0 ? 'dn' : ''), a=Math.abs(v), t = a>=1000 ? '>999' : String(Math.round(a));
-  const ttl = label+'ไตรมาสล่าสุดเทียบ'+(qoq?'ไตรมาสก่อน (ไม่มีตัวเลขเทียบปีก่อน)':'ไตรมาสเดียวกันของปีก่อน')+' · '+(v>0?'+':'')+v+'%';
+  const ttl = label+'ไตรมาสล่าสุดเทียบ'+(qoq?'ไตรมาสก่อน':'ไตรมาสเดียวกันของปีก่อน')+' · '+(v>0?'+':'')+v+'%';
   return '<span class="ern '+cls+'" title="'+ttl+'">'+label+' '+(v>0?'▲':(v<0?'▼':'•'))+' '+t+'% <small style="opacity:.75;font-weight:500">'+(qoq?'QoQ':'YoY')+'</small></span>';
 }
 function ernChips(s, mk){
@@ -1148,6 +1152,8 @@ function renderEarnPanel(){
   const tS=document.getElementById('earnTabSoon'), tO=document.getElementById('earnTabOut');
   if(tS){ tS.classList.toggle('active', earnTab==='soon'); tS.textContent='กำลังจะออก '+soon.length; }
   if(tO){ tO.classList.toggle('active', earnTab==='out'); tO.textContent='ออกแล้ว '+out.length; }
+  const bY=document.getElementById('earnBasisYoY'), bQ=document.getElementById('earnBasisQoQ');
+  if(bY) bY.classList.toggle('active', ernBasis==='yoy'); if(bQ) bQ.classList.toggle('active', ernBasis==='qoq');
   const ttl=document.getElementById('earnTitle'); if(ttl) ttl.textContent = earnTab==='soon' ? 'งบสัปดาห์นี้และสัปดาห์หน้า · หุ้น RS ≥ '+RS_TOP_TH : 'งบที่ออกแล้วใน 14 วันล่าสุด · หุ้น RS ≥ '+RS_TOP_TH;
   if(!(stockData||[]).length){ box.innerHTML='<div class="trs-empty">กำลังโหลด…</div>'; return; }
   const arr = earnTab==='soon' ? soon : out;
@@ -1161,7 +1167,7 @@ function renderEarnPanel(){
     html+='<div class="ern-row"><span class="tk" onclick="openModalByTk(\''+tk+'\')">'+s.ticker+'</span><span class="trs-rs">'+s.rs+'</span><span class="nm">'+(s.name||'')+'</span><span class="ern-wrap">'+((earnTab==='out'||i.st==='pend')?ernChips(s,mk):'')+'</span></div>';
   });
   if(arr.length>LIM) html+='<div style="margin-top:12px"><button class="tf-chip" onclick="document.getElementById(\'earnList\').dataset.all=\''+(showAll?'0':'1')+'\';renderEarnPanel()">'+(showAll?'ย่อ':'ดูทั้งหมด '+arr.length+' ตัว')+'</button></div>';
-  if(earnTab==='out') html+='<div class="trs-empty" style="padding:12px 0 0;font-size:11px">เขียว = ดีขึ้น · แดง = แย่ลง · YoY = เทียบไตรมาสเดียวกันของปีก่อน · QoQ = เทียบไตรมาสก่อน (ใช้เมื่อไม่มีตัวเลขเทียบปีก่อน เช่น ปีก่อนขาดทุน) · ข้อมูลจาก TradingView อาจช้า 1 วัน</div>';
+  if(earnTab==='out') html+='<div class="trs-empty" style="padding:12px 0 0;font-size:11px">เขียว = ดีขึ้น · แดง = แย่ลง · เทียบ'+(ernBasis==='qoq'?'ไตรมาสก่อน (QoQ)':'ไตรมาสเดียวกันของปีก่อน (YoY)')+' · "–" = ไม่มีตัวเลขเทียบ · ข้อมูลจาก TradingView อาจช้า 1 วัน</div>';
   box.innerHTML=html;
 }
 /* Top RS วันนี้: 8 ตัว RS สูงสุดของตลาดที่เปิดอยู่ (ข้อมูลชุดเดียวกับหน้าหุ้น) */
