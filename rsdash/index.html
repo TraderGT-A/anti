@@ -355,6 +355,7 @@ html .mm-btn { font-size:12px; color:var(--muted); padding:6px 12px; border:1px 
   html #leadersPanel table th:nth-child(1), html #leadersPanel table td:nth-child(1), html #leadersPanel table th:nth-child(n+8), html #leadersPanel table td:nth-child(n+8), html #leadersPanel table th:nth-child(6), html #leadersPanel table td:nth-child(6) { display:none; }
   html #leadersPanel table .ld-nm { display:none; }
   html #leadersPanel .ld-hint { display:none; }
+  html #scannerPanel table th:nth-child(n+5):not(:nth-child(8)), html #scannerPanel table td:nth-child(n+5):not(:nth-child(8)) { display:none; }
 }
 html #leadersPanel table { font-size:14px; } html #leadersPanel table td, html #leadersPanel table th { padding:11px 10px; border-color:var(--line); }
 html #leadersPanel table thead th { font-size:11px; letter-spacing:.08em; color:var(--muted); font-weight:500; white-space:nowrap; }
@@ -514,6 +515,7 @@ html #topbar .brand-logo { display:none; }
                       <h2 class="text-sm font-bold flex items-center gap-2"><span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></span> Scanner — หุ้นแกร่งที่กำลังพักตัวแคบ <span class="mk-chip mk-tag"></span></h2> <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('scanner','copy',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg> TV</button><button class="tf-chip" onclick="wlExport('scanner','file',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> .txt</button></span>
                     </div>
                     <div id="scGate" class="mb-2"></div>
+                    <details class="fold" id="scFold"><summary>ตัวกรอง</summary><div class="fold-body">
                     <div class="flex flex-wrap items-end gap-x-4 gap-y-2 mb-2 text-[11px] text-slate-300">
                       <label class="flex flex-col gap-0.5">RS ≥ <b id="scRsV">85</b><input id="scRs" type="range" min="50" max="99" value="85" class="accent-sky-500 w-28"></label>
                       <label class="flex flex-col gap-0.5">ห่างจุดสูง 52w ≤ <b id="scNearV">15</b>%<input id="scNear" type="range" min="3" max="25" value="15" class="accent-sky-500 w-28"></label>
@@ -522,12 +524,12 @@ html #topbar .brand-logo { display:none; }
                       <label class="flex flex-col gap-0.5">มูลค่าซื้อขาย/วัน ≥ <select id="scVal" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-white"></select></label>
                       <label class="flex items-center gap-1.5 cursor-pointer select-none"><input id="scTT" type="checkbox" checked class="accent-emerald-500"> ต้องผ่าน Trend Template ครบ 8</label>
                       <label class="flex items-center gap-1.5 cursor-pointer select-none" title="ATR10 ÷ ATR50 ≤ 0.85 คำนวณจากแท่งรายวัน (นิยามเดียวกับ backtest)"><input id="scSq" type="checkbox" checked class="accent-emerald-500"> ต้องบีบตัว (ATR10/ATR50 ≤ 0.85)</label>
-                    </div>
+                    </div></div></details>
                     <div id="scSummary" class="text-[11px] text-slate-400 mb-2"></div>
                     <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-[10px] uppercase text-slate-500 border-b border-[#1e2634]"><tr>
                       <th class="p-2">Setup</th><th class="p-2">หุ้น</th><th class="p-2">RS</th><th class="p-2">ราคา</th><th class="p-2" title="ห่างจุดสูง 52 สัปดาห์">จากจุดสูง</th><th class="p-2" title="ATR14 ÷ ราคา — ยิ่งต่ำยิ่งนิ่ง">ATR%</th><th class="p-2" title="ATR10 ÷ ATR50 จากแท่งรายวัน (ต่ำกว่า 0.85 = บีบตัว)">บีบตัว</th><th class="p-2">TT</th><th class="p-2">RVOL</th><th class="p-2">3M</th>
                     </tr></thead><tbody id="scBody"></tbody></table></div>
-                    <div class="text-[10px] text-slate-500 mt-2 leading-relaxed">⚠ เกณฑ์นี้ตีความจากแนวทางของ Minervini/Qullamaggie (แหล่งรอง) และ <b>backtest ของเรา (ไทย 2015–26, US 2015–26) ไม่พบ edge ที่พิสูจน์ได้</b> — ใช้คัดหุ้นที่ควรเปิดดูกราฟเท่านั้น ไม่ใช่สัญญาณซื้อ · ข้อ 3 ของ Trend Template (SMA200 ชี้ขึ้น) ในตารางเป็นค่าประมาณ ยืนยันจริงได้ในหน้าต่างหุ้น · บีบตัว = ATR10/ATR50 ≤ 0.85 (คำนวณจากแท่งรายวัน เฉพาะหุ้นที่ผ่านด่านแรก ~60 ตัว แคช 6 ชม.) · คะแนน Setup = RS 30 + Trend Template 25 + ใกล้จุดสูง 15 + บีบตัว 20 + ปริมาณแห้ง 10 แล้วคูณ Market Gate (เขียว×1 / เหลือง×0.7 / แดง×0.4)</div>
+                    <details class="fold mt-3"><summary>วิธีคิดและข้อจำกัด</summary><div class="fold-body"><div class="text-[10px] text-slate-500 mt-2 leading-relaxed">⚠ เกณฑ์นี้ตีความจากแนวทางของ Minervini/Qullamaggie (แหล่งรอง) และ <b>backtest ของเรา (ไทย 2015–26, US 2015–26) ไม่พบ edge ที่พิสูจน์ได้</b> — ใช้คัดหุ้นที่ควรเปิดดูกราฟเท่านั้น ไม่ใช่สัญญาณซื้อ · ข้อ 3 ของ Trend Template (SMA200 ชี้ขึ้น) ในตารางเป็นค่าประมาณ ยืนยันจริงได้ในหน้าต่างหุ้น · บีบตัว = ATR10/ATR50 ≤ 0.85 (คำนวณจากแท่งรายวัน เฉพาะหุ้นที่ผ่านด่านแรก ~60 ตัว แคช 6 ชม.) · คะแนน Setup = RS 30 + Trend Template 25 + ใกล้จุดสูง 15 + บีบตัว 20 + ปริมาณแห้ง 10 แล้วคูณ Market Gate (เขียว×1 / เหลือง×0.7 / แดง×0.4)</div></div></details>
                   </div>
 
                   <!-- 🏆 ผู้นำหุ้นไทย: near52wHigh + โมเมนตัม 12-1 Top20 รายเดือน + Gate (ผลสำรวจ in-sample) -->
@@ -559,6 +561,7 @@ html #topbar .brand-logo { display:none; }
                       <button id="rpTh" class="tf-chip active" onclick="setRpMk('thailand')">ไทย</button>
                       <button id="rpUs" class="tf-chip" onclick="setRpMk('america')">อเมริกา</button>
                     </div>
+                    <details class="fold" id="rpFold"><summary>ตัวเลือก · เรียงตาม · ช่วงวันที่</summary><div class="fold-body">
                     <div class="flex flex-wrap items-center gap-2 mb-2 text-[11px] text-slate-300">
                       <span>เรียงตาม</span>
                       <select id="rpMetric" onchange="loadReport()" class="bg-[#0a0f16] border border-[#243044] rounded px-2 py-1 text-[11px]">
@@ -583,7 +586,7 @@ html #topbar .brand-logo { display:none; }
                       </select>
                       <button class="tf-chip" onclick="loadReportInit()"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.300 5.700M20 4v7h-7"/></svg> โหลดใหม่</button>
                     </div>
-                    <div id="rpStatus" class="text-[10px] text-slate-400 mb-2"></div>
+                    <div id="rpStatus" class="text-[10px] text-slate-400 mb-2"></div></div></details>
                     <div id="rpSummary"></div>
                     <div id="rpBody"></div>
                   </div>
@@ -599,6 +602,7 @@ html #topbar .brand-logo { display:none; }
                         <button id="tpViewCard" class="tf-chip" onclick="setTopView('card')">การ์ด</button>
                       </span>
                     </div>
+                    <details class="fold" id="tpFold"><summary>กลุ่มหุ้น · เรียงตาม</summary><div class="fold-body">
                     <div class="flex flex-wrap items-center gap-1 mb-1">
                       <span class="text-[10px] text-slate-500">Universe:</span>
                       <button id="tpUniAll" class="tf-chip active" onclick="setTopUniverse('all')">ทั้งหมด (หุ้นสามัญ)</button>
@@ -613,7 +617,7 @@ html #topbar .brand-logo { display:none; }
                       <button id="tpSort2y" class="tf-chip" onclick="setTopSort('p2y')">2 ปี</button>
                       <button class="tf-chip" onclick="toggleTopDir()" title="สลับ มาก→น้อย / น้อย→มาก">↑↓</button>
                       <span class="text-[10px] text-slate-500 ml-auto">แตะชื่อหุ้น = กราฟเต็ม</span>
-                    </div>
+                    </div></div></details>
                     <div id="top20Main"></div>
                   </div>
 
@@ -1422,7 +1426,7 @@ function rpSummaryHTML(j){
   s+=box('▲ ขึ้น '+c.up+' · ▼ ลง '+c.down,'border-sky-500/40 text-sky-300');
   s+=box('⏸️ อยู่ครบ '+c.stayed,'border-slate-500/40 text-slate-300');
   s+='</div>';
-  s+='<div class="text-[10px] text-slate-400 mb-2"><b>R = Return (ผลตอบแทน)</b> · ตัวเลขที่มี <b>%</b> = เปอร์เซ็นต์ · <b>RS</b> = คะแนนเปอร์เซ็นไทล์ (ไม่ใช่ %) · <b>ราคา = บาท (หุ้นไทย) / USD (หุ้น US)</b> · ชื่อคอลัมน์ <b>@วันที่</b> = ค่าของหุ้นตัวนั้น ณ วันนั้น (ต้นทาง = วันเริ่ม "จาก" · ปลายทาง = วันสิ้นสุด "ถึง")</div>';
+  s+='<details class="fold"><summary>วิธีอ่านตัวย่อ</summary><div class="fold-body"><div class="text-[10px] text-slate-400 mb-2"><b>R = Return (ผลตอบแทน)</b> · ตัวเลขที่มี <b>%</b> = เปอร์เซ็นต์ · <b>RS</b> = คะแนนเปอร์เซ็นไทล์ (ไม่ใช่ %) · <b>ราคา = บาท (หุ้นไทย) / USD (หุ้น US)</b> · ชื่อคอลัมน์ <b>@วันที่</b> = ค่าของหุ้นตัวนั้น ณ วันนั้น (ต้นทาง = วันเริ่ม "จาก" · ปลายทาง = วันสิ้นสุด "ถึง")</div></div></details>';
   (j.warnings||[]).forEach(w=>{ s+='<div class="text-[10px] text-amber-300 mb-1">⚠ '+(w.message||w.code)+'</div>'; });
   return s;
 }
