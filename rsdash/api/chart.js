@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   // allowlist — interval/range ถูกต่อเข้า URL ของ Yahoo ตรงๆ (กัน query injection / ยิงพารามิเตอร์แปลก)
   if (!/^[A-Za-z0-9.^=&_\-]{1,20}$/.test(symbol0)) return res.status(400).json({ error: "Invalid symbol" });
   if (!["1m", "5m", "15m", "30m", "60m", "1d", "1wk", "1mo"].includes(interval)) return res.status(400).json({ error: "Invalid interval" });
-  if (!["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"].includes(rng)) return res.status(400).json({ error: "Invalid range" });
+  if (!["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "3y", "5y", "10y", "ytd", "max"].includes(rng)) return res.status(400).json({ error: "Invalid range" });
   res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
 
   // Thai stocks: append .BK automatically (Yahoo needs SET suffix). US = ไม่เติม (ใช้ symbol ตรงๆ)
@@ -46,7 +46,13 @@ export default async function handler(req, res) {
         });
       }
     }
-    return res.status(200).json({ symbol, interval, range: rng, count: candles.length, data: candles });
+    // firstTradeDate = วันแรกที่มีการซื้อขาย (Yahoo meta) — ใช้คำนวณ "IPO มาแล้วกี่ปี"
+    const ftd = result.meta?.firstTradeDate;
+    return res.status(200).json({
+      symbol, interval, range: rng, count: candles.length,
+      firstTradeDate: ftd ? new Date(ftd * 1000).toISOString().slice(0, 10) : null,
+      data: candles
+    });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
