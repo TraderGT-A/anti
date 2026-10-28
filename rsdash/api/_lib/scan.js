@@ -157,7 +157,8 @@ export async function scanMarket(market = "thailand") {
       sma150: sma150 || null, ema20: ema20 || null, hi52: hi52 || null, lo52: lo52 || null,
       atr: atr || null,   // ATR14 (หน่วยราคา) จาก TradingView
       o: dOpen ?? null, h: dHigh ?? null, l: dLow ?? null,   // OHLC วันนี้จาก TradingView
-      tv: r.s || "",               // สัญลักษณ์เต็มของ TradingView (EXCHANGE:SYMBOL) — ใช้ส่งออก Watchlist\n      logoId: logoId || "",        // TradingView logoid → ใช้ดึงโลโก้จริงจาก s3-symbol-logo.tradingview.com
+      tv: r.s || "",               // สัญลักษณ์เต็มของ TradingView (EXCHANGE:SYMBOL) — ใช้ส่งออก Watchlist
+      logoId: logoId || "",        // TradingView logoid → ใช้ดึงโลโก้จริงจาก s3-symbol-logo.tradingview.com
     });
   }
 
@@ -180,13 +181,22 @@ export async function scanMarket(market = "thailand") {
     }
   });
 
-  let clean = raw.filter(s => s.val >= M.min_value && s.price >= M.min_price && s.mcap >= M.min_mcap && s.volume >= M.min_vol);
+  // สภาพคล่อง — ใช้ "ยอดของวันนี้" หรือ "ค่าเฉลี่ย 10 วัน" ถึงเกณฑ์ก็ผ่าน (A+B)
+  // เหตุผล: ระหว่างวันยอดสะสมของวันนี้ยังไม่ครบ (ตอนเช้ามักได้ ~1/3 ของเฉลี่ย)
+  // → ถ้าใช้แต่ยอดวันนี้ รายชื่อจะผอมผิดปกติตอนเช้า แล้วค่อยขยายตอนบ่าย
+  // ต้องผ่านทั้งปริมาณและมูลค่า "ในชุดเดียวกัน": (วันนี้ผ่านทั้งคู่) หรือ (เฉลี่ย 10 วันผ่านทั้งคู่)
+  // ไม่ใช่ผ่านอย่างใดอย่างหนึ่ง — กันหุ้นที่จำนวนหุ้นถึงเกณฑ์แต่มูลค่าซื้อขายเล็กมากหลุดเข้ามา
+  const okLiq = (s, minV, minVal) =>
+    ((s.volume || 0) >= minV && (s.val || 0) >= minVal) ||
+    ((s.avgVol || 0) >= minV && (s.avgVol || 0) * (s.price || 0) >= minVal);
+
+  let clean = raw.filter(s => s.price >= M.min_price && s.mcap >= M.min_mcap && okLiq(s, M.min_vol, M.min_value));
 
   if (market === "thailand") {
     clean = clean.filter(s => {
       const gf = M.groupFilters[s.group];
       if (!gf) return true;
-      return s.volume >= gf.min_vol && s.val >= gf.min_value && s.mcap >= gf.min_mcap && s.price >= gf.min_price;
+      return okLiq(s, gf.min_vol, gf.min_value) && s.mcap >= gf.min_mcap && s.price >= gf.min_price;
     });
   }
 
