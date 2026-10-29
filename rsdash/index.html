@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RS Dashboard — หุ้นไทย</title>
+<title>RS Dashboard — TH</title>
 <link rel="icon" type="image/png" href="/brand/thus-symbol-color.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('rsd_theme')==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}</script>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('rsd_theme')==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}</script>
 <script src="/vendor/lightweight-charts.4.1.1.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
@@ -228,31 +228,32 @@ html[data-theme="dark"] #themeToggle .t-moon { display:none; } html[data-theme="
 html #topbar .lbl-s { display:none; }
 html #lastUpdateText { color:var(--faint); }
 
-/* ---------- เดสก์ท็อป: เมนูซ้ายแบบ THUS Journal ---------- */
+/* ---------- เดสก์ท็อป: แถบเมนูด้านบนแบบเว็บไซต์ THUS (โลโก้ซ้าย · เมนูกลาง · ตลาด/โหมดขวา) ---------- */
 @media (min-width:1024px){
   html body { padding:0 !important; }
-  html .max-w-7xl { max-width:none !important; margin:0 !important; padding:28px 40px 64px 288px !important; width:100%; }
-  html #topbar { position:fixed !important; left:0; top:0; bottom:0; width:248px; margin:0 !important; padding:24px 16px !important; overflow-y:auto; background:var(--side); border-right:1px solid var(--line); border-bottom:none; backdrop-filter:none; -webkit-backdrop-filter:none; display:flex; flex-direction:column; gap:20px; z-index:50; }
-  html #topbar > div:first-child { display:flex; flex-direction:column; align-items:stretch; gap:14px; margin:0; }
-  html #topbar .brand-logo { width:124px; height:auto; margin:0 8px; }
-  html #topbar h1 { font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:var(--gold); padding:0 8px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-weight:500; }
-  html #topbar h1 > .text-slate-400 { text-transform:none; letter-spacing:0; font-size:12px; color:var(--faint); }
+  html .max-w-7xl { max-width:1240px !important; margin:0 auto !important; padding:96px 40px 64px !important; width:100%; }
+  html #topbar { position:fixed !important; left:0; right:0; top:0; bottom:auto; width:auto; height:68px; margin:0 !important; padding:0 40px !important; overflow:visible; background:color-mix(in srgb,var(--bg) 92%,transparent); border-bottom:1px solid var(--line); border-right:none; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); display:flex; flex-direction:row; align-items:center; gap:28px; z-index:50; }
+  html #topbar > div:first-child { display:contents; }
+  html #topbar .brand-logo { width:auto; height:34px; margin:0; order:1; }
+  html #topbar h1 { order:2; font-size:11px; letter-spacing:.28em; text-transform:uppercase; color:var(--gold); padding:0; margin:0; display:flex; gap:8px; align-items:center; font-weight:500; white-space:nowrap; }
+  html #topbar h1 > .text-slate-400 { display:none !important; }
   html #topbar h1 #mkChip { text-transform:none; letter-spacing:0; font-size:11px; }
-  html #topbar > div:first-child > div { display:flex; flex-direction:column; align-items:stretch; gap:12px; }
-  html #topbar .pillseg { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
-  html #topbar .pillseg .tf-chip { justify-content:center; text-align:center; }
-  html #topbar .zoom-seg { display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)); }
-  html #lastUpdateText { text-align:center; font-size:12px; }
-  html #topbar .nav-row { margin:0; display:block; }
-  html #topbar .seg { display:flex; flex-direction:column; gap:4px; border:none; padding:0; border-radius:0; width:100%; }
-  html #topbar .seg .tf-chip { width:100%; justify-content:flex-start; text-align:left; display:flex; align-items:center; gap:12px; min-height:46px; padding:0 14px; border:none; border-radius:14px; background:transparent; color:var(--muted); font-weight:400; font-size:14.5px; }
-  html #topbar .seg .tf-chip .nav-ico { display:block; flex:none; color:currentColor; }
-  html #topbar .seg .tf-chip:hover { background:var(--panel2); color:var(--text); }
-  html #topbar .seg .tf-chip.active { background:var(--navon); color:var(--text); font-weight:600; }
-  html #topbar .seg .tf-chip.active .nav-ico { color:var(--gold); }
-  html #themeToggle { width:100%; border-radius:999px; gap:10px; font-size:14px; font-weight:500; } html #themeToggle .t-text { display:inline; }
+  html #topbar .nav-row { order:3; margin:0 auto; display:block; }
+  html #topbar > div:first-child > div { order:4; display:flex; flex-direction:row; align-items:center; gap:12px; margin:0; }
+  html #topbar .zoom-seg, html #topbar #marketBadge { display:none !important; }
+  html #lastUpdateText { font-size:11.5px; color:var(--faint); white-space:nowrap; }
+  html #topbar .pillseg { display:inline-flex; }
+  html #topbar .pillseg .tf-chip { min-height:32px; padding:0 14px; justify-content:center; }
+  html #topbar .seg { display:flex; flex-direction:row; gap:2px; border:none; padding:0; border-radius:0; background:transparent; width:auto; }
+  html #topbar .seg .tf-chip { width:auto; height:68px; min-height:68px; padding:0 16px; display:inline-flex; align-items:center; gap:0; border:none; border-radius:0; background:transparent; color:var(--muted); font-weight:500; font-size:14px; box-shadow:inset 0 -2px 0 transparent; }
+  html #topbar .seg .tf-chip .nav-ico, html #topbar .seg .tf-chip .lbl { display:none; }
+  html #topbar .seg .tf-chip .lbl-s { display:inline; }
+  html #topbar .seg .tf-chip:hover { color:var(--text); background:transparent; }
+  html #topbar .seg .tf-chip.active { background:transparent; color:var(--text); font-weight:600; box-shadow:inset 0 -2px 0 var(--gold); }
+  html #themeToggle { width:36px; height:36px; min-height:36px; border-radius:999px; gap:0; } html #themeToggle .t-text { display:none; }
+  html #pageHead { padding-top:6px; }
 }
-
+@media (min-width:1024px) and (max-width:1180px){ html #topbar { gap:16px; padding:0 20px !important; } html #topbar h1 { display:none; } html #topbar .seg .tf-chip { padding:0 11px; } html #lastUpdateText { display:none; } }
 /* ---------- มือถือ: เมนูแถบล่าง ---------- */
 @media (max-width:767px){
   html body { padding-bottom:84px !important; }
@@ -308,9 +309,139 @@ html[data-theme="light"] .ern.up { color:color-mix(in srgb, var(--up) 68%, #000)
 html .lgo { display:inline-block; border-radius:50%; object-fit:cover; vertical-align:-3px; margin-right:6px; flex:none; background:#fff; }
 html .ern-wrap { display:flex; flex-wrap:wrap; align-items:center; }
 html .ern-day { font-size:12px; letter-spacing:.08em; color:var(--gold); margin:16px 0 2px; }
-html .ern-row { display:flex; flex-wrap:wrap; align-items:center; gap:4px 12px; padding:9px 0; border-top:1px solid var(--line); }
-html .ern-row .tk { font-weight:600; color:var(--text); cursor:pointer; min-width:64px; } html .ern-row .tk:hover { color:var(--gold); }
-html .ern-row .nm { color:var(--faint); font-size:12px; flex:1 1 140px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+html #earnPanel.earn-wide #earnTabSoon, html #earnPanel.earn-wide #earnTabOut { display:none; } html #earnPanel.earn-wide .trs-head > span.inline-flex { display:none; }
+html .earn-cols { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 48px; align-items:start; margin-top:8px; }
+html .earn-colhead { display:flex; align-items:baseline; gap:10px; font-size:15px; font-weight:600; padding:10px 0 2px; border-bottom:1px solid var(--line2, var(--line)); } html .earn-colhead b { color:var(--gold); font-weight:600; } html .earn-colhead small { font-size:11px; font-weight:400; color:var(--faint); }
+html .earn-cols .ern-row { grid-template-columns:96px 44px minmax(0,1fr); }
+html .ern-row { display:grid; grid-template-columns:108px 44px minmax(0,1fr); align-items:center; gap:6px 10px; padding:9px 0; border-top:1px solid var(--line); }
+html .ern-row .tk { font-weight:600; color:var(--text); cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; } html .ern-row .tk:hover { color:var(--gold); }
+html .ern-row .trs-rs { justify-self:center; }
+html .ern-row .nm { color:var(--faint); font-size:12px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+html .ern-row .ern-wrap { grid-column:2 / -1; padding:0 0 2px; gap:2px 0; flex-wrap:nowrap; } html #earnList .ern small { display:none; } html #earnList .ern { margin-right:4px; padding:2px 7px; font-size:10.5px; }
+/* แถวสรุป (Report): คอลัมน์ตรงกันทุกแถว ตัวเลขชิดขวา ป้ายกลาง */
+html .sr-wrap { display:flex; flex-direction:column; }
+html .sr { display:grid; align-items:center; column-gap:10px; padding:8px 2px; border-top:1px solid var(--line); font-size:13px; font-variant-numeric:tabular-nums; cursor:pointer; }
+html .sr:hover { background:var(--panel2); }
+html .sr-h { cursor:default; border-top:0; font-size:10px; letter-spacing:.1em; color:var(--faint); padding:0 2px 4px; }
+html .sr-h:hover { background:none; }
+html .sr > span { min-width:0; } html .sr .c { text-align:center; } html .sr .r { text-align:right; white-space:nowrap; padding-right:6px; } html .sr .gp { padding-left:6px; } html .sr .r b, html .sr .c b { font-weight:600; }
+html .sr .tk { font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; }
+html .sr .gp { color:var(--muted); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+html .sr .rsb { display:inline-flex; min-width:32px; height:24px; align-items:center; justify-content:center; border-radius:8px; font-weight:700; font-size:13px; background:var(--panel2); color:var(--gold); }
+html .sr-note { font-size:11px; color:var(--faint); margin-top:8px; line-height:1.5; }
+html .sr-ttl { font-size:13px; font-weight:700; margin-bottom:8px; }
+@media (max-width:1150px){ html #indexBar { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } html #indexBar > div:not(.idx-card) { grid-column:1 / -1 !important; } }
+html .idx-name { white-space:nowrap; } html .idx-live { font-size:10px; margin-left:4px; vertical-align:1px; } html .idx-pct { white-space:nowrap; }
+@media (max-width:640px){ html .idx-top { flex-wrap:nowrap; } html .idx-name { letter-spacing:.02em; font-size:12px; } html .idx-pct { font-size:12.5px; } html .idx-num { font-size:30px; } html .idx-sub { display:grid; grid-template-columns:1fr; gap:3px; width:100%; } html .idx-sub span { display:flex; justify-content:space-between; } }
+html table td, html table th { font-variant-numeric:tabular-nums; vertical-align:middle; }
+/* โลโก้ + ชื่อหุ้น + ป้าย อยู่บรรทัดเดียวกันเสมอ (ไม่ตกบรรทัด) */
+html .tkrow { display:inline-flex; align-items:center; gap:4px; white-space:nowrap; max-width:100%; }
+html .tkcell { display:flex; flex-wrap:wrap; align-items:center; gap:3px 8px; } html .tkcell .ern-wrap { gap:4px; }
+html .tkrow > * { flex:none; } html .tkrow .lgo { margin-right:2px; vertical-align:middle; }
+html .tpod-tk { display:flex; flex-wrap:wrap; align-items:center; gap:2px 8px; white-space:nowrap; } html .tpod-tk .ern-wrap { font-size:13px; font-weight:400; } html .tpod-tk .lgo { margin-right:0; }
+html .tpod-nm { display:none; }
+/* จุดสถานะ: ข่าว = จุดฟ้าหน้าชื่อหุ้น · SSF = จุดเขียวหลังชื่อหุ้น · งบ = ข้อความเล็กไม่มีกรอบ */
+html .news-ic { display:inline-flex; align-items:center; justify-content:center; width:14px; height:18px; padding:0; border:0; background:transparent; cursor:pointer; flex:none; margin-right:2px; }
+html .news-ic i { width:7px; height:7px; border-radius:50%; background:#4f8cf0; display:block; } html .news-ic:hover i { box-shadow:0 0 0 3px color-mix(in srgb,#4f8cf0 25%,transparent); }
+/* หน้าหุ้น: แถบเครื่องมือเรียบ ๆ + แถบเลขหน้าแบบย่อ + ตัวเลขไม่ตกบรรทัด */
+html .sbar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+html .sbar input, html .sbar select, html .sbar #sortDirBtn { height:36px; background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:0 14px; font-size:13px; color:var(--text); outline:none; }
+html .sbar input { flex:1 1 180px; min-width:150px; } html .sbar select { padding-right:8px; max-width:100%; } html .sbar #sortDirBtn { width:36px; padding:0; }
+html .sbar .wl-btns { margin-left:0; } html .sbar .sb-update { margin-left:auto; } html .sbar #sortMain { max-width:150px; } html .sbar #groupFilter { max-width:170px; } html .sbar #rsFilter { max-width:110px; }
+html .sb-update { height:36px; padding:0 16px; border-radius:999px; background:var(--text); color:var(--bg); font-size:13px; font-weight:600; display:inline-flex; gap:6px; align-items:center; }
+html .sb-more { flex-basis:100%; margin:0; } html .sb-more-body { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
+html .sb-auto { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); cursor:pointer; }
+html .pgbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 14px; padding:10px 14px; font-size:12px; color:var(--muted); }
+html .pg-nav, html .pg-cols { display:inline-flex; align-items:center; gap:4px; }
+html .pg-b { min-width:30px; height:30px; padding:0 8px; border-radius:999px; border:1px solid transparent; background:transparent; color:var(--muted); font-size:13px; font-variant-numeric:tabular-nums; } html .pg-b:hover { background:var(--panel2); }
+html .pg-b.on { background:var(--text); color:var(--bg); } html .pg-b.off { opacity:.35; pointer-events:none; } html .pg-gap { color:var(--faint); padding:0 2px; }
+html #tableView td, html #tableView th { white-space:nowrap; } html #tableView td:last-child, html #tableView th:last-child { white-space:normal; }
+html #tableView th, html #tableView td { padding:10px 12px; }
+html #tableView thead { background:transparent; border-bottom:1px solid var(--line); }
+html #tableView thead th { font-size:11px; text-transform:none; letter-spacing:.06em; font-weight:500; color:var(--faint); }
+html #tableView thead th.text-sky-400, html #tableView thead th.text-amber-400 { color:var(--text); }
+html #tableView thead th .sort-icon { display:inline; font-size:9px; margin-left:2px; }
+html .rk { font-size:12.5px; font-weight:500; white-space:nowrap; font-variant-numeric:tabular-nums; } html .rk.new, html .rk.mu { color:var(--faint); }
+html #tableView td:nth-child(n+3):nth-child(-n+8), html #tableView th:nth-child(n+3):nth-child(-n+8) { text-align:right; }
+/* สไตล์ C: RS = วงแหวนเส้นบาง (สูง = เขียวอมฟ้า, ต่ำ = เทา) · % = ▲/▼ + ตัวเลข */
+html .trs-rs, html .sr .rsb, html .th-rs .rsb, html .tpod-rs, html .rsr, html .trs-table .trs-rs { display:inline-flex; align-items:center; justify-content:center; min-width:0 !important; width:30px; height:30px !important; padding:0 !important; border-radius:50%; border:1.5px solid var(--up); background:transparent !important; color:var(--up); font-weight:600; font-size:12.5px !important; font-variant-numeric:tabular-nums; flex:none; }
+html .sr .rsb, html .th-rs .rsb { width:28px; height:28px !important; font-size:12px !important; }
+html .trs-rs.lo, html .sr .rsb.lo, html .th-rs .rsb.lo, html .rsr.lo { border-color:var(--faint); color:var(--faint); }
+html .nw, html td .ar { white-space:nowrap; }
+html .ar { font-style:normal; font-size:.72em; margin-right:1px; vertical-align:1px; }
+html .dot-legend { display:flex; flex-wrap:wrap; gap:4px 16px; font-size:11px; color:var(--faint); margin:0 0 10px; }
+html .dot-legend span { display:inline-flex; align-items:center; gap:6px; }
+html .dot-legend i { display:inline-block; width:7px; height:7px; border-radius:50%; }
+html .dot-legend .lg-news { background:#4f8cf0; } html .dot-legend .lg-ssf { background:var(--up); } html .dot-legend .lg-ern { background:var(--gold); }
+html .dot-ssf { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--up); flex:none; margin-left:3px; vertical-align:middle; }
+/* ป้ายงบทุกชนิด: ขอบบางโปร่งแสง + พื้นจางมาก (สีตามสถานะ) */
+html .ern { padding:2px 9px; margin:2px 6px 2px 0; font-size:11px; font-weight:500; border:1px solid color-mix(in srgb, var(--muted) 30%, transparent); background:color-mix(in srgb, var(--muted) 7%, transparent) !important; color:var(--muted); border-radius:999px; }
+html .ern.soon { color:var(--gold); border-color:color-mix(in srgb, var(--gold) 40%, transparent); background:color-mix(in srgb, var(--gold) 8%, transparent) !important; }
+html .ern.today { color:var(--gold); font-weight:700; border-color:color-mix(in srgb, var(--gold) 60%, transparent); background:color-mix(in srgb, var(--gold) 16%, transparent) !important; }
+html .ern.pend { color:var(--muted); border-style:dashed; }
+/* ป้ายกำไร/รายได้: ขอบบางโปร่งแสง + พื้นจาง ๆ ตามสีเขียว/แดง */
+html .ern.up, html .ern.dn { font-weight:600; }
+html .ern.up { border-color:color-mix(in srgb, var(--up) 38%, transparent); background:color-mix(in srgb, var(--up) 9%, transparent) !important; }
+html .ern.dn { border-color:color-mix(in srgb, var(--down) 38%, transparent); background:color-mix(in srgb, var(--down) 9%, transparent) !important; }
+/* โพเดียม Top20: เหลือ อันดับ/RS · ชื่อหุ้น · ผลตอบแทนหลัก (ตัวเลข 1 ปี/2 ปี/ราคา อยู่ในตารางด้านล่างแล้ว) */
+html .tpod-sub { display:none !important; }
+html .tpod-grid { grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:12px !important; }
+html .tpod { gap:6px !important; padding:14px 16px !important; }
+@media (max-width:560px){ html .tpod-grid { grid-template-columns:1fr !important; } html .tpod { flex-direction:row; flex-wrap:wrap; align-items:center; gap:4px 10px; } html .tpod-top { width:100%; } html .tpod-big { margin-left:auto; } }
+/* การ์ดโพเดียม Top20: ตัวเลขไม่ล้นกรอบ */
+html .tpod { min-width:0; padding:16px 16px; }
+html .tpod-big { font-size:clamp(22px,3.4vw,30px); white-space:nowrap; } html .tpod-big span { display:block; margin:2px 0 0; }
+html .tpod-sub { font-size:11px; } html .tpod-sub i { font-size:10px; }
+html .top-tbl th:nth-child(3), html .top-tbl td:nth-child(3) { text-align:center; } html .top-tbl td:nth-child(3) .pill { display:block; margin:2px auto 0; width:max-content; } html .tpod-sub span { padding:8px 6px; min-width:0; overflow:hidden; } html .tpod-sub b { white-space:nowrap; font-weight:600; }
+html .tpod-sub span { align-items:flex-start; }
+/* Leaders: มุมมองการ์ด */
+html .ld-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:12px; margin-top:6px; }
+html .ldc-chart { height:130px !important; border-radius:10px; overflow:hidden; }
+html .ldc { background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:14px 16px; display:flex; flex-direction:column; gap:8px; cursor:pointer; min-width:0; } html .ldc:hover { border-color:var(--goldline); }
+html .ldc-top { display:flex; justify-content:space-between; align-items:center; } html .ldc-n { font-size:11px; color:var(--faint); letter-spacing:.1em; }
+html .ldc-tk { font-size:19px; font-weight:600; letter-spacing:-.01em; }
+html .ldc-big { font-size:26px; line-height:1.1; color:var(--up); font-variant-numeric:tabular-nums; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; } html .ldc-big b { font-weight:500; } html .ldc-big small { font-size:11px; color:var(--muted); }
+html .ldc-sub { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; border-radius:12px; background:var(--panel2); padding:8px 10px; font-size:12px; font-variant-numeric:tabular-nums; } html .ldc-sub span { display:flex; flex-direction:column; gap:2px; min-width:0; white-space:nowrap; } html .ldc-sub i { font-style:normal; font-size:10px; color:var(--muted); }
+@media (max-width:560px){ html .ld-grid { grid-template-columns:minmax(0,1fr); gap:10px; } html .ldc { padding:12px 14px; } html .ldc-chart { height:120px !important; } }
+/* Leaders: ซ่อนคอลัมน์รอง (มูลค่า/วัน, MA50/200) — เหลือที่ใช้ตัดสินใจ */
+html #leadersPanel table th:nth-child(6), html #leadersPanel table td:nth-child(6), html #leadersPanel table th:nth-child(10), html #leadersPanel table td:nth-child(10) { display:none; }
+html #leadersPanel .ld-nm { display:none; }
+@media (max-width:1000px){ html #leadersPanel table th:nth-child(8), html #leadersPanel table td:nth-child(8) { display:none; } html .top-tbl th:nth-child(8), html .top-tbl td:nth-child(8) { display:none; } html #tableView table th:nth-child(6), html #tableView table td:nth-child(6) { display:none; } }
+/* Leaders: คอลัมน์ตัวเลข (เดือนนี้…1Y) ชิดขวา, RS กึ่งกลาง ทั้งหัวและข้อมูล */
+html #leadersPanel table th:nth-child(n+3):nth-child(-n+9), html #leadersPanel table td:nth-child(n+3):nth-child(-n+9) { text-align:right; white-space:nowrap; }
+html #leadersPanel table th:nth-child(4), html #leadersPanel table td:nth-child(4) { text-align:center; }
+html #scannerPanel table th:nth-child(3), html #scannerPanel table td:nth-child(3), html #scannerPanel table th:nth-child(8), html #scannerPanel table td:nth-child(8) { text-align:center; }
+html #scannerPanel table th:nth-child(4), html #scannerPanel table td:nth-child(4) { text-align:right; white-space:nowrap; }
+@media (max-width:640px){ html #leadersPanel table th:nth-child(7), html #leadersPanel table td:nth-child(7) { display:none; } html #leadersPanel table { font-size:13px; } html #leadersPanel .ld-nm { display:none; } html #leadersPanel table th, html #leadersPanel table td { padding-left:4px; padding-right:4px; } }
+/* Money flow รายกลุ่ม: ชื่อ | ▲ | ▼ ชิดขวาตรงคอลัมน์ + แท่งเต็มความกว้าง */
+html #flowBars { display:flex; flex-direction:column; max-height:460px; }
+html .fl-row { display:grid; grid-template-columns:minmax(0,1fr) 84px 84px; column-gap:8px; row-gap:3px; align-items:baseline; width:100%; text-align:left; padding:9px 2px; border-top:1px solid var(--line); font-variant-numeric:tabular-nums; }
+html .fl-row:first-child { border-top:0; } html .fl-row { padding-right:12px; }
+html #flowSums { display:grid; grid-template-columns:1fr 1fr; gap:8px; } html #flowSums > div:last-child { grid-column:1 / -1; }
+@media (min-width:640px){ html #flowSums { grid-template-columns:repeat(3,minmax(0,1fr)); } html #flowSums > div:last-child { grid-column:auto; } }
+html .fl-row:hover { background:var(--panel2); }
+html .fl-nm { font-size:13px; font-weight:600; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+html .fl-v { font-size:13px; font-weight:600; text-align:right; white-space:nowrap; }
+html .fl-tk { grid-column:1 / -1; font-size:11px; color:var(--faint); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+html .fl-bar { grid-column:1 / -1; display:flex; height:5px; border-radius:3px; overflow:hidden; background:var(--panel2); margin-top:2px; }
+html .fl-bar .up { background:var(--up); } html .fl-bar .dn { background:var(--down); }
+/* Themes: แถวสะอาด เลขอันดับ | ชื่อ | RS เฉลี่ย + หุ้นตัวแทนใต้ชื่อ */
+html #themeList { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); column-gap:32px; row-gap:0; }
+html .th-row { display:grid; grid-template-columns:26px minmax(0,1fr) auto; column-gap:10px; row-gap:4px; align-items:center; padding:11px 2px; border-top:1px solid var(--line); cursor:pointer; }
+html .th-row:hover { background:var(--panel2); }
+html .th-n { font-size:12px; color:var(--faint); text-align:center; font-variant-numeric:tabular-nums; }
+html .th-nm { font-size:14px; font-weight:600; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+html .th-rs { display:flex; align-items:center; gap:8px; justify-content:flex-end; }
+html .th-rs small { font-size:11px; color:var(--faint); min-width:34px; text-align:right; }
+html .th-rs .rsb { display:inline-flex; min-width:32px; height:24px; align-items:center; justify-content:center; border-radius:8px; font-weight:700; font-size:13px; background:var(--panel2); color:var(--gold); }
+html .th-st { grid-column:2 / -1; display:flex; flex-wrap:wrap; gap:2px 14px; font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; }
+html .th-st b { color:var(--text); font-weight:600; margin-left:2px; } html .th-st span:hover { color:var(--gold); }
+@media (max-width:640px){ html .fl-row { grid-template-columns:minmax(0,1fr) 68px 68px; } html .fl-nm, html .fl-v { font-size:12.5px; } html #themeList { grid-template-columns:1fr; } }
+html .trs-table { table-layout:fixed; }
+html .trs-table .c { text-align:center; }
+html .trs-table .trs-grp { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } html .trs-table th:nth-child(6) { width:30%; }
+html .trs-table th:nth-child(1) { width:64px; } html .trs-table th:nth-child(3) { width:92px; } html .trs-table th:nth-child(4) { width:92px; } html .trs-table th:nth-child(5) { width:96px; }
+@media (max-width:640px){ html .trs-table th:nth-child(1) { width:42px; } html .trs-table th:nth-child(3) { width:50px; } html .trs-table th:nth-child(4) { width:58px; } html .trs-table th:nth-child(5) { width:62px; } html .trs-table th { letter-spacing:.04em; font-size:10px; } html .trs-table .trs-rs { min-width:32px; height:26px; font-size:13px; } html .trs-table td { font-size:12.5px; white-space:nowrap; padding-left:2px; padding-right:2px; } html .trs-table td:nth-child(2) { overflow:hidden; text-overflow:ellipsis; } html .ern-row { grid-template-columns:92px 40px minmax(0,1fr); gap:4px 8px; } html .sr { column-gap:6px; font-size:12.5px; } }
 html .idx-card { padding:20px 22px; display:flex; flex-direction:column; gap:10px; }
 html #indexBar > div.idx-card { padding:20px 22px; }
 html .idx-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
@@ -445,15 +576,15 @@ html .ma-leg { display:flex; gap:14px; font-size:12px; color:var(--muted); margi
 html .ma-leg i { display:inline-block; width:14px; height:2px; margin-right:6px; vertical-align:3px; border-radius:2px; }
 html .ma-leg .lg1 { background:var(--l1); } html .ma-leg .lg2 { background:var(--l2); }
 html #scannerPanel > div.flex.flex-wrap.items-end { background:var(--panel2); border:1px solid var(--line); border-radius:20px; padding:18px 20px; gap:18px 28px; margin-bottom:14px; font-size:13px; }
-/* Scanner: เงื่อนไขเป็นการ์ดซ้าย + ผลลัพธ์ขวา (จอกว้าง) */
-@media (min-width:1100px){
-  html #scannerPanel:not([style*="display: none"]):not([style*="display:none"]) { display:grid !important; grid-template-columns:320px minmax(0,1fr); column-gap:24px; align-items:start; }
-  html #scannerPanel > div:nth-child(1), html #scannerPanel > #scGate { grid-column:1 / -1; }
-  html #scannerPanel > div.flex.flex-wrap.items-end { grid-column:1; grid-row:3 / span 4; flex-direction:column; align-items:stretch; flex-wrap:nowrap; position:sticky; top:20px; margin-bottom:0; }
-  html #scannerPanel > div.flex.flex-wrap.items-end label { width:100%; }
-  html #scannerPanel > div.flex.flex-wrap.items-end input[type=range] { width:100%; }
-  html #scannerPanel > #scSummary, html #scannerPanel > div.overflow-x-auto, html #scannerPanel > div:last-child { grid-column:2; }
-}
+/* Scanner: ตัวกรองอยู่ในกล่องพับ — เมื่อเปิดเป็นกริดเต็มความกว้าง เรียงช่องเท่ากัน (ไม่เว้นที่โล่งด้านขวา) */
+html #scFold .fold-body > div { display:grid !important; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:16px 28px; align-items:end; background:var(--panel2); border:1px solid var(--line); border-radius:18px; padding:16px 20px; margin:0 !important; font-size:13px; color:var(--text); }
+html #scFold label.flex-col { display:block; }
+html #scFold label.flex-col b { color:var(--text); font-weight:600; font-variant-numeric:tabular-nums; }
+html #scFold label.flex-col input[type=range], html #scFold label.flex-col select { display:block; width:100%; margin-top:8px; }
+html #scFold select { height:34px; border-radius:999px; background:var(--panel); border:1px solid var(--line); color:var(--text); padding:0 12px; }
+html #scFold .sc-checks { grid-column:span 2; display:flex; flex-direction:column; gap:10px; align-self:end; } html #scFold .sc-checks label { white-space:nowrap; }
+html #scFold .fold-body > div { display:grid !important; }
+@media (max-width:640px){ html #scFold label.items-center { grid-column:1 / -1; } }
 html #scannerPanel #scGate > div, html #leadersPanel #ldGate > div { border-radius:18px; }
 html #scannerPanel #scSummary, html #leadersPanel #ldNote { font-size:13px; }
 html #leadersPanel #ldWarn { border-radius:18px; padding:12px 16px; }
@@ -476,7 +607,88 @@ html #topbar .brand-logo { display:none; }
   html[data-theme="dark"] #topbar .logo-l { display:none; }
   html[data-theme="dark"] #topbar .logo-d { display:block; }
 }
-@media (min-width:1024px){ html #themeToggle .t-text { display:inline; } }
+
+/* รายการแบบแถว: ไม่ใช้เส้นคั่น — แยกเป็นบล็อกโปร่งแสงทีละแถว */
+html .ern-row, html .sr:not(.sr-h), html .th-row, html .fl-row { border-top:0 !important; border-radius:14px; background:color-mix(in srgb, var(--panel2) 55%, transparent); margin:0 0 6px; }
+html .ern-row { padding:11px 14px; column-gap:10px; }
+html .sr:not(.sr-h) { padding:9px 14px; } html .sr-h { padding:0 14px 6px; }
+html .th-row { padding:11px 14px; } html #themeList { row-gap:0; }
+html .fl-row { padding:11px 14px; }
+html .ern-row:hover, html .sr:not(.sr-h):hover, html .th-row:hover, html .fl-row:hover { background:color-mix(in srgb, var(--panel2) 90%, transparent); }
+html .ern-day { margin:16px 0 8px; } html .earn-colhead { border-bottom:0; padding:6px 0 8px; }
+html .ern-row .ern-wrap { padding:2px 0 0; }/* ===== หน้า How to: บทความ + แอนิเมชัน (CSS/SVG ล้วน) ===== */
+html #howtoPanel { max-width:1080px; }
+html .ht-hero { padding:6px 0 18px; } html .ht-hero p { color:var(--muted); font-size:15px; line-height:1.75; max-width:720px; margin:6px 0 0; }
+html .ht-toc { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 4px; } html .ht-toc a { font-size:12.5px; color:var(--muted); padding:6px 12px; border:1px solid var(--line); border-radius:999px; text-decoration:none; background:var(--panel); } html .ht-toc a:hover { color:var(--text); border-color:var(--goldline); }
+html .ht-sec { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:28px 40px; align-items:center; padding:30px 0; border-top:1px solid var(--line); scroll-margin-top:84px; }
+html .ht-sec.flip .ht-txt { order:2; }
+html .ht-sec.solo { grid-template-columns:minmax(0,1fr); }
+html .ht-no { font-size:11px; letter-spacing:.2em; color:var(--gold); text-transform:uppercase; }
+html .ht-sec h2 { font-size:22px; font-weight:600; margin:6px 0 10px; letter-spacing:-.01em; }
+html .ht-sec p { color:var(--muted); font-size:14.5px; line-height:1.8; margin:0 0 10px; } html .ht-sec p b { color:var(--text); font-weight:600; }
+html .ht-tip { margin-top:12px; padding:10px 14px; border-radius:14px; background:color-mix(in srgb, var(--gold) 9%, transparent); border:1px solid color-mix(in srgb, var(--gold) 28%, transparent); font-size:13.5px; line-height:1.7; color:var(--text); }
+html .ht-tip i { font-style:normal; color:var(--gold); font-weight:600; margin-right:6px; }
+html .ht-warn { background:color-mix(in srgb, var(--down) 7%, transparent); border-color:color-mix(in srgb, var(--down) 28%, transparent); } html .ht-warn i { color:var(--down); }
+html abbr.ht-g { text-decoration:underline dotted var(--faint); text-underline-offset:3px; cursor:help; position:relative; } html abbr.ht-g:hover::after, html abbr.ht-g:focus::after { content:attr(data-t); position:absolute; left:0; top:calc(100% + 6px); z-index:30; width:max-content; max-width:260px; padding:8px 11px; border-radius:12px; background:var(--panel); border:1px solid var(--line2, var(--line)); box-shadow:var(--shadow); color:var(--text); font-size:12.5px; line-height:1.6; font-weight:400; white-space:normal; }
+/* ฉากแอนิเมชัน */
+html .ht-scene { background:var(--panel); border:1px solid var(--line); border-radius:22px; padding:14px 16px 12px; box-shadow:var(--shadow); min-width:0; }
+html .ht-stage { position:relative; height:290px; overflow:hidden; border-radius:14px; background:color-mix(in srgb, var(--panel2) 55%, transparent); }
+html .ht-cap { display:flex; gap:10px; align-items:flex-start; min-height:58px; padding:12px 2px 0; } html .ht-capn { flex:none; width:22px; height:22px; border-radius:50%; background:var(--text); color:var(--bg); font-size:12px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; margin-top:2px; } html .ht-capt { margin:0 !important; font-size:13.5px !important; line-height:1.65 !important; color:var(--text) !important; }
+html .ht-ctl { display:flex; align-items:center; gap:8px; padding-top:6px; } html .ht-b { width:30px; height:30px; border-radius:50%; border:1px solid var(--line); background:transparent; color:var(--muted); font-size:13px; cursor:pointer; } html .ht-b:hover { background:var(--panel2); color:var(--text); }
+html .ht-dots { display:flex; gap:6px; margin-left:auto; } html .ht-dots button { width:8px; height:8px; padding:0; border-radius:50%; border:0; background:var(--line); cursor:pointer; transition:all .25s; } html .ht-dots button.on { width:22px; border-radius:6px; background:var(--gold); }
+/* S1 จุดหุ้น */
+html .ht-dot { position:absolute; width:20px; height:20px; border-radius:50%; background:var(--faint); opacity:.5; transform:translate(-50%,-50%); transition:left .9s cubic-bezier(.3,.7,.2,1), top .9s cubic-bezier(.3,.7,.2,1), background .6s, opacity .6s, box-shadow .4s; }
+html .ht-stage[data-step="1"] .ht-dot, html .ht-stage[data-step="2"] .ht-dot, html .ht-stage[data-step="3"] .ht-dot, html .ht-stage[data-step="4"] .ht-dot { background:var(--c); opacity:1; }
+html .ht-dot.hot { box-shadow:0 0 0 4px color-mix(in srgb, var(--text) 18%, transparent); z-index:2; }
+html .ht-tag { position:absolute; z-index:3; padding:5px 11px; border-radius:999px; background:var(--text); color:var(--bg); font-size:12px; font-weight:600; white-space:nowrap; transform:translate(-50%,70%); opacity:0; transition:opacity .4s, left .6s, top .6s; pointer-events:none; } html .ht-tag.on { opacity:1; }
+/* S2 สูตร */
+html .ht-f { position:absolute; inset:0; padding:18px 18px; display:flex; flex-direction:column; justify-content:center; gap:11px; font-size:13px; font-variant-numeric:tabular-nums; }
+html .ht-fr { display:grid; grid-template-columns:60px minmax(0,1fr) 58px 34px 42px; align-items:center; gap:8px; }
+html .ht-fr .nm { color:var(--muted); } html .ht-fr .bar { height:8px; border-radius:6px; background:color-mix(in srgb, var(--line) 80%, transparent); overflow:hidden; } html .ht-fr .bar i { display:block; height:100%; width:0; background:var(--up); border-radius:6px; transition:width 1s cubic-bezier(.3,.7,.2,1); }
+html .ht-fr .rt { text-align:right; opacity:0; transition:opacity .5s; color:var(--text); } html .ht-stage:not([data-step="0"]) .ht-fr .rt { opacity:1; }
+html .ht-fr .w, html .ht-fr .pt { text-align:right; opacity:0; transition:opacity .5s; color:var(--text); font-weight:600; }
+html .ht-stage[data-step="1"] .bar i, html .ht-stage[data-step="2"] .bar i, html .ht-stage[data-step="3"] .bar i, html .ht-stage[data-step="4"] .bar i { width:var(--w); }
+html .ht-stage[data-step="2"] .w, html .ht-stage[data-step="3"] .w, html .ht-stage[data-step="4"] .w { opacity:1; }
+html .ht-stage[data-step="3"] .pt, html .ht-stage[data-step="4"] .pt { opacity:1; }
+html .ht-fsum { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-top:8px; border-top:1px dashed var(--line); opacity:0; transition:opacity .5s; } html .ht-fsum .rsbig { display:flex; align-items:center; gap:12px; opacity:0; transition:opacity .6s; }
+html .ht-stage[data-step="3"] .ht-fsum, html .ht-stage[data-step="4"] .ht-fsum { opacity:1; } html .ht-stage[data-step="4"] .rsbig { opacity:1; }
+html .ht-ring { width:56px; height:56px; transform:rotate(-90deg); } html .ht-ring circle { fill:none; stroke-width:5; } html .ht-ring .bg { stroke:var(--line); } html .ht-ring .fg { stroke:var(--up); stroke-linecap:round; stroke-dasharray:138.2; stroke-dashoffset:138.2; transition:stroke-dashoffset 1.2s cubic-bezier(.3,.7,.2,1); } html .ht-stage[data-step="4"] .ht-ring .fg { stroke-dashoffset:var(--off); }
+html .ht-ringn { position:relative; width:56px; height:56px; display:inline-flex; align-items:center; justify-content:center; font-weight:600; } html .ht-ringn .ht-ring { position:absolute; inset:0; } html .ht-ringn span { position:relative; font-size:15px; }
+/* S3 กรวย */
+html .ht-fun { position:absolute; inset:0; padding:22px 20px; display:flex; flex-direction:column; justify-content:center; gap:14px; }
+html .ht-fb { display:flex; flex-direction:column; gap:5px; opacity:.18; transition:opacity .5s; } html .ht-fb .tr { height:30px; border-radius:10px; background:color-mix(in srgb, var(--line) 70%, transparent); } html .ht-fb .tr i { display:flex; align-items:center; padding:0 12px; height:100%; width:0; border-radius:10px; font-size:13px; font-weight:600; color:#fff; white-space:nowrap; background:var(--c, var(--faint)); transition:width 1.1s cubic-bezier(.3,.7,.2,1); overflow:hidden; } html .ht-fb small { font-size:12px; color:var(--muted); }
+html .ht-stage[data-step="0"] .ht-fb:nth-child(1), html .ht-stage[data-step="1"] .ht-fb:nth-child(-n+2), html .ht-stage[data-step="2"] .ht-fb:nth-child(-n+3), html .ht-stage[data-step="3"] .ht-fb { opacity:1; }
+html .ht-stage[data-step="0"] .ht-fb:nth-child(1) i, html .ht-stage[data-step="1"] .ht-fb:nth-child(-n+2) i, html .ht-stage[data-step="2"] .ht-fb:nth-child(-n+3) i, html .ht-stage[data-step="3"] .ht-fb i { width:var(--w); min-width:64px; }
+/* S4 แถวหุ้น */
+html .ht-row { position:absolute; left:14px; right:14px; top:50%; transform:translateY(-50%); }
+html .ht-rowbox { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:16px 16px; border-radius:16px; background:var(--panel); border:1px solid var(--line); font-size:15px; }
+html .ht-rowbox > * { transition:box-shadow .4s, background .4s, transform .4s; border-radius:10px; } html .ht-rowbox .hl { box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 55%, transparent); background:color-mix(in srgb, var(--gold) 10%, transparent); transform:scale(1.06); }
+html .ht-call { margin-top:18px; min-height:46px; font-size:13px; color:var(--gold); font-weight:600; text-align:center; }
+/* S5 ไฟจราจร */
+html .ht-gate { position:absolute; inset:0; display:grid; grid-template-columns:96px minmax(0,1fr); gap:10px; padding:16px; align-items:center; }
+html .ht-lamps { display:flex; flex-direction:column; gap:10px; align-items:center; padding:12px 0; border-radius:40px; background:var(--text); width:62px; margin:auto; } html .ht-lamp { width:34px; height:34px; border-radius:50%; background:color-mix(in srgb, var(--bg) 22%, transparent); transition:all .5s; }
+html .ht-stage[data-step="0"] .l-g, html .ht-stage[data-step="1"] .l-g { background:#22c55e; box-shadow:0 0 18px #22c55e; } html .ht-stage[data-step="2"] .l-y { background:#facc15; box-shadow:0 0 18px #facc15; } html .ht-stage[data-step="3"] .l-r { background:#ef4444; box-shadow:0 0 18px #ef4444; }
+html .ht-gate svg { width:100%; height:100%; } html .ht-gate .pl { fill:none; stroke:var(--text); stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; opacity:0; transition:opacity .6s; } html .ht-gate .s50 { stroke:var(--l1, #b8860b); } html .ht-gate .s200 { stroke:var(--l2, #6b6bd6); } html .ht-gate .sma { fill:none; stroke-width:2; stroke-dasharray:5 4; }
+html .ht-stage[data-step="0"] .p0, html .ht-stage[data-step="1"] .p0, html .ht-stage[data-step="2"] .p1, html .ht-stage[data-step="3"] .p2 { opacity:1; }
+/* S6 Scanner */
+html .ht-sc { position:absolute; inset:0; padding:16px 18px; display:flex; flex-direction:column; gap:12px; }
+html .ht-sl { display:flex; align-items:center; gap:12px; font-size:13px; } html .ht-sl .trk { position:relative; flex:1; height:6px; border-radius:6px; background:var(--line); } html .ht-sl .trk i { position:absolute; left:0; top:0; height:100%; border-radius:6px; background:var(--text); width:var(--p,20%); transition:width 1s cubic-bezier(.3,.7,.2,1); } html .ht-sl .trk b { position:absolute; top:50%; left:var(--p,20%); width:18px; height:18px; margin:-9px 0 0 -9px; border-radius:50%; background:var(--text); border:3px solid var(--bg); box-shadow:0 0 0 1px var(--text); transition:left 1s cubic-bezier(.3,.7,.2,1); } html .ht-sl .v { width:34px; font-weight:600; text-align:right; font-variant-numeric:tabular-nums; }
+html .ht-sr { display:flex; flex-direction:column; gap:6px; } html .ht-sri { display:flex; align-items:center; gap:10px; padding:7px 12px; border-radius:12px; background:var(--panel); border:1px solid var(--line); font-size:13.5px; transition:opacity .5s, transform .5s; } html .ht-sri.off { opacity:.14; transform:scale(.97); } html .ht-sri .tk { font-weight:600; width:62px; } html .ht-sri .rsr { width:26px; height:26px; font-size:11.5px; }
+html .ht-sri .u { margin-left:auto; color:var(--muted); font-size:12px; }
+/* S7 งบ */
+html .ht-cal { position:absolute; inset:0; padding:16px 16px; display:flex; flex-direction:column; gap:12px; }
+html .ht-wk { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; } html .ht-wk .h { grid-column:1/-1; font-size:11px; color:var(--faint); letter-spacing:.1em; } html .ht-dy { height:52px; border-radius:12px; background:var(--panel); border:1px solid var(--line); font-size:11px; color:var(--faint); padding:5px 7px; position:relative; } html .ht-dy.on { border-color:var(--goldline); background:color-mix(in srgb, var(--gold) 9%, var(--panel)); color:var(--gold); font-weight:600; }
+html .ht-ev { position:absolute; left:6px; right:6px; bottom:5px; font-size:11px; padding:2px 6px; border-radius:999px; background:var(--gold); color:var(--bg); text-align:center; font-weight:600; opacity:0; transform:translateY(-8px); transition:all .5s; }
+html .ht-stage[data-step="1"] .ht-ev, html .ht-stage[data-step="2"] .ht-ev { opacity:1; transform:none; }
+html .ht-res { display:flex; flex-direction:column; gap:8px; align-items:flex-start; opacity:0; transform:translateY(6px); transition:all .6s; } html .ht-res > div { display:flex; gap:8px; flex-wrap:wrap; align-items:center; font-size:14px; }
+html .ht-stage[data-step="2"] .ht-res { opacity:1; transform:none; }
+/* ที่มาแนวคิด */
+html .ht-tl { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-top:6px; } html .ht-tc { padding:14px 16px; border-radius:18px; background:color-mix(in srgb, var(--panel2) 55%, transparent); border:1px solid var(--line); } html .ht-tc .yr { font-size:12px; letter-spacing:.14em; color:var(--gold); font-weight:600; } html .ht-tc h3 { font-size:15px; font-weight:600; margin:4px 0 4px; } html .ht-tc p { font-size:13px; line-height:1.7; margin:0; color:var(--muted); }
+html .ht-steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; } html .ht-st { padding:14px 16px; border-radius:18px; background:color-mix(in srgb, var(--panel2) 55%, transparent); } html .ht-st b { display:block; font-size:14.5px; margin:2px 0 4px; } html .ht-st span.n { font-size:12px; color:var(--gold); font-weight:600; } html .ht-st p { margin:0; font-size:13px; line-height:1.7; }
+@media (max-width:860px){ html .ht-sec { grid-template-columns:minmax(0,1fr); gap:16px; padding:24px 0; } html .ht-sec.flip .ht-txt { order:0; } html .ht-sec h2 { font-size:19px; } html .ht-stage { height:270px; } html .ht-gate { grid-template-columns:80px minmax(0,1fr); } }
+@media (prefers-reduced-motion:reduce){ html .ht-dot, html .ht-fr .bar i, html .ht-fb .tr i, html .ht-ring .fg, html .ht-sl .trk i, html .ht-sl .trk b, html .ht-ev, html .ht-res, html .ht-sri { transition:none !important; } }
+html #howtoBtn { display:none; }
+@media (max-width:1023px){ html #navHowto { display:none !important; } html #howtoBtn { display:inline-flex; width:40px; height:40px; align-items:center; justify-content:center; border-radius:999px; border:1px solid var(--line2, var(--line)); background:transparent; color:var(--text); font-weight:600; font-size:16px; cursor:pointer; } html #howtoBtn.active { background:var(--text); color:var(--bg); } }
 </style>
 </head>
 <body class="py-3 sm:py-4 md:py-6">
@@ -486,7 +698,7 @@ html #topbar .brand-logo { display:none; }
   <div class="flex items-center justify-between flex-wrap gap-3 mb-1">
     <img class="brand-logo logo-l" src="/brand/thus-logo-color.png" alt="THUS House of Traders" width="124" height="53"><img class="brand-logo logo-d" src="/brand/thus-logo-white.png" alt="THUS House of Traders" width="124" height="53">
     <h1 class="text-lg md:text-xl font-bold flex items-center gap-2">
-      RS Dashboard <span class="text-slate-400 font-semibold">· <span id="stockCount">…</span></span> <span id="mkChip" class="mk-chip" title="ตลาดที่กำลังดู — ทุกแผงในหน้านี้แสดงข้อมูลของตลาดนี้เท่านั้น">ตลาดไทย · SET + mai · ฿</span> <span class="tip text-[10px] text-slate-500">ⓘ<span class="tipbox">ตัวบนสุดของชื่อ = ผ่านเกณฑ์ขั้นต่ำลงตาราง (value/ราคา/mcap/volume) · ทั้งกระดาน = หุ้นผ่านเกณฑ์คำนวณ RS (ตัด junk)</span></span>
+      RS Dashboard <span class="text-slate-400 font-semibold" style="display:none">· <span id="stockCount">…</span></span> <span id="mkChip" class="mk-chip" title="ตลาดที่กำลังดู — ทุกแผงในหน้านี้แสดงข้อมูลของตลาดนี้เท่านั้น">TH</span> <span class="tip text-[10px] text-slate-500" style="display:none">ⓘ<span class="tipbox">ตัวบนสุดของชื่อ = ผ่านเกณฑ์ขั้นต่ำลงตาราง (value/ราคา/mcap/volume) · ทั้งกระดาน = หุ้นผ่านเกณฑ์คำนวณ RS (ตัด junk)</span></span>
     </h1>
     <div class="flex items-center gap-3">
           <!-- ปุ่มปรับขนาดตัวหนังสือ (zoom เว็บ) -->
@@ -497,17 +709,19 @@ html #topbar .brand-logo { display:none; }
           </div>
           <!-- ตลาดสลับไทย/US -->
           <div class="pillseg flex gap-1 bg-[#0a0f16] p-1 rounded-lg border border-[#243044]">
-            <button id="tabTh" class="tf-chip active" onclick="switchMarket('thailand')">ไทย</button>
+            <button id="tabTh" class="tf-chip active" onclick="switchMarket('thailand')">TH</button>
             <button id="tabUs" class="tf-chip" onclick="switchMarket('america')">US</button>
           </div>
+      <button id="howtoBtn" type="button" onclick="setPage('howto')" aria-label="How to — คู่มือเริ่มต้น" title="How to — คู่มือเริ่มต้น">?</button>
       <button id="themeToggle" type="button" onclick="toggleTheme()" aria-label="สลับโหมดมืด/สว่าง" title="สลับโหมดมืด/สว่าง"><svg class="t-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="t-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span class="t-text">สลับโหมดมืด/สว่าง</span></button>
       <span id="lastUpdateText" class="text-slate-300 text-sm"></span>
-            <span id="marketBadge" class="bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 rounded">RS Dashboard · หุ้นไทย</span>
+            <span id="marketBadge" class="bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 rounded">RS Dashboard · TH</span>
           </div>
         </div>
 
         <!-- Navigation: แยกหน้า ภาพรวมตลาด / หุ้น (Cards-Table) -->
         <div class="nav-row"><div class="seg">
+          <button id="navHowto" class="tf-chip" onclick="setPage('howto')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></svg><span class="lbl">How to</span><span class="lbl-s">How to</span></button>
           <button id="navOverview" class="tf-chip active" onclick="setPage('overview')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="lbl">ภาพรวม</span><span class="lbl-s">ภาพรวม</span></button>
                     <button id="navStocks" class="tf-chip" onclick="setPage('stocks')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="lbl">หุ้น · จัดอันดับ RS</span><span class="lbl-s">หุ้น</span></button>
                     <button id="navTop20" class="tf-chip" onclick="setPage('top20')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><span class="lbl">Top20 ผลตอบแทน</span><span class="lbl-s">Top20</span></button>
@@ -519,9 +733,10 @@ html #topbar .brand-logo { display:none; }
                   <header id="pageHead"><span class="ph-eyebrow" id="phEyebrow"></span><span class="ph-title" id="phTitle" role="heading" aria-level="1"></span></header>
 
                   <!-- 🥇 Top RS วันนี้ (หน้าภาพรวม): หุ้น RS สูงสุด — กดชื่อเปิดกราฟเหมือนหน้าหุ้น -->
-                  <div id="topRsPanel">
+                  <div id="howtoPanel" style="display:none"></div>
+<div id="topRsPanel">
                     <div class="trs-head"><div><span class="trs-eyebrow">Top RS วันนี้</span><div class="trs-title">หุ้นแกร่งที่สุดของตลาด</div></div><button type="button" class="tf-chip" onclick="setPage('stocks')">ดูทั้งหมด →</button></div>
-                    <div class="overflow-x-auto"><table class="trs-table"><thead><tr><th>RS</th><th>หุ้น</th><th class="r">ราคา</th><th class="r">วันนี้</th><th class="r">3 เดือน</th><th>กลุ่ม</th></tr></thead><tbody id="topRsBody"></tbody></table></div>
+                    <div class="overflow-x-auto"><table class="trs-table"><thead><tr><th class="c">RS</th><th>หุ้น</th><th class="r">ราคา</th><th class="r">วันนี้</th><th class="r">3 เดือน</th><th>กลุ่ม</th></tr></thead><tbody id="topRsBody"></tbody></table></div>
                   </div>
 
                   <!-- ปฏิทินงบ: หุ้น RS แข็งที่งบกำลังจะออก (สัปดาห์นี้+หน้า) / ออกแล้ว (14 วัน) พร้อมกำไร-รายได้ดีขึ้นหรือไม่ -->
@@ -546,10 +761,13 @@ html #topbar .brand-logo { display:none; }
                       <label class="flex flex-col gap-0.5">ATR% ≤ <b id="scAtrV">5</b>%<input id="scAtr" type="range" min="1" max="10" step="0.5" value="5" class="accent-sky-500 w-28"></label>
                       <label class="flex flex-col gap-0.5">3M ≥ <b id="scMomV">20</b>%<input id="scMom" type="range" min="0" max="100" step="5" value="20" class="accent-sky-500 w-28"></label>
                       <label class="flex flex-col gap-0.5">มูลค่าซื้อขาย/วัน ≥ <select id="scVal" class="bg-[#0d1219] border border-[#243044] rounded-lg px-2 py-1 text-white"></select></label>
+                      <div class="sc-checks">
                       <label class="flex items-center gap-1.5 cursor-pointer select-none"><input id="scTT" type="checkbox" checked class="accent-emerald-500"> ต้องผ่าน Trend Template ครบ 8</label>
                       <label class="flex items-center gap-1.5 cursor-pointer select-none" title="ATR10 ÷ ATR50 ≤ 0.85 คำนวณจากแท่งรายวัน (นิยามเดียวกับ backtest)"><input id="scSq" type="checkbox" checked class="accent-emerald-500"> ต้องบีบตัว (ATR10/ATR50 ≤ 0.85)</label>
+                      </div>
                     </div></div></details>
                     <div id="scSummary" class="text-[11px] text-slate-400 mb-2"></div>
+                    <div class="dot-legend"><span><i class="lg-ssf"></i>มี SSF ที่ TFEX</span><span><i class="lg-ern"></i>งบกำลังจะออก</span></div>
                     <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-[10px] uppercase text-slate-500 border-b border-[#1e2634]"><tr>
                       <th class="p-2">Setup</th><th class="p-2">หุ้น</th><th class="p-2">RS</th><th class="p-2">ราคา</th><th class="p-2" title="ห่างจุดสูง 52 สัปดาห์">จากจุดสูง</th><th class="p-2" title="ATR14 ÷ ราคา — ยิ่งต่ำยิ่งนิ่ง">ATR%</th><th class="p-2" title="ATR10 ÷ ATR50 จากแท่งรายวัน (ต่ำกว่า 0.85 = บีบตัว)">บีบตัว</th><th class="p-2">TT</th><th class="p-2">RVOL</th><th class="p-2">3M</th>
                     </tr></thead><tbody id="scBody"></tbody></table></div>
@@ -558,7 +776,7 @@ html #topbar .brand-logo { display:none; }
 
                   <!-- 🏆 ผู้นำหุ้นไทย: near52wHigh + โมเมนตัม 12-1 Top20 รายเดือน + Gate (ผลสำรวจ in-sample) -->
                   <div id="leadersPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
-                    <div class="flex flex-wrap items-center gap-2 mb-2"><h2 class="text-sm font-bold flex items-center gap-2"><span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/></svg></span> ผู้นำรายเดือน<span class="ld-hd-more"> — ขึ้นมากสุดเดือนนี้ · ขาขึ้น MA50>MA200 · ผ่านสภาพคล่อง</span> <span class="mk-chip mk-tag"></span></h2> <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('leaders','copy',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg> TV</button><button class="tf-chip" onclick="wlExport('leaders','file',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> .txt</button></span></div>
+                    <div class="flex flex-wrap items-center gap-2 mb-2"><h2 class="text-sm font-bold flex items-center gap-2"><span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/></svg></span> ผู้นำรายเดือน<span class="ld-hd-more"> — ขึ้นมากสุดเดือนนี้ · ขาขึ้น MA50>MA200 · ผ่านสภาพคล่อง</span> <span class="mk-chip mk-tag"></span></h2> <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('leaders','copy',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg> TV</button><button class="tf-chip" onclick="wlExport('leaders','file',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> .txt</button></span><span class="flex items-center gap-1 ml-auto"><button id="ldViewTable" class="tf-chip active" onclick="setLdView('table')">ตาราง</button><button id="ldViewCard" class="tf-chip" onclick="setLdView('card')">การ์ด</button></span></div>
                     <div id="ldCards"></div>
                     <div id="ldGate" class="mb-2"></div>
                     <details class="fold" id="ldFold"><summary>เกณฑ์ · SSF · ข้อจำกัด</summary><div class="fold-body">
@@ -575,15 +793,17 @@ html #topbar .brand-logo { display:none; }
                         <span class="ld-hint">· <span class="text-slate-500">กดหัวคอลัมน์เพื่อเรียง</span></span>
                       </label>
                     </div>
-                    <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-[10px] uppercase text-slate-500 border-b border-[#1e2634]"><tr><th class="p-2">#</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('ticker')" title="กดเพื่อเรียง">หุ้น</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('mtd')" title="กดเพื่อเรียง — ผลตอบแทนตั้งแต่ปิดเดือนก่อนถึงปิดล่าสุด">เดือนนี้</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('rs')" title="กดเพื่อเรียง — คะแนนความแข็งแกร่ง 1–99">RS</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('price')" title="กดเพื่อเรียง">ราคา</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('val')" title="กดเพื่อเรียง — มูลค่าซื้อขายต่อวัน">มูลค่า/วัน</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p3m')" title="กดเพื่อเรียง">3M</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p6m')" title="กดเพื่อเรียง">6M</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p1y')" title="กดเพื่อเรียง">1Y</th><th class="p-2 text-slate-500" title="เส้นค่าเฉลี่ย 50 วัน vs 200 วัน — ขาขึ้นเมื่อ MA50 > MA200">MA50/200</th></tr></thead><tbody id="ldBody"></tbody></table></div>
+                    <div class="dot-legend"><span><i class="lg-ssf"></i>มี SSF ที่ TFEX</span><span><i class="lg-ern"></i>งบกำลังจะออก</span></div>
+                    <div id="ldCardGrid" class="ld-grid" style="display:none"></div>
+                    <div id="ldTableWrap" class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-[10px] uppercase text-slate-500 border-b border-[#1e2634]"><tr><th class="p-2">#</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('ticker')" title="กดเพื่อเรียง">หุ้น</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('mtd')" title="กดเพื่อเรียง — ผลตอบแทนตั้งแต่ปิดเดือนก่อนถึงปิดล่าสุด">เดือนนี้</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('rs')" title="กดเพื่อเรียง — คะแนนความแข็งแกร่ง 1–99">RS</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('price')" title="กดเพื่อเรียง">ราคา</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('val')" title="กดเพื่อเรียง — มูลค่าซื้อขายต่อวัน">มูลค่า/วัน</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p3m')" title="กดเพื่อเรียง">3M</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p6m')" title="กดเพื่อเรียง">6M</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p1y')" title="กดเพื่อเรียง">1Y</th><th class="p-2 text-slate-500" title="เส้นค่าเฉลี่ย 50 วัน vs 200 วัน — ขาขึ้นเมื่อ MA50 > MA200">MA50/200</th></tr></thead><tbody id="ldBody"></tbody></table></div>
                   </div>
 
                   <!-- 📅 Report: เทียบอันดับ Top-N ระหว่าง 2 วัน (ข้อมูลจาก /api/history) -->
                   <div id="reportPanel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
                     <div class="flex flex-wrap items-center gap-2 mb-2">
                       <h2 class="text-sm font-bold flex items-center gap-2"><span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span> Report — เทียบอันดับ Top <span class="mk-chip mk-tag"></span></h2>
-                      <button id="rpTh" class="tf-chip active" onclick="setRpMk('thailand')">ไทย</button>
-                      <button id="rpUs" class="tf-chip" onclick="setRpMk('america')">อเมริกา</button>
+                      <button id="rpTh" class="tf-chip active" onclick="setRpMk('thailand')">TH</button>
+                      <button id="rpUs" class="tf-chip" onclick="setRpMk('america')">US</button>
                     </div>
                     <details class="fold" id="rpFold"><summary>ตัวเลือก · เรียงตาม · ช่วงวันที่</summary><div class="fold-body">
                     <div class="flex flex-wrap items-center gap-2 mb-2 text-[11px] text-slate-300">
@@ -619,8 +839,8 @@ html #topbar .brand-logo { display:none; }
                   <div id="top20Panel" class="bg-[#0d1219] border border-[#1e2634] rounded-xl p-3 mb-3" style="display:none">
                     <div class="flex flex-wrap items-center gap-2 mb-1">
                       <h2 class="text-sm font-bold flex items-center gap-2"><span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/></svg></span> Top 20 ผลตอบแทน <span class="mk-chip mk-tag"></span></h2>
-                      <button id="tpTh" class="tf-chip active" onclick="setTopMk('thailand')">ไทย</button>
-                      <button id="tpUs" class="tf-chip" onclick="setTopMk('america')">อเมริกา</button>
+                      <button id="tpTh" class="tf-chip active" onclick="setTopMk('thailand')">TH</button>
+                      <button id="tpUs" class="tf-chip" onclick="setTopMk('america')">US</button>
                       <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('top20','copy',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg> TV</button><button class="tf-chip" onclick="wlExport('top20','file',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> .txt</button></span> <span class="flex items-center gap-1 ml-auto">
                         <button id="tpViewTable" class="tf-chip active" onclick="setTopView('table')">ตาราง</button>
                         <button id="tpViewCard" class="tf-chip" onclick="setTopView('card')">การ์ด</button>
@@ -689,15 +909,11 @@ html #topbar .brand-logo { display:none; }
     <div id="megatrendBody" class="grid grid-cols-1 md:grid-cols-2 gap-2 collapsed"></div>
   </div>
 
-  <div id="searchBar" class="flex flex-wrap items-center gap-2 my-4">
+  <div id="searchBar" class="sbar my-4">
     <input id="searchInput" placeholder="ค้นหาหุ้น..." class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white w-44 focus:border-sky-600">
     <select id="groupFilter" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white">
           <option value="ALL">ทุกกลุ่ม</option>
         </select>
-    <select id="viewMode" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white">
-      <option value="table" selected>Table View</option>
-            <option value="card">Cards View</option>
-    </select>
     <select id="rsFilter" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white">
       <option value="0">RS ทั้งหมด</option>
             <option value="50">RS ≥ 50</option>
@@ -706,12 +922,6 @@ html #topbar .brand-logo { display:none; }
             <option value="90">RS ≥ 90</option>
     </select>
     <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('stocks','copy',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg> TV</button><button class="tf-chip" onclick="wlExport('stocks','file',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> .txt</button></span>
-    <select id="perPageSel" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white">
-          <option value="10" selected>แสดง 10</option>
-          <option value="20">แสดง 20</option>
-          <option value="30">แสดง 30</option>
-          <option value="50">แสดง 50</option>
-        </select>
             <select id="sortMain" onchange="setSortMain(this.value)" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white" title="เรียงหลัก (ใช้ได้ทั้ง Card และ Table)">
       <option value="rs">เรียง: RS</option>
       <option value="change">เรียง: Change</option>
@@ -725,23 +935,37 @@ html #topbar .brand-logo { display:none; }
       <option value="p1y">เรียง: 1Y%</option>
     </select>
     <button onclick="toggleSortDir()" id="sortDirBtn" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm text-slate-200 hover:border-sky-600" title="สลับทิศ">↓</button>
-    <select id="sortSec" onchange="setSortSecondary(this.value)" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white" title="คอลัมน์รอง (เรียงต่อเมื่อคอลัมน์หลักเท่ากัน)">
-              <option value="">＋ คอลัมน์รอง</option>
-              <option value="rs">เรียงตาม RS</option>
-              <option value="change">เรียงตาม Change</option>
-              <option value="val">เรียงตาม Value</option>
-              <option value="relVol">เรียงตาม RVOL</option>
-              <option value="p3m">เรียงตาม 3M%</option>
-              <option value="rD">เรียงตาม ΔRank</option>
-              <option value="ticker">เรียงตาม Ticker</option>
-            </select>
-                <div class="flex-1"></div>
-    <button id="btnUpdate" onclick="runUpdate(true)" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold px-4 py-2 rounded-lg"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.300 5.700M20 4v7h-7"/></svg> Update</button>
-    <button onclick="runUpdate(false)" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold px-4 py-2 rounded-lg">แคช</button>
-    <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer select-none bg-[#0a0f16] px-2.5 py-1.5 rounded-lg border border-[#243044]" title="โหลดราคาใหม่ทุก 45 วินาทีอัตโนมัติ (แบบเบา ไม่วาดกราฟใหม่) — ดึงราคาล่าสุดสดจากกระดาน">
-      <input id="autoRefresh" type="checkbox" class="accent-emerald-500 cursor-pointer" checked onchange="toggleAutoRefresh()">
-      <span id="autoRefreshLabel" class="flex items-center gap-1.5 text-xs"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> อัปเดตสดอัตโนมัติ (45วิ)</span>
-    </label>
+    <button id="btnUpdate" onclick="runUpdate(true)" class="sb-update" title="ดึงข้อมูลใหม่ทั้งหมด"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.300 5.700M20 4v7h-7"/></svg> Update</button>
+    <details class="fold sb-more">
+      <summary>ตัวเลือกเพิ่มเติม</summary>
+      <div class="sb-more-body">
+        <select id="viewMode" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white">
+          <option value="table" selected>มุมมอง: ตาราง</option>
+          <option value="card">มุมมอง: การ์ด + กราฟ</option>
+        </select>
+        <select id="perPageSel" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white">
+          <option value="10" selected>แสดง 10</option>
+          <option value="20">แสดง 20</option>
+          <option value="30">แสดง 30</option>
+          <option value="50">แสดง 50</option>
+        </select>
+        <select id="sortSec" onchange="setSortSecondary(this.value)" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white" title="คอลัมน์รอง (เรียงต่อเมื่อคอลัมน์หลักเท่ากัน)">
+          <option value="">＋ คอลัมน์รอง</option>
+          <option value="rs">เรียงตาม RS</option>
+          <option value="change">เรียงตาม Change</option>
+          <option value="val">เรียงตาม Value</option>
+          <option value="relVol">เรียงตาม RVOL</option>
+          <option value="p3m">เรียงตาม 3M%</option>
+          <option value="rD">เรียงตาม ΔRank</option>
+          <option value="ticker">เรียงตาม Ticker</option>
+        </select>
+        <button onclick="runUpdate(false)" class="tf-chip" title="โหลดจากแคช (เร็ว)">โหลดจากแคช</button>
+        <label class="sb-auto" title="โหลดราคาใหม่ทุก 45 วินาทีอัตโนมัติ (แบบเบา ไม่วาดกราฟใหม่) — ดึงราคาล่าสุดสดจากกระดาน">
+          <input id="autoRefresh" type="checkbox" class="accent-emerald-500 cursor-pointer" checked onchange="toggleAutoRefresh()">
+          <span id="autoRefreshLabel" class="flex items-center gap-1.5 text-xs"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> อัปเดตสดอัตโนมัติ (45วิ)</span>
+        </label>
+      </div>
+    </details>
   </div>
 
   <div id="progressPanel" class="hidden bg-[#0d1219] border border-sky-900 p-3 rounded-xl mb-4">
@@ -788,8 +1012,8 @@ html #topbar .brand-logo { display:none; }
               </h2>
               <div class="flex flex-wrap items-center gap-1.5 text-xs">
                 <div class="flex gap-1 bg-[#0a0f16] p-1 rounded-lg border border-[#243044]">
-                  <button id="glmTh" class="tf-chip active" onclick="switchGLMarket('thailand')">ไทย</button>
-                  <button id="glmUs" class="tf-chip" onclick="switchGLMarket('america')">อเมริกา</button>
+                  <button id="glmTh" class="tf-chip active" onclick="switchGLMarket('thailand')">TH</button>
+                  <button id="glmUs" class="tf-chip" onclick="switchGLMarket('america')">US</button>
                 </div>
                 <select id="glGroup" onchange="renderTopGL()" class="bg-[#0a0f16] border border-[#243044] rounded-lg px-2 py-1 text-xs outline-none text-white"></select>
                 <select id="glVal" onchange="renderTopGL()" class="bg-[#0a0f16] border border-[#243044] rounded-lg px-2 py-1 text-xs outline-none text-white">
@@ -822,28 +1046,29 @@ html #topbar .brand-logo { display:none; }
     </div>
   </div>
 
+  <div id="stkLegend" class="dot-legend"><span><i class="lg-news"></i>มีข่าวใน 7 วัน (กดดู)</span><span><i class="lg-ssf"></i>มี SSF ที่ TFEX</span><span><i class="lg-ern"></i>งบกำลังจะออก</span></div>
   <div id="cardsView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-3"></div>
 
   <div id="tableView" class="hidden overflow-x-auto bg-[#0d1219] rounded-xl border border-[#1e2634]">
     <table class="w-full text-right text-sm">
       <thead class="bg-[#05070b] text-slate-400 border-b border-[#1e2634]">
         <tr>
-          <th class="p-4 text-left sortable cursor-pointer" data-col="rs" onclick="sortTable('rs',event)" title="คลิก=คอลัมน์หลัก · Shift+คลิก=คอลัมน์รอง · กดซ้ำ=สลับทิศ">RS/Rank <span class="sort-icon">↕</span></th>
-          <th class="p-4 text-left sortable cursor-pointer" data-col="ticker" onclick="sortTable('ticker',event)" title="กดเพื่อเรียง">Ticker <span class="sort-icon">↕</span></th>
-          <th class="p-4 sortable cursor-pointer" data-col="price" onclick="sortTable('price',event)" title="กดเพื่อเรียง">Price <span class="sort-icon">↕</span></th>
-          <th class="p-4 sortable cursor-pointer" data-col="change" onclick="sortTable('change',event)" title="กดเพื่อเรียง">Change <span class="sort-icon">↕</span></th>
-          <th class="p-4 sortable cursor-pointer" data-col="val" id="thValHeader" onclick="sortTable('val',event)" title="กดเพื่อเรียง">Value(฿M) <span class="sort-icon">↕</span></th>
-          <th class="p-4 sortable cursor-pointer" data-col="relVol" onclick="sortTable('relVol',event)" title="กดเพื่อเรียง">RVOL <span class="sort-icon">↕</span></th>
-          <th class="p-4 sortable cursor-pointer" data-col="p3m" onclick="sortTable('p3m',event)" title="กดเพื่อเรียง">3M% <span class="sort-icon">↕</span></th>
-          <th class="p-4 sortable cursor-pointer" data-col="rD" onclick="sortTable('rD',event)" title="กดเพื่อเรียง">ΔRank <span class="sort-icon">↕</span></th>
-          <th class="p-4 text-left">Theme</th>
+          <th class="p-4 text-left sortable cursor-pointer" data-col="rs" onclick="sortTable('rs',event)" title="คลิก=คอลัมน์หลัก · Shift+คลิก=คอลัมน์รอง · กดซ้ำ=สลับทิศ">RS <span class="sort-icon"></span></th>
+          <th class="p-4 text-left sortable cursor-pointer" data-col="ticker" onclick="sortTable('ticker',event)" title="กดเพื่อเรียง">หุ้น <span class="sort-icon"></span></th>
+          <th class="p-4 sortable cursor-pointer" data-col="price" onclick="sortTable('price',event)" title="กดเพื่อเรียง">ราคา <span class="sort-icon"></span></th>
+          <th class="p-4 sortable cursor-pointer" data-col="change" onclick="sortTable('change',event)" title="กดเพื่อเรียง">วันนี้ <span class="sort-icon"></span></th>
+          <th class="p-4 sortable cursor-pointer" data-col="val" id="thValHeader" onclick="sortTable('val',event)" title="กดเพื่อเรียง">มูลค่า (฿M) <span class="sort-icon"></span></th>
+          <th class="p-4 sortable cursor-pointer" data-col="relVol" onclick="sortTable('relVol',event)" title="กดเพื่อเรียง">RVOL <span class="sort-icon"></span></th>
+          <th class="p-4 sortable cursor-pointer" data-col="p3m" onclick="sortTable('p3m',event)" title="กดเพื่อเรียง">3 เดือน <span class="sort-icon"></span></th>
+          <th class="p-4 sortable cursor-pointer" data-col="rD" onclick="sortTable('rD',event)" title="กดเพื่อเรียง">อันดับ <span class="sort-icon"></span></th>
+          <th class="p-4 text-left">กลุ่ม</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
     </table>
   </div>
 
-  <div id="footerText" class="text-center text-slate-500 text-[11px] mt-6">rsdashclean.vercel.app • ข้อมูลไทย • RS เต็มตลาด</div>
+  <div id="footerText" class="text-center text-slate-500 text-[11px] mt-6">rsdashclean.vercel.app • ข้อมูล TH • RS เต็มตลาด</div>
 </div>
 
 <div id="chartModal" class="fixed inset-0 z-50 hidden items-start justify-center p-4 bg-black/80 overflow-y-auto">
@@ -1021,7 +1246,7 @@ function updateSortUI(){
     if(!col) return;
     const isMain = (sortKey === col);
     const isSec = (sortKey2 === col);
-    let icon = '↕';
+    let icon = '';   // ไอคอนเรียงแสดงเฉพาะคอลัมน์ที่กำลังเรียง (เหมือนหน้าอื่น)
     if(isMain){
       icon = sortAsc ? '▲' : '▼';
       th.classList.add('text-sky-400');
@@ -1097,7 +1322,7 @@ function thusRange(c,n,bars){ try{ c.timeScale().setVisibleLogicalRange({from:Ma
 /* หัวหน้า (eyebrow + ชื่อหน้า) ตามหน้า/ตลาดที่เปิดอยู่ */
 function thusHead(pg){
   const us=currentMarket==='america', mk=us?'US':'TH';
-  const H={ overview:['Market overview · '+mk,'ภาพรวมตลาด'+(us?'สหรัฐฯ':'ไทย')], stocks:['RS ranking · '+mk,'จัดอันดับความแข็งแกร่ง'], top20:['Top 20 · '+mk,'ขึ้นแรงที่สุด'], scanner:['Scanner · '+mk,'หุ้นแกร่งที่กำลังพักตัวแคบ'], leaders:['Monthly leaders · '+mk,'ผู้นำรายเดือน'], report:['Report · '+mk,'ใครเข้า ใครออก ระหว่างสองวัน'] };
+  const H={ overview:['Market overview · '+mk,'ภาพรวมตลาด'], stocks:['RS ranking · '+mk,'จัดอันดับความแข็งแกร่ง'], top20:['Top 20 · '+mk,'ขึ้นแรงที่สุด'], scanner:['Scanner · '+mk,'หุ้นแกร่งที่กำลังพักตัวแคบ'], leaders:['Monthly leaders · '+mk,'ผู้นำรายเดือน'], report:['Report · '+mk,'ใครเข้า ใครออก ระหว่างสองวัน'], howto:['How to','เข้าใจ RS แล้วใช้เว็บนี้เป็น'] };
   const h=H[pg]||H.overview; const a=document.getElementById('phEyebrow'), b=document.getElementById('phTitle');
   if(a) a.textContent=h[0]; if(b) b.textContent=h[1];
 }
@@ -1153,50 +1378,61 @@ function ernBy(tk, mk, compact){
 let earnTab='soon', earnGroup='day';
 function setEarnTab(t){ earnTab=t; renderEarnPanel(); }
 function setEarnGroup(g){ earnGroup=g; renderEarnPanel(); }
-function renderEarnPanel(){
-  const box=document.getElementById('earnList'); if(!box) return;
-  const mk=currentMarket, list=[];
-  (stockData||[]).forEach(s=>{ if(Number.isFinite(s.rs) && s.rs>=RS_TOP_TH){ const i=ernInfo(s,mk); if(i) list.push({s,i}); } });
-  const soon=list.filter(x=>x.i.st==='soon'||x.i.st==='pend'), out=list.filter(x=>x.i.st==='out');
-  const tS=document.getElementById('earnTabSoon'), tO=document.getElementById('earnTabOut');
-  if(tS){ tS.classList.toggle('active', earnTab==='soon'); tS.textContent='กำลังจะออก '+soon.length; }
-  if(tO){ tO.classList.toggle('active', earnTab==='out'); tO.textContent='ออกแล้ว '+out.length; }
-  const bY=document.getElementById('earnBasisYoY'), bQ=document.getElementById('earnBasisQoQ');
-  if(bY) bY.classList.toggle('active', ernBasis==='yoy'); if(bQ) bQ.classList.toggle('active', ernBasis==='qoq');
-  const ttl=document.getElementById('earnTitle'); if(ttl) ttl.textContent = earnTab==='soon' ? 'งบสัปดาห์นี้และสัปดาห์หน้า · หุ้น RS ≥ '+RS_TOP_TH : 'งบที่ออกแล้วใน 14 วันล่าสุด · หุ้น RS ≥ '+RS_TOP_TH;
-  if(!(stockData||[]).length){ box.innerHTML='<div class="trs-empty">กำลังโหลด…</div>'; return; }
-  const arr = earnTab==='soon' ? soon : out;
+function earnBuild(tab, arr, mk, box){
   const gDay = earnGroup==='day';
   const keyOf = x => gDay ? x.i.d : (x.s.industry||x.s.sector||'อื่น ๆ');
   const cnt={}; arr.forEach(x=>{ const k=keyOf(x); cnt[k]=(cnt[k]||0)+1; });
-  const dirD = earnTab==='soon' ? 1 : -1;
+  const dirD = tab==='soon' ? 1 : -1;
   arr.sort((a,b)=> gDay ? ((dirD*(a.i.d-b.i.d))||(b.s.rs-a.s.rs))
                         : ((cnt[keyOf(b)]-cnt[keyOf(a)])||String(keyOf(a)).localeCompare(String(keyOf(b)))||(dirD*(a.i.d-b.i.d))||(b.s.rs-a.s.rs)));
-  const gD=document.getElementById('earnGrpDay'), gI=document.getElementById('earnGrpInd');
-  if(gD) gD.classList.toggle('active', gDay); if(gI) gI.classList.toggle('active', !gDay);
-  if(!arr.length){ box.innerHTML='<div class="trs-empty">'+(earnTab==='soon'?'ไม่มีหุ้น RS แข็งที่งบจะออกในช่วงนี้':'ยังไม่มีหุ้น RS แข็งที่ประกาศงบใน 14 วันล่าสุด')+'</div>'; return; }
-  const LIM=12, showAll = box.dataset.all==='1', rows=showAll?arr:arr.slice(0,LIM);
+  if(!arr.length) return '<div class="trs-empty">'+(tab==='soon'?'ไม่มีหุ้น RS แข็งที่งบจะออกในช่วงนี้':'ยังไม่มีหุ้น RS แข็งที่ประกาศงบใน 14 วันล่าสุด')+'</div>';
+  const LIM=12, key='all'+tab, showAll = box.dataset[key]==='1', rows=showAll?arr:arr.slice(0,LIM);
   let html='', cur=null;
   rows.forEach(({s,i})=>{
     const k=keyOf({s,i});
     if(k!==cur){ cur=k; html+='<div class="ern-day">'+(gDay ? ernLbl(i.d,i.tn)+(i.st==='pend'?' · ถึงกำหนดแล้ว':'') : themeDisplay(k))+' <span style="color:var(--faint)">· '+cnt[k]+' ตัว</span></div>'; }
     const tk=String(s.ticker).replace(/'/g,'');
-    const chips = (earnTab==='out'||i.st==='pend') ? ernChips(s,mk) : (gDay ? '' : '<span class="ern soon'+(i.d===i.tn?' today':'')+'">งบ '+ernLbl(i.d,i.tn)+'</span>');
-    html+='<div class="ern-row"><span class="tk" onclick="openModalByTk(\''+tk+'\')">'+lg(s.ticker,mk,20)+s.ticker+'</span><span class="trs-rs">'+s.rs+'</span><span class="nm">'+(s.name||'')+'</span><span class="ern-wrap">'+chips+'</span></div>';
+    const chips = (tab==='out'||i.st==='pend') ? ernChips(s,mk) : (gDay ? '' : '<span class="ern soon'+(i.d===i.tn?' today':'')+'">งบ '+ernLbl(i.d,i.tn)+'</span>');
+    html+='<div class="ern-row"><span class="tk" onclick="openModalByTk(\''+tk+'\')">'+lg(s.ticker,mk,20)+s.ticker+'</span><span class="trs-rs">'+s.rs+'</span><span class="nm">'+(s.name||'')+'</span>'+(chips?'<span class="ern-wrap">'+chips+'</span>':'')+'</div>';
   });
-  if(arr.length>LIM) html+='<div style="margin-top:12px"><button class="tf-chip" onclick="document.getElementById(\'earnList\').dataset.all=\''+(showAll?'0':'1')+'\';renderEarnPanel()">'+(showAll?'ย่อ':'ดูทั้งหมด '+arr.length+' ตัว')+'</button></div>';
-  if(earnTab==='out') html+='<div class="trs-empty" style="padding:12px 0 0;font-size:11px">เขียว = ดีขึ้น · แดง = แย่ลง · เทียบ'+(ernBasis==='qoq'?'ไตรมาสก่อน (QoQ)':'ไตรมาสเดียวกันของปีก่อน (YoY)')+' · "–" = ไม่มีตัวเลขเทียบ · ข้อมูลจาก TradingView อาจช้า 1 วัน</div>';
-  box.innerHTML=html;
+  if(arr.length>LIM) html+='<div style="margin-top:12px"><button class="tf-chip" onclick="document.getElementById(\'earnList\').dataset.'+key+'=\''+(showAll?'0':'1')+'\';renderEarnPanel()">'+(showAll?'ย่อ':'ดูทั้งหมด '+arr.length+' ตัว')+'</button></div>';
+  if(tab==='out') html+='<div class="trs-empty" style="padding:12px 0 0;font-size:11px">เขียว = ดีขึ้น · แดง = แย่ลง · เทียบ'+(ernBasis==='qoq'?'ไตรมาสก่อน (QoQ)':'ไตรมาสเดียวกันของปีก่อน (YoY)')+' · "–" = ไม่มีตัวเลขเทียบ · ข้อมูลจาก TradingView อาจช้า 1 วัน</div>';
+  return html;
 }
-/* Top RS วันนี้: 8 ตัว RS สูงสุดของตลาดที่เปิดอยู่ (ข้อมูลชุดเดียวกับหน้าหุ้น) */
+const earnMQ = window.matchMedia ? window.matchMedia('(min-width:1024px)') : {matches:false};
+try{ earnMQ.addEventListener('change', ()=>{ try{ renderEarnPanel(); }catch(e){} }); }catch(e){}
+function renderEarnPanel(){
+  const box=document.getElementById('earnList'); if(!box) return;
+  const mk=currentMarket, list=[];
+  (stockData||[]).forEach(s=>{ if(Number.isFinite(s.rs) && s.rs>=RS_TOP_TH){ const i=ernInfo(s,mk); if(i) list.push({s,i}); } });
+  const soon=list.filter(x=>x.i.st==='soon'||x.i.st==='pend'), out=list.filter(x=>x.i.st==='out');
+  const wide = earnMQ.matches;   // จอกว้าง: แสดง "กำลังจะออก" กับ "ออกแล้ว" เคียงข้างกัน ไม่ต้องสลับแท็บ
+  const pnl=document.getElementById('earnPanel'); if(pnl) pnl.classList.toggle('earn-wide', wide);
+  const tS=document.getElementById('earnTabSoon'), tO=document.getElementById('earnTabOut');
+  if(tS){ tS.classList.toggle('active', earnTab==='soon'); tS.textContent='กำลังจะออก '+soon.length; }
+  if(tO){ tO.classList.toggle('active', earnTab==='out'); tO.textContent='ออกแล้ว '+out.length; }
+  const bY=document.getElementById('earnBasisYoY'), bQ=document.getElementById('earnBasisQoQ');
+  if(bY) bY.classList.toggle('active', ernBasis==='yoy'); if(bQ) bQ.classList.toggle('active', ernBasis==='qoq');
+  const ttl=document.getElementById('earnTitle'); if(ttl) ttl.textContent = wide ? 'งบที่กำลังจะออกและออกแล้ว · หุ้น RS ≥ '+RS_TOP_TH : (earnTab==='soon' ? 'งบสัปดาห์นี้และสัปดาห์หน้า · หุ้น RS ≥ '+RS_TOP_TH : 'งบที่ออกแล้วใน 14 วันล่าสุด · หุ้น RS ≥ '+RS_TOP_TH);
+  if(!(stockData||[]).length){ box.innerHTML='<div class="trs-empty">กำลังโหลด…</div>'; return; }
+  const gDay = earnGroup==='day';
+  const gD=document.getElementById('earnGrpDay'), gI=document.getElementById('earnGrpInd');
+  if(gD) gD.classList.toggle('active', gDay); if(gI) gI.classList.toggle('active', !gDay);
+  if(wide){
+    box.innerHTML='<div class="earn-cols"><section><div class="earn-colhead">กำลังจะออก <b>'+soon.length+'</b><small>สัปดาห์นี้และสัปดาห์หน้า</small></div>'+earnBuild('soon',soon,mk,box)+'</section>'+
+                  '<section><div class="earn-colhead">ออกแล้ว <b>'+out.length+'</b><small>14 วันล่าสุด</small></div>'+earnBuild('out',out,mk,box)+'</section></div>';
+    return;
+  }
+  box.innerHTML = earnBuild(earnTab, earnTab==='soon'?soon:out, mk, box);
+}/* Top RS วันนี้: 8 ตัว RS สูงสุดของตลาดที่เปิดอยู่ (ข้อมูลชุดเดียวกับหน้าหุ้น) */
 function renderTopRs(){
   try{ renderEarnPanel(); }catch(e){}
   const tb=document.getElementById('topRsBody'); if(!tb) return;
   const list=(stockData||[]).filter(s=>Number.isFinite(s.rs)).slice().sort((a,b)=>(b.rs-a.rs)||((b.score||0)-(a.score||0))).slice(0,8);
   if(!list.length){ tb.innerHTML='<tr><td colspan="6" class="trs-empty">กำลังโหลด…</td></tr>'; return; }
-  const pc=(v)=>Number.isFinite(v)?((v>=0?'+':'−')+Math.abs(v).toFixed(2)+'%'):'–';
+  const pc=(v)=>Number.isFinite(v)?('<i class="ar">'+(v>=0?'▲':'▼')+'</i> '+Math.abs(v).toFixed(1)+'%'):'–';
   const cl=(v)=>Number.isFinite(v)?(v>=0?'pos':'neg'):'';
-  tb.innerHTML=list.map(s=>`<tr><td><span class="trs-rs">${s.rs}</span></td><td><a href="#" class="trs-tk" onclick="openModalByTk('${String(s.ticker).replace(/'/g,"")}');return false;">${lg(s.ticker,currentMarket,20)}${s.ticker}</a></td><td class="r">${Number(s.price).toFixed(2)}</td><td class="r ${cl(s.change)}">${pc(s.change)}</td><td class="r ${cl(s.p3m)}">${pc(s.p3m)}</td><td class="trs-grp">${s.industry||s.sector||''}</td></tr>`).join('');
+  tb.innerHTML=list.map(s=>`<tr><td class="c"><span class="trs-rs">${s.rs}</span></td><td><a href="#" class="trs-tk" onclick="openModalByTk('${String(s.ticker).replace(/'/g,"")}');return false;">${lg(s.ticker,currentMarket,20)}${s.ticker}</a></td><td class="r">${Number(s.price).toFixed(2)}</td><td class="r ${cl(s.change)}">${pc(s.change)}</td><td class="r ${cl(s.p3m)}">${pc(s.p3m)}</td><td class="trs-grp">${s.industry||s.sector||''}</td></tr>`).join('');
 }
 function toggleTheme(){ const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; try{ localStorage.setItem('rsd_theme',n); }catch(e){} location.reload(); }function fontZoom(delta){
   const base=parseFloat(localStorage.getItem('rsd_zoom')||'1');
@@ -1224,11 +1460,15 @@ function setPage(pg){
   try{ localStorage.setItem('rsd_curPage', pg); localStorage.setItem('rsd_curMarket', currentMarket); }catch(e){}   // จำหน้า+ตลาดสุดท้ายไว้ (บอส)
   const ov = ['topRsPanel','earnPanel','marketBriefPanel','indexBar','marketSummaryPanel','megatrendPanel','flowPanel','themesPanel','topglPanel'];
   try{ thusHead(pg); if(pg==='overview') renderTopRs(); }catch(e){}
-  const st = ['searchBar','progressPanel','cardsView','tableView'];
+  const st = ['searchBar','progressPanel','stkLegend','cardsView','tableView'];
   ov.forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display = (pg==='overview') ? '' : 'none'; });
   st.forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display = (pg==='stocks') ? '' : 'none'; });
   const t20=document.getElementById('top20Panel'); if(t20) t20.style.display = (pg==='top20') ? '' : 'none';
   const rp=document.getElementById('reportPanel'); if(rp) rp.style.display = (pg==='report') ? '' : 'none';
+  const htp=document.getElementById('howtoPanel'); if(htp) htp.style.display = (pg==='howto') ? '' : 'none';
+  const nht=document.getElementById('navHowto'); if(nht) nht.classList.toggle('active', pg==='howto');
+  const hbt=document.getElementById('howtoBtn'); if(hbt) hbt.classList.toggle('active', pg==='howto');
+  if(pg==='howto' && typeof renderHowto==='function'){ try{ renderHowto(); window.scrollTo(0,0); }catch(e){} }
   const scp=document.getElementById('scannerPanel'); if(scp) scp.style.display = (pg==='scanner') ? '' : 'none';
   const nsc=document.getElementById('navScanner'); if(nsc) nsc.classList.toggle('active', pg==='scanner');
   if(pg==='scanner'){ renderScanner(); }
@@ -1313,8 +1553,8 @@ function renderScanner(){
     const dim = gi.mult<1 ? ` <span class="text-[9px] text-slate-500" title="ลดคะแนนตาม Market Gate">(${r.raw}×${gi.mult})</span>` : '';
     return `<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal('${jq(s.ticker)}','${jq(s.name)}','${currentMarket}')">
       <td class="p-2 font-black ${r.score>=75?'text-emerald-400':(r.score>=60?'text-sky-300':'text-slate-300')}">${r.score}${dim}</td>
-      <td class="p-2">${lg(s.ticker,currentMarket,18)}<b class="text-sky-400">${s.ticker}</b> <span class="text-[10px] text-slate-500">${themeDisplay(s.industry||s.sector)}</span>${ernChips(s,currentMarket)?`<div class="ern-wrap">${ernChips(s,currentMarket)}</div>`:''}</td>
-      <td class="p-2 font-bold ${rsColor(s.rs)}">${s.rs}</td>
+      <td class="p-2"><div class="tkcell"><span class="tkrow">${lg(s.ticker,currentMarket,18)}<b class="text-sky-400">${s.ticker}</b></span>${ernChips(s,currentMarket)?`<span class="ern-wrap">${ernChips(s,currentMarket)}</span>`:''}</div></td>
+      <td class="p-2"><span class="rsr${s.rs<70?' lo':''}">${s.rs}</span></td>
       <td class="p-2">${fNum(s.price)} ${fPct(s.change)}</td>
       <td class="p-2">${r.pctFromHigh==null?'-':'-'+r.pctFromHigh.toFixed(1)+'%'}</td>
       <td class="p-2">${pctc(r.atrPct)}</td>
@@ -1388,7 +1628,7 @@ function ldSortBy(k){
 function ldTags(tk){
   if(!tk) return '';
   if(ldMarket==='thailand'){
-    return hasSSF(tk) ? '<span class="text-[9px] font-bold text-emerald-400 border border-emerald-500/40 rounded px-1 ml-0.5 align-middle whitespace-nowrap" title="SSF — มี Single Stock Future ที่ TFEX (สัญญาซื้อขายรายตัว)">SSF</span>' : '';
+    return hasSSF(tk) ? '<i class="dot-ssf" title="SSF — มี Single Stock Future ที่ TFEX (สัญญาซื้อขายรายตัว)"></i>' : '';
   }
   return drLabel(tk,'america');   // ตลาดสหรัฐฯ: ป้าย (DR) ของหุ้นที่ซื้อในไทยได้ผ่านตราสารแสดงสิทธิ
 }
@@ -1416,6 +1656,8 @@ function ldCardsApply(j){
     '<div class="ld-card"><span class="ld-k">ข้อมูล ณ</span><span class="ld-v ld-date">'+(j.asOf||'–')+'</span><span class="ld-s">'+(j.base?('เทียบกับปิด '+j.base):'ผลตอบแทนย้อนหลัง 1 เดือน')+'</span></div>'+
     '</div>';
 }
+let ldView='table';
+function setLdView(v){ ldView=(v==='card')?'card':'table'; ldApply(); }
 function ldApply(){
   const body=document.getElementById('ldBody'); if(!body) return;
   const sel=document.getElementById('ldLimit');
@@ -1431,7 +1673,25 @@ function ldApply(){
   const lbl={mtd:'เดือนนี้',rs:'RS',ticker:'ตัวอักษร',price:'ราคา',val:'มูลค่า',p3m:'3M',p6m:'6M',p1y:'1Y'}[ldSortKey]||ldSortKey;
   const sh=document.getElementById('ldShown');
   if(sh) sh.textContent='— แสดง '+show.length+' จาก '+rows.length+' ตัว · เรียงตาม'+lbl+' '+(ldSortDir<0?'มาก→น้อย':'น้อย→มาก');
-  body.innerHTML=show.map((p,i)=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')"><td class="p-2 text-slate-400">'+(i+1)+'</td><td class="p-2">'+lg(p.ticker,ldMarket,18)+'<b class="text-sky-400">'+p.ticker+'</b>'+ldTags(p.ticker)+' <span class="ld-nm text-[10px] text-slate-500">'+p.name+'</span>'+(ernBy(p.ticker,ldMarket,true)?'<div class="ern-wrap">'+ernBy(p.ticker,ldMarket,true)+'</div>':'')+'</td><td class="p-2"><b class="pos">+'+p.mtd.toFixed(1)+'%</b></td><td class="p-2"><span class="'+rsColor(p.rs)+' font-bold">'+p.rs+'</span></td><td class="p-2">'+fx(p.price)+'</td><td class="p-2">'+fb(p.val)+'</td><td class="p-2 '+(p.p3m>=0?'pos':'neg')+'">'+p.p3m.toFixed(1)+'%</td><td class="p-2 '+(p.p6m>=0?'pos':'neg')+'">'+p.p6m.toFixed(1)+'%</td><td class="p-2 '+(p.p1y>=0?'pos':'neg')+'">'+p.p1y.toFixed(1)+'%</td><td class="p-2 text-[11px] text-slate-400" title="MA50 '+fx(p.sma50)+' เหนือ MA200 '+fx(p.sma200)+'">'+fx(p.sma50)+'/'+fx(p.sma200)+'</td></tr>').join('')||'<tr><td colspan="10" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
+  const tw=document.getElementById('ldTableWrap'), cg=document.getElementById('ldCardGrid');
+  const vt=document.getElementById('ldViewTable'), vc=document.getElementById('ldViewCard');
+  if(vt) vt.classList.toggle('active', ldView==='table'); if(vc) vc.classList.toggle('active', ldView==='card');
+  if(tw) tw.style.display = ldView==='table' ? '' : 'none';
+  if(cg){
+    cg.style.display = ldView==='card' ? '' : 'none';
+    const pc=v=>{ const n=Number(v); return Number.isFinite(n) ? '<b class="'+(n>=0?'pos':'neg')+' nw"><i class="ar">'+(n>=0?'▲':'▼')+'</i> '+Math.abs(n).toFixed(1)+'%</b>' : '–'; };
+    cg.innerHTML = ldView==='card' ? (show.map((p,i)=>{
+      const ec=ernBy(p.ticker,ldMarket,true);
+      return '<div class="ldc" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')">'+
+        '<div class="ldc-top"><span class="ldc-n">#'+(i+1)+'</span><span class="rsr'+(p.rs<70?' lo':'')+'">'+p.rs+'</span></div>'+
+        '<div class="tkcell"><span class="tkrow">'+lg(p.ticker,ldMarket,22)+'<b class="ldc-tk">'+p.ticker+'</b>'+ldTags(p.ticker)+'</span>'+(ec?'<span class="ern-wrap">'+ec+'</span>':'')+'</div>'+
+        '<div class="ldc-big">'+pc(p.mtd)+'<small>เดือนนี้</small></div>'+
+        '<div id="tchart_'+ldMarket+'_'+String(p.ticker).replace(/[^a-z0-9]/gi,'_')+'" class="chart ldc-chart"></div>'+
+        '<div class="ldc-sub"><span><i>ราคา</i>'+fx(p.price)+'</span><span><i>3M</i>'+pc(p.p3m)+'</span><span><i>1Y</i>'+pc(p.p1y)+'</span></div>'+
+      '</div>'; }).join('') || '<div class="trs-empty">ไม่มีข้อมูล</div>') : '';
+    if(ldView==='card' && show.length){ try{ loadTop20Charts(show, ldMarket); }catch(e){} }
+  }
+  body.innerHTML=show.map((p,i)=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')"><td class="p-2 text-slate-400">'+(i+1)+'</td><td class="p-2"><div class="tkcell"><span class="tkrow">'+lg(p.ticker,ldMarket,18)+'<b class="text-sky-400">'+p.ticker+'</b>'+ldTags(p.ticker)+'</span>'+(ernBy(p.ticker,ldMarket,true)?'<span class="ern-wrap">'+ernBy(p.ticker,ldMarket,true)+'</span>':'')+'</div></td><td class="p-2"><b class="pos">+'+p.mtd.toFixed(1)+'%</b></td><td class="p-2"><span class="rsr'+(p.rs<70?' lo':'')+'">'+p.rs+'</span></td><td class="p-2">'+fx(p.price)+'</td><td class="p-2">'+fb(p.val)+'</td><td class="p-2 '+(p.p3m>=0?'pos':'neg')+'">'+p.p3m.toFixed(1)+'%</td><td class="p-2 '+(p.p6m>=0?'pos':'neg')+'">'+p.p6m.toFixed(1)+'%</td><td class="p-2 '+(p.p1y>=0?'pos':'neg')+'">'+p.p1y.toFixed(1)+'%</td><td class="p-2 text-[11px] text-slate-400" title="MA50 '+fx(p.sma50)+' เหนือ MA200 '+fx(p.sma200)+'">'+fx(p.sma50)+'/'+fx(p.sma200)+'</td></tr>').join('')||'<tr><td colspan="10" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
 }
 async function renderLeaders(){
   const isUs = currentMarket==='america';
@@ -1727,7 +1987,7 @@ function hasSSF(tk){ return TH_SSF.indexOf((tk||'').toUpperCase())>-1; }
 // ป้าย SSF สำหรับหน้า Top20 (หุ้นไทยเท่านั้น) — การ์ด + ตาราง + ป็อปอัปใช้ตัวเดียวกัน
 function ssfBadge(tk, m){
   if(m!=='thailand' || !tk) return '';
-  return hasSSF(tk) ? '<span class="text-[9px] font-bold text-emerald-400 border border-emerald-500/40 rounded px-1 ml-0.5 align-middle whitespace-nowrap" title="SSF — มี Single Stock Future ที่ TFEX (สัญญาซื้อขายรายตัว)">SSF</span>' : '';
+  return hasSSF(tk) ? '<i class="dot-ssf" title="SSF — มี Single Stock Future ที่ TFEX (สัญญาซื้อขายรายตัว)"></i>' : '';
 }
 function idxBadge(tk, mk){
   if(mk!=='america') return '';
@@ -1753,11 +2013,12 @@ function topRSHTML(s, forCard){   // ค่า RS ตัวเดียวใช
   const eligible = topRSEligible.size ? topRSEligible.has(s.ticker) : ((s.rs||0) >= RS_TOP_TH);
   if(topUniverse!=='rs' && !eligible){
     if(forCard) return '<span class="text-base font-extrabold text-slate-500" title="ไม่ผ่านเกณฑ์ RS หลัก (RS≥'+RS_TOP_TH+' และผ่านเกณฑ์มูลค่าซื้อขาย)">'+rs+'</span>';
-    return '<span class="text-slate-500" title="ไม่ผ่านเกณฑ์ RS หลัก (RS≥'+RS_TOP_TH+' และผ่านเกณฑ์มูลค่าซื้อขาย)">'+rs+'</span> <span class="pill text-slate-500 border-slate-600/60" title="ไม่ผ่านเกณฑ์ RS หลัก">ไม่ผ่านเกณฑ์</span>';
+    return '<span class="rsr lo" title="ไม่ผ่านเกณฑ์ RS หลัก (RS≥'+RS_TOP_TH+' และผ่านเกณฑ์มูลค่าซื้อขาย)">'+rs+'</span>';
   }
   if(forCard) return '<span class="text-base font-extrabold '+rsColor(Number(s.rs))+'">'+rs+'</span>';
-  return '<span class="text-sky-300">'+rs+'</span>';
+  return '<span class="rsr'+(Number(s.rs)<70?' lo':'')+'">'+rs+'</span>';
 }
+const DOT_LEGEND = '<div class="dot-legend"><span><i class="lg-news"></i>มีข่าวใน 7 วัน (กดดู)</span><span><i class="lg-ssf"></i>มี SSF ที่ TFEX</span><span><i class="lg-ern"></i>งบกำลังจะออก</span></div>';
 function topTableHTML(rows, m){
   const head=(k,l)=>(`<th class="p-1 text-right cursor-pointer hover:text-white text-[10px]" onclick="sortTop20('${k}')">${l}${topSortKey===k?(topSortDir>0?' ▼':' ▲'):''}</th>`);
   const body=rows.map((s,i)=>{
@@ -1765,7 +2026,7 @@ function topTableHTML(rows, m){
     const has2=(p2yCache[p2yKey(m,s.ticker)]!==undefined);
     return '<tr class="border-b border-[#16202e] hover:bg-[#111827] cursor-pointer" onclick="openModal(\''+s.ticker+'\',\''+jq(s.name)+'\',\''+m+'\')">'+
       '<td class="p-1 text-slate-500">'+(i+1)+'</td>'+
-      '<td class="p-1 font-semibold">'+lg(s.ticker,m,18)+s.ticker+drLabel(s.ticker, m)+ssfBadge(s.ticker, m)+Notes.badgeHtml(noteOf(m,s.ticker),m,s.ticker)+'<span class="block text-[9px] text-slate-500 truncate max-w-[150px]">'+(s.name||'')+'</span>'+(ernChips(s,m,true)?'<span class="ern-wrap block">'+ernChips(s,m,true)+'</span>':'')+'</td>'+
+      '<td class="p-1 font-semibold"><div class="tkcell"><span class="tkrow">'+Notes.badgeHtml(noteOf(m,s.ticker),m,s.ticker)+lg(s.ticker,m,18)+s.ticker+drLabel(s.ticker, m)+ssfBadge(s.ticker, m)+'</span>'+(ernChips(s,m,true)?'<span class="ern-wrap">'+ernChips(s,m,true)+'</span>':'')+'</div></td>'+
       '<td class="p-1 text-right">'+topRSHTML(s)+'</td>'+
       '<td class="p-1 text-right">'+fPctExact(s.pYTD)+'</td>'+
       '<td class="p-1 text-right">'+fPctExact(s.p1y)+'</td>'+
@@ -1774,7 +2035,7 @@ function topTableHTML(rows, m){
       '<td class="p-1 text-left truncate max-w-[120px] text-slate-400">'+(s.industry||'')+'</td></tr>'+
       notesPanel(m,s.ticker,'table');
   }).join('');
-  return '<div class="overflow-x-auto"><table class="w-full text-[11px]">'+
+  return '<div class="overflow-x-auto"><table class="w-full text-[11px] top-tbl">'+
     '<thead><tr class="text-slate-400 border-b border-[#243044]">'+
     '<th class="p-1 text-left text-[10px]">#</th><th class="p-1 text-left text-[10px]">หุ้น</th>'+
     '<th class="p-1 text-right text-[10px]">RS</th>'+head('pYTD','ปีนี้ YTD')+head('p1y','1 ปี')+head('p2y','2 ปี')+
@@ -1790,12 +2051,11 @@ function topCardItems(rows, m){
       <div class="flex items-start justify-between gap-1">
         <div class="flex items-center gap-2 min-w-0">
           <span class="text-[10px] font-bold text-slate-500">#${i+1}</span>
+          ${Notes.badgeHtml(noteOf(m,tk),m,tk)}
           ${logo}
           <button onclick="openModal('${tk}','${jq(s.name)}','${m}')" class="text-[15px] font-bold hover:text-sky-400 truncate" title="${(s.name||'')}">${tk}${drLabel(tk, m)}</button>
           ${ssfBadge(tk, m)}
           <span class="tag-market" title="${m==='america'?'ตลาดสหรัฐฯ (US)':'ตลาดไทย'}">${m==='america'?'US':'TH'}</span>
-          <span class="text-[10px] text-slate-500 truncate max-w-[120px]">${s.name||''}</span>
-          ${Notes.badgeHtml(noteOf(m,tk),m,tk)}
         </div>
         ${topRSHTML(s,true)}
       </div>
@@ -1814,7 +2074,7 @@ function topCardItems(rows, m){
 }
 function topCardsGrid(rows,m){ return '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-3">'+topCardItems(rows,m)+'</div>'; }
 function topUniverseNote(){
-  const mk = topMk==='america' ? 'US' : 'ไทย';
+  const mk = topMk==='america' ? 'US' : 'TH';
   const dir = topSortDir>0 ? ' ▼' : ' ▲';
   const cap = ' · 2 ปี: คำนวณจากกราฟ';
   if(topUniverse==='rs') return 'Universe: หุ้นที่ผ่านเกณฑ์ RS หลัก ('+topRows.length+' ตัว) — ต้องผ่านทั้ง RS ≥ '+RS_TOP_TH+' และเกณฑ์มูลค่าซื้อขาย/สภาพคล่องตาม Dashboard · เรียง '+sortLabel(topSortKey)+dir+cap;
@@ -1841,7 +2101,7 @@ function renderTop20(){
     return;
   }
   const rows=topRows.slice(0, TOP20_N);
-  el.innerHTML = ((topView==='card') ? topCardsGrid(rows,m) : (topPodiumHTML(rows.slice(0,3),m) + topTableHTML(rows,m))) + note;
+  el.innerHTML = DOT_LEGEND + ((topView==='card') ? topCardsGrid(rows,m) : (topPodiumHTML(rows.slice(0,3),m) + topTableHTML(rows,m))) + note;
   if(topView==='card') loadTop20Charts(rows, m);
 }
 /* 3 อันดับแรกเป็นการ์ดเด่น (อันดับ 1 ขอบทอง) — ข้อมูลชุดเดียวกับตาราง กดแล้วเปิดกราฟเต็มเหมือนเดิม */
@@ -1853,7 +2113,7 @@ function topPodiumHTML(rows, m){
     const keys=['pYTD','p1y','p2y'].filter(k=>k!==topSortKey);
     return '<div class="tpod'+(i===0?' first':'')+'" onclick="openModal(\''+s.ticker+'\',\''+jq(s.name)+'\',\''+m+'\')" role="button" tabindex="0">'+
       '<div class="tpod-top"><span class="tpod-n">อันดับ '+(i+1)+'</span><span class="tpod-rs">'+((s.rs!=null)?s.rs:'-')+'</span></div>'+
-      '<div class="tpod-tk">'+lg(s.ticker,m,26)+s.ticker+'</div><div class="tpod-nm">'+(s.name||'')+'</div>'+(ernChips(s,m,true)?'<div class="ern-wrap">'+ernChips(s,m,true)+'</div>':'')+
+      '<div class="tpod-tk">'+lg(s.ticker,m,26)+s.ticker+(ernChips(s,m,true)?'<span class="ern-wrap">'+ernChips(s,m,true)+'</span>':'')+'</div>'+
       '<div class="tpod-big">'+val(s,topSortKey)+'<span>'+cur+'</span></div>'+
       '<div class="tpod-sub"><span><i>'+sortLabel(keys[0])+'</i>'+val(s,keys[0])+'</span><span><i>'+sortLabel(keys[1])+'</i>'+val(s,keys[1])+'</span><span><i>ราคา</i>'+fmtPx(s.price)+'</span></div></div>';
   }).join('');
@@ -1908,10 +2168,10 @@ async function fetchP2y(m, s){
 /* แยกตลาดให้ชัด: ป้ายตลาด + สีเน้น + title และล้างข้อมูลตลาดเก่าทันทีที่สลับ */
 function applyMarketIdentity(mk){
   document.body.setAttribute('data-market', mk);
-  document.querySelectorAll('.mk-tag').forEach(e=>{ e.textContent = mk==='america' ? 'สหรัฐฯ · USD' : 'ไทย · THB'; });
+  document.querySelectorAll('.mk-tag').forEach(e=>{ e.textContent = mk==='america' ? 'US' : 'TH'; });
   const chip=document.getElementById('mkChip');
-  if(chip) chip.textContent = mk==='america' ? 'ตลาดสหรัฐฯ · NYSE + NASDAQ + AMEX · $' : 'ตลาดไทย · SET + mai · ฿';
-  document.title = mk==='america' ? 'RS Dashboard — หุ้นสหรัฐฯ' : 'RS Dashboard — หุ้นไทย';
+  if(chip){ chip.textContent = mk==='america' ? 'US' : 'TH'; chip.title = mk==='america' ? 'ตลาดสหรัฐฯ · NYSE + NASDAQ + AMEX · USD' : 'ตลาดไทย · SET + mai · บาท'; }
+  document.title = mk==='america' ? 'RS Dashboard — US' : 'RS Dashboard — TH';
 }
 function clearMarketData(){
   stockData=[]; moneyFlowData=null; themesData=null; summaryData=null; indexList=[];
@@ -1926,7 +2186,7 @@ function switchMarket(mk){
   currentMarket = mk;
   document.getElementById('tabTh').classList.toggle('active', mk==='thailand');
   document.getElementById('tabUs').classList.toggle('active', mk==='america');
-  document.getElementById('marketBadge').textContent = mk==='america' ? 'RS Dashboard · หุ้นอเมริกา (US)' : 'RS Dashboard · หุ้นไทย';
+  document.getElementById('marketBadge').textContent = mk==='america' ? 'RS Dashboard · US' : 'RS Dashboard · TH';
   applyMarketIdentity(mk);
   clearMarketData();   // ล้างข้อมูลของตลาดเก่าทันที — ไม่ให้เห็นข้อมูลปนกันระหว่างรอโหลดตลาดใหม่
   document.getElementById('stockCount').textContent='…';
@@ -1963,9 +2223,9 @@ function switchMarket(mk){
 
   // 4) ซิงค์หน่วยหัวตาราง & ท้ายหน้า
   const thVal = document.getElementById('thValHeader');
-  if(thVal) thVal.innerHTML = `Value(${mk==='america'?'$M':'฿M'}) <span class="sort-icon">↕</span>`;
+  if(thVal) thVal.innerHTML = `มูลค่า (${mk==='america'?'$M':'฿M'}) <span class="sort-icon"></span>`;
   const foot = document.getElementById('footerText');
-  if(foot) foot.textContent = `rsdashclean.vercel.app • ข้อมูล${mk==='america'?'สหรัฐฯ (US)':'ไทย'} • RS เต็มตลาด`;
+  if(foot) foot.textContent = `rsdashclean.vercel.app • ข้อมูล ${mk==='america'?'US':'TH'} • RS เต็มตลาด`;
 
   page=1;
   preloadedCharts = {};
@@ -2061,7 +2321,7 @@ function capBadge(grp){
 }
 function buildCard(tk, nm, grp, ind, rs, px, ch, vol, val, p3, xn, rd, isDR, rv){
   const cid='chart_'+tk.replace(/[^a-z0-9]/gi,'_');
-  const rdx = (rd===null||rd===undefined) ? '<span class="pill text-sky-300">NEW</span>' : (rd>0 ? '<span class="pill pos">▲ +'+rd+'</span>' : (rd<0 ? '<span class="pill neg">▼ '+Math.abs(rd)+'</span>' : '<span class="pill text-slate-500">—</span>'));
+  const rdx = (rd===null||rd===undefined) ? '<span class="rk new">ใหม่</span>' : (rd>0 ? '<span class="rk pos"><i class="ar">▲</i> '+rd+'</span>' : (rd<0 ? '<span class="rk neg"><i class="ar">▼</i> '+Math.abs(rd)+'</span>' : '<span class="rk mu">–</span>'));
   const ntag = xn ? '<span class="pill text-slate-300">#'+xn+'</span>' : '';
   const cap = currentMarket==='america' ? idxBadge(tk, currentMarket) : capBadge(grp);
     const drBadge = isDR ? '<span class="pill text-amber-400 border-amber-700/60" title="Depositary Receipt — ตราสารอ้างอิงหุ้นนอก">DR</span>' : '';
@@ -2072,12 +2332,12 @@ function buildCard(tk, nm, grp, ind, rs, px, ch, vol, val, p3, xn, rd, isDR, rv)
       <div class="c-id">
         ${logo}
         <button onclick="openModal('${tk}','${jq(nm)}','${currentMarket}')" class="c-tk" title="${ind||''}${grp?(' · '+grp):''}">${tk}${drLabel(tk)}</button>
+        ${(()=>{ const e=ernBy(tk,currentMarket,true); return e?`<span class="ern-wrap">${e}</span>`:''; })()}
       </div>
       <span class="c-rs ${rsColor(Number(rs))}" title="RS เปอร์เซ็นต์ไทล์ เทียบทั้งตลาด">${rs}</span>
     </div>
     <div class="c-name" title="${nm||''}">${nm||''}</div>
     <div class="c-tags">${cap}${ind?`<span class="pill c-ind" title="กลุ่ม/หมวด">${ind}</span>`:''}</div>
-    ${(()=>{ const e=ernBy(tk,currentMarket); return e?`<div class="ern-wrap mt-1">${e}</div>`:''; })()}
     <div class="c-price">
       <b id="price_${tk}" class="text-white">${fNum(px)}</b> <span id="chg_${tk}">${fPct(ch)}</span>
       <span class="text-slate-400" title="มูลค่าซื้อขาย">${fBil(val||0)}</span>
@@ -2107,9 +2367,9 @@ function fVal(n){ const v=Number(n); return Number.isFinite(v)?(v/1000000).toFix
 function fPct(v){
   const n=Number(v);
   if(!Number.isFinite(n)) return '<span class="text-slate-500 font-bold">-</span>';
-  if(n>0) return '<span class="pos font-bold">+'+n.toFixed(2)+'%</span>';
-  if(n<0) return '<span class="neg font-bold">'+n.toFixed(2)+'%</span>';
-  return '<span class="text-slate-500 font-bold">0.00%</span>';
+  if(n>0) return '<span class="pos font-bold nw"><i class="ar">▲</i> '+n.toFixed(1)+'%</span>';
+  if(n<0) return '<span class="neg font-bold nw"><i class="ar">▼</i> '+Math.abs(n).toFixed(1)+'%</span>';
+  return '<span class="text-slate-500 font-bold nw">– 0.0%</span>';
 }
 function fPct2(v){ const n=Number(v); if(!Number.isFinite(n)) return '-'; return (n>=0?'+':'')+n.toFixed(1)+'%'; }
 // Relative Volume — เทียบ volume ล่าสุด vs ค่าเฉลี่ย 10 วัน (TradingView relative_volume_10d_calc)
@@ -2144,15 +2404,15 @@ function loadVolCorr(){
 }
 // ตัวเลขตรง ไม่ปัด (ตามบอสสั่ง) — ราคา/เปลี่ยน/มูลค่า แสดงเต็มหน่วยชัดเจน
 function fNumFull(n){ const v=Number(n); if(!Number.isFinite(v)) return '-'; return v>=1000?v.toLocaleString('en-US',{maximumFractionDigits:2}):v.toFixed(2); }
-function fPctExact(v){ const n=Number(v); if(!Number.isFinite(n)) return '<span class="text-slate-500">-</span>'; return (n>=0?'<b class="pos">+':'<b class="neg">-')+Math.abs(n).toFixed(2)+'%</b>'; }
+function fPctExact(v){ const n=Number(v); if(!Number.isFinite(n)) return '<span class="text-slate-500">-</span>'; return (n>=0?'<b class="pos nw"><i class="ar">▲</i> ':'<b class="neg nw"><i class="ar">▼</i> ')+Math.abs(n).toFixed(1)+'%</b>'; }
 function fBilExact(n, mk){ const v=Number(n); if(!Number.isFinite(v)) return '-'; return ((mk||currentMarket)==='america'?'$':'฿')+ (v>=1e9?(v/1e9).toFixed(2)+'B':(v/1e6).toFixed(1)+'M'); }
 function rsColor(r){ return r>=80?'text-emerald-400':(r>=50?'text-yellow-400':'text-red-400'); }
 function rDhtml(x){
   const d=x.rD;
-  if(d===null||d===undefined) return '<span class="pill text-sky-300">NEW</span>';
-  if(d>0) return '<span class="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/40">▲ +'+d+'</span>';
-  if(d<0) return '<span class="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/40">▼ '+Math.abs(d)+'</span>';
-  return '<span class="text-slate-500 text-xs">—</span>';
+  if(d===null||d===undefined) return '<span class="rk new">ใหม่</span>';
+  if(d>0) return '<span class="rk pos"><i class="ar">▲</i> '+d+'</span>';
+  if(d<0) return '<span class="rk neg"><i class="ar">▼</i> '+Math.abs(d)+'</span>';
+  return '<span class="rk mu">–</span>';
 }
 function setProgress(p,msg){
   document.getElementById('progressBar').style.width=p+'%';
@@ -2269,7 +2529,7 @@ async function renderMarketBrief(){
     let advise = 'ข้อมูล Breadth ยังไม่พอสรุป';
     if(th||us){
       const mm = th||us;
-      const nm = mm.market==='thailand'?'ไทย':'อเมริกา';
+      const nm = mm.market==='thailand'?'TH':'US';
       let verdict;
       if(mm.ma50>=50) verdict='หุ้นที่ราคาเหนือเส้นระยะสั้นมีถึงครึ่งกว่า ตลาดกว้าง แรงส่งดี';
       else if(mm.ma50<35 && mm.ma200<35) verdict='หุ้นส่วนใหญ่ยังต่ำกว่าเส้นตลอด ระยะสั้นและยาวอ่อน ระวัง';
@@ -2322,6 +2582,18 @@ async function renderMarketBreadth(){
   }catch(e){ box.innerHTML='<div class="text-[10px] text-slate-500">โหลด Breadth ไม่ได้</div>'; }
 }
 
+/* แถวสรุป: grid คอลัมน์คงที่ต่อการ์ด (ticker | RS | ตัวเลข | กลุ่ม) ให้ตรงกันทุกแถว */
+function sumRows(list, tpl, cols){
+  if(!list||!list.length) return '<div class="trs-empty" style="padding:6px 2px">-</div>';
+  const st='grid-template-columns:'+tpl;
+  const head='<div class="sr sr-h" style="'+st+'">'+cols.map(c=>'<span class="'+(c.c||'')+'">'+c.h+'</span>').join('')+'</div>';
+  return '<div class="sr-wrap">'+head+list.map(s=>'<div class="sr" style="'+st+'" onclick="openModal(\''+s.ticker+'\',\''+jq(s.name)+'\',\''+currentMarket+'\')">'+cols.map(c=>'<span class="'+(c.c||'')+'">'+c.f(s)+'</span>').join('')+'</div>').join('')+'</div>';
+}
+const SR_TPL = 'minmax(76px,.8fr) 42px 74px minmax(0,1.3fr)';   // ทุกการ์ด: หุ้น | RS | % (ชิดขวา) | กลุ่ม/อันดับ (ชิดซ้าย)
+const srTk = s => lg(s.ticker,currentMarket,18)+s.ticker+drLabel(s.ticker, currentMarket);
+const srRs = s => '<span class="rsb'+(s.rs<70?' lo':'')+'">'+s.rs+'</span>';
+const srGp = s => themeDisplay(s.industry||'');
+const srP2 = v => { const n=Number(v); return Number.isFinite(n)?'<b class="'+(n>=0?'pos':'neg')+'"><i class="ar">'+(n>=0?'▲':'▼')+'</i> '+Math.abs(n).toFixed(1)+'%</b>':'–'; };
 function renderSummary(sum){
   const el=document.getElementById('marketSummaryBody');
   if(!sum || (!sum.breadth && !sum.breadth_full)){ el.innerHTML='<div class="text-slate-500 text-xs">ยังไม่มีข้อมูล (กด Update/โหลดสรุป)</div>'; return; }
@@ -2360,26 +2632,26 @@ function renderSummary(sum){
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
     <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
       <div class="text-[11px] font-bold text-emerald-400 mb-1">ผู้นำ / สนใจ (RS≥90) — กำลังแข็งแกร่ง</div>
-      <div class="flex flex-wrap gap-1.5">${strong.map(s=>`<button onclick="openModal('${s.ticker}','${jq(s.name)}','${currentMarket}')" class="pill hover:bg-emerald-900/30">${s.ticker}${drLabel(s.ticker)} <b class="text-emerald-400">${s.rs}</b><span class="ml-1.5 text-[9px] text-emerald-400/70">${themeDisplay(s.industry)}</span></button>`).join('')}</div>
+      ${sumRows(strong,SR_TPL,[{h:'หุ้น',f:srTk,c:'tk'},{h:'RS',f:srRs,c:'c'},{h:'วันนี้',f:s=>fPct(s.change),c:'r'},{h:'กลุ่ม',f:srGp,c:'gp'}])}
       <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS สูง + อยู่ในธีมแข็งแกร่ง — แต่เช็ค Breadth/มูลค่าซื้อขาย + ไม่ไล่ซื้อตอน RS 99 นาน/ราคาไกลฐาน</div>
     </div>
     ${ weak.length?`
     <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
       <div class="text-[11px] font-bold text-rose-400 mb-1">⚠ อ่อนตัว / ระวัง (RS&lt;50 + วันนี้ลง&gt;3%) — มีประเด็น</div>
-      <div class="flex flex-wrap gap-1.5">${weak.map(s=>`<button onclick="openModal('${s.ticker}','${jq(s.name)}','${currentMarket}')" class="pill border-rose-800 text-rose-300">${s.ticker}${drLabel(s.ticker)}${s.isDR?' <b class="text-amber-400">DR</b>':''} RS${s.rs} ${fPct(s.change)}<span class="ml-1.5 text-[9px] text-rose-300/70">${themeDisplay(s.industry)}</span></button>`).join('')}</div>
+      ${sumRows(weak,SR_TPL,[{h:'หุ้น',f:srTk,c:'tk'},{h:'RS',f:srRs,c:'c'},{h:'วันนี้',f:s=>fPct(s.change),c:'r'},{h:'กลุ่ม',f:srGp,c:'gp'}])}
     </div>`:''}
     </div>`:''}
   ${ (sum.upComing&&sum.upComing.length || sum.downComing&&sum.downComing.length)?`
   <div class="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-2">
   <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
     <div class="text-[11px] font-bold text-yellow-300 mb-1">UPCOMING (กำลังขึ้น) — RS กลาง ยังไม่พีค มีโอกาส</div>
-    <div class="flex flex-wrap gap-1.5">${sum.upComing.map(s=>`<button onclick="openModal('${s.ticker}','${jq(s.name)}','${currentMarket}')" class="pill border-yellow-700 text-yellow-200" title="${s.industry}: 1M ${fPct2(s.p1m)} · 1W ${fPct2(s.p1w)}">${s.ticker}${drLabel(s.ticker)}${s.isDR?' <b class="text-amber-400">DR</b>':''} <b>${s.rs}</b> ${fPct2(s.p1m)}<span class="ml-1.5 text-[9px] text-yellow-200/70">${themeDisplay(s.industry)}</span></button>`).join('')}</div>
+    ${sumRows(sum.upComing,SR_TPL,[{h:'หุ้น',f:srTk,c:'tk'},{h:'RS',f:srRs,c:'c'},{h:'1M',f:s=>srP2(s.p1m),c:'r'},{h:'กลุ่ม',f:srGp,c:'gp'}])}
     <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS 70+ (ยังไม่พีค, ไม่ใช่ท็อปแรงสุด) + กำลังเร่ง 1M/1W >0 — จับตา breakout ยังทันลุ้น leader</div>
   </div>
   ${ sum.downComing&&sum.downComing.length?`
   <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
     <div class="text-[11px] font-bold text-rose-400 mb-1">DOWNCOMING (กำลังอ่อนแรง) — เคยแรงแต่เริ่มลง</div>
-    <div class="flex flex-wrap gap-1.5">${sum.downComing.map(s=>`<button onclick="openModal('${s.ticker}','${jq(s.name)}','${currentMarket}')" class="pill border-rose-800 text-rose-300" title="${s.industry}: 1M ${fPct2(s.p1m)} · 1W ${fPct2(s.p1w)}">${s.ticker}${drLabel(s.ticker)}${s.isDR?' <b class="text-amber-400">DR</b>':''} <b>${s.rs}</b> ${fPct2(s.p1m)}<span class="ml-1.5 text-[9px] text-rose-300/70">${themeDisplay(s.industry)}</span></button>`).join('')}</div>
+    ${sumRows(sum.downComing,SR_TPL,[{h:'หุ้น',f:srTk,c:'tk'},{h:'RS',f:srRs,c:'c'},{h:'1M',f:s=>srP2(s.p1m),c:'r'},{h:'กลุ่ม',f:srGp,c:'gp'}])}
     <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS ยังสูง (RS≥70) แต่ 1M ลบ/แรงขายเริ่ม — กำลัง distribution ระวังถอย/ตรวจ 52w สูงพัง</div>
       </div>
       </div>`:''}
@@ -2388,12 +2660,12 @@ function renderSummary(sum){
   <div class="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-2">
   <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
     <div class="text-[11px] font-bold text-emerald-400 mb-1">▲️ ขึ้นอันดับมากสุด (Rank Change สูงสุด)</div>
-    <div class="flex flex-wrap gap-1.5">${(sum.rank_up||[]).map(s=>`<button onclick="openModal('${s.ticker}','${jq(s.name)}','${currentMarket}')" class="pill border-emerald-700 text-emerald-200" title="${s.name||''}: rank ${s.rT} · ขึ้น ${s.rD} อันดับ">${s.ticker}${drLabel(s.ticker)} <b>${s.rD>0?'+'+s.rD:s.rD}</b> RS${s.rs} ${fPct(s.change)}</button>`).join('')}</div>
+    ${sumRows(sum.rank_up,SR_TPL,[{h:'หุ้น',f:srTk,c:'tk'},{h:'RS',f:srRs,c:'c'},{h:'วันนี้',f:s=>fPct(s.change),c:'r'},{h:'อันดับ',f:s=>'<b class="pos">▲ '+Math.abs(s.rD)+'</b>',c:'gp'}])}
     <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS ไต่ขึ้นเร็วจากเมื่อวาน - อันดับดีขึ้น ยังไม่พีค จับ tier พึ่งขึ้น</div>
   </div>
   <div class="rounded-xl border border-[#1e2634] bg-[#0f1622] p-3">
     <div class="text-[11px] font-bold text-rose-400 mb-1">▼️ ลงอันดับมากสุด (Rank Change ต่ำสุด)</div>
-    <div class="flex flex-wrap gap-1.5">${(sum.rank_down||[]).map(s=>`<button onclick="openModal('${s.ticker}','${jq(s.name)}','${currentMarket}')" class="pill border-rose-800 text-rose-300" title="${s.name||''}: rank ${s.rT} · ลง ${s.rD} อันดับ">${s.ticker}${drLabel(s.ticker)} <b>${s.rD}</b> RS${s.rs} ${fPct(s.change)}</button>`).join('')}</div>
+    ${sumRows(sum.rank_down,SR_TPL,[{h:'หุ้น',f:srTk,c:'tk'},{h:'RS',f:srRs,c:'c'},{h:'วันนี้',f:s=>fPct(s.change),c:'r'},{h:'อันดับ',f:s=>'<b class="neg">▼ '+Math.abs(s.rD)+'</b>',c:'gp'}])}
     <div class="text-[10px] text-slate-500 mt-1">เหตุ: RS ร่วงเร็วจากเมื่อวาน - อันดับหล่น ระวังจุดอ่อน/เทขาย ตรวจสาเหตุ</div>
   </div>
   </div>`:''}
@@ -2598,15 +2870,10 @@ function renderFlow(){
     const leaders = topStocksOf[r.name] || [];
     const max=Math.max(...rows.map(x=>Math.max(x.in,x.out)),1);
     bars.innerHTML+=`
-      <button onclick="openIndustry('${jq(r.name)}')" class="text-left block w-full hover:bg-[#101724] rounded px-1 transition-colors" title="คลิกดูหุ้นในกลุ่ม ${r.name}">
-        <div class="flex justify-between text-[11px] mb-0.5">
-          <span class="truncate pr-2"><span class="text-slate-300">${r.name}${leaders.length?` (${leaders.map(x=>x.ticker+drLabel(x.ticker, currentMarket)).join(", ")}${leaders.length>=5?", …":""})`:``}</span></span>
-          <span><b class="pos">▲ ${fBil(r.in)}</b> / <b class="neg">▼ ${fBil(r.out)}</b></span>
-        </div>
-        <div class="flex w-full h-2 rounded overflow-hidden bg-[#161d29]">
-          <div class="bg-emerald-500" style="width:${(r.in/max*100).toFixed(0)}%"></div>
-          <div class="bg-rose-500" style="width:${(r.out/max*100).toFixed(0)}%"></div>
-        </div>
+      <button onclick="openIndustry('${jq(r.name)}')" class="fl-row" title="คลิกดูหุ้นในกลุ่ม ${r.name}">
+        <span class="fl-nm">${r.name}</span><span class="fl-v pos">▲ ${fBil(r.in)}</span><span class="fl-v neg">▼ ${fBil(r.out)}</span>
+        <span class="fl-tk">${leaders.map(x=>x.ticker+drLabel(x.ticker, currentMarket)).join(" · ")}${leaders.length>=5?" …":""}</span>
+        <span class="fl-bar"><i class="up" style="width:${(r.in/max*100).toFixed(0)}%"></i><i class="dn" style="width:${(r.out/max*100).toFixed(0)}%"></i></span>
       </button>`;
   });
 }
@@ -2801,14 +3068,11 @@ function renderThemes(){
   const el=document.getElementById('themeList');
   if(!themesData || !themesData.length){ el.innerHTML='<div class="text-slate-500 text-sm">ยังไม่มีข้อมูลธีม (รอ Update)</div>'; return; }
   el.innerHTML = themesData.map(t=>`
-    <div onclick="openIndustry('${jq(t.name)}')" class="cursor-pointer bg-[#101724] hover:bg-[#161d29] border border-[#1e2634] rounded-lg p-2.5 transition-colors">
-      <div class="flex items-center justify-between mb-1">
-        <span class="font-bold text-[13px] truncate">#${t.rank} · ${themeDisplay(t.name)}</span>
-        <span class="text-[10px] text-slate-400 shrink-0 ml-2">RS <b class="text-emerald-400">${t.avgRS}</b> · ${t.count}</span>
-      </div>
-      <div class="flex flex-wrap gap-1">
-        ${t.stocks.map(s=>`<span class="pill cursor-pointer" onclick="openModalByTk('${s.ticker}','${currentMarket}')" title="กดดูกราฟ ${s.ticker}">${s.ticker}${drLabel(s.ticker)} <b class="text-emerald-400">${s.rs}</b></span>`).join('')}
-      </div>
+    <div onclick="openIndustry('${jq(t.name)}')" class="th-row">
+      <span class="th-n">${t.rank}</span>
+      <span class="th-nm">${themeDisplay(t.name)}</span>
+      <span class="th-rs"><span class="rsb${t.avgRS<70?' lo':''}">${t.avgRS}</span><small>${t.count} ตัว</small></span>
+      <span class="th-st">${t.stocks.map(s=>`<span onclick="event.stopPropagation();openModalByTk('${s.ticker}','${currentMarket}')" title="กดดูกราฟ ${s.ticker}">${s.ticker}${drLabel(s.ticker)} <b>${s.rs}</b></span>`).join('')}</span>
     </div>`).join('');
 }
 
@@ -3005,17 +3269,16 @@ function renderView(){
   if(page<1) page=1;
   const start=(page-1)*perPage;
   const visible=list.slice(start, start+perPage);
-  const pager=`<div class="col-span-full flex flex-wrap items-center justify-center gap-1.5 text-[11px] py-2">
-      <button onclick="page=Math.max(1,page-1);renderView()" class="tf-chip ${page>1?'':'opacity-40 pointer-events-none'}">◀ ก่อน</button>
-      ${Array.from({length:totalPages},(_,i)=>`<button onclick="page=${i+1};renderView()" class="tf-chip ${page===i+1?'active':''}">${i+1}</button>`).join('')}
-      <button onclick="page=Math.min(${totalPages},page+1);renderView()" class="tf-chip ${page<totalPages?'':'opacity-40 pointer-events-none'}">ถัดไป ▶</button>
-    </div>
-    <div class="col-span-full flex flex-wrap items-center justify-center gap-2 text-[10px] text-slate-500 py-1">
-      <span>แสดง ${start+1}-${Math.min(start+perPage,list.length)} จาก ${list.length} ตัว</span>
-      <span class="flex items-center gap-1 bg-[#101724] border border-[#243044] rounded-lg px-1.5 py-0.5">
-        <span class="text-slate-400">กราฟ</span>
-        ${[1,2,3,4].map(n=>`<button onclick="setCols(${n})" class="tf-chip ${colsChoice===n?'active':''}">${n}</button>`).join('')}
+  // แถบเลขหน้าแบบย่อ: 1 … 4 [5] 6 … 10 (ไม่ไล่ทุกหน้า) + จำนวนที่แสดง; ปุ่มจำนวนกราฟต่อแถวแสดงเฉพาะโหมดการ์ด
+  const pgs=[]; for(let i=1;i<=totalPages;i++){ if(i===1||i===totalPages||Math.abs(i-page)<=1) pgs.push(i); else if(pgs[pgs.length-1]!=='…') pgs.push('…'); }
+  const pager=`<div class="pgbar col-span-full">
+      <span class="pg-info">${list.length?start+1:0}–${Math.min(start+perPage,list.length)} จาก ${list.length} ตัว</span>
+      <span class="pg-nav">
+        <button onclick="page=Math.max(1,page-1);renderView()" class="pg-b ${page>1?'':'off'}" aria-label="ก่อนหน้า">‹</button>
+        ${pgs.map(p=>p==='…'?'<span class="pg-gap">…</span>':`<button onclick="page=${p};renderView()" class="pg-b ${page===p?'on':''}">${p}</button>`).join('')}
+        <button onclick="page=Math.min(${totalPages},page+1);renderView()" class="pg-b ${page<totalPages?'':'off'}" aria-label="ถัดไป">›</button>
       </span>
+      ${mode==='card'?`<span class="pg-cols"><span>กราฟต่อแถว</span>${[1,2,3,4].map(n=>`<button onclick="setCols(${n})" class="pg-b ${colsChoice===n?'on':''}">${n}</button>`).join('')}</span>`:''}
     </div>`;
     if(mode==='card'){
     cv.classList.remove('hidden'); tv.classList.add('hidden');
@@ -3029,8 +3292,8 @@ function renderView(){
       <tr class="border-b border-[#1e2634]"><td colspan="9" class="p-0"><div class="col-span-full w-full">${pager}</div></td></tr>`;
           visible.forEach(x=>{
       tb.innerHTML+=`<tr id="row_${x.ticker}" class="hover:bg-[#111827] border-b border-[#1e2634]">
-        <td class="p-4 text-left"><span class="text-base font-extrabold ${rsColor(x.rs)}">${x.rs}</span> <b class="ml-1 text-slate-300">#${x.rT}</b></td>
-        <td class="p-4 text-left"><button onclick="openModal('${x.ticker}','${jq(x.name)}','${currentMarket}')" class="font-bold text-sky-400 hover:underline">${lg(x.ticker,currentMarket,20)}${x.ticker}</button>${drLabel(x.ticker)}${x.isDR?' <span class="text-[9px] font-bold text-amber-400 bg-amber-400/10 border border-amber-500/40 rounded px-1">DR</span>':''}${currentMarket==='america'?(' '+drShort(x.ticker)):''}</td>
+        <td class="p-4 text-left"><span class="rsr${x.rs<70?' lo':''}">${x.rs}</span> <b class="ml-1 text-slate-400 text-xs">#${x.rT}</b></td>
+        <td class="p-4 text-left"><span class="tkrow"><button onclick="openModal('${x.ticker}','${jq(x.name)}','${currentMarket}')" class="font-bold text-sky-400 hover:underline">${lg(x.ticker,currentMarket,20)}${x.ticker}</button>${drLabel(x.ticker)}${x.isDR?' <span class="text-[9px] font-bold text-amber-400 bg-amber-400/10 border border-amber-500/40 rounded px-1">DR</span>':''}${currentMarket==='america'?(' '+drShort(x.ticker)):''}</span></td>
         <td class="p-4 font-bold tprice">${fNum(x.price)}</td>
         <td class="p-4"><span class="tchg">${fPct(x.change)}</span></td>
         <td class="p-4 text-slate-300 tval">${x.val!=null?fVal(x.val):'-'}</td>
@@ -3254,10 +3517,171 @@ document.addEventListener('DOMContentLoaded',()=>{ try{
   loadUsIndexes();   // สมาชิก index สหรัฐฯ สดจาก TradingView
   loadDrUs();   // โหลดข้อมูล DR ไทยที่อ้างอิงหุ้นเมกา (แสดงเฉพาะหน้าหุ้นเมกา)
   if(_mk!==currentMarket) switchMarket(_mk);   // ซิงค์หน้าต่างๆ + สแกนตลาดนั้นให้พร้อม
+  if(location.hash==='#howto') _pg='howto';   // ลิงก์ตรงไปคู่มือ
   setPage(_pg);   // กลับไปหน้าที่เข้าล่าสุด
   runUpdate(true);   // ทุกครั้งเข้าเว็บ: บังคับ Update ข้อมูลสดเสมอ (ข้าม cache)
   toggleAutoRefresh(); // เริ่มต้นเปิดอัปเดตสดอัตโนมัติต่อเนื่อง
 }catch(e){} });
+</script>
+<script>
+/* ===== หน้า How to: เริ่มจากศูนย์ — RS คืออะไร + แอนิเมชันอธิบาย (สร้างครั้งแรกที่เปิดหน้า) ===== */
+(function(){
+const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+const GL = {
+  RS:'Relative Strength — อันดับ 1–99 ของ "ความแรงของราคา" เทียบกับหุ้นทั้งตลาด',
+  pct:'เปอร์เซ็นไทล์ — ตำแหน่งในแถว เช่น 90 = อยู่สูงกว่า 90% ของทั้งหมด',
+  SMA:'Simple Moving Average — ราคาปิดเฉลี่ย N วัน ใช้ดูแนวโน้ม SMA50 = เฉลี่ย 50 วัน',
+  Breadth:'Breadth — สัดส่วนหุ้นทั้งตลาดที่แข็งแรง ดูว่าตลาดขึ้นกว้างหรือขึ้นแค่ไม่กี่ตัว',
+  TT:'Trend Template — เช็กลิสต์ 8 ข้อของ Mark Minervini ว่าหุ้นอยู่ในขาขึ้นที่แข็งแรง',
+  ATR:'ATR — ช่วงแกว่งของราคาโดยเฉลี่ยต่อวัน ค่าต่ำ = ราคานิ่ง',
+  SSF:'Single Stock Future — สัญญาล่วงหน้ารายตัวที่ TFEX เทรดได้ทั้งขึ้นและลง',
+  YoY:'YoY — เทียบไตรมาสเดียวกันของปีก่อน',
+  QoQ:'QoQ — เทียบไตรมาสก่อนหน้า',
+  mom:'โมเมนตัม — แนวโน้มที่ราคาที่กำลังวิ่งแรงมักวิ่งต่ออีกสักพัก'
+};
+const g=(t,k)=>'<abbr class="ht-g" tabindex="0" data-t="'+GL[k]+'">'+t+'</abbr>';
+const topStock=()=>{ try{ const a=(typeof stockData!=='undefined'?stockData:[]).filter(s=>Number.isFinite(s.rs)&&Number.isFinite(s.p1m)&&Number.isFinite(s.p3m)&&Number.isFinite(s.p6m)&&Number.isFinite(s.p1y)); a.sort((x,y)=>(y.rs-x.rs)||((y.score||0)-(x.score||0))); return a[0]||null; }catch(e){ return null; } };
+const mkt=()=>{ try{ return currentMarket; }catch(e){ return 'thailand'; } };
+const f1=v=>(v>=0?'':'−')+Math.abs(v).toFixed(1);
+
+const SCENES = {
+ rs: { ms:3600,
+  steps:['นี่คือหุ้นทั้งตลาด (875 ตัว) ขอใช้ 100 จุดแทน — ตอนนี้ยังไม่รู้ว่าตัวไหนเก่งกว่าตัวไหน',
+         'ให้คะแนน "ความแรงของราคา" ทีละตัว ยิ่งเขียวเข้ม = ราคาวิ่งแรงกว่าในช่วงที่ผ่านมา',
+         'เรียงจากแรงสุดไปอ่อนสุด เหมือนเรียงคะแนนสอบของนักเรียนในห้อง',
+         'ตัวหัวแถวได้ RS 99 = ราคาแรงกว่าหุ้นราว 99% ของตลาด (ไม่ได้แปลว่า "ขึ้นมา 99%")',
+         'ตัวกลางห้องได้ RS 50 — RS บอก "อันดับเทียบตลาด" ไม่ได้บอกว่าจะขึ้นต่อหรือไม่'],
+  html(){ return '<div id="dots"></div><div class="ht-tag"></div>'; },
+  init(st){
+    const box=st.querySelector('#dots'); const N=100; const seed=[...Array(N).keys()]; let x=7; for(let i=N-1;i>0;i--){ x=(x*9301+49297)%233280; const j=Math.floor(x/233280*(i+1)); [seed[i],seed[j]]=[seed[j],seed[i]]; }
+    let h=''; for(let r=0;r<N;r++){ h+='<i class="ht-dot" data-r="'+r+'" style="--c:color-mix(in srgb, var(--up) '+(100-r)+'%, var(--faint))"></i>'; } box.innerHTML=h;
+    st._pos=r=>({sh:(()=>{ const p=seed.indexOf(r); return [(p%10)*10+5,Math.floor(p/10)*10+5]; })(), so:[(r%10)*10+5,Math.floor(r/10)*10+5]});
+    st._dots=[...box.children];
+  },
+  on(st,k){
+    st._dots.forEach(d=>{ const r=+d.dataset.r; const p=st._pos(r)[k<2?'sh':'so']; d.style.left=p[0]+'%'; d.style.top=p[1]+'%'; d.classList.toggle('hot',(k===3&&r===0)||(k===4&&r===49)); });
+    const tag=st.querySelector('.ht-tag'); tag.classList.toggle('on',k>=3);
+    if(k>=3){ const r=k===3?0:49; const p=st._pos(r).so; tag.style.left=Math.min(74,Math.max(26,p[0]))+'%'; tag.style.top=p[1]+'%'; tag.textContent=k===3?'RS 99 · เก่งกว่า 99% ของห้อง':'RS 50 · อยู่กลางห้อง'; }
+  }},
+ formula: { ms:3800,
+  steps:null,
+  build(){ const s=topStock(); const d=s||{ticker:'ตัวอย่าง',p1m:19.8,p3m:62.0,p6m:246.3,p1y:459.3,rs:99};
+    const w=[.3,.3,.2,.2], rets=[d.p1m,d.p3m,d.p6m,d.p1y], mx=Math.max(...rets.map(Math.abs),1), pts=rets.map((r,i)=>r*w[i]), sum=pts.reduce((a,b)=>a+b,0);
+    this._d=d;
+    this.steps=['RS เริ่มจากคำถามเดียว: "ช่วงที่ผ่านมาราคาวิ่งไปเท่าไหร่?" — ดู 4 ช่วงเวลา',
+      'ตัวอย่างจริงวันนี้: '+d.ticker+' (ตัวที่ RS สูงสุดตอนนี้) ผลตอบแทนแต่ละช่วงเป็นตามแท่งนี้',
+      'ให้น้ำหนักช่วงล่าสุดมากกว่า: 1 เดือน 30% · 3 เดือน 30% · 6 เดือน 20% · 1 ปี 20%',
+      'คูณน้ำหนักแล้วรวมกัน = "คะแนนความแรง" '+f1(sum)+' (ยังไม่ใช่ RS)',
+      'เอาคะแนนของหุ้นทุกตัวมาเรียง แล้วแปลงเป็นอันดับ 1–99 → '+d.ticker+' ได้ RS '+d.rs];
+    const nm=['1 เดือน','3 เดือน','6 เดือน','1 ปี'], wt=['×0.3','×0.3','×0.2','×0.2'];
+    const rows=rets.map((r,i)=>'<div class="ht-fr"><span class="nm">'+nm[i]+'</span><span class="bar"><i style="--w:'+Math.max(5,Math.sqrt(Math.abs(r)/mx)*100).toFixed(0)+'%;'+(r<0?'background:var(--down)':'')+'"></i></span><span class="rt">'+(r>=0?'+':'')+f1(r)+'%</span><span class="w">'+wt[i]+'</span><span class="pt">'+f1(pts[i])+'</span></div>').join('');
+    return '<div class="ht-f">'+rows+'<div class="ht-fsum"><span>คะแนนรวม <b>'+f1(sum)+'</b></span><span class="rsbig"><span>เรียงทั้งตลาด →</span><span class="ht-ringn"><svg class="ht-ring" viewBox="0 0 50 50" style="--off:'+(138.2*(1-d.rs/99)).toFixed(1)+'"><circle class="bg" cx="25" cy="25" r="22"/><circle class="fg" cx="25" cy="25" r="22" style="stroke-dashoffset:var(--off)"/></svg><span>'+d.rs+'</span></span></span></div></div>'; },
+  html(){ return this.build(); } },
+ funnel: { ms:3400,
+  steps:['ตลาดหุ้นไทยมีหุ้นสามัญราว 875 ตัว (SET + mai) เป็นจุดเริ่มต้น',
+         'ตัดหุ้นที่ซื้อขายเบาบาง ราคาต่ำมาก หรือบริษัทเล็กเกินไป — เหลือกลุ่มที่ "ซื้อขายได้จริง"',
+         'ในกลุ่มนี้ เอาเฉพาะที่ RS ≥ 70 (แรงกว่า 70% ของตลาด) ไปเข้าแผงปฏิทินงบ/Top RS',
+         'Scanner กรองซ้ำอีกชั้น (ใกล้จุดสูง ราคานิ่ง ขาขึ้นชัด) จนเหลือไม่กี่ตัวที่ควรเปิดกราฟดู'],
+  html(){
+    let tot=875,q=169; try{ const m=(document.getElementById('stockCount')||{}).textContent||''; const r=/(\d+)\s*ผ่านเกณฑ์.*?(\d+)\s*ทั้งกระดาน/.exec(m); if(r){ q=+r[1]; tot=+r[2]; } }catch(e){}
+    let r70=0; try{ r70=stockData.filter(s=>s.rs>=70).length; }catch(e){} if(!r70) r70=Math.round(q*.55);
+    const bar=(w,label,cap,c)=>'<div class="ht-fb"><div class="tr"><i style="--w:'+Math.max(w,6).toFixed(0)+'%;--c:'+c+'">'+label+'</i></div><small>'+cap+'</small></div>';
+    return '<div class="ht-fun">'+bar(100,tot+' ตัว','หุ้นทั้งกระดาน','var(--faint)')+bar(q/tot*100,q+' ตัว','ผ่านเกณฑ์สภาพคล่อง/ราคา/ขนาด','color-mix(in srgb, var(--up) 55%, var(--faint))')+bar(r70/tot*100,r70+' ตัว','RS ≥ 70 — กลุ่มหุ้นแกร่ง','var(--up)')+bar(5,'ไม่กี่ตัว','ผ่าน Scanner — ตัวที่ควรเปิดกราฟดู','var(--gold)')+'</div>'; } },
+ row: { ms:3200,
+  steps:['นี่คือหนึ่งแถวหุ้นในเว็บ (ตัวอย่างจริงวันนี้) ลองดูทีละจุด',
+         'วงแหวน = RS สีเขียวอมฟ้าคือ RS ≥ 70 (แรง) สีเทาคือต่ำกว่า',
+         '▲/▼ + % = ราคาวันนี้ขึ้นหรือลงเท่าไหร่ (สีเขียวขึ้น สีแดงลง)',
+         'จุดสีฟ้าหน้าชื่อ = มีข่าวใน 7 วัน แตะเพื่อดูสรุป',
+         'จุดสีเขียวท้ายชื่อ = เทรดสัญญารายตัว (SSF) ที่ TFEX ได้',
+         'ป้ายงบ = งบกำลังจะออกวันไหน ถ้าออกแล้วจะมีป้ายกำไร/รายได้ ▲ดีขึ้น ▼แย่ลง'],
+  html(){ const s=topStock()||{ticker:'SMT',rs:99,change:1.2,price:7.5}; const m=mkt();
+    let lgo=''; try{ lgo=lg(s.ticker,m,24); }catch(e){}
+    return '<div class="ht-row"><div class="ht-rowbox"><span class="rsr" data-k="1">'+s.rs+'</span><span class="news-ic" data-k="3" style="pointer-events:none"><i></i></span><span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:17px">'+lgo+s.ticker+'<i class="dot-ssf" data-k="4"></i></span><span data-k="2" style="padding:2px 6px">'+(Number.isFinite(s.change)?((s.change>=0?'<b class="pos nw"><i class="ar">▲</i> ':'<b class="neg nw"><i class="ar">▼</i> ')+Math.abs(s.change).toFixed(1)+'%</b>'):'')+'</span><span class="ern soon" data-k="5">งบ พฤ. 5 พ.ย.</span></div></div>'; },
+  on(st,k){ st.querySelectorAll('[data-k]').forEach(e=>e.classList.toggle('hl',+e.dataset.k===k)); } },
+ gate: { ms:3600,
+  steps:['ไฟจราจรตลาดดูจาก "ดัชนี" (SET / S&P 500) เทียบกับเส้นค่าเฉลี่ย 50 และ 200 วัน',
+         'ดัชนียืนเหนือทั้งสองเส้น = ไฟเขียว ตลาดแข็งแรง ใช้ขนาดไม้ตามปกติ',
+         'หลุด SMA50 แต่ยังเหนือ SMA200 = ไฟเหลือง ควรลดขนาดไม้ (คะแนน Scanner ×0.7)',
+         'หลุดทั้งสองเส้น = ไฟแดง ระวัง/ลดโพซิชัน (คะแนน Scanner ×0.4)'],
+  html(){ return '<div class="ht-gate"><div class="ht-lamps"><i class="ht-lamp l-r"></i><i class="ht-lamp l-y"></i><i class="ht-lamp l-g"></i></div><svg viewBox="0 0 200 130" preserveAspectRatio="xMidYMid meet"><path class="sma s50" d="M10 95 C60 88 120 76 190 58"/><path class="sma s200" d="M10 98 L190 86"/><text x="192" y="55" font-size="8" fill="currentColor" text-anchor="end" dy="-3">SMA50</text><text x="192" y="94" font-size="8" fill="currentColor" text-anchor="end" dy="9">SMA200</text><polyline class="pl p0" points="10,92 45,74 85,60 125,44 160,32 190,24"/><polyline class="pl p1" points="10,92 55,62 95,48 130,56 160,68 190,72"/><polyline class="pl p2" points="10,92 60,64 105,72 145,96 190,108"/></svg></div>'; } },
+ scan: { ms:3400,
+  steps:['Scanner คือ "ตะแกรงร่อน": ตั้งเงื่อนไขเองได้ เริ่มจากรายชื่อหุ้น RS สูง',
+         'เลื่อน RS ขั้นต่ำขึ้นเป็น 85 — หุ้นที่ RS ต่ำกว่าหลุดออกจากรายการทันที',
+         'เลื่อนเป็น 95 — เหลือเฉพาะตัวท็อป ยิ่งตึงรายชื่อยิ่งสั้น',
+         'ยังมีเงื่อนไขอื่นซ้อนอีก (ใกล้จุดสูง 52 สัปดาห์, ราคานิ่ง, ขาขึ้นครบ Trend Template) ตัวที่ผ่านทั้งหมดคือ "ควรเปิดกราฟดู"'],
+  html(){ let a=[]; try{ a=stockData.filter(s=>Number.isFinite(s.rs)&&s.rs>=70).sort((x,y)=>y.rs-x.rs); a=a.length>7?[0,1,2,3,4,5,6].map(i=>a[Math.floor(i*(a.length-1)/6)]):a; }catch(e){} if(a.length<4) a=[['SMT',99],['KCE',98],['TRT',98],['SSP',97],['TSE',92],['NAT',88],['PSL',80]].map(x=>({ticker:x[0],rs:x[1]}));
+    this._rows=a; return '<div class="ht-sc"><div class="ht-sl"><span>RS ≥</span><span class="trk"><i></i><b></b></span><span class="v">70</span></div><div class="ht-sr">'+a.map((s,i)=>'<div class="ht-sri" data-rs="'+s.rs+'" data-i="'+i+'"><span class="rsr">'+s.rs+'</span><span class="tk">'+s.ticker+'</span><span class="u">RS '+s.rs+'</span></div>').join('')+'</div></div>'; },
+  on(st,k){ const th=[70,85,95,85][k]; const sc=st.querySelector('.ht-sc'); sc.style.setProperty('--p',((th-50)/49*100).toFixed(0)+'%'); sc.querySelector('.v').textContent=th; st.querySelectorAll('.ht-sri').forEach(r=>{ r.classList.toggle('off', (+r.dataset.rs<th) || (k===3 && +r.dataset.i>=3)); }); } },
+ earn: { ms:3400,
+  steps:['ปฏิทินงบเตือนล่วงหน้า: สัปดาห์นี้และสัปดาห์หน้า เฉพาะหุ้นที่ RS ≥ 70',
+         'ถึงวันประกาศ ป้าย "งบ" ขึ้นที่วันนั้น (ข้อมูลจาก TradingView อาจคลาดเคลื่อน 1 วัน)',
+         'พอประกาศแล้ว เว็บแสดงกำไร/รายได้ — เขียว ▲ = ดีขึ้น · แดง ▼ = แย่ลง เทียบไตรมาสเดียวกันของปีก่อน (หรือไตรมาสก่อน เลือกได้)'],
+  html(){ const d=['จ.','อ.','พ.','พฤ.','ศ.']; return '<div class="ht-cal"><div class="ht-wk"><span class="h">สัปดาห์นี้</span>'+d.map((x,i)=>'<div class="ht-dy'+(i===3?' on':'')+'">'+x+(i===3?'<span class="ht-ev">งบ</span>':'')+'</div>').join('')+'</div><div class="ht-res"><div><b style="font-size:15px">ตัวอย่างหลังประกาศ</b></div><div><span class="ern">งบออกแล้ว พฤ.</span><span class="ern up">กำไร <i class="ar">▲</i> 24%</span><span class="ern dn">รายได้ <i class="ar">▼</i> 3%</span></div><div style="font-size:12.5px;color:var(--muted)">กำไรโตแต่รายได้ลด = ต้องดูต่อว่ากำไรมาจากอะไร</div></div></div>'; } }
+};
+
+function mount(box, key){
+  const def=SCENES[key]; const stageHTML=def.html();
+  box.innerHTML='<div class="ht-stage" data-step="0">'+stageHTML+'</div><div class="ht-cap"><span class="ht-capn">1</span><p class="ht-capt"></p></div><div class="ht-ctl"><button class="ht-b pp" aria-label="หยุด/เล่น">'+(RM?'▶':'⏸')+'</button><button class="ht-b rp" aria-label="เล่นซ้ำ">↻</button><span class="ht-dots"></span></div>';
+  const st=box.querySelector('.ht-stage'), cap=box.querySelector('.ht-capt'), capn=box.querySelector('.ht-capn'), dots=box.querySelector('.ht-dots'), pp=box.querySelector('.pp');
+  const n=def.steps.length; let i=0, timer=null, playing=!RM, vis=false;
+  dots.innerHTML=def.steps.map((_,k)=>'<button aria-label="ขั้นที่ '+(k+1)+'"></button>').join('');
+  if(def.init) def.init.call(def, st);
+  function show(k){ i=k; st.dataset.step=k; cap.textContent=def.steps[k]; capn.textContent=k+1; [...dots.children].forEach((d,j)=>d.classList.toggle('on',j===k)); if(def.on) def.on.call(def, st, k); }
+  function stop(){ if(timer){ clearInterval(timer); timer=null; } }
+  function run(){ stop(); if(playing && vis) timer=setInterval(()=>show((i+1)%n), def.ms||3400); }
+  dots.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; playing=false; pp.textContent='▶'; stop(); show([...dots.children].indexOf(b)); });
+  pp.onclick=()=>{ playing=!playing; pp.textContent=playing?'⏸':'▶'; run(); };
+  box.querySelector('.rp').onclick=()=>{ playing=true; pp.textContent='⏸'; show(0); run(); };
+  show(0);
+  if('IntersectionObserver' in window){ new IntersectionObserver(es=>{ es.forEach(e=>{ vis=e.isIntersecting; run(); }); },{threshold:.35}).observe(box); } else { vis=true; run(); }
+}
+
+function sec(o){
+  return '<section class="ht-sec'+(o.flip?' flip':'')+(o.scene?'':' solo')+'" id="'+o.id+'"><div class="ht-txt"><span class="ht-no">'+o.no+'</span><h2>'+o.h+'</h2>'+o.body+(o.tip?'<div class="ht-tip"><i>จำง่าย ๆ</i>'+o.tip+'</div>':'')+'</div>'+(o.scene?'<div class="ht-scene" data-scene="'+o.scene+'"></div>':'')+'</section>';
+}
+
+function page(){
+  const gate=(()=>{ try{ return scGateInfo().label; }catch(e){ return ''; } })();
+  const S=[
+   sec({id:'ht-rs',no:'01 · เริ่มจากศูนย์',h:'RS คืออะไร? — "อันดับในห้องเรียนหุ้น"',scene:'rs',body:
+    '<p>สมมติตลาดหุ้นคือห้องเรียนที่มีนักเรียน <b>875 คน</b> (หุ้น 875 ตัว) เราไม่ได้ถามว่าใครสอบได้กี่คะแนน แต่ถามว่า <b>"ใครอยู่อันดับที่เท่าไหร่ของห้อง"</b></p><p>นั่นคือ '+g('RS','RS')+' (Relative Strength หรือ "ความแรงเชิงเปรียบเทียบ") ให้อันดับ <b>1 ถึง 99</b> ตามความแรงของราคา หุ้นที่ได้ RS 90 หมายถึงราคาแรงกว่าหุ้นราว 90% ของตลาด</p>',
+    tip:'RS สูง = ราคาวิ่งแรงกว่าคนอื่นในช่วงที่ผ่านมา · RS ไม่ใช่ "% ที่ขึ้น" และไม่ใช่ราคาถูก/แพง'}),
+   sec({id:'ht-score',no:'02 · คะแนนมาจากไหน',h:'สูตรของเว็บเรา: ผลตอบแทน 4 ช่วง ถ่วงน้ำหนัก',scene:'formula',flip:true,body:
+    '<p>เว็บนี้ให้คะแนนจากผลตอบแทนราคา 4 ช่วง: <b>1 เดือน 30% · 3 เดือน 30% · 6 เดือน 20% · 1 ปี 20%</b> เน้นช่วงล่าสุดมากกว่า เพราะอยากเห็นหุ้นที่ "กำลังแรงอยู่ตอนนี้" ไม่ใช่แค่เคยแรง</p><p>จากนั้นเอาคะแนนของหุ้นทุกตัวมาเรียง แล้วแปลงเป็นอันดับ 1–99 ที่เห็นในวงแหวน ตัวอย่างด้านขวาใช้หุ้นจริงที่ RS สูงสุดตอนนี้</p>',
+    tip:'RS ไม่ใช่ราคาปัจจุบัน แต่เป็น "อันดับ" ของคะแนนผลตอบแทนเมื่อเทียบกับหุ้นทุกตัว'}),
+   sec({id:'ht-origin',no:'03 · ที่มาของแนวคิด',h:'ใครคิด? RS มาจากไหน',body:
+    '<p>แนวคิดว่า "หุ้นที่แรงมักแรงต่อ" ('+g('โมเมนตัม','mom')+') ไม่ได้เพิ่งมี มีงานวิชาการและนักลงทุนต่อยอดกันมาหลายสิบปี:</p>'+
+    '<div class="ht-tl"><div class="ht-tc"><span class="yr">1967</span><h3>Robert Levy</h3><p>งานตีพิมพ์ใน Journal of Finance "Relative Strength as a Criterion for Investment Selection" เสนอเลือกหุ้นที่ราคาแรงกว่าตลาดเป็นหลักเกณฑ์ลงทุน</p></div>'+
+    '<div class="ht-tc"><span class="yr">1988</span><h3>William O\'Neil</h3><p>ผู้ก่อตั้ง Investor\'s Business Daily ในหนังสือ How to Make Money in Stocks (ระบบ CAN SLIM) ทำ "RS Rating" ให้อันดับ 1–99 เทียบทั้งตลาด และแนะนำหุ้นที่ RS สูง</p></div>'+
+    '<div class="ht-tc"><span class="yr">1993</span><h3>Jegadeesh &amp; Titman</h3><p>งานวิจัย "Returns to Buying Winners and Selling Losers" พบในข้อมูลหุ้นสหรัฐฯ ว่าหุ้นที่ชนะในรอบ 3–12 เดือน มักชนะต่ออีกระยะ เป็นหลักฐานทางวิชาการของโมเมนตัม</p></div>'+
+    '<div class="ht-tc"><span class="yr">2013 →</span><h3>Minervini · Qullamaggie</h3><p>Mark Minervini เอา RS ไปรวมกับ '+g('Trend Template','TT')+' (เช็กขาขึ้น 8 ข้อ) ส่วน Kristjan Kullamägi (Qullamaggie) เน้นหุ้นแรงที่ "พักตัวแคบ" ก่อนวิ่งต่อ — สองแนวนี้คือที่มาของหน้า Scanner</p></div></div>'+
+    '<p style="margin-top:12px"><b>ของเราต่างจากต้นฉบับ:</b> สูตร 30/30/20/20 เป็นสูตรง่าย ๆ ของเว็บนี้เอง ไม่ใช่สูตรของ IBD (ซึ่งถ่วงช่วงล่าสุดมากกว่าและใช้ 12 เดือน)</p>',
+    tip:'RS เป็นแนวคิดเก่าแก่ที่มีงานวิจัยรองรับในอดีต — แต่ไม่ได้การันตีอนาคต'}),
+   sec({id:'ht-limit',no:'ข้อควรรู้',h:'ซื่อตรงกันก่อน: RS ไม่ใช่สัญญาณซื้อ',body:
+    '<p>จากการ backtest ของเราเอง (ไทย 2015–26, สหรัฐฯ 2015–26) <b>ยังไม่พบ edge ที่พิสูจน์ได้</b> ว่าเกณฑ์ RS/Scanner ในเว็บนี้ทำกำไรเหนือการสุ่มอย่างมีนัย และงานวิชาการเองก็ระบุว่าโมเมนตัมมีช่วงที่ร่วงแรง (เช่นตลาดกลับตัวหลังวิกฤต)</p><p>เว็บนี้จึงเป็น <b>เครื่องมือคัดรายชื่อ</b> ว่าหุ้นตัวไหนควรเปิดกราฟดูต่อ ไม่ใช่เครื่องบอกให้ซื้อหรือขาย</p>',tip:'ใช้ประกอบการตัดสินใจเท่านั้น ไม่ใช่คำแนะนำการลงทุน'}).replace('class="ht-tip"','class="ht-tip ht-warn"'),
+   sec({id:'ht-funnel',no:'04 · ใครอยู่ในเว็บบ้าง',h:'จาก 875 ตัว เหลือไม่กี่ตัว ได้ยังไง',scene:'funnel',body:
+    '<p>ไม่ใช่ทุกตัวถูกจัดอันดับเข้ามาให้ดู เว็บตัดหุ้นที่ซื้อขายบางเบา ราคาต่ำมาก หรือเล็กเกินไป เพราะ RS ของหุ้นพวกนี้ผันผวนและซื้อขายจริงยาก ที่เหลือจึงเป็นหุ้นที่ <b>มีสภาพคล่องพอ</b></p><p>จากนั้นชั้นต่อไปคือ RS ≥ 70 และ Scanner ที่เข้มกว่า ทำให้รายชื่อสั้นลงเรื่อย ๆ</p>',tip:'ยิ่งลงล่างยิ่งเข้ม รายชื่อสั้นลง ตัวที่เหลือคือ "ที่ควรเปิดกราฟดู"'}),
+   sec({id:'ht-row',no:'05 · อ่านแถวหุ้น',h:'สัญลักษณ์ในแต่ละแถว',scene:'row',flip:true,body:
+    '<p>ทุกหน้าใช้สัญลักษณ์ชุดเดียวกัน จำครั้งเดียวใช้ได้ทั้งเว็บ: <b>วงแหวน</b> = RS · <b>▲▼</b> = ราคาวันนี้ · <b>จุดฟ้า</b> = มีข่าว · <b>จุดเขียว</b> = มี '+g('SSF','SSF')+' · <b>ป้ายงบ</b> = วันประกาศงบ</p><p>ป้ายงบเมื่อประกาศแล้วจะบอกกำไร/รายได้เทียบ '+g('YoY','YoY')+' (ไตรมาสเดียวกันปีก่อน) หรือ '+g('QoQ','QoQ')+' (ไตรมาสก่อน) เลือกได้ที่แผงปฏิทินงบ</p>',tip:'วงแหวนเขียว = แรง · วงแหวนเทา = RS ต่ำกว่า 70'}),
+   sec({id:'ht-gate',no:'06 · ดูสภาพตลาด',h:'ไฟจราจรของตลาด (Market Gate)',scene:'gate',body:
+    '<p>หุ้นแรงแค่ไหนก็ลำบากถ้าตลาดรวมอ่อน เว็บจึงมีไฟจราจรดูจากดัชนีเทียบ '+g('SMA','SMA')+' 50 และ 200 วัน คู่กับ '+g('Breadth','Breadth')+' (กี่ % ของหุ้นทั้งตลาดยืนเหนือเส้นเดียวกัน)</p>'+(gate?'<p>วันนี้ตลาด: <b>'+gate+'</b></p>':'')+'<p>ไฟเหลือง/แดงไม่ได้แปลว่าห้ามเทรด แต่เตือนให้ระวังขนาดไม้ — Scanner จึงลดคะแนนอัตโนมัติ</p>',tip:'เขียว = ตลาดช่วย · เหลือง = ระวัง · แดง = ลดความเสี่ยง'}),
+   sec({id:'ht-scan',no:'07 · Scanner',h:'ตะแกรงร่อนหุ้น: ตั้งเงื่อนไขเอง',scene:'scan',flip:true,body:
+    '<p>หน้า Scanner หาหุ้นแกร่งที่ <b>"พักตัวแคบ"</b> คือราคาแรงแต่นิ่งลง ก่อนจะมีโอกาสวิ่งต่อ ใช้เงื่อนไข: RS ขั้นต่ำ · ห่างจุดสูงไม่เกิน X% · '+g('ATR','ATR')+' ต่ำ (ราคานิ่ง) · ผลตอบแทน 3 เดือน · ผ่าน '+g('Trend Template','TT')+' ครบ 8 ข้อ</p><p>ลองเลื่อนแถบในหน้าจริงแล้วดูรายชื่อสั้น/ยาวตามเงื่อนไข</p>',tip:'เงื่อนไขตึง = รายชื่อสั้น แต่ไม่ได้แปลว่าดีกว่าเสมอ'}),
+   sec({id:'ht-earn',no:'08 · ปฏิทินงบ',h:'เตือนวันประกาศงบ และดูว่าดีหรือแย่',scene:'earn',body:
+    '<p>งบการเงินคือวันที่ราคาอาจขยับแรง เว็บจึงเตือนล่วงหน้าเฉพาะหุ้นแกร่ง (RS ≥ 70) ที่งบจะออกภายในสัปดาห์นี้และสัปดาห์หน้า และบอกวันประกาศ</p><p>ข้อมูลมาจาก TradingView อาจ <b>ช้าหรือคลาดเคลื่อนประมาณ 1 วัน</b> ควรเช็กวันจริงกับประกาศของบริษัท/ตลท. ก่อนตัดสินใจ</p>',tip:'ป้ายขอบเขียว = ดีขึ้น · ป้ายขอบแดง = แย่ลง (เทียบปีก่อนหรือไตรมาสก่อน)'}),
+   sec({id:'ht-use',no:'09 · ใช้งานจริง',h:'4 ขั้นตอนแนะนำ',body:
+    '<div class="ht-steps"><div class="ht-st"><span class="n">ขั้น 1</span><b>ดูภาพรวม</b><p>เปิดหน้า "ภาพรวม" ดูไฟตลาด Breadth และ Top RS ว่าตลาดแข็งหรืออ่อน</p></div><div class="ht-st"><span class="n">ขั้น 2</span><b>คัดรายชื่อ</b><p>หน้า "หุ้น" (จัดอันดับ RS), "Top20" (ผลตอบแทนสูงสุด) หรือ "ผู้นำรายเดือน" เพื่อดูหุ้นแรง</p></div><div class="ht-st"><span class="n">ขั้น 3</span><b>กรองให้แคบ</b><p>ใช้ "Scanner" หาตัวที่แรงและพักตัวแคบ แล้วเช็กป้ายงบ/ข่าว</p></div><div class="ht-st"><span class="n">ขั้น 4</span><b>เปิดกราฟเอง</b><p>กดที่หุ้นเพื่อดูกราฟกับ SMA50/SMA200 หรือกดปุ่ม TV/.txt ส่งรายชื่อไป Watchlist ของ TradingView แล้วตัดสินใจเอง</p></div></div><p style="margin-top:14px">หน้า "Report" ใช้เทียบอันดับสองวัน (ใครเข้า ใครออก ใครขึ้นอันดับ) ส่วนข้อมูลทั้งหมดอัปเดตตอนเปิดเว็บ และราคาหุ้นอาจช้ากว่าตลาดจริงเล็กน้อย</p>',tip:'เว็บช่วย "คัด" · คุณเป็นคน "ตัดสินใจ"'})
+  ];
+  const toc=[['ht-rs','RS คืออะไร'],['ht-score','สูตรคะแนน'],['ht-origin','ที่มา'],['ht-funnel','875 → ไม่กี่ตัว'],['ht-row','อ่านแถวหุ้น'],['ht-gate','ไฟตลาด'],['ht-scan','Scanner'],['ht-earn','ปฏิทินงบ'],['ht-use','ใช้งานจริง']];
+  return '<div class="ht-hero"><p>สำหรับคนที่ไม่เคยรู้จัก RS มาก่อน — อธิบายแบบไม่ต้องมีพื้นฐาน มีแอนิเมชันประกอบ กดจุดด้านล่างของแต่ละภาพเพื่อข้ามขั้น และชี้/แตะคำที่ขีดเส้นประเพื่อดูความหมายศัพท์</p><div class="ht-toc">'+toc.map(t=>'<a href="#'+t[0]+'" onclick="document.getElementById(\''+t[0]+'\').scrollIntoView({behavior:\'smooth\',block:\'start\'});return false">'+t[1]+'</a>').join('')+'</div></div>'+S.join('');
+}
+
+window.renderHowto=function(){
+  const p=document.getElementById('howtoPanel'); if(!p) return;
+  p.innerHTML=page();
+  p.querySelectorAll('.ht-scene').forEach(b=>{ try{ mount(b,b.dataset.scene); }catch(e){ b.innerHTML='<div class="trs-empty">โหลดแอนิเมชันไม่สำเร็จ</div>'; } });
+};
+})();
 </script>
 </body>
 </html>

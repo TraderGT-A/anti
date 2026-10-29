@@ -33,7 +33,7 @@
   function badgeHtml(row, m, tk) {
     if (!row) return '';
     const a = esc(m), b = esc(tk);
-    return `<button class="tf-chip !py-0 !px-1.5 !min-h-0 text-[10px] ml-1" title="ข่าว 7 วัน · แตะเพื่อดูสรุปว่าทำไมติด Top20" onclick="event.stopPropagation();toggleNotes('${a}','${b}')">📰 ${Number(row.news_7d) || 0}</button>`;
+    return `<button class="news-ic" title="ข่าว ${Number(row.news_7d) || 0} รายการใน 7 วัน · แตะเพื่อดูสรุปว่าทำไมติด Top20" aria-label="ข่าว" onclick="event.stopPropagation();toggleNotes('${a}','${b}')"><i></i></button>`;
   }
 
   /* แผงใต้หุ้น — open=true วาดแบบเปิดพร้อมเนื้อหา (ตารางถูกวาดใหม่เป็นระยะ ต้องคงสถานะที่ผู้ใช้เปิดไว้) */
