@@ -39,7 +39,7 @@
 - Heatmap ทำเอง (treemap): ไทย = SET100, เมกา = S&P500 · ซูมล้อเมาส์/ปุ่ม, ลากเลื่อน, กดชื่อกลุ่มเพื่อขยาย
 - สลับธีมแล้วอยู่หน้าเดิม (sessionStorage `rsd_keepPage`)
 - ΔRANK: แก้ฐานเทียบแล้วที่ `api/scan.js` บล็อก `oldRank` (Hermes) — ตัวเลขจะถูกต้องเต็มที่หลัง snapshot ของ 29 ต.ค. กลายเป็น "เมื่อวาน"
-- **ยังไม่ได้ commit — รอ Hermes commit** (ไฟล์งานของ Claude ที่ค้าง: `rsdash/index.html`, `rsdash/notes.js`, `rsdash/api/heatmap.js` (ใหม่), `rsdash/HANDOFF.md` (ใหม่), `AGENTS.md`; ส่วน `api/scan.js` เป็นของ Hermes เอง) · เมื่อ commit แล้วให้ลบบรรทัดนี้และบันทึกในล็อก
+- **Commit หมดแล้ว (Hermes, 30 ต.ค.)** — ไม่มีไฟล์งานค้าง · push รอบอสสั่งเท่านั้น
 
 ## ยังไม่ได้ตรวจ / ค้าง
 - หน้า How to: ข้อเท็จจริงที่มาของ RS เขียนจากความจำ (Levy 1967, O'Neil 1988, Jegadeesh & Titman 1993, Minervini, Qullamaggie) — บอสหรือผู้รู้ควรตรวจปี/ชื่อ
@@ -48,6 +48,10 @@
 - เช้าทุกวัน: เช็กว่า cron 17:40 ไม่ได้ทับ UI (ใช้เช็กลิสต์ด้านบน)
 
 ## ล็อก (ใหม่อยู่บน)
+
+### 30 ต.ค. 2026 — Hermes
+- **Commit แล้ว** ตามข้อ 5.1: commit `2f79080` รวม `rsdash/index.html`, `rsdash/notes.js`, `rsdash/api/heatmap.js` (ใหม่), `rsdash/api/scan.js` (ΔRANK oldRank ของ Hermes), `rsdash/HANDOFF.md` (ใหม่), `AGENTS.md` — ข้อความ commit อ้างอิงล็อกทั้งสองฝั่ง · **ยังไม่ push (รอบอสสั่ง)**
+- การ commit ไม่มีการแก้โค้ดใด ๆ — ไฟล์ทั้งหมดคือสิ่งที่ Claude/Hermes เขียนไว้ในล็อกด้านล่าง และ deploy บนเว็บจริงยังเป็นชุดเดิมที่ผ่านเช็กลิสต์ 30 ต.ค. (hash ตรงต้นทาง, heatmap TH=100/US=503, scan TH=182 มี eN)
 
 ### 30 ต.ค. 2026 — Claude
 - บอสสั่งให้ **Hermes เป็นคน commit** → เพิ่มข้อ 5.1 และบรรทัด "รอ Hermes commit" ใน "สถานะปัจจุบัน" · Claude ไม่ได้ commit อะไร
