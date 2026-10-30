@@ -152,11 +152,14 @@ export default async function handler(req, res) {
     const { snapshot } = await loadPreviousSnapshot(market);
     const oldRank = {};
     if (snapshot && snapshot.payload) {
-      // snapshot เก่าที่ไม่มี rT: data ถูกเรียงตาม score อยู่แล้ว → ใช้ลำดับในลิสต์เป็นอันดับ
-      // (ของเดิมถอยไปใช้ s.rs ซึ่งเป็นคะแนนเปอร์เซ็นไทล์ 1-99 ไม่ใช่อันดับ → Rank Change เพี้ยน)
-      (snapshot.payload.data || []).forEach((s, i) => {
-        oldRank[s.ticker] = (s.rT != null) ? s.rT : i + 1;
-      });
+      // ⚠️ อ่าน "อันดับเมื่อวาน" ให้อยู่บนฐานเดียวกับ rT วันนี้ (clean เรียงตาม score) เสมอ
+      // บั๊กที่เจอ 29 ต.ค. 2026: snapshot บางวันถูกเขียนจากชุดใหญ่ (~250 แถว ปน DR/กองทุน
+      // จาก deploy ชุดอื่น) → ใช้ลำดับในลิสต์ตรง ๆ เป็นอันดับ = เทียบข้ามฐาน → ΔRank เว่อร์ +70/ชุด
+      // วิธีแก้: อันดับเมื่อวานต้อง "rank ใหม่บนชุดที่มีอยู่จริง" ด้วยเกณฑ์เดียวกับวันนี้ =
+      //   กรองตัวจริง (ตัด isDR/ไม่มี score) + เรียง score desc + เลขอันดับใหม่จาก 1
+      const prevRows = (snapshot.payload.data || []).filter(s => s && s.ticker && !s.isDR && Number.isFinite(Number(s.score)));
+      prevRows.sort((a, b) => Number(b.score) - Number(a.score));
+      prevRows.forEach((s, i) => { oldRank[s.ticker] = i + 1; });
     }
 
     clean.sort((a, b) => b.score - a.score);

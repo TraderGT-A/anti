@@ -341,8 +341,6 @@ html .tkrow > * { flex:none; } html .tkrow .lgo { margin-right:2px; vertical-ali
 html .tpod-tk { display:flex; flex-wrap:wrap; align-items:center; gap:2px 8px; white-space:nowrap; } html .tpod-tk .ern-wrap { font-size:13px; font-weight:400; } html .tpod-tk .lgo { margin-right:0; }
 html .tpod-nm { display:none; }
 /* จุดสถานะ: ข่าว = จุดฟ้าหน้าชื่อหุ้น · SSF = จุดเขียวหลังชื่อหุ้น · งบ = ข้อความเล็กไม่มีกรอบ */
-html .news-ic { display:inline-flex; align-items:center; justify-content:center; width:14px; height:18px; padding:0; border:0; background:transparent; cursor:pointer; flex:none; margin-right:2px; }
-html .news-ic i { width:7px; height:7px; border-radius:50%; background:#4f8cf0; display:block; } html .news-ic:hover i { box-shadow:0 0 0 3px color-mix(in srgb,#4f8cf0 25%,transparent); }
 /* หน้าหุ้น: แถบเครื่องมือเรียบ ๆ + แถบเลขหน้าแบบย่อ + ตัวเลขไม่ตกบรรทัด */
 html .sbar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
 html .sbar input, html .sbar select, html .sbar #sortDirBtn { height:36px; background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:0 14px; font-size:13px; color:var(--text); outline:none; }
@@ -372,7 +370,7 @@ html .ar { font-style:normal; font-size:.72em; margin-right:1px; vertical-align:
 html .dot-legend { display:flex; flex-wrap:wrap; gap:4px 16px; font-size:11px; color:var(--faint); margin:0 0 10px; }
 html .dot-legend span { display:inline-flex; align-items:center; gap:6px; }
 html .dot-legend i { display:inline-block; width:7px; height:7px; border-radius:50%; }
-html .dot-legend .lg-news { background:#4f8cf0; } html .dot-legend .lg-ssf { background:var(--up); } html .dot-legend .lg-ern { background:var(--gold); }
+html .dot-legend .lg-news { font-size:11px; line-height:1; } html .dot-legend .lg-ssf { background:var(--up); } html .dot-legend .lg-ern { background:var(--gold); }
 html .dot-ssf { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--up); flex:none; margin-left:3px; vertical-align:middle; }
 /* ป้ายงบทุกชนิด: ขอบบางโปร่งแสง + พื้นจางมาก (สีตามสถานะ) */
 html .ern { padding:2px 9px; margin:2px 6px 2px 0; font-size:11px; font-weight:500; border:1px solid color-mix(in srgb, var(--muted) 30%, transparent); background:color-mix(in srgb, var(--muted) 7%, transparent) !important; color:var(--muted); border-radius:999px; }
@@ -689,6 +687,25 @@ html .ht-steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(200p
 @media (prefers-reduced-motion:reduce){ html .ht-dot, html .ht-fr .bar i, html .ht-fb .tr i, html .ht-ring .fg, html .ht-sl .trk i, html .ht-sl .trk b, html .ht-ev, html .ht-res, html .ht-sri { transition:none !important; } }
 html #howtoBtn { display:none; }
 @media (max-width:1023px){ html #navHowto { display:none !important; } html #howtoBtn { display:inline-flex; width:40px; height:40px; align-items:center; justify-content:center; border-radius:999px; border:1px solid var(--line2, var(--line)); background:transparent; color:var(--text); font-weight:600; font-size:16px; cursor:pointer; } html #howtoBtn.active { background:var(--text); color:var(--bg); } }
+
+/* Heatmap (treemap ทำเอง) */
+.hm-bar{display:flex;align-items:center;gap:8px;margin:0 0 6px;flex-wrap:wrap}
+.hm-idx{font-weight:700;color:var(--text);margin-right:4px}
+.hm-zb{width:32px;padding:0;text-align:center}
+.hm-leg{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.hm-leg i{display:inline-block;width:22px;height:10px;border-radius:3px}
+.hm-note{font-size:11px;color:var(--faint);margin:0 0 10px}
+.hm-box{position:relative;overflow:hidden;border-radius:12px;background:#0d0f14;border:1px solid var(--line);user-select:none}
+.hm-box.zoomed{cursor:grab}
+.hm-in{position:absolute;left:0;top:0;width:100%;height:100%;transform-origin:0 0;will-change:transform}
+.hm-sec{position:absolute;box-sizing:border-box;border:1px solid rgba(255,255,255,.34);background:#161922;pointer-events:none}
+.hm-sh{position:absolute;box-sizing:border-box;padding:0 4px;font-size:9.5px;line-height:13px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;color:rgba(255,255,255,.82);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:zoom-in;z-index:2}
+.hm-sh:hover{color:#fff;background:rgba(255,255,255,.1)}
+.hm-t{position:absolute;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;cursor:pointer;overflow:hidden;line-height:1.15}
+.hm-t:hover{filter:brightness(1.25);z-index:3;outline:1px solid rgba(255,255,255,.7)}
+.hm-t .lgo{margin-bottom:2px;flex:none}
+.hm-t b{font-weight:600}.hm-t span{opacity:.9;font-variant-numeric:tabular-nums}
+.hm-msg{padding:40px;text-align:center;color:var(--muted)}
 </style>
 </head>
 <body class="py-3 sm:py-4 md:py-6">
@@ -727,6 +744,7 @@ html #howtoBtn { display:none; }
                     <button id="navTop20" class="tf-chip" onclick="setPage('top20')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg><span class="lbl">Top20 ผลตอบแทน</span><span class="lbl-s">Top20</span></button>
                     <button id="navScanner" class="tf-chip" onclick="setPage('scanner')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span class="lbl">Scanner</span><span class="lbl-s">Scanner</span></button>
                     <button id="navLeaders" class="tf-chip" onclick="setPage('leaders')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/></svg><span class="lbl">ผู้นำรายเดือน</span><span class="lbl-s">ผู้นำ</span></button>
+                    <button id="navHeatmap" class="tf-chip" onclick="setPage('heatmap')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="11" rx="1.5"/><rect x="3" y="13" width="7" height="8" rx="1.5"/><rect x="14" y="17" width="7" height="4" rx="1.5"/></svg><span class="lbl">Heatmap</span><span class="lbl-s">Heat</span></button>
                     <button id="navReport" class="tf-chip" onclick="setPage('report')"><svg class="nav-ico" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5"/></svg><span class="lbl">Report เทียบอันดับ</span><span class="lbl-s">Report</span></button>
                   </div></div></div><!-- /topbar -->
 
@@ -796,6 +814,21 @@ html #howtoBtn { display:none; }
                     <div class="dot-legend"><span><i class="lg-ssf"></i>มี SSF ที่ TFEX</span><span><i class="lg-ern"></i>งบกำลังจะออก</span></div>
                     <div id="ldCardGrid" class="ld-grid" style="display:none"></div>
                     <div id="ldTableWrap" class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-[10px] uppercase text-slate-500 border-b border-[#1e2634]"><tr><th class="p-2">#</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('ticker')" title="กดเพื่อเรียง">หุ้น</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('mtd')" title="กดเพื่อเรียง — ผลตอบแทนตั้งแต่ปิดเดือนก่อนถึงปิดล่าสุด">เดือนนี้</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('rs')" title="กดเพื่อเรียง — คะแนนความแข็งแกร่ง 1–99">RS</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('price')" title="กดเพื่อเรียง">ราคา</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('val')" title="กดเพื่อเรียง — มูลค่าซื้อขายต่อวัน">มูลค่า/วัน</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p3m')" title="กดเพื่อเรียง">3M</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p6m')" title="กดเพื่อเรียง">6M</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p1y')" title="กดเพื่อเรียง">1Y</th><th class="p-2 text-slate-500" title="เส้นค่าเฉลี่ย 50 วัน vs 200 วัน — ขาขึ้นเมื่อ MA50 > MA200">MA50/200</th></tr></thead><tbody id="ldBody"></tbody></table></div>
+                  </div>
+
+                  <!-- 🔥 Heatmap: TradingView Stock Heatmap (วิดเจ็ตล้วน — เอาแค่วิดเจ็ต ไม่มีปุ่ม) -->
+                  <div id="heatmapPanel" style="display:none">
+                    <div class="hm-bar">
+                      <span class="hm-idx" id="hmIdx"></span>
+                      <button id="hmChg" class="tf-chip active" onclick="setHmMetric('change')">วันนี้</button>
+                      <button id="hmYtd" class="tf-chip" onclick="setHmMetric('ytd')">YTD</button>
+                      <button class="tf-chip hm-zb" onclick="hmZoomBtn(1.6)" aria-label="ซูมเข้า">+</button>
+                      <button class="tf-chip hm-zb" onclick="hmZoomBtn(1/1.6)" aria-label="ซูมออก">−</button>
+                      <button class="tf-chip" onclick="hmReset()">รีเซ็ต</button>
+                      <span class="hm-leg"><i style="background:#c0392b"></i>−3%<i style="background:#3b3f4a"></i>0<i style="background:#1e9e6a"></i>+3%</span>
+                    </div>
+                    <p class="hm-note">ขนาดบล็อก = มูลค่าตลาด · สี = % เปลี่ยนแปลง · เลื่อนล้อเมาส์/ปุ่ม + − เพื่อซูม ลากเพื่อเลื่อน กดชื่อกลุ่มเพื่อขยายกลุ่ม ดับเบิลคลิกเพื่อรีเซ็ต</p>
+                    <div id="hmBox" class="hm-box"></div>
                   </div>
 
                   <!-- 📅 Report: เทียบอันดับ Top-N ระหว่าง 2 วัน (ข้อมูลจาก /api/history) -->
@@ -1046,7 +1079,7 @@ html #howtoBtn { display:none; }
     </div>
   </div>
 
-  <div id="stkLegend" class="dot-legend"><span><i class="lg-news"></i>มีข่าวใน 7 วัน (กดดู)</span><span><i class="lg-ssf"></i>มี SSF ที่ TFEX</span><span><i class="lg-ern"></i>งบกำลังจะออก</span></div>
+  <div id="stkLegend" class="dot-legend"><span>📰 = มีข่าวใน 7 วัน (กดดู)</span><span><i class="lg-ssf"></i>มี SSF ที่ TFEX</span><span><i class="lg-ern"></i>งบกำลังจะออก</span></div>
   <div id="cardsView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-3"></div>
 
   <div id="tableView" class="hidden overflow-x-auto bg-[#0d1219] rounded-xl border border-[#1e2634]">
@@ -1322,7 +1355,7 @@ function thusRange(c,n,bars){ try{ c.timeScale().setVisibleLogicalRange({from:Ma
 /* หัวหน้า (eyebrow + ชื่อหน้า) ตามหน้า/ตลาดที่เปิดอยู่ */
 function thusHead(pg){
   const us=currentMarket==='america', mk=us?'US':'TH';
-  const H={ overview:['Market overview · '+mk,'ภาพรวมตลาด'], stocks:['RS ranking · '+mk,'จัดอันดับความแข็งแกร่ง'], top20:['Top 20 · '+mk,'ขึ้นแรงที่สุด'], scanner:['Scanner · '+mk,'หุ้นแกร่งที่กำลังพักตัวแคบ'], leaders:['Monthly leaders · '+mk,'ผู้นำรายเดือน'], report:['Report · '+mk,'ใครเข้า ใครออก ระหว่างสองวัน'], howto:['How to','เข้าใจ RS แล้วใช้เว็บนี้เป็น'] };
+  const H={ overview:['Market overview · '+mk,'ภาพรวมตลาด'], stocks:['RS ranking · '+mk,'จัดอันดับความแข็งแกร่ง'], top20:['Top 20 · '+mk,'ขึ้นแรงที่สุด'], scanner:['Scanner · '+mk,'หุ้นแกร่งที่กำลังพักตัวแคบ'], leaders:['Monthly leaders · '+mk,'ผู้นำรายเดือน'], report:['Report · '+mk,'ใครเข้า ใครออก ระหว่างสองวัน'], howto:['How to','เข้าใจ RS แล้วใช้เว็บนี้เป็น'], heatmap:['Heatmap · '+mk,'Heatmap'] };
   const h=H[pg]||H.overview; const a=document.getElementById('phEyebrow'), b=document.getElementById('phTitle');
   if(a) a.textContent=h[0]; if(b) b.textContent=h[1];
 }
@@ -1434,7 +1467,7 @@ function renderTopRs(){
   const cl=(v)=>Number.isFinite(v)?(v>=0?'pos':'neg'):'';
   tb.innerHTML=list.map(s=>`<tr><td class="c"><span class="trs-rs">${s.rs}</span></td><td><a href="#" class="trs-tk" onclick="openModalByTk('${String(s.ticker).replace(/'/g,"")}');return false;">${lg(s.ticker,currentMarket,20)}${s.ticker}</a></td><td class="r">${Number(s.price).toFixed(2)}</td><td class="r ${cl(s.change)}">${pc(s.change)}</td><td class="r ${cl(s.p3m)}">${pc(s.p3m)}</td><td class="trs-grp">${s.industry||s.sector||''}</td></tr>`).join('');
 }
-function toggleTheme(){ const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; try{ localStorage.setItem('rsd_theme',n); }catch(e){} location.reload(); }function fontZoom(delta){
+function toggleTheme(){ const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; try{ localStorage.setItem('rsd_theme',n); }catch(e){} try{ sessionStorage.setItem('rsd_keepPage',curPage); }catch(e){} location.reload(); }function fontZoom(delta){
   const base=parseFloat(localStorage.getItem('rsd_zoom')||'1');
   let z=delta===0?1:(delta>0?base+0.12:base-0.12);
   z=Math.max(0.8, Math.min(1.5, +z.toFixed(2)));
@@ -1475,6 +1508,10 @@ function setPage(pg){
   const ldp=document.getElementById('leadersPanel'); if(ldp) ldp.style.display = (pg==='leaders') ? '' : 'none';
   const nld=document.getElementById('navLeaders'); if(nld) nld.classList.toggle('active', pg==='leaders');
   if(pg==='leaders'){ renderLeaders(); }
+  /* Heatmap — TradingView Stock Heatmap (วิดเจ็ตล้วน ไม่แตะข้อมูล/เกณฑ์ RS) */
+  const hmp=document.getElementById('heatmapPanel'); if(hmp) hmp.style.display = (pg==='heatmap') ? '' : 'none';
+  const nhm=document.getElementById('navHeatmap'); if(nhm) nhm.classList.toggle('active', pg==='heatmap');
+  if(pg==='heatmap'){ renderHeatmap(); }
   const no=document.getElementById('navOverview'), ns=document.getElementById('navStocks'), nt=document.getElementById('navTop20'), nr=document.getElementById('navReport');
   if(no) no.classList.toggle('active', pg==='overview');
   if(ns) ns.classList.toggle('active', pg==='stocks');
@@ -1491,6 +1528,124 @@ function setPage(pg){
   if(pg==='report'){ loadReportInit(); }
 }
 // ===== Scanner: Trend Template + พักตัวแคบ + Market Gate (คำนวณใน trendlib.js) =====
+/* ===== Heatmap (TradingView Stock Heatmap — วิดเจ็ตล้วน) ===== */
+let hmMetric = 'change', hmT = {k:1,x:0,y:0}, hmSecR = {}, hmMoved = false, hmRt;
+const hmCache = {};
+function hmSetMetricBtn(){ const a=document.getElementById('hmChg'), b=document.getElementById('hmYtd'); if(a) a.classList.toggle('active', hmMetric==='change'); if(b) b.classList.toggle('active', hmMetric==='ytd'); }
+function setHmMetric(m){ hmMetric = m; hmSetMetricBtn(); hmDraw(); }
+function hmCol(v){
+  if(v==null || isNaN(v)) return '#3b3f4a';
+  const t = Math.max(-1, Math.min(1, v/(hmMetric==='ytd' ? 30 : 3)));
+  const to = t<0 ? [192,57,43] : [30,158,106], from=[59,63,74], k=Math.abs(t);
+  return 'rgb('+from.map((c,i)=>Math.round(c+(to[i]-c)*k)).join(',')+')';
+}
+/* treemap แบบ squarified: items=[{v,..}] เรียงมาก→น้อย → คืนสี่เหลี่ยม {it,x,y,w,h} */
+function hmSq(items,x,y,w,h){
+  const out=[], tot=items.reduce((s,i)=>s+i.v,0);
+  if(!tot || w<=0 || h<=0) return out;
+  const sc=(w*h)/tot; let rest=items.map(i=>({it:i,a:i.v*sc}));
+  const worst=(r,s,side)=>{ const mx=r[0].a, mn=r[r.length-1].a; return Math.max(side*side*mx/(s*s), s*s/(side*side*mn)); };
+  while(rest.length){
+    const side=Math.min(w,h); let row=[rest[0]], sum=rest[0].a, i=1;
+    while(i<rest.length){ const n=row.concat(rest[i]), s2=sum+rest[i].a; if(worst(n,s2,side)<=worst(row,sum,side)){ row=n; sum=s2; i++; } else break; }
+    rest=rest.slice(row.length);
+    const th=sum/side;
+    if(w>=h){ let yy=y; row.forEach(z=>{ const hh=z.a/th; out.push({it:z.it,x:x,y:yy,w:th,h:hh}); yy+=hh; }); x+=th; w-=th; }
+    else    { let xx=x; row.forEach(z=>{ const ww=z.a/th; out.push({it:z.it,x:xx,y:y,w:ww,h:th}); xx+=ww; }); y+=th; h-=th; }
+  }
+  return out;
+}
+/* ซูม/แพน: ใช้ transform บนเลเยอร์ #hmIn แล้ววาดป้ายใหม่ตามขนาดจริงหลังหยุดซูม */
+function hmApply(smooth){
+  const i=document.getElementById('hmIn'), b=document.getElementById('hmBox'); if(!i||!b) return;
+  i.style.transition = smooth ? 'transform .25s ease' : 'none';
+  i.style.transform = 'translate('+hmT.x+'px,'+hmT.y+'px) scale('+hmT.k+')';
+  b.style.touchAction = hmT.k>1 ? 'none' : 'auto';
+  b.classList.toggle('zoomed', hmT.k>1);
+  clearTimeout(hmRt); hmRt=setTimeout(hmDraw, smooth?280:140);
+}
+function hmClamp(){
+  const b=document.getElementById('hmBox'), W=b.clientWidth, H=b.clientHeight;
+  hmT.k=Math.max(1,Math.min(14,hmT.k));
+  hmT.x=Math.min(0,Math.max(W-W*hmT.k,hmT.x)); hmT.y=Math.min(0,Math.max(H-H*hmT.k,hmT.y));
+}
+function hmZoomAt(mx,my,nk,smooth){
+  nk=Math.max(1,Math.min(14,nk)); const r=nk/hmT.k;
+  hmT.x=mx-(mx-hmT.x)*r; hmT.y=my-(my-hmT.y)*r; hmT.k=nk; hmClamp(); hmApply(smooth);
+}
+function hmZoomBtn(f){ const b=document.getElementById('hmBox'); hmZoomAt(b.clientWidth/2,b.clientHeight/2,hmT.k*f,true); }
+function hmReset(){ hmT={k:1,x:0,y:0}; hmApply(true); }
+function hmZoomSec(si){
+  const r=hmSecR[si], b=document.getElementById('hmBox'); if(!r||!b) return;
+  const W=b.clientWidth, H=b.clientHeight, k=Math.max(1,Math.min(14,Math.min(W/r.w,H/r.h)*0.97));
+  hmT.k=k; hmT.x=W/2-(r.x+r.w/2)*k; hmT.y=H/2-(r.y+r.h/2)*k; hmClamp(); hmApply(true);
+}
+function hmDraw(){
+  const inn=document.getElementById('hmIn'), box=document.getElementById('hmBox'); if(!inn||!box) return;
+  const d=hmCache[currentMarket]; if(!d || !d.data) return;
+  const W=box.clientWidth, H=box.clientHeight; if(W<50||H<50) return;
+  const K=hmT.k, val=s=>hmMetric==='ytd' ? s.ytd : s.change;
+  const g={}; d.data.forEach(s=>{ (g[s.sector]=g[s.sector]||{name:s.sector,v:0,list:[]}); g[s.sector].v+=s.mcap; g[s.sector].list.push({v:s.mcap,s:s}); });
+  const secs=Object.values(g).sort((a,b)=>b.v-a.v);
+  let html=''; hmSecR={};
+  hmSq(secs,0,0,W,H).forEach((sr,si)=>{
+    const sec=sr.it, x=sr.x, y=sr.y, w=sr.w, h=sr.h;
+    hmSecR[si]={x:x,y:y,w:w,h:h};
+    const hd = (h>22 && w>34) ? 13 : 0;
+    html+='<div class="hm-sec" style="left:'+x+'px;top:'+y+'px;width:'+w+'px;height:'+h+'px"></div>';
+    if(hd) html+='<div class="hm-sh" data-si="'+si+'" title="ขยายกลุ่ม '+sec.name+'" style="left:'+(x+1)+'px;top:'+(y+1)+'px;width:'+(w-2)+'px;height:'+hd+'px">'+sec.name+'</div>';
+    hmSq(sec.list.sort((a,b)=>b.v-a.v), x+2, y+hd+2, w-4, h-hd-4).forEach(r=>{
+      const s=r.it.s, v=val(s), tw=r.w, th=r.h, ew=tw*K, eh=th*K;
+      let inner='';
+      if(ew>=26 && eh>=16){
+        const fe=Math.max(9, Math.min(22, ew/(s.ticker.length*0.75), eh/2.4));
+        const lp=Math.min(28, ew*0.3, eh-fe*2.5);
+        if(lp>=13 && eh>=fe*2.3 && ew>=40) inner+=lg(s.ticker, currentMarket, Math.round(lp/K*10)/10);
+        inner+='<b style="font-size:'+(fe/K).toFixed(2)+'px">'+s.ticker+'</b>';
+        if(eh>=fe*2.3 && ew>=40) inner+='<span style="font-size:'+(Math.max(9,fe*0.62)/K).toFixed(2)+'px">'+(v==null?'–':(v>0?'+':'')+v.toFixed(2)+'%')+'</span>';
+      }
+      html+='<div class="hm-t" data-tk="'+s.ticker+'" style="left:'+r.x+'px;top:'+r.y+'px;width:'+(tw-1)+'px;height:'+(th-1)+'px;background:'+hmCol(v)+'" title="'+(s.name||s.ticker).replace(/"/g,'')+' · '+s.ticker+' · '+(v==null?'–':v.toFixed(2)+'%')+'">'+inner+'</div>';
+    });
+  });
+  inn.innerHTML=html;
+}
+async function renderHeatmap(force){
+  const box=document.getElementById('hmBox'); if(!box) return;
+  const mk=currentMarket, id=document.getElementById('hmIdx');
+  if(id) id.textContent = mk==='america' ? 'S&P 500' : 'SET100';
+  hmMetric='change'; hmSetMetricBtn(); hmT={k:1,x:0,y:0};
+  box.style.height = Math.max(520, window.innerHeight-270)+'px';
+  box.innerHTML='<div id="hmIn" class="hm-in"></div>'; hmApply(false);
+  if(!box.dataset.bound){
+    box.dataset.bound='1';
+    box.addEventListener('click',e=>{
+      if(hmMoved) return;
+      const sh=e.target.closest('.hm-sh'); if(sh){ hmZoomSec(sh.dataset.si); return; }
+      const t=e.target.closest('.hm-t'); if(t) openModal(t.dataset.tk,'',currentMarket);
+    });
+    box.addEventListener('dblclick',e=>{ if(!e.target.closest('.hm-t')&&!e.target.closest('.hm-sh')) hmReset(); });
+    box.addEventListener('wheel',e=>{
+      e.preventDefault(); const r=box.getBoundingClientRect();
+      hmZoomAt(e.clientX-r.left, e.clientY-r.top, hmT.k*(e.deltaY<0?1.2:1/1.2), false);
+    },{passive:false});
+    let drag=null;
+    box.addEventListener('pointerdown',e=>{ hmMoved=false; if(hmT.k>1) drag={x:e.clientX,y:e.clientY,ox:hmT.x,oy:hmT.y}; });
+    window.addEventListener('pointermove',e=>{
+      if(!drag) return; const dx=e.clientX-drag.x, dy=e.clientY-drag.y;
+      if(Math.abs(dx)+Math.abs(dy)>4) hmMoved=true;
+      if(hmMoved){ hmT.x=drag.ox+dx; hmT.y=drag.oy+dy; hmClamp(); hmApply(false); }
+    });
+    window.addEventListener('pointerup',()=>{ drag=null; setTimeout(()=>{ hmMoved=false; },0); });
+    let rt; window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(()=>{ if(curPage==='heatmap'){ box.style.height=Math.max(520,window.innerHeight-270)+'px'; hmClamp(); hmApply(false); } },150); });
+  }
+  const inn=document.getElementById('hmIn');
+  if(!hmCache[mk]){
+    inn.innerHTML='<div class="hm-msg">กำลังโหลด…</div>';
+    try{ const r=await fetch('/api/heatmap?market='+mk); if(!r.ok) throw 0; hmCache[mk]=await r.json(); }
+    catch(e){ inn.innerHTML='<div class="hm-msg">โหลด heatmap ไม่สำเร็จ ลองรีเฟรชอีกครั้ง</div>'; return; }
+  }
+  if(mk===currentMarket) hmDraw();
+}
 const SC_VAL = {
   thailand:[[0,'ทั้งหมด'],[5e6,'5 ล้านบาท'],[20e6,'20 ล้านบาท'],[50e6,'50 ล้านบาท'],[100e6,'100 ล้านบาท']],
   america:[[0,'ทั้งหมด'],[5e6,'$5M'],[20e6,'$20M'],[50e6,'$50M'],[100e6,'$100M']]
@@ -2018,7 +2173,7 @@ function topRSHTML(s, forCard){   // ค่า RS ตัวเดียวใช
   if(forCard) return '<span class="text-base font-extrabold '+rsColor(Number(s.rs))+'">'+rs+'</span>';
   return '<span class="rsr'+(Number(s.rs)<70?' lo':'')+'">'+rs+'</span>';
 }
-const DOT_LEGEND = '<div class="dot-legend"><span><i class="lg-news"></i>มีข่าวใน 7 วัน (กดดู)</span><span><i class="lg-ssf"></i>มี SSF ที่ TFEX</span><span><i class="lg-ern"></i>งบกำลังจะออก</span></div>';
+const DOT_LEGEND = '<div class="dot-legend"><span>📰 = มีข่าวใน 7 วัน (กดดู)</span><span><i class="lg-ssf"></i>มี SSF ที่ TFEX</span><span><i class="lg-ern"></i>งบกำลังจะออก</span></div>';
 function topTableHTML(rows, m){
   const head=(k,l)=>(`<th class="p-1 text-right cursor-pointer hover:text-white text-[10px]" onclick="sortTop20('${k}')">${l}${topSortKey===k?(topSortDir>0?' ▼':' ▲'):''}</th>`);
   const body=rows.map((s,i)=>{
@@ -2172,6 +2327,8 @@ function applyMarketIdentity(mk){
   const chip=document.getElementById('mkChip');
   if(chip){ chip.textContent = mk==='america' ? 'US' : 'TH'; chip.title = mk==='america' ? 'ตลาดสหรัฐฯ · NYSE + NASDAQ + AMEX · USD' : 'ตลาดไทย · SET + mai · บาท'; }
   document.title = mk==='america' ? 'RS Dashboard — US' : 'RS Dashboard — TH';
+  // Heatmap ผูกตลาด — สลับตลาดแล้วรีสร้างวิดเจ็ต (ถ้ากำลังอยู่หน้า heatmap)
+  if(curPage==='heatmap'){ try{ renderHeatmap(true); }catch(e){} }
 }
 function clearMarketData(){
   stockData=[]; moneyFlowData=null; themesData=null; summaryData=null; indexList=[];
@@ -3518,6 +3675,7 @@ document.addEventListener('DOMContentLoaded',()=>{ try{
   loadDrUs();   // โหลดข้อมูล DR ไทยที่อ้างอิงหุ้นเมกา (แสดงเฉพาะหน้าหุ้นเมกา)
   if(_mk!==currentMarket) switchMarket(_mk);   // ซิงค์หน้าต่างๆ + สแกนตลาดนั้นให้พร้อม
   if(location.hash==='#howto') _pg='howto';   // ลิงก์ตรงไปคู่มือ
+  try{ const kp=sessionStorage.getItem('rsd_keepPage'); if(kp){ sessionStorage.removeItem('rsd_keepPage'); if(['overview','stocks','top20','scanner','leaders','report','howto','heatmap'].includes(kp)) _pg=kp; } }catch(e){}   // สลับธีม (รีโหลด) → อยู่หน้าเดิม
   setPage(_pg);   // กลับไปหน้าที่เข้าล่าสุด
   runUpdate(true);   // ทุกครั้งเข้าเว็บ: บังคับ Update ข้อมูลสดเสมอ (ข้าม cache)
   toggleAutoRefresh(); // เริ่มต้นเปิดอัปเดตสดอัตโนมัติต่อเนื่อง
@@ -3596,7 +3754,7 @@ const SCENES = {
          'ป้ายงบ = งบกำลังจะออกวันไหน ถ้าออกแล้วจะมีป้ายกำไร/รายได้ ▲ดีขึ้น ▼แย่ลง'],
   html(){ const s=topStock()||{ticker:'SMT',rs:99,change:1.2,price:7.5}; const m=mkt();
     let lgo=''; try{ lgo=lg(s.ticker,m,24); }catch(e){}
-    return '<div class="ht-row"><div class="ht-rowbox"><span class="rsr" data-k="1">'+s.rs+'</span><span class="news-ic" data-k="3" style="pointer-events:none"><i></i></span><span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:17px">'+lgo+s.ticker+'<i class="dot-ssf" data-k="4"></i></span><span data-k="2" style="padding:2px 6px">'+(Number.isFinite(s.change)?((s.change>=0?'<b class="pos nw"><i class="ar">▲</i> ':'<b class="neg nw"><i class="ar">▼</i> ')+Math.abs(s.change).toFixed(1)+'%</b>'):'')+'</span><span class="ern soon" data-k="5">งบ พฤ. 5 พ.ย.</span></div></div>'; },
+    return '<div class="ht-row"><div class="ht-rowbox"><span class="rsr" data-k="1">'+s.rs+'</span><span class="tf-chip !py-0 !px-1.5 !min-h-0 text-[10px]" style="pointer-events:none" data-k="3">📰</span><span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:17px">'+lgo+s.ticker+'<i class="dot-ssf" data-k="4"></i></span><span data-k="2" style="padding:2px 6px">'+(Number.isFinite(s.change)?((s.change>=0?'<b class="pos nw"><i class="ar">▲</i> ':'<b class="neg nw"><i class="ar">▼</i> ')+Math.abs(s.change).toFixed(1)+'%</b>'):'')+'</span><span class="ern soon" data-k="5">งบ พฤ. 5 พ.ย.</span></div></div>'; },
   on(st,k){ st.querySelectorAll('[data-k]').forEach(e=>e.classList.toggle('hl',+e.dataset.k===k)); } },
  gate: { ms:3600,
   steps:['ไฟจราจรตลาดดูจาก "ดัชนี" (SET / S&P 500) เทียบกับเส้นค่าเฉลี่ย 50 และ 200 วัน',

@@ -1,0 +1,6 @@
+# กฎเหล็กประจำตัว (Agent Strict Rules)
+1. **CHECK BEFORE ACTING**: Before executing any command that requires authentication (like `wrangler deploy`, API calls, etc.), the agent MUST check the authentication status first (e.g., `wrangler whoami`). Do not assume it will succeed.
+2. **ASK BEFORE BACKGROUND TASKS**: If a task requires interactive input (like a browser login) or is likely to fail in the background without a TTY, the agent MUST inform the user and ask for permission or provide the command for the user to run directly. Do not blindly pop open command prompts without explaining why first.
+3. **REPORT FAILURES IMMEDIATELY**: If a background task fails, report it to the user immediately. Do not ignore it and proceed as if it succeeded.
+5. **READ AND UPDATE THE HANDOFF**: Before any work on `rsdash/`, read `rsdash/HANDOFF.md` (shared board with the other agent, Hermes). After every code change or deploy, add an entry at the top of its log and update "สถานะปัจจุบัน" if it changed. Follow its "ห้ามทำ" list.
+4. **CLEAN UP BACKGROUND TASKS**: The agent MUST explicitly monitor and kill any background tasks (such as stuck `curl` commands, hanging scripts, or long-running dev servers) when they are no longer needed or have completed their purpose. Do not leave zombie tasks running in the background.
