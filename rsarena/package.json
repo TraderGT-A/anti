@@ -1,0 +1,19 @@
+{
+  "name": "rs-arena",
+  "version": "1.0.0",
+  "description": "RS Arena — Paper Trading Battle (Boss vs System Bot)",
+  "type": "module",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs"
+  },
+  "keywords": [
+    "trading",
+    "paper-trading",
+    "rs-rating",
+    "relative-strength"
+  ],
+  "author": "Antigravity Pair",
+  "license": "MIT"
+}

@@ -39,10 +39,11 @@ test('notesHtml: ไม่มี summary → "ยังไม่มีสรุ�
   assert.match(h, /Nvidia beats/);
 });
 
-test('badgeHtml: ไม่มีแถว → ""; มีแถว → ปุ่ม 📰 จำนวนข่าว 7 วัน เรียก toggleNotes', () => {
+test('badgeHtml: ไม่มีแถว → ""; มีแถว → จุดข่าว (news-ic) บอกจำนวนข่าว 7 วันใน title เรียก toggleNotes', () => {
   assert.equal(N.badgeHtml(undefined, 'america', 'NVDA'), '');
   const b = N.badgeHtml(row, 'america', 'NVDA');
-  assert.match(b, /📰 6/);
+  assert.match(b, /class="news-ic"/);
+  assert.match(b, /ข่าว 6 รายการ/);
   assert.match(b, /toggleNotes\('america','NVDA'\)/);
   assert.match(b, /event\.stopPropagation\(\)/);
 });

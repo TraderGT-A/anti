@@ -48,3 +48,7 @@ rsdash/us_closes.json
 
 # สำเนา deploy เก่า — ย้าย flow deploy ไปใช้ update_a1a2.py + staging (29 ต.ค. 2569)
 rsdash/rsdash_clean_deploy/
+
+# rsdash node_modules (ws dependency)
+rsdash/node_modules/
+rsarena/node_modules/

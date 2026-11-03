@@ -1,5 +1,6 @@
 {
   "crons": [
     { "path": "/api/scan?universe=leaders&tick=1", "schedule": "30 10 * * 1-5" }
-  ]
+  ],
+  "functions": { "api/flow.js": { "maxDuration": 30 } }
 }

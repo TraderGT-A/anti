@@ -1,4 +1,4 @@
-/* notes.js — "ทำไมติด Top20": ปุ่ม 📰 + แผงสรุป/หัวข่าว จากตาราง stock_notes (เขียนโดย scripts/news)
+/* notes.js — "ทำไมติด Top20": จุดข่าวสีน้ำเงินข้างชื่อหุ้น + แผงสรุป/หัวข่าว จากตาราง stock_notes (เขียนโดย scripts/news)
    ข้อมูลทุกช่องมาจากภายนอก (หัวข่าว, สรุป) → escape ก่อนเสมอ; ลิงก์อนุญาตเฉพาะ http(s)
    ใช้ทั้งเว็บและเทสต์ → ตั้ง globalThis.Notes */
 (function (g) {
@@ -33,7 +33,7 @@
   function badgeHtml(row, m, tk) {
     if (!row) return '';
     const a = esc(m), b = esc(tk);
-    return `<button class="tf-chip !py-0 !px-1.5 !min-h-0 text-[10px] ml-1" title="ข่าว ${Number(row.news_7d) || 0} รายการใน 7 วัน · แตะเพื่อดูสรุปว่าทำไมติด Top20" onclick="event.stopPropagation();toggleNotes('${a}','${b}')">📰 ${Number(row.news_7d) || 0}</button>`;
+    return `<button class="news-ic" title="ข่าว ${Number(row.news_7d) || 0} รายการใน 7 วัน · แตะเพื่ออ่านสรุป" aria-label="ข่าว ${Number(row.news_7d) || 0} รายการ" onclick="event.stopPropagation();toggleNotes('${a}','${b}')"><i></i></button>`;
   }
 
   /* แผงใต้หุ้น — open=true วาดแบบเปิดพร้อมเนื้อหา (ตารางถูกวาดใหม่เป็นระยะ ต้องคงสถานะที่ผู้ใช้เปิดไว้) */

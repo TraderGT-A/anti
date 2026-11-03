@@ -1,0 +1,3419 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RS ARENA — พอร์ตประลอง (Boss vs System Bot)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lightweight Charts (TradingView) -->
+  <script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
+  <style>
+    :root {
+      --bg: #0a0e17;
+      --card: #111827;
+      --card-hover: #162032;
+      --border: #1f293d;
+      --border-light: #2d3b55;
+      --text: #f3f4f6;
+      --text-dim: #9ca3af;
+      --text-muted: #6b7280;
+      
+      --boss-gold: #f59e0b;
+      --boss-gold-dim: rgba(245, 158, 11, 0.12);
+      --boss-gold-border: rgba(245, 158, 11, 0.35);
+      
+      --bot-cyan: #06b6d4;
+      --bot-cyan-dim: rgba(6, 182, 212, 0.12);
+      --bot-cyan-border: rgba(6, 182, 212, 0.35);
+
+      --up: #10b981;
+      --up-bg: rgba(16, 185, 129, 0.12);
+      --dn: #f43f5e;
+      --dn-bg: rgba(244, 63, 94, 0.12);
+      --wait: #eab308;
+      --wait-bg: rgba(234, 179, 8, 0.12);
+
+      --radius: 12px;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-main: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+
+    header {
+      background: rgba(17, 24, 39, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand-logo {
+      font-size: 1.45rem;
+      background: linear-gradient(135deg, var(--boss-gold), var(--bot-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .brand-badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--boss-gold);
+      border: 1px solid var(--boss-gold-border);
+      font-weight: 500;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .mkt-toggle {
+      display: flex;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px;
+    }
+    .mkt-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      padding: 5px 12px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .mkt-btn.active {
+      background: #1e293b;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .btn:hover {
+      background: var(--card-hover);
+      border-color: var(--border-light);
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      color: #fff;
+      border: 1px solid #f59e0b;
+      font-weight: 600;
+    }
+    .btn-gold:hover {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    .wb-banner {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(37, 99, 235, 0.08));
+      border: 1px dashed rgba(6, 182, 212, 0.4);
+      border-radius: 12px;
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      font-size: 0.85rem;
+      gap: 1rem;
+    }
+
+    /* Hero Battle Arena */
+    .arena-hero {
+      background: radial-gradient(circle at 50% 0%, rgba(30, 41, 59, 0.7) 0%, rgba(17, 24, 39, 0.95) 75%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+    .arena-hero::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--boss-gold) 0%, #3b82f6 50%, var(--bot-cyan) 100%);
+    }
+
+    .battle-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .battle-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .battle-gate-chip {
+      font-size: 0.8rem;
+      padding: 5px 14px;
+      border-radius: 9999px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .battle-gate-chip.green {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .battle-gate-chip.yellow {
+      background: rgba(234, 179, 8, 0.15);
+      color: #eab308;
+      border: 1px solid rgba(234, 179, 8, 0.4);
+    }
+    .battle-gate-chip.red {
+      background: rgba(244, 63, 94, 0.15);
+      color: #f43f5e;
+      border: 1px solid rgba(244, 63, 94, 0.4);
+    }
+
+    .vs-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .port-box {
+      background: rgba(15, 23, 42, 0.65);
+      border-radius: 12px;
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+      position: relative;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .port-box.boss {
+      border-color: var(--boss-gold-border);
+      box-shadow: inset 0 0 20px rgba(245, 158, 11, 0.03);
+    }
+    .port-box.bot {
+      border-color: var(--bot-cyan-border);
+      box-shadow: inset 0 0 20px rgba(6, 182, 212, 0.03);
+    }
+
+    .port-tag {
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    .port-tag.boss { color: var(--boss-gold); }
+    .port-tag.bot { color: var(--bot-cyan); }
+
+    .port-equity {
+      font-size: 1.9rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      line-height: 1.1;
+      margin-bottom: 0.25rem;
+    }
+    .port-ret {
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 0.75rem;
+    }
+
+    .exposure-wrap {
+      margin-bottom: 0.75rem;
+      padding: 8px 10px;
+      background: rgba(0,0,0,0.25);
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .exposure-hdr {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      margin-bottom: 4px;
+    }
+    .exposure-bar-bg {
+      height: 6px;
+      background: #1e293b;
+      border-radius: 3px;
+      overflow: hidden;
+      display: flex;
+    }
+    .exposure-fill-boss {
+      background: var(--boss-gold);
+      height: 100%;
+      transition: width 0.3s;
+    }
+    .exposure-fill-bot {
+      background: var(--bot-cyan);
+      height: 100%;
+      transition: width 0.3s;
+    }
+
+    .port-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.75rem;
+    }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.68rem;
+    }
+    .stat-val {
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+
+    .vs-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 160px;
+    }
+    .vs-badge {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+      letter-spacing: 2px;
+    }
+    .lead-banner {
+      font-size: 0.78rem;
+      text-align: center;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      white-space: nowrap;
+    }
+    .lead-banner.boss-lead {
+      background: var(--boss-gold-dim);
+      color: var(--boss-gold);
+      border: 1px solid var(--boss-gold-border);
+    }
+    .lead-banner.bot-lead {
+      background: var(--bot-cyan-dim);
+      color: var(--bot-cyan);
+      border: 1px solid var(--bot-cyan-border);
+    }
+    .lead-banner.tie {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-dim);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .tug-bar-wrap {
+      width: 100%;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+    }
+    .tug-boss {
+      height: 100%;
+      background: var(--boss-gold);
+      transition: width 0.4s ease;
+    }
+    .tug-bot {
+      height: 100%;
+      background: var(--bot-cyan);
+      transition: width 0.4s ease;
+    }
+
+    /* Chart Section */
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .chart-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chart-legend {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.78rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .canvas-container {
+      position: relative;
+      height: 240px;
+      width: 100%;
+    }
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* Tabs Bar */
+    .tabs-bar {
+      display: flex;
+      gap: 0.4rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      padding: 0.65rem 1rem;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active {
+      color: #fff;
+      font-weight: 600;
+      border-bottom-color: var(--boss-gold);
+    }
+    .tab-btn .badge-count {
+      background: #1e293b;
+      padding: 1px 6px;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+    }
+
+    /* 7-Days Filter Toolbar */
+    .days-filter-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .day-pill {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .day-pill:hover { background: #1e293b; color: #fff; }
+    .day-pill.active {
+      background: #1e293b;
+      color: var(--boss-gold);
+      border-color: var(--boss-gold-border);
+      font-weight: 600;
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1rem;
+    }
+
+    .stock-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.1rem;
+      transition: transform 0.15s, border-color 0.15s;
+      position: relative;
+    }
+    .stock-card:hover {
+      border-color: var(--border-light);
+      transform: translateY(-2px);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.6rem;
+    }
+    .tk-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tk-symbol {
+      font-size: 1.15rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: #38bdf8;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .tk-symbol:hover {
+      color: #7dd3fc;
+    }
+
+    .tk-rs {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .tk-rs.high {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .card-price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.5rem;
+    }
+    .card-price {
+      font-size: 1.25rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+    .card-chg {
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+
+    .sig-date-badge {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--boss-gold);
+      border: 1px solid var(--boss-gold-border);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 0.6rem;
+    }
+
+    .card-meta {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      margin-bottom: 0.85rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .buy-btn-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .buy-action-btn {
+      flex: 1;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-family: inherit;
+      transition: filter 0.15s;
+    }
+    .buy-action-btn:hover {
+      filter: brightness(1.1);
+    }
+    .chart-view-btn {
+      background: #1e293b;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+    .chart-view-btn:hover {
+      background: #334155;
+      color: #fff;
+    }
+
+    /* Table styles for Holdings */
+    .table-container {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+    th {
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-family: var(--font-mono);
+    }
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .badge-signal {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .badge-buy { background: var(--up-bg); color: var(--up); }
+    .badge-sell { background: var(--dn-bg); color: var(--dn); }
+    .badge-wait { background: var(--wait-bg); color: var(--wait); }
+
+    .action-btn-sell {
+      background: rgba(244, 63, 94, 0.15);
+      color: var(--dn);
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: var(--font-main);
+      transition: all 0.15s;
+    }
+    .action-btn-sell:hover {
+      background: var(--dn);
+      color: #fff;
+    }
+    .btn-edit-sl {
+      background: rgba(56, 189, 248, 0.12);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 3px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.72rem;
+      font-weight: 500;
+      font-family: var(--font-main);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .btn-edit-sl:hover {
+      background: #38bdf8;
+      color: #0f172a;
+    }
+    .chip-btn.active {
+      background: rgba(245, 158, 11, 0.25) !important;
+      border-color: #f59e0b !important;
+      color: #fbbf24 !important;
+      font-weight: 600 !important;
+    }
+
+    /* Modal Form */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: #111827;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 520px;
+      padding: 1.5rem;
+      box-shadow: 0 20px 30px -5px rgba(0, 0, 0, 0.6);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .modal-title { font-size: 1.1rem; font-weight: 700; }
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 0.35rem;
+    }
+    .form-input {
+      width: 100%;
+      background: #0b0f19;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+    }
+    .quick-chips {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    .chip-btn {
+      background: #1e293b;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .chip-btn:hover { background: #334155; color: #fff; }
+
+    .radio-pill-group {
+      display: flex;
+      gap: 6px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+    }
+    .radio-pill {
+      flex: 1;
+      text-align: center;
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s;
+    }
+    .radio-pill.active {
+      background: #1e293b;
+      color: #fff;
+      font-weight: 600;
+      border: 1px solid var(--border-light);
+    }
+
+    /* Full Card Graph Modal (เหมือน RS Dashboard) */
+    .chart-modal-box {
+      background: #0f172a;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 960px;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 1.5rem;
+      box-shadow: 0 25px 40px -10px rgba(0, 0, 0, 0.8);
+      position: relative;
+    }
+    .chart-modal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .chart-modal-tkinfo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .chart-modal-sym {
+      font-size: 1.6rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #fff;
+    }
+    .chart-modal-rs {
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .chart-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+    }
+    .tf-chips {
+      display: flex;
+      gap: 4px;
+    }
+    .tf-btn {
+      background: #1e293b;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .tf-btn.active {
+      background: #38bdf8;
+      color: #000;
+      font-weight: 700;
+      border-color: #38bdf8;
+    }
+    .ma-legend {
+      display: flex;
+      gap: 10px;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+    .ma-leg-item { display: flex; align-items: center; gap: 4px; }
+    .ma-leg-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    #lwcContainer {
+      width: 100%;
+      height: 420px;
+      background: #0b0f19;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .matrix-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+    }
+    .matrix-card.overlap {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.03);
+    }
+    .matrix-card.boss-only {
+      border-color: var(--boss-gold-border);
+    }
+    .matrix-card.bot-only {
+      border-color: var(--bot-cyan-border);
+    }
+    .matrix-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    @media (max-width: 860px) {
+      .vs-grid { grid-template-columns: 1fr; gap: 1rem; }
+      .vs-center { order: -1; width: 100%; margin-bottom: 0.5rem; }
+      .port-equity { font-size: 1.5rem; }
+      .matrix-grid { grid-template-columns: 1fr; }
+      header { flex-wrap: wrap; }
+      #lwcContainer { height: 320px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">⚔️ RS ARENA</div>
+      <span class="brand-badge">Battleground</span>
+    </div>
+
+    <div class="nav-controls">
+      <div class="mkt-toggle">
+        <button class="mkt-btn active" id="btnTh" onclick="setMarket('th')">🇹🇭 หุ้นไทย (SET)</button>
+        <button class="mkt-btn" id="btnUs" onclick="setMarket('us')">🇺🇸 หุ้นสหรัฐฯ (US)</button>
+      </div>
+
+      <button class="btn" onclick="openManualBuyModal()">➕ เคาะหุ้นเอง</button>
+      <button class="btn btn-gold" onclick="openConfigModal()">⚙️ ตั้งค่าความเสี่ยง & เพดาน</button>
+      <button class="btn" onclick="openBackupModal()">💾 สำรองข้อมูล</button>
+      <button class="btn" onclick="resetBattle()">🔄 ล้างกระดาน</button>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Arena Scoreboard Hero -->
+    <section class="arena-hero">
+      <div class="battle-header">
+        <div class="battle-title">
+          <span>🏆 The Arena: 👑 พอร์ตบอส (เคาะมือ) VS 🤖 พอร์ตบอท (ตามกฎ 100%)</span>
+        </div>
+        <div class="battle-gate-chip green" id="marketGateBadge">
+          <span>⚡ กำลังโหลดข้อมูลไฟตลาด...</span>
+        </div>
+      </div>
+
+      <div class="vs-grid">
+        <!-- Boss Port Box -->
+        <div class="port-box boss">
+          <div class="port-tag boss">
+            <span>👑 พอร์ตบอส (DISCRETIONARY)</span>
+            <span id="bossActiveCount">0 หุ้น</span>
+          </div>
+          <div class="port-equity" id="bossEquity">฿1,000,000</div>
+          <div class="port-ret" id="bossReturn">
+            <span>+0.00%</span>
+            <small style="font-size:0.75rem;color:var(--text-muted);">(฿0)</small>
+          </div>
+
+          <!-- Boss Exposure Bar -->
+          <div class="exposure-wrap">
+            <div class="exposure-hdr">
+              <span>พอร์ตลงทุน (Exposure)</span>
+              <strong id="bossExposureText">0% / เพดาน 100%</strong>
+            </div>
+            <div class="exposure-bar-bg">
+              <div class="exposure-fill-boss" id="bossExposureBar" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="port-stats">
+            <div class="stat-item">
+              <span class="stat-label">เงินสดคงเหลือ</span>
+              <span class="stat-val" id="bossCash">฿1,000,000</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Win Rate</span>
+              <span class="stat-val" id="bossWinRate">0%</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">ปิดออเดอร์แล้ว</span>
+              <span class="stat-val" id="bossClosedCount">0 ไม้</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Tug of War -->
+        <div class="vs-center">
+          <div class="vs-badge">VS</div>
+          <div class="lead-banner tie" id="leadBanner">⚖️ เริ่มต้นสูสี เสมอกัน</div>
+          <div class="tug-bar-wrap">
+            <div class="tug-boss" id="tugBoss" style="width: 50%;"></div>
+            <div class="tug-bot" id="tugBot" style="width: 50%;"></div>
+          </div>
+        </div>
+
+        <!-- Bot Port Box -->
+        <div class="port-box bot">
+          <div class="port-tag bot">
+            <span>🤖 พอร์ตบอท (SYSTEMATIC BOT)</span>
+            <span id="botActiveCount">0 หุ้น</span>
+          </div>
+          <div class="port-equity" id="botEquity">฿1,000,000</div>
+          <div class="port-ret" id="botReturn">
+            <span>+0.00%</span>
+            <small style="font-size:0.75rem;color:var(--text-muted);">(฿0)</small>
+          </div>
+
+          <!-- Bot Exposure Bar -->
+          <div class="exposure-wrap">
+            <div class="exposure-hdr">
+              <span>พอร์ตลงทุน (Exposure)</span>
+              <strong id="botExposureText">0% / เพดาน 100%</strong>
+            </div>
+            <div class="exposure-bar-bg">
+              <div class="exposure-fill-bot" id="botExposureBar" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="port-stats">
+            <div class="stat-item">
+              <span class="stat-label">เงินสดคงเหลือ</span>
+              <span class="stat-val" id="botCash">฿1,000,000</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Win Rate</span>
+              <span class="stat-val" id="botWinRate">0%</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">ปิดออเดอร์แล้ว</span>
+              <span class="stat-val" id="botClosedCount">0 ไม้</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dual Equity Curve Chart -->
+    <section class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">
+          <span>📈 Dual Equity Curve (เปรียบเทียบมูลค่าพอร์ตสะสม)</span>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><span class="legend-dot" style="background:var(--boss-gold);"></span> 👑 บอส</div>
+          <div class="legend-item"><span class="legend-dot" style="background:var(--bot-cyan);"></span> 🤖 บอท</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#64748b;"></span> 🏛️ ดัชนีตลาด</div>
+        </div>
+      </div>
+      <div class="canvas-container">
+        <canvas id="equityChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-bar">
+      <button class="tab-btn active" id="tabFeed" onclick="setTab('feed')">
+        ⚡ สัญญาณ BUY ย้อนหลัง 7 วัน <span class="badge-count" id="feedCount">0</span>
+      </button>
+      <button class="tab-btn" id="tabBoss" onclick="setTab('boss')">
+        <span id="tabBossLabel">👑 พอร์ตจำลองบอส</span> <span class="badge-count" id="bossHoldCount">0</span>
+      </button>
+      <button class="tab-btn" id="tabBot" onclick="setTab('bot')">
+        <span id="tabBotLabel">🤖 พอร์ตจำลองบอท</span> <span class="badge-count" id="botHoldCount">0</span>
+      </button>
+      <button class="tab-btn" id="tabMatrix" onclick="setTab('matrix')">
+        ⚔️ สถิติประลอง & จุดทับซ้อน
+      </button>
+      <button class="tab-btn" id="tabHistory" onclick="setTab('history')">
+        📜 ประวัติการปิดออเดอร์
+      </button>
+    </div>
+
+    <!-- Tab 1: Signals Feed (BUY ย้อนหลัง 7 วัน) -->
+    <div id="viewFeed">
+      <div style="margin-bottom:0.75rem;color:var(--text-dim);font-size:0.85rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span>กดชื่อหุ้นเพื่อเปิดดูกราฟเทคนิค หรือเคาะซื้อเข้าพอร์ต:</span>
+          <input type="text" id="signalSearch" placeholder="🔍 ค้นหาชื่อหุ้น / หมวด..." oninput="filterSignals()" style="background:#0f172a;border:1px solid var(--border);color:#fff;padding:4px 8px;border-radius:6px;font-size:0.8rem;">
+        </div>
+        <span id="dataTimestamp" style="font-family:var(--font-mono);font-size:0.75rem;"></span>
+      </div>
+
+      <!-- 7-Days Date Filter Pills -->
+      <div class="days-filter-bar" id="daysFilterBar">
+        <button class="day-pill active" onclick="setDayFilter('all')">ทั้ง 7 วัน</button>
+      </div>
+
+      <div class="cards-grid" id="signalCardsGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">
+          กำลังดึงข้อมูลสัญญาณล่าสุดจาก RS Dashboard...
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Boss Holdings -->
+    <div id="viewBoss" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+        <span style="font-size:0.85rem;color:var(--text-dim);">หุ้นที่บอสเลือกเคาะเข้าพอร์ต (กดชื่อหุ้นเพื่อเปิดกราฟ):</span>
+        <button class="btn btn-gold" onclick="openManualBuyModal()">➕ ซื้อหุ้นเพิ่ม</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>หลักทรัพย์</th>
+              <th>วันที่ซื้อ</th>
+              <th>ราคาซื้อ</th>
+              <th>ราคาล่าสุด</th>
+              <th>จำนวนหุ้น</th>
+              <th>มูลค่าปัจจุบัน</th>
+              <th>กำไร/ขาดทุน</th>
+              <th>จุด Stop Loss</th>
+              <th>สถานะเตือน</th>
+              <th>คำสั่ง</th>
+            </tr>
+          </thead>
+          <tbody id="bossHoldingsBody">
+            <tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--text-muted);">ยังไม่มีหุ้นในพอร์ตบอส — เลือกช้อปได้จากแท็บ "สัญญาณ BUY ย้อนหลัง 7 วัน"</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 3: Bot Holdings -->
+    <div id="viewBot" style="display:none;">
+      <div style="margin-bottom:0.75rem;font-size:0.85rem;color:var(--text-dim);">
+        บอทจำลองรันตามกฎเชิงปริมาณ 100% (Market Gate คุมเพดาน + คัด RS สูงสุด + Stop Loss -8% + ขายเมื่อเกิด ▼ SELL):
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>หลักทรัพย์</th>
+              <th>วันที่ซื้อ</th>
+              <th>ราคาซื้อ</th>
+              <th>ราคาล่าสุด</th>
+              <th>จำนวนหุ้น</th>
+              <th>มูลค่าปัจจุบัน</th>
+              <th>กำไร/ขาดทุน</th>
+              <th>จุด Stop Loss</th>
+              <th>เกณฑ์การถือครอง</th>
+            </tr>
+          </thead>
+          <tbody id="botHoldingsBody">
+            <tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--text-muted);">บอทกำลังคำนวณและถือครองตามสัญญาณ RS อัตโนมัติ</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 4: Head-to-Head & Overlap Matrix -->
+    <div id="viewMatrix" style="display:none;">
+      <div class="chart-card" style="margin-bottom:1.5rem;">
+        <div class="chart-title" style="margin-bottom:1rem;">
+          <span>⚔️ Head-to-Head Battle Scorecard (ผลประลองตัวต่อตัว)</span>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>เกณฑ์วัดผล (Metric)</th>
+                <th style="color:var(--boss-gold);">👑 บอส (เคาะมือ)</th>
+                <th style="color:var(--bot-cyan);">🤖 บอท (ตามกฎ 100%)</th>
+                <th>ใครเหนือกว่า</th>
+              </tr>
+            </thead>
+            <tbody id="matrixScorecardBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Overlap Matrix -->
+      <div class="matrix-grid">
+        <div class="matrix-card overlap">
+          <div class="matrix-title">
+            <span>🤝 ใจตรงกัน (Both Bought)</span>
+            <span class="badge-count" id="overlapCount">0</span>
+          </div>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem;">หุ้นที่ทั้งบอสและบอทเลือกซื้อทั้งคู่ (กดชื่อหุ้นเปิดกราฟ)</p>
+          <div id="overlapList" style="display:flex;flex-direction:column;gap:8px;font-size:0.8rem;"></div>
+        </div>
+
+        <div class="matrix-card boss-only">
+          <div class="matrix-title">
+            <span style="color:var(--boss-gold);">👑 บอสเลือกเดี่ยว (Boss Solo)</span>
+            <span class="badge-count" id="bossSoloCount">0</span>
+          </div>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem;">หุ้นที่บอสเลือกเคาะเอง แต่บอทไม่ได้ซื้อ</p>
+          <div id="bossSoloList" style="display:flex;flex-direction:column;gap:8px;font-size:0.8rem;"></div>
+        </div>
+
+        <div class="matrix-card bot-only">
+          <div class="matrix-title">
+            <span style="color:var(--bot-cyan);">🤖 บอทเลือกเดี่ยว (Bot Solo)</span>
+            <span class="badge-count" id="botSoloCount">0</span>
+          </div>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem;">หุ้นที่บอทซื้อตามระบบ แต่บอสไม่ได้เลือก</p>
+          <div id="botSoloList" style="display:flex;flex-direction:column;gap:8px;font-size:0.8rem;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 5: History -->
+    <div id="viewHistory" style="display:none;">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>พอร์ต</th>
+              <th>หลักทรัพย์</th>
+              <th>วันเข้า - วันออก</th>
+              <th>ราคาซื้อ</th>
+              <th>ราคาขาย</th>
+              <th>กำไร/ขาดทุน</th>
+              <th>ผลตอบแทน (%)</th>
+              <th>เหตุผลที่ขาย</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted);">ยังไม่มีประวัติการขาย</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 1. Stock Card Graph Modal (เหมือน RS Dashboard ทุกอย่าง) -->
+  <div class="modal-backdrop" id="stockChartModal">
+    <div class="chart-modal-box">
+      <div class="chart-modal-top">
+        <div class="chart-modal-tkinfo">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="chart-modal-sym" id="modalTkSymbol">-</span>
+              <span class="chart-modal-rs" id="modalTkRs">RS -</span>
+              <span id="modalTkTag" style="font-size:0.75rem;padding:2px 8px;border-radius:4px;background:#1e293b;color:var(--text-dim);border:1px solid var(--border);">TH</span>
+            </div>
+            <div style="font-size:0.85rem;color:var(--text-muted);margin-top:2px;" id="modalTkFullName">-</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <div style="text-align:right;">
+            <div style="font-size:1.45rem;font-weight:700;font-family:var(--font-mono);line-height:1.1;" id="modalTkPriceDisplay">฿0.00</div>
+            <div style="font-size:0.85rem;font-weight:600;font-family:var(--font-mono);" id="modalTkChangeDisplay">+0.00%</div>
+          </div>
+          <button class="btn btn-gold" id="btnBuyFromChart" onclick="onBuyFromChartModal()" style="padding:8px 16px;font-size:0.9rem;">
+            ⚡ เคาะซื้อ (Paper Buy)
+          </button>
+          <button class="modal-close" onclick="closeStockChartModal()">&times;</button>
+        </div>
+      </div>
+
+      <!-- Quick Metrics bar -->
+      <div style="display:flex;gap:1.5rem;font-size:0.75rem;color:var(--text-dim);margin-bottom:0.75rem;padding:6px 12px;background:#0b0f19;border-radius:8px;border:1px solid var(--border);flex-wrap:wrap;">
+        <div>กลุ่ม: <strong style="color:#fff;" id="modalTkSector">-</strong></div>
+        <div>Mcap: <strong style="color:#fff;" id="modalTkMcap">-</strong></div>
+        <div>Volume: <strong style="color:#fff;" id="modalTkVol">-</strong></div>
+        <div>ห่างจุดสูง 52W: <strong style="color:#fff;" id="modalTkHi52">-</strong></div>
+      </div>
+
+      <!-- Timeframe selector and MA legend -->
+      <div class="chart-toolbar">
+        <div class="tf-chips">
+          <button class="tf-btn active" id="tf1y" onclick="changeChartTF('1y')">1D (1 ปี)</button>
+          <button class="tf-btn" id="tf1wk" onclick="changeChartTF('1wk')">1W (2 ปี)</button>
+          <button class="tf-btn" id="tf1mo" onclick="changeChartTF('1mo')">1M (5 ปี)</button>
+          <button class="tf-btn" id="tf30m" onclick="changeChartTF('30m')">30m</button>
+        </div>
+        <div class="ma-legend">
+          <div class="ma-leg-item"><span class="ma-leg-dot" style="background:#f59e0b;"></span> SMA20</div>
+          <div class="ma-leg-item"><span class="ma-leg-dot" style="background:#38bdf8;"></span> SMA50</div>
+          <div class="ma-leg-item"><span class="ma-leg-dot" style="background:#c084fc;"></span> SMA150</div>
+          <div class="ma-leg-item"><span class="ma-leg-dot" style="background:#94a3b8;"></span> SMA200</div>
+          <div class="ma-leg-item"><span style="color:#10b981;">▲ BUY</span></div>
+        </div>
+      </div>
+
+      <!-- Lightweight Charts Container -->
+      <div id="lwcContainer">
+        <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#38bdf8;">
+          กำลังโหลดกราฟแท่งเทียน...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Realistic Paper Buy Modal (เอาราคาจริง ณ ตอนนั้น ห้ามเลือกราคาแฟนตาซี) -->
+  <div class="modal-backdrop" id="buyModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">⚡ เคาะซื้อเข้าพอร์ตบอส (Paper Buy)</div>
+        <button class="modal-close" onclick="closeBuyModal()">&times;</button>
+      </div>
+
+      <!-- Paper Trading Notice -->
+      <div id="modalPaperNotice" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);border-radius:8px;padding:8px 12px;font-size:0.78rem;color:#60a5fa;margin-bottom:0.85rem;line-height:1.5;">
+        💡 <strong>จำลองพอร์ต (Paper Trading):</strong> หุ้นจะถูกบันทึกเข้าแท็บ <em>"พอร์ตจำลองบอส"</em> บนเว็บนี้เพื่อประลองผลงานกับบอท (ปลอดภัย 100% เป็นระบบจำลอง ไม่แตะต้องเงินจริง)
+      </div>
+
+      <!-- Ticker Info -->
+      <div class="form-group" style="background:#0f172a;padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <span style="font-size:1.2rem;font-weight:700;font-family:var(--font-mono);" id="modalTickerName">-</span>
+          <div style="font-size:0.75rem;color:var(--text-muted);" id="modalTickerSub">-</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:1.25rem;font-weight:700;font-family:var(--font-mono);color:var(--boss-gold);" id="modalCurrentPriceDisplay">฿0.00</div>
+          <div style="font-size:0.72rem;color:var(--text-dim);" id="modalSignalPriceDisplay">ราคาปิดสัญญาณ: -</div>
+        </div>
+      </div>
+
+      <!-- Realistic Price Execution Box (ห้ามพิมพ์ราคาเอง) -->
+      <div class="form-group">
+        <label class="form-label">🎯 ราคาจับคู่จริงตามตลาด (Execution Price)</label>
+        
+        <!-- Market Open Banner -->
+        <div id="mktOpenBox" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);border-radius:8px;padding:8px 12px;font-size:0.8rem;color:#10b981;display:none;">
+          🟢 <strong>ตลาดกำลังเปิดทำการ</strong> — ซื้อที่ราคาตลาด Real-time ทันที (Market Order)
+        </div>
+
+        <!-- Market Closed Banner & Options -->
+        <div id="mktClosedBox" style="background:rgba(234,179,8,0.12);border:1px solid rgba(234,179,8,0.4);border-radius:8px;padding:8px 12px;font-size:0.8rem;color:#fde047;display:none;">
+          <div style="margin-bottom:6px;">🌙 <strong>ตลาดปิดทำการแล้ว</strong> — เลือกลักษณะคำสั่งจริงตามกลไกตลาด:</div>
+          <div class="radio-pill-group">
+            <div class="radio-pill active" id="pillPxClose" onclick="setClosedExecPrice('close')">
+              📌 ราคาปิดล่าสุด (Close): <span id="lblClosePx">฿0.00</span>
+            </div>
+            <div class="radio-pill" id="pillPxNextOpen" onclick="setClosedExecPrice('nextOpen')">
+              🌅 ราคาเปิดวันถัดไป (ATO): <span id="lblNextOpenPx">฿0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Locked Execution Price Input -->
+        <div style="margin-top:8px;">
+          <input type="number" id="modalEntryPriceInput" class="form-input" readonly style="background:#0b0f19;color:var(--boss-gold);font-weight:700;font-size:1.15rem;cursor:not-allowed;" title="ราคาถูกคำนวณตามราคาจริงของตลาด ไม่อนุญาตให้แก้ตัวเลข">
+        </div>
+      </div>
+
+      <!-- Position Sizing (% of Port & Shares) -->
+      <div class="form-group">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <label class="form-label">📊 สัดส่วนเงินลงทุนต่อไม้ (% ของพอร์ต)</label>
+          <span style="font-size:0.75rem;color:var(--text-muted);" id="modalMaxAvailPct">เงินสดมีพอซื้อ: 0%</span>
+        </div>
+        <div class="quick-chips">
+          <button class="chip-btn" onclick="applySizingPct(5)">5%</button>
+          <button class="chip-btn" onclick="applySizingPct(8)">8%</button>
+          <button class="chip-btn" onclick="applySizingPct(10)">10%</button>
+          <button class="chip-btn" onclick="applySizingPct(15)">15%</button>
+          <button class="chip-btn" onclick="applySizingPct(20)">20%</button>
+          <button class="chip-btn" onclick="applySizingPct(25)">25%</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+          <div>
+            <label class="form-label">ระบุ % พอร์ตอิสระ</label>
+            <input type="number" step="0.5" min="1" max="100" id="modalPctInput" class="form-input" oninput="onPctInputChanged()">
+          </div>
+          <div>
+            <label class="form-label" id="modalSharesLabel">จำนวนหุ้น</label>
+            <input type="number" id="modalSharesInput" class="form-input" oninput="onSharesInputChanged()">
+            <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px;" id="modalSharesRuleBadge">ขั้นต่ำ 100 หุ้น</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stop Loss Setup -->
+      <div class="form-group">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <label class="form-label">🛡️ กำหนดจุดตัดขาดทุน (Stop Loss)</label>
+          <span style="font-size:0.75rem;color:var(--text-muted);" id="modalSlModeNotice">สถานะ: ตั้งคัทลอส -8%</span>
+        </div>
+        <div class="quick-chips">
+          <button class="chip-btn chip-sl" id="chipSlNone" onclick="setStopLossPct('none')">🚫 ไม่ต้อง Stop (กดขายเอง)</button>
+          <button class="chip-btn chip-sl" id="chipSl5" onclick="setStopLossPct(5)">-5%</button>
+          <button class="chip-btn chip-sl" id="chipSl7" onclick="setStopLossPct(7)">-7%</button>
+          <button class="chip-btn chip-sl active" id="chipSl8" onclick="setStopLossPct(8)">-8%</button>
+          <button class="chip-btn chip-sl" id="chipSl10" onclick="setStopLossPct(10)">-10%</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+          <div>
+            <label class="form-label">% คัทลอส (ปล่อยว่างถ้าไม่ตั้ง)</label>
+            <input type="number" step="0.5" id="modalStopLossPctInput" class="form-input" value="8" oninput="updateStopLossCalc()">
+          </div>
+          <div>
+            <label class="form-label">ราคาตัดขาดทุน (฿/$)</label>
+            <input type="number" step="0.01" id="modalStopLossPriceInput" class="form-input" oninput="updateStopLossFromPrice()">
+          </div>
+        </div>
+        <div style="font-size:0.72rem;color:var(--text-dim);margin-top:4px;">
+          💡 หากเลือก <em>"ไม่ต้อง Stop"</em> ระบบจะไม่ตัดขาดทุนอัตโนมัติ ให้บอสกดปุ่มขายด้วยตนเองเมื่อต้องการ
+        </div>
+      </div>
+
+      <!-- Market Gate Warning Alert -->
+      <div id="modalGateWarning" style="display:none;background:rgba(234,179,8,0.12);border:1px solid rgba(234,179,8,0.4);border-radius:8px;padding:8px 12px;font-size:0.75rem;color:#fde047;margin-bottom:1rem;">
+        ⚠️ ตลาดอยู่ในโหมดไฟเหลือง/แดง แนะนำคุมเพดาน Exposure รวมไม่เกินเกณฑ์
+      </div>
+
+      <!-- Cost Breakdown -->
+      <div class="form-group" style="background:#0f172a;padding:10px;border-radius:8px;font-size:0.8rem;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="color:var(--text-muted);">มูลค่าที่ต้องจ่าย:</span>
+          <strong id="modalCostVal" style="font-family:var(--font-mono);">฿0</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="color:var(--text-muted);">เงินสดคงเหลือหลังซื้อ:</span>
+          <strong id="modalCashRemaining" style="font-family:var(--font-mono);">฿0</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:var(--text-muted);">Exposure พอร์ตหลังซื้อ:</span>
+          <strong id="modalNewExposure" style="font-family:var(--font-mono);">0%</strong>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+        <button class="btn" style="flex:1;" onclick="closeBuyModal()">ยกเลิก</button>
+        <button class="btn btn-gold" style="flex:2;" onclick="confirmBuy()">ยืนยันซื้อเข้าพอร์ตบอส ⚡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Sell Modal -->
+  <div class="modal-backdrop" id="sellModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">🏷️ บันทึกคำสั่งขาย (Sell Position)</div>
+        <button class="modal-close" onclick="closeSellModal()">&times;</button>
+      </div>
+      <div class="form-group" style="background:#0f172a;padding:10px 14px;border-radius:8px;">
+        <div style="display:flex;justify-content:space-between;font-weight:700;font-size:1.1rem;" id="sellStockName">-</div>
+        <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-dim);margin-top:4px;" id="sellStockSub">-</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ราคาขายตามตลาด</label>
+        <input type="number" step="0.01" id="sellPriceInput" class="form-input" readonly style="background:#0b0f19;color:var(--boss-gold);font-weight:700;cursor:not-allowed;">
+      </div>
+      <div class="form-group">
+        <label class="form-label">เหตุผลในการขาย</label>
+        <select id="sellReasonSelect" class="form-input" style="font-family:var(--font-main);">
+          <option value="บอสกดขายเอง (ทำกำไร/Take Profit)">บอสกดขายเอง (ทำกำไร / Take Profit)</option>
+          <option value="สัญญาณ ▼ SELL ใน RS Dashboard">สัญญาณ ▼ SELL ใน RS Dashboard</option>
+          <option value="ชนจุดตัดขาดทุน (Stop Loss)">ชนจุดตัดขาดทุน (Stop Loss)</option>
+          <option value="ลดสัดส่วนตามไฟตลาด (Market Gate)">ลดสัดส่วนตามไฟตลาด (Market Gate)</option>
+          <option value="ปรับสลับตัวเล่น (Rebalancing)">ปรับสลับตัวเล่น (Rebalancing)</option>
+        </select>
+      </div>
+      <div class="form-group" style="background:#0f172a;padding:10px;border-radius:8px;font-size:0.85rem;" id="sellPnlPreview"></div>
+      <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+        <button class="btn" style="flex:1;" onclick="closeSellModal()">ยกเลิก</button>
+        <button class="btn btn-gold" style="flex:1;" onclick="confirmSellPosition()">ยืนยันปิดการขาย</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Manual Buy Modal -->
+  <div class="modal-backdrop" id="manualBuyModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">➕ ซื้อหุ้นนอกสัญญาณ (Manual Entry)</div>
+        <button class="modal-close" onclick="closeManualBuyModal()">&times;</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ชื่อหุ้น (Ticker)</label>
+        <input type="text" id="manualTickerInput" class="form-input" placeholder="e.g. DELTA, PTT, NVDA" style="text-transform:uppercase;">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ราคาเข้าซื้อ (ใช้ราคาตลาดล่าสุด)</label>
+        <input type="number" step="0.01" id="manualPriceInput" class="form-input" placeholder="0.00">
+      </div>
+      <div class="form-group">
+        <label class="form-label">จำนวนหุ้น</label>
+        <input type="number" id="manualSharesInput" class="form-input" placeholder="100">
+      </div>
+      <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+        <button class="btn" style="flex:1;" onclick="closeManualBuyModal()">ยกเลิก</button>
+        <button class="btn btn-gold" style="flex:1;" onclick="confirmManualBuy()">ซื้อเข้าพอร์ตบอส</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Config Modal -->
+  <div class="modal-backdrop" id="configModal">
+    <div class="modal-box" style="max-width:540px;">
+      <div class="modal-header">
+        <div class="modal-title">⚙️ ตั้งค่าความเสี่ยง & เพดาน Exposure</div>
+        <button class="modal-close" onclick="closeConfigModal()">&times;</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">เงินทุนเริ่มต้น (Initial Capital)</label>
+        <input type="number" id="cfgCapital" class="form-input">
+        <div class="quick-chips">
+          <button class="chip-btn" onclick="document.getElementById('cfgCapital').value=500000">500,000</button>
+          <button class="chip-btn" onclick="document.getElementById('cfgCapital').value=1000000">1,000,000</button>
+          <button class="chip-btn" onclick="document.getElementById('cfgCapital').value=2000000">2,000,000</button>
+          <button class="chip-btn" onclick="document.getElementById('cfgCapital').value=5000000">5,000,000</button>
+        </div>
+      </div>
+
+      <div style="background:#0f172a;padding:12px;border-radius:10px;margin-bottom:1rem;border:1px solid var(--border);">
+        <strong style="font-size:0.85rem;display:block;margin-bottom:8px;">🚦 เพดานพอร์ตตามไฟตลาด (Market Gate Exposure Caps)</strong>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <div>
+            <label class="form-label" style="color:#10b981;">🟢 ไฟเขียว (Bull)</label>
+            <input type="number" id="cfgCapGreen" class="form-input" min="10" max="100">
+          </div>
+          <div>
+            <label class="form-label" style="color:#eab308;">🟡 ไฟเหลือง (Pullback)</label>
+            <input type="number" id="cfgCapYellow" class="form-input" min="0" max="100">
+          </div>
+          <div>
+            <label class="form-label" style="color:#f43f5e;">🔴 ไฟแดง (Bear)</label>
+            <input type="number" id="cfgCapRed" class="form-input" min="0" max="100">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;">
+        <div>
+          <label class="form-label">ขนาดไม้สูงสุดต่อตัว (% Port)</label>
+          <input type="number" id="cfgMaxSlice" class="form-input" min="5" max="50">
+        </div>
+        <div>
+          <label class="form-label">Hard Stop Loss เริ่มต้น (%)</label>
+          <input type="number" id="cfgDefaultSL" class="form-input" min="2" max="25">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+        <button class="btn" style="flex:1;" onclick="closeConfigModal()">ยกเลิก</button>
+        <button class="btn btn-gold" style="flex:1;" onclick="saveConfigSettings()">บันทึกการตั้งค่า</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Backup & Restore Modal -->
+  <div class="modal-backdrop" id="backupModal">
+    <div class="modal-box" style="max-width:540px;">
+      <div class="modal-header">
+        <div class="modal-title">💾 สำรองและนำเข้าข้อมูลพอร์ตประลอง</div>
+        <button class="modal-close" onclick="closeBackupModal()">&times;</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ข้อมูลพอร์ตประลอง (JSON Payload)</label>
+        <textarea id="backupTextarea" class="form-input" style="height:140px;font-size:0.75rem;resize:vertical;"></textarea>
+      </div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <button class="btn btn-gold" onclick="exportBackupData()">คัดลอกข้อมูลสำรอง (Export)</button>
+        <button class="btn" onclick="importBackupData()">นำเข้าข้อมูล (Import)</button>
+        <button class="btn" onclick="downloadBackupFile()">ดาวน์โหลดไฟล์ .json</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Edit Stop Loss Modal -->
+  <div class="modal-backdrop" id="editStopLossModal">
+    <div class="modal-box" style="max-width:480px;">
+      <div class="modal-header">
+        <div class="modal-title">🛡️ แก้ไข Stop Loss — <span id="editSlTicker" style="color:var(--boss-gold);font-family:var(--font-mono);">-</span></div>
+        <button class="modal-close" onclick="closeEditStopLossModal()">&times;</button>
+      </div>
+
+      <!-- Current Position Info -->
+      <div class="form-group" style="background:#0f172a;padding:12px;border-radius:8px;font-size:0.82rem;line-height:1.6;">
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:var(--text-muted);">ราคาต้นทุน:</span>
+          <strong id="editSlBuyPx" style="font-family:var(--font-mono);">-</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:var(--text-muted);">ราคาตลาดล่าสุด:</span>
+          <strong id="editSlCurrentPx" style="font-family:var(--font-mono);">-</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:var(--text-muted);">กำไร/ขาดทุนปัจจุบัน:</span>
+          <strong id="editSlCurrentPnl" style="font-family:var(--font-mono);">-</strong>
+        </div>
+      </div>
+
+      <!-- Quick Chips -->
+      <div class="form-group">
+        <label class="form-label">⚡ เลือกปรับด่วน</label>
+        <div class="quick-chips" style="flex-wrap:wrap;gap:6px;">
+          <button class="chip-btn" id="editChipNone" onclick="setEditSlChoice('none')">🚫 ไม่ต้อง Stop (กดขายเอง)</button>
+          <button class="chip-btn" id="editChipBe" onclick="setEditSlChoice('be')" style="color:#10b981;border-color:rgba(16,185,129,0.4);">⚡ เลื่อนเท่าทุน (0%)</button>
+          <button class="chip-btn" id="editChip5" onclick="setEditSlChoice(5)">-5%</button>
+          <button class="chip-btn" id="editChip7" onclick="setEditSlChoice(7)">-7%</button>
+          <button class="chip-btn" id="editChip8" onclick="setEditSlChoice(8)">-8%</button>
+          <button class="chip-btn" id="editChip10" onclick="setEditSlChoice(10)">-10%</button>
+        </div>
+      </div>
+
+      <!-- Stop Loss Inputs -->
+      <div class="form-group">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div>
+            <label class="form-label">% คัทลอส (จากทุน)</label>
+            <input type="number" step="0.5" id="editSlPctInput" class="form-input" oninput="onEditSlPctChanged()">
+          </div>
+          <div>
+            <label class="form-label">ราคาตัดขาดทุน (฿/$)</label>
+            <input type="number" step="0.01" id="editSlPriceInput" class="form-input" oninput="onEditSlPriceChanged()">
+          </div>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;" id="editSlHelpText">
+          หากเลือก "ไม่ต้อง Stop" ระบบจะไม่เตือนคัทลอส ให้บอสกดปุ่มขายด้วยตนเองเมื่อต้องการ
+        </div>
+      </div>
+
+      <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+        <button class="btn" style="flex:1;" onclick="closeEditStopLossModal()">ยกเลิก</button>
+        <button class="btn btn-gold" style="flex:2;" onclick="saveEditStopLoss()">💾 บันทึก Stop Loss ใหม่</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // System State & Settings
+    const STORAGE_KEY = 'rs_arena_battle_v4';
+    let currentMarket = 'th'; // 'th' | 'us'
+    let currentTab = 'feed';
+    let currentDayFilter = 'all';
+
+    let scanData = [];
+    let rshistData = null;
+    let setFiledData = null;
+    let indexData = [];
+    let marketGate = { state: 'green', label: 'กำลังโหลด...', reason: '', mult: 1, cap: 100 };
+
+    let arena = {
+      th: {
+        initialCapital: 1000000,
+        capGreen: 100,
+        capYellow: 50,
+        capRed: 20,
+        maxSlicePct: 20,
+        defaultStopLoss: 8,
+        boss: { cash: 1000000, holdings: [], history: [], equityHistory: [] },
+        bot: { cash: 1000000, holdings: [], history: [], equityHistory: [] }
+      },
+      us: {
+        initialCapital: 50000,
+        capGreen: 100,
+        capYellow: 50,
+        capRed: 20,
+        maxSlicePct: 20,
+        defaultStopLoss: 8,
+        boss: { cash: 50000, holdings: [], history: [], equityHistory: [] },
+        bot: { cash: 50000, holdings: [], history: [], equityHistory: [] }
+      }
+    };
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.th && parsed.us) arena = parsed;
+        }
+      } catch (e) {
+        console.error("Failed to load state", e);
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(arena));
+      } catch (e) {
+        console.error("Failed to save state", e);
+      }
+    }
+
+    function fmtNum(n) {
+      if (n == null || isNaN(n)) return '0';
+      return Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    }
+    function fmtShares(n) {
+      if (n == null || isNaN(n)) return '0';
+      if (currentMarket === 'th') {
+        return Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+      } else {
+        return Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 4 });
+      }
+    }
+    function fmtMoney(val) {
+      const sym = currentMarket === 'th' ? '฿' : '$';
+      return sym + fmtNum(val);
+    }
+    function fmtPct(p) {
+      if (p == null || isNaN(p)) return '0.00%';
+      const sign = p > 0 ? '+' : '';
+      return `${sign}${Number(p).toFixed(2)}%`;
+    }
+
+    // Market Open Hours Checker
+    function getMarketStatus(market) {
+      const now = new Date();
+      const utcHours = now.getUTCHours();
+      const utcMinutes = now.getUTCMinutes();
+      const utcDay = now.getUTCDay();
+
+      if (utcDay === 0 || utcDay === 6) {
+        return { isOpen: false, text: 'ปิดทำการ (วันหยุดสุดสัปดาห์)', isWeekend: true };
+      }
+
+      if (market === 'th') {
+        const ictHours = (utcHours + 7) % 24;
+        const ictMins = ictHours * 60 + utcMinutes;
+        // 09:30 - 16:35 ICT
+        const isOpen = (ictMins >= 570 && ictMins <= 995);
+        return {
+          isOpen: isOpen,
+          text: isOpen ? '🟢 ตลาดเปิดทำการ (09:30 - 16:30 น.)' : '🌙 ตลาดปิดทำการ (After Hours)'
+        };
+      } else {
+        // US Market: 14:30 - 21:00 UTC
+        const utcMins = utcHours * 60 + utcMinutes;
+        const isOpen = (utcMins >= 870 && utcMins <= 1260);
+        return {
+          isOpen: isOpen,
+          text: isOpen ? '🟢 ตลาดเปิดทำการ (09:30 - 16:00 ET)' : '🌙 ตลาดปิดทำการ (After Hours)'
+        };
+      }
+    }
+
+    // Toast Notification System
+    function showToast(msg, type = 'success') {
+      let toast = document.getElementById('globalToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'globalToast';
+        toast.style.cssText = `
+          position: fixed;
+          top: 24px;
+          right: 24px;
+          z-index: 99999;
+          background: #1e293b;
+          border: 1px solid #10b981;
+          color: #fff;
+          padding: 12px 20px;
+          border-radius: 10px;
+          font-size: 0.88rem;
+          font-weight: 500;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          transform: translateY(-20px);
+          opacity: 0;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          pointer-events: none;
+        `;
+        document.body.appendChild(toast);
+      }
+      toast.style.borderColor = type === 'error' ? '#f43f5e' : (type === 'warn' ? '#f59e0b' : '#10b981');
+      toast.innerHTML = msg;
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+      clearTimeout(toast._timeout);
+      toast._timeout = setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-20px)';
+      }, 4000);
+    }
+
+    function updateTabLabels() {
+      const isTh = currentMarket === 'th';
+      const mLabel = isTh ? 'SET' : 'US';
+      const m = arena[currentMarket];
+      const bossCnt = m?.boss?.holdings?.length || 0;
+      const botCnt = m?.bot?.holdings?.length || 0;
+
+      const bossEl = document.getElementById('tabBossLabel');
+      const botEl = document.getElementById('tabBotLabel');
+      if (bossEl) bossEl.innerText = `👑 พอร์ตจำลองบอส (${mLabel})`;
+      if (botEl) botEl.innerText = `🤖 พอร์ตจำลองบอท (${mLabel})`;
+
+      const bCntEl = document.getElementById('bossHoldCount');
+      const btCntEl = document.getElementById('botHoldCount');
+      if (bCntEl) bCntEl.innerText = bossCnt;
+      if (btCntEl) btCntEl.innerText = botCnt;
+    }
+
+    // Tab Navigation
+    function setTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('viewFeed').style.display = 'none';
+      document.getElementById('viewBoss').style.display = 'none';
+      document.getElementById('viewBot').style.display = 'none';
+      document.getElementById('viewMatrix').style.display = 'none';
+      document.getElementById('viewHistory').style.display = 'none';
+
+      if (tab === 'feed') {
+        document.getElementById('tabFeed').classList.add('active');
+        document.getElementById('viewFeed').style.display = 'block';
+      } else if (tab === 'boss') {
+        document.getElementById('tabBoss').classList.add('active');
+        document.getElementById('viewBoss').style.display = 'block';
+        renderBossHoldings();
+      } else if (tab === 'bot') {
+        document.getElementById('tabBot').classList.add('active');
+        document.getElementById('viewBot').style.display = 'block';
+        renderBotHoldings();
+      } else if (tab === 'matrix') {
+        document.getElementById('tabMatrix').classList.add('active');
+        document.getElementById('viewMatrix').style.display = 'block';
+        renderBattleMatrix();
+      } else if (tab === 'history') {
+        document.getElementById('tabHistory').classList.add('active');
+        document.getElementById('viewHistory').style.display = 'block';
+        renderHistory();
+      }
+      updateTabLabels();
+    }
+
+    // Market Switcher
+    function setMarket(m) {
+      currentMarket = m;
+      currentDayFilter = 'all';
+      document.getElementById('btnTh').classList.toggle('active', m === 'th');
+      document.getElementById('btnUs').classList.toggle('active', m === 'us');
+      updateTabLabels();
+      loadMarketData();
+    }
+
+    // Live Data Loader
+    async function loadMarketData() {
+      const isTh = currentMarket === 'th';
+      const mktParam = isTh ? 'thailand' : 'america';
+      const histFile = isTh ? 'rshist_th.json' : 'rshist_us.json';
+
+      document.getElementById('signalCardsGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">กำลังดึงข้อมูลสัญญาณล่าสุดจาก RS Dashboard...</div>';
+
+      try {
+        const [scanRes, histRes, idxRes, filedRes] = await Promise.all([
+          fetch(`https://rsdashclean.vercel.app/api/scan?market=${mktParam}`).then(r => r.json()).catch(() => []),
+          fetch(`https://rsdashclean.vercel.app/${histFile}`).then(r => r.json()).catch(() => null),
+          fetch(`https://rsdashclean.vercel.app/api/index?market=${mktParam}`).then(r => r.json()).catch(() => ({ indexes: [] })),
+          isTh ? fetch('https://rsdashclean.vercel.app/set_filed_th.json').then(r => r.json()).catch(() => null) : Promise.resolve(null)
+        ]);
+
+        scanData = scanRes.data || scanRes || [];
+        rshistData = histRes;
+        indexData = idxRes.indexes || [];
+        setFiledData = filedRes?.filed || null;
+
+        calcMarketGate();
+        simulateBotPortfolio();
+        updateHoldingPrices();
+        recordEquitySnapshot();
+
+        renderDayFilterBar();
+        renderSignalCards();
+        renderScoreboard();
+        drawEquityChart();
+      } catch (err) {
+        console.error("Data load error:", err);
+      }
+    }
+
+    function calcMarketGate() {
+      const isTh = currentMarket === 'th';
+      const key = isTh ? 'SET' : 'SPX';
+      const idx = indexData.find(i => i.key === key) || {};
+      const p = idx.price, s50 = idx.sma50, s200 = idx.sma200;
+      const m = arena[currentMarket];
+
+      if (p == null || s50 == null || s200 == null) {
+        marketGate = { state: 'green', label: 'ไฟเขียว — ตลาดปกติ', reason: 'กำลังรอการประมวลผลดัชนี', mult: 1, cap: m.capGreen };
+      } else if (p > s50 && s50 > s200) {
+        marketGate = { state: 'green', label: '🟢 ไฟเขียว — ตลาดขาขึ้น', reason: `${key} เหนือ SMA50 และ SMA50 เหนือ SMA200`, mult: 1, cap: m.capGreen };
+      } else if (p < s200 && p < s50) {
+        marketGate = { state: 'red', label: '🔴 ไฟแดง — ตลาดอ่อนแอ', reason: `${key} หลุดต่ำกว่า SMA50 และ SMA200`, mult: 0.4, cap: m.capRed };
+      } else if (p < s200 || (p < s50 && s50 < s200)) {
+        marketGate = { state: 'red', label: '🔴 ไฟแดง — ตลาดอ่อนแอ', reason: p < s200 ? `${key} ต่ำกว่า SMA200` : `${key} ต่ำกว่า SMA50`, mult: 0.4, cap: m.capRed };
+      } else {
+        marketGate = { state: 'yellow', label: '🟡 ไฟเหลือง — ตลาดพักตัว/ผสม', reason: p < s50 ? `${key} หลุด SMA50 แต่ยังเหนือ SMA200` : `${key} เหนือ SMA50 แต่ SMA50 ยังไม่เหนือ SMA200`, mult: 0.7, cap: m.capYellow };
+      }
+
+      const badge = document.getElementById('marketGateBadge');
+      badge.className = `battle-gate-chip ${marketGate.state}`;
+      badge.innerHTML = `<span>${marketGate.label} (เพดานแนะนำ: ${marketGate.cap}%)</span>`;
+      badge.title = marketGate.reason;
+    }
+
+    function getRecent7DaysCandidates() {
+      if (!rshistData || !rshistData.bh || !rshistData.dates) return { days: [], list: [] };
+
+      const dates = rshistData.dates;
+      const days = dates.slice(-8).reverse();
+      const buyMap = rshistData.bh || {};
+      const sigMap = rshistData.sig || {};
+      const rowMap = new Map(scanData.map(s => [s.ticker, s]));
+
+      const candidates = [];
+      Object.entries(buyMap).forEach(([tk, ds]) => {
+        const row = rowMap.get(tk);
+        if (!row || row.isDR) return;
+
+        const hits = ds.filter(d => days.includes(d));
+        if (hits.length > 0) {
+          const sig = sigMap[tk] || [];
+          const sigPrice = sig[3] || row.price;
+          const latestDay = hits[0];
+
+          candidates.push({
+            ticker: tk,
+            row: row,
+            dates: hits,
+            latestDate: latestDay,
+            sigPrice: sigPrice,
+            rs: row.rs || (sig[2] || 0)
+          });
+        }
+      });
+
+      candidates.sort((a, b) => (b.rs || 0) - (a.rs || 0));
+      return { days, list: candidates };
+    }
+
+    function renderDayFilterBar() {
+      const { days, list } = getRecent7DaysCandidates();
+      const bar = document.getElementById('daysFilterBar');
+
+      const byD = {};
+      list.forEach(c => {
+        c.dates.forEach(d => { byD[d] = (byD[d] || 0) + 1; });
+      });
+
+      let html = `<button class="day-pill ${currentDayFilter==='all'?'active':''}" onclick="setDayFilter('all')">ทั้ง 7 วัน (${list.length})</button>`;
+      days.forEach((d, idx) => {
+        const cnt = byD[d] || 0;
+        const tag = idx === 0 ? 'วันนี้' : (idx === 1 ? 'เมื่อวาน' : d.slice(5));
+        html += `<button class="day-pill ${currentDayFilter===d?'active':''}" onclick="setDayFilter('${d}')">${tag} (${cnt})</button>`;
+      });
+
+      bar.innerHTML = html;
+    }
+
+    function setDayFilter(d) {
+      currentDayFilter = d;
+      renderDayFilterBar();
+      renderSignalCards();
+    }
+
+    function renderSignalCards() {
+      const { list } = getRecent7DaysCandidates();
+      let filtered = currentDayFilter === 'all' ? list : list.filter(c => c.dates.includes(currentDayFilter));
+
+      const q = (document.getElementById('signalSearch').value || '').trim().toUpperCase();
+      if (q) {
+        filtered = filtered.filter(c => 
+          c.ticker.toUpperCase().includes(q) || 
+          (c.row.name && c.row.name.toUpperCase().includes(q)) ||
+          (c.row.sector && c.row.sector.toUpperCase().includes(q))
+        );
+      }
+
+      document.getElementById('feedCount').innerText = filtered.length;
+      document.getElementById('dataTimestamp').innerText = `อัปเดต: ${rshistData?.sigAsOf || 'วันนี้'}`;
+
+      const grid = document.getElementById('signalCardsGrid');
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">ไม่มีหุ้นที่เข้าเงื่อนไขสัญญาณ BUY ในตัวกรองนี้</div>';
+        return;
+      }
+
+      const sym = currentMarket === 'th' ? '฿' : '$';
+      grid.innerHTML = filtered.map(c => {
+        const s = c.row;
+        const chgCls = s.change >= 0 ? 'color:var(--up)' : 'color:var(--dn)';
+        const chgSign = s.change >= 0 ? '+' : '';
+        const filing = setFiledData && setFiledData[s.ticker];
+        
+        let filingBadge = '';
+        if (filing) {
+          const niY = filing.niY != null ? `${filing.niY >= 0 ? '+' : ''}${filing.niY}% YoY` : 'รอตัวเลข';
+          filingBadge = `<span style="font-size:0.68rem;padding:2px 6px;border-radius:4px;background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3);" title="ยื่นงบแล้ว">📄 งบ: ${niY}</span>`;
+        }
+
+        const dateTag = c.latestDate === rshistData?.dates?.slice(-1)[0] ? 'วันนี้' : c.latestDate;
+
+        return `
+          <div class="stock-card">
+            <div class="card-top">
+              <div class="tk-wrap">
+                <span class="tk-symbol" onclick="openStockChartModal('${s.ticker}')" title="กดเพื่อเปิดดูกราฟแทคนิค">${s.ticker}</span>
+                <span class="tk-rs high">RS ${Math.round(c.rs || 0)}</span>
+                ${filingBadge}
+              </div>
+              <span class="badge-signal badge-buy">▲ BUY</span>
+            </div>
+
+            <div class="sig-date-badge">
+              <span>📅 สัญญาณเมื่อ: ${dateTag} (ทุนสัญญาณ: ${sym}${fmtNum(c.sigPrice)})</span>
+            </div>
+
+            <div class="card-price-row">
+              <div class="card-price">${sym}${fmtNum(s.price)}</div>
+              <div class="card-chg" style="${chgCls}">${chgSign}${fmtNum(s.change)}%</div>
+            </div>
+
+            <div class="card-meta">
+              <span>กลุ่ม: ${s.group || s.sector || '-'}</span>
+              <span style="text-align:right;">ห่างจุดสูง 52W: ${s.hi52 ? fmtNum(((s.hi52/s.price)-1)*100)+'%' : '-'}</span>
+            </div>
+
+            <div class="buy-btn-row">
+              <button class="buy-action-btn" onclick="openBuyModal('${s.ticker}', ${s.price}, ${c.sigPrice}, '${(s.name||'').replace(/'/g, "")}')">
+                ⚡ ซื้อ (Paper Buy)
+              </button>
+              <button class="chart-view-btn" onclick="openStockChartModal('${s.ticker}')" title="ดูกราฟ">
+                📈 ดูกราฟ
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterSignals() {
+      renderSignalCards();
+    }
+
+    // Bot Simulation
+    function simulateBotPortfolio() {
+      if (!rshistData || !rshistData.bh) return;
+      const m = arena[currentMarket];
+      const bot = m.bot;
+
+      let botHoldVal = 0;
+      bot.holdings.forEach(h => { botHoldVal += (h.currentPrice * h.shares); });
+      const botEquity = bot.cash + botHoldVal;
+      const curExposurePct = botEquity > 0 ? (botHoldVal / botEquity) * 100 : 0;
+
+      // Exits: SELL signal or Stop Loss hit
+      const sigs = rshistData.sig || {};
+      for (let i = bot.holdings.length - 1; i >= 0; i--) {
+        const h = bot.holdings[i];
+        const isSellSig = sigs[h.ticker] && sigs[h.ticker][0] === 0;
+        const isStopLoss = h.pnlPct <= -(h.stopLossPct || m.defaultStopLoss);
+
+        if (isSellSig || isStopLoss) {
+          const pnl = (h.currentPrice - h.buyPrice) * h.shares;
+          bot.cash += h.shares * h.currentPrice;
+          bot.history.push({
+            ticker: h.ticker,
+            buyDate: h.buyDate,
+            sellDate: new Date().toISOString().slice(0, 10),
+            buyPrice: h.buyPrice,
+            sellPrice: h.currentPrice,
+            shares: h.shares,
+            pnl: pnl,
+            pnlPct: h.pnlPct,
+            reason: isStopLoss ? `Stop Loss (-${h.stopLossPct||m.defaultStopLoss}%)` : 'สัญญาณ ▼ Sell'
+          });
+          bot.holdings.splice(i, 1);
+        }
+      }
+
+      // Buys if under Market Gate Cap
+      const allowedCap = marketGate.cap;
+      if (curExposurePct < allowedCap) {
+        const { list } = getRecent7DaysCandidates();
+        const maxPositions = Math.min(8, Math.floor(allowedCap / (m.maxSlicePct || 12)));
+        const allocSlice = Math.min(botEquity * ((m.maxSlicePct || 12) / 100), bot.cash);
+
+        list.slice(0, maxPositions).forEach(c => {
+          const stock = c.row;
+          const alreadyHeld = bot.holdings.some(h => h.ticker === stock.ticker);
+          const wouldExceedCap = ((botHoldVal + allocSlice) / botEquity) * 100 > allowedCap;
+
+          if (!alreadyHeld && bot.holdings.length < maxPositions && bot.cash >= allocSlice && !wouldExceedCap) {
+            let shares = 0;
+            if (currentMarket === 'th') {
+              shares = Math.floor((allocSlice / stock.price) / 100) * 100;
+            } else {
+              // US Market: Fractional shares allowed (up to 4 decimals)
+              shares = Number((allocSlice / stock.price).toFixed(4));
+            }
+            if (shares > 0) {
+              const cost = shares * stock.price;
+              bot.cash -= cost;
+              botHoldVal += cost;
+              bot.holdings.push({
+                ticker: stock.ticker,
+                name: stock.name,
+                buyPrice: stock.price,
+                currentPrice: stock.price,
+                shares: shares,
+                buyDate: new Date().toISOString().slice(0, 10),
+                stopLossPct: m.defaultStopLoss,
+                stopLossPrice: stock.price * (1 - (m.defaultStopLoss / 100)),
+                pnl: 0,
+                pnlPct: 0
+              });
+            }
+          }
+        });
+      }
+
+      saveState();
+    }
+
+    function updateHoldingPrices() {
+      const priceMap = {};
+      scanData.forEach(s => { priceMap[s.ticker] = s.price; });
+
+      const m = arena[currentMarket];
+      m.boss.holdings.forEach(h => {
+        if (priceMap[h.ticker]) h.currentPrice = priceMap[h.ticker];
+        h.pnl = (h.currentPrice - h.buyPrice) * h.shares;
+        h.pnlPct = ((h.currentPrice - h.buyPrice) / h.buyPrice) * 100;
+      });
+
+      m.bot.holdings.forEach(h => {
+        if (priceMap[h.ticker]) h.currentPrice = priceMap[h.ticker];
+        h.pnl = (h.currentPrice - h.buyPrice) * h.shares;
+        h.pnlPct = ((h.currentPrice - h.buyPrice) / h.buyPrice) * 100;
+      });
+
+      saveState();
+    }
+
+    function recordEquitySnapshot() {
+      const m = arena[currentMarket];
+      const today = new Date().toISOString().slice(0, 10);
+
+      let bossHoldVal = 0;
+      m.boss.holdings.forEach(h => { bossHoldVal += (h.currentPrice * h.shares); });
+      const bossEquity = m.boss.cash + bossHoldVal;
+
+      let botHoldVal = 0;
+      m.bot.holdings.forEach(h => { botHoldVal += (h.currentPrice * h.shares); });
+      const botEquity = m.bot.cash + botHoldVal;
+
+      if (!m.boss.equityHistory) m.boss.equityHistory = [];
+      if (!m.bot.equityHistory) m.bot.equityHistory = [];
+
+      const lastBoss = m.boss.equityHistory[m.boss.equityHistory.length - 1];
+      if (!lastBoss || lastBoss.date !== today) {
+        m.boss.equityHistory.push({ date: today, equity: bossEquity });
+      } else {
+        lastBoss.equity = bossEquity;
+      }
+
+      const lastBot = m.bot.equityHistory[m.bot.equityHistory.length - 1];
+      if (!lastBot || lastBot.date !== today) {
+        m.bot.equityHistory.push({ date: today, equity: botEquity });
+      } else {
+        lastBot.equity = botEquity;
+      }
+
+      saveState();
+    }
+
+    function renderScoreboard() {
+      const m = arena[currentMarket];
+
+      let bossHoldVal = 0;
+      m.boss.holdings.forEach(h => { bossHoldVal += (h.currentPrice * h.shares); });
+      const bossEquity = m.boss.cash + bossHoldVal;
+      const bossRetPct = ((bossEquity - m.initialCapital) / m.initialCapital) * 100;
+      const bossDiff = bossEquity - m.initialCapital;
+      const bossExposurePct = bossEquity > 0 ? (bossHoldVal / bossEquity) * 100 : 0;
+
+      let botHoldVal = 0;
+      m.bot.holdings.forEach(h => { botHoldVal += (h.currentPrice * h.shares); });
+      const botEquity = m.bot.cash + botHoldVal;
+      const botRetPct = ((botEquity - m.initialCapital) / m.initialCapital) * 100;
+      const botDiff = botEquity - m.initialCapital;
+      const botExposurePct = botEquity > 0 ? (botHoldVal / botEquity) * 100 : 0;
+
+      const bossWins = m.boss.history.filter(t => t.pnl > 0).length;
+      const bossWinRate = m.boss.history.length > 0 ? (bossWins / m.boss.history.length) * 100 : 0;
+      const botWins = m.bot.history.filter(t => t.pnl > 0).length;
+      const botWinRate = m.bot.history.length > 0 ? (botWins / m.bot.history.length) * 100 : 0;
+
+      // Boss DOM
+      document.getElementById('bossEquity').innerText = fmtMoney(bossEquity);
+      document.getElementById('bossReturn').innerHTML = `
+        <span style="color:${bossRetPct >= 0 ? 'var(--up)' : 'var(--dn)'}">${fmtPct(bossRetPct)}</span>
+        <small style="font-size:0.75rem;color:var(--text-muted);">(${bossDiff>=0?'+':''}${fmtMoney(bossDiff)})</small>
+      `;
+      document.getElementById('bossCash').innerText = fmtMoney(m.boss.cash);
+      document.getElementById('bossWinRate').innerText = `${bossWinRate.toFixed(1)}%`;
+      document.getElementById('bossActiveCount').innerText = `${m.boss.holdings.length} หุ้น`;
+      document.getElementById('bossClosedCount').innerText = `${m.boss.history.length} ไม้`;
+      document.getElementById('bossHoldCount').innerText = m.boss.holdings.length;
+
+      document.getElementById('bossExposureText').innerText = `${bossExposurePct.toFixed(1)}% / เพดาน ${marketGate.cap}%`;
+      document.getElementById('bossExposureBar').style.width = `${Math.min(100, bossExposurePct)}%`;
+
+      // Bot DOM
+      document.getElementById('botEquity').innerText = fmtMoney(botEquity);
+      document.getElementById('botReturn').innerHTML = `
+        <span style="color:${botRetPct >= 0 ? 'var(--up)' : 'var(--dn)'}">${fmtPct(botRetPct)}</span>
+        <small style="font-size:0.75rem;color:var(--text-muted);">(${botDiff>=0?'+':''}${fmtMoney(botDiff)})</small>
+      `;
+      document.getElementById('botCash').innerText = fmtMoney(m.bot.cash);
+      document.getElementById('botWinRate').innerText = `${botWinRate.toFixed(1)}%`;
+      document.getElementById('botActiveCount').innerText = `${m.bot.holdings.length} หุ้น`;
+      document.getElementById('botClosedCount').innerText = `${m.bot.history.length} ไม้`;
+      document.getElementById('botHoldCount').innerText = m.bot.holdings.length;
+
+      document.getElementById('botExposureText').innerText = `${botExposurePct.toFixed(1)}% / เพดาน ${marketGate.cap}%`;
+      document.getElementById('botExposureBar').style.width = `${Math.min(100, botExposurePct)}%`;
+
+      // Tug of war
+      const lead = bossRetPct - botRetPct;
+      const banner = document.getElementById('leadBanner');
+      const tugBoss = document.getElementById('tugBoss');
+      const tugBot = document.getElementById('tugBot');
+
+      if (Math.abs(lead) < 0.05) {
+        banner.className = 'lead-banner tie';
+        banner.innerText = '⚖️ กำลังสูสี เสมอกัน';
+        tugBoss.style.width = '50%';
+        tugBot.style.width = '50%';
+      } else if (lead > 0) {
+        banner.className = 'lead-banner boss-lead';
+        banner.innerText = `🔥 บอสนำอยู่ +${lead.toFixed(2)}%`;
+        const bossPct = Math.min(80, Math.max(20, 50 + lead * 3));
+        tugBoss.style.width = `${bossPct}%`;
+        tugBot.style.width = `${100 - bossPct}%`;
+      } else {
+        banner.className = 'lead-banner bot-lead';
+        banner.innerText = `🤖 บอทนำอยู่ +${Math.abs(lead).toFixed(2)}%`;
+        const botPct = Math.min(80, Math.max(20, 50 + Math.abs(lead) * 3));
+        tugBoss.style.width = `${100 - botPct}%`;
+        tugBot.style.width = `${botPct}%`;
+      }
+    }
+
+    // Boss Holdings Table
+    function renderBossHoldings() {
+      const m = arena[currentMarket];
+      const tbody = document.getElementById('bossHoldingsBody');
+      const sigs = rshistData?.sig || {};
+
+      if (m.boss.holdings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--text-muted);">ยังไม่มีหุ้นในพอร์ตบอส — เลือกช้อปได้จากแท็บ "สัญญาณ BUY ย้อนหลัง 7 วัน"</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = m.boss.holdings.map((h, idx) => {
+        const isSellSig = sigs[h.ticker] && sigs[h.ticker][0] === 0;
+        const hasSl = h.stopLossPct != null && h.stopLossPct > 0;
+        const isStopLoss = hasSl && (h.pnlPct <= -h.stopLossPct);
+        const pnlCls = h.pnl >= 0 ? 'color:var(--up)' : 'color:var(--dn)';
+        
+        let alertBadge = `<span style="color:var(--text-muted);font-size:0.75rem;">ปกติ (ถือต่อ)</span>`;
+        if (isStopLoss) {
+          alertBadge = `<span class="badge-signal badge-sell">⚠️ แตะ Stop Loss (-${h.stopLossPct}%)</span>`;
+        } else if (isSellSig) {
+          alertBadge = `<span class="badge-signal badge-sell">🚨 สัญญาณ ▼ SELL</span>`;
+        } else if (!hasSl) {
+          alertBadge = `<span style="color:var(--text-dim);font-size:0.75rem;">✋ ปล่อยขายมือเอง</span>`;
+        }
+
+        let slDisplay = '';
+        if (hasSl) {
+          slDisplay = `<div><strong>${fmtMoney(h.stopLossPrice)}</strong></div><small style="color:var(--dn);">(-${h.stopLossPct}%)</small>`;
+        } else {
+          slDisplay = `<div style="color:var(--text-muted);font-size:0.78rem;">🚫 ไม่ตั้ง Stop</div><small style="color:var(--text-dim);">(ขายเอง)</small>`;
+        }
+
+        return `
+          <tr>
+            <td>
+              <strong class="tk-symbol" onclick="openStockChartModal('${h.ticker}')" title="กดดูกราฟ">${h.ticker}</strong>
+              <br><small style="color:var(--text-muted);">${h.name || ''}</small>
+            </td>
+            <td>${h.buyDate}</td>
+            <td>${fmtMoney(h.buyPrice)}</td>
+            <td><strong>${fmtMoney(h.currentPrice)}</strong></td>
+            <td>${fmtShares(h.shares)}</td>
+            <td>${fmtMoney(h.currentPrice * h.shares)}</td>
+            <td style="${pnlCls}"><strong>${h.pnl>=0?'+':''}${fmtMoney(h.pnl)}</strong><br><small>(${fmtPct(h.pnlPct)})</small></td>
+            <td>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+                <div>${slDisplay}</div>
+                <button class="btn-edit-sl" onclick="openEditStopLossModal(${idx})" title="แก้ไข Stop Loss หรือเลือกไม่ตั้ง">✏️ แก้ไข</button>
+              </div>
+            </td>
+            <td>${alertBadge}</td>
+            <td>
+              <button class="action-btn-sell" onclick="openSellModal(${idx})">ขาย (Sell)</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Bot Holdings Table
+    function renderBotHoldings() {
+      const m = arena[currentMarket];
+      const tbody = document.getElementById('botHoldingsBody');
+
+      if (m.bot.holdings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--text-muted);">บอทกำลังรอจังหวะเข้าซื้อรอบใหม่ตามเกณฑ์ไฟตลาด</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = m.bot.holdings.map(h => {
+        const pnlCls = h.pnl >= 0 ? 'color:var(--up)' : 'color:var(--dn)';
+        return `
+          <tr>
+            <td>
+              <strong class="tk-symbol" onclick="openStockChartModal('${h.ticker}')" title="กดดูกราฟ">${h.ticker}</strong>
+              <br><small style="color:var(--text-muted);">${h.name || ''}</small>
+            </td>
+            <td>${h.buyDate}</td>
+            <td>${fmtMoney(h.buyPrice)}</td>
+            <td><strong>${fmtMoney(h.currentPrice)}</strong></td>
+            <td>${fmtShares(h.shares)}</td>
+            <td>${fmtMoney(h.currentPrice * h.shares)}</td>
+            <td style="${pnlCls}"><strong>${h.pnl>=0?'+':''}${fmtMoney(h.pnl)}</strong><br><small>(${fmtPct(h.pnlPct)})</small></td>
+            <td>${fmtMoney(h.stopLossPrice)}<br><small style="color:var(--dn);">(-${h.stopLossPct}%)</small></td>
+            <td><span class="badge-signal badge-buy">โมเมนตัม RS + คุมเพดาน</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Battle Matrix & Scorecard
+    function renderBattleMatrix() {
+      const m = arena[currentMarket];
+
+      let bossHoldVal = 0;
+      m.boss.holdings.forEach(h => { bossHoldVal += (h.currentPrice * h.shares); });
+      const bossEquity = m.boss.cash + bossHoldVal;
+      const bossRetPct = ((bossEquity - m.initialCapital) / m.initialCapital) * 100;
+
+      let botHoldVal = 0;
+      m.bot.holdings.forEach(h => { botHoldVal += (h.currentPrice * h.shares); });
+      const botEquity = m.bot.cash + botHoldVal;
+      const botRetPct = ((botEquity - m.initialCapital) / m.initialCapital) * 100;
+
+      const bossWins = m.boss.history.filter(t => t.pnl > 0).length;
+      const bossWinRate = m.boss.history.length > 0 ? (bossWins / m.boss.history.length) * 100 : 0;
+      const botWins = m.bot.history.filter(t => t.pnl > 0).length;
+      const botWinRate = m.bot.history.length > 0 ? (botWins / m.bot.history.length) * 100 : 0;
+
+      const bossGrossWin = m.boss.history.filter(t => t.pnl > 0).reduce((acc, t) => acc + t.pnl, 0);
+      const bossGrossLoss = Math.abs(m.boss.history.filter(t => t.pnl < 0).reduce((acc, t) => acc + t.pnl, 0));
+      const bossPF = bossGrossLoss > 0 ? (bossGrossWin / bossGrossLoss).toFixed(2) : (bossGrossWin > 0 ? 'MAX' : '0.00');
+
+      const botGrossWin = m.bot.history.filter(t => t.pnl > 0).reduce((acc, t) => acc + t.pnl, 0);
+      const botGrossLoss = Math.abs(m.bot.history.filter(t => t.pnl < 0).reduce((acc, t) => acc + t.pnl, 0));
+      const botPF = botGrossLoss > 0 ? (botGrossWin / botGrossLoss).toFixed(2) : (botGrossWin > 0 ? 'MAX' : '0.00');
+
+      const tbody = document.getElementById('matrixScorecardBody');
+      tbody.innerHTML = `
+        <tr>
+          <td>ผลตอบแทนรวม (Total Return)</td>
+          <td style="color:${bossRetPct>=0?'var(--up)':'var(--dn)'};font-weight:700;">${fmtPct(bossRetPct)}</td>
+          <td style="color:${botRetPct>=0?'var(--up)':'var(--dn)'};font-weight:700;">${fmtPct(botRetPct)}</td>
+          <td>${bossRetPct > botRetPct ? '👑 บอสนำ' : (botRetPct > bossRetPct ? '🤖 บอทนำ' : '⚖️ เสมอ')}</td>
+        </tr>
+        <tr>
+          <td>อัตราการชนะ (Win Rate)</td>
+          <td style="font-weight:600;">${bossWinRate.toFixed(1)}%</td>
+          <td style="font-weight:600;">${botWinRate.toFixed(1)}%</td>
+          <td>${bossWinRate > botWinRate ? '👑 บอสสูงกว่า' : (botWinRate > bossWinRate ? '🤖 บอทสูงกว่า' : '⚖️ เท่ากัน')}</td>
+        </tr>
+        <tr>
+          <td>Profit Factor (กำไร / ขาดทุน)</td>
+          <td style="font-weight:600;">${bossPF}</td>
+          <td style="font-weight:600;">${botPF}</td>
+          <td>${parseFloat(bossPF) > parseFloat(botPF) ? '👑 บอสดีกว่า' : '🤖 บอทดีกว่า'}</td>
+        </tr>
+        <tr>
+          <td>จำนวนการเทรดที่ปิดแล้ว (Closed Trades)</td>
+          <td>${m.boss.history.length} ไม้</td>
+          <td>${m.bot.history.length} ไม้</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>หุ้นที่กำลังถือครอง (Active Positions)</td>
+          <td>${m.boss.holdings.length} ตัว</td>
+          <td>${m.bot.holdings.length} ตัว</td>
+          <td>-</td>
+        </tr>
+      `;
+
+      // Overlap
+      const bossTks = new Set(m.boss.holdings.map(h => h.ticker));
+      const botTks = new Set(m.bot.holdings.map(h => h.ticker));
+
+      const overlap = [...bossTks].filter(t => botTks.has(t));
+      const bossSolo = [...bossTks].filter(t => !botTks.has(t));
+      const botSolo = [...botTks].filter(t => !bossTks.has(t));
+
+      document.getElementById('overlapCount').innerText = overlap.length;
+      document.getElementById('bossSoloCount').innerText = bossSolo.length;
+      document.getElementById('botSoloCount').innerText = botSolo.length;
+
+      // Render Overlap List
+      const overlapEl = document.getElementById('overlapList');
+      if (overlap.length === 0) {
+        overlapEl.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:1rem;">ยังไม่มีหุ้นที่ใจตรงกัน</div>';
+      } else {
+        overlapEl.innerHTML = overlap.map(tk => {
+          const bH = m.boss.holdings.find(h => h.ticker === tk);
+          const btH = m.bot.holdings.find(h => h.ticker === tk);
+          return `
+            <div style="background:#0f172a;padding:8px 12px;border-radius:8px;border:1px solid rgba(16,185,129,0.3);">
+              <div style="display:flex;justify-content:space-between;font-weight:700;">
+                <span class="tk-symbol" onclick="openStockChartModal('${tk}')">${tk}</span>
+                <span style="color:var(--up);">กำลังถือทั้งคู่</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-top:4px;color:var(--text-dim);">
+                <span>👑 บอสซื้อ: ${fmtMoney(bH?.buyPrice)} (${fmtPct(bH?.pnlPct)})</span>
+                <span>🤖 บอทซื้อ: ${fmtMoney(btH?.buyPrice)} (${fmtPct(btH?.pnlPct)})</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Render Boss Solo
+      const bossSoloEl = document.getElementById('bossSoloList');
+      if (bossSolo.length === 0) {
+        bossSoloEl.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:1rem;">ไม่มีหุ้นที่บอสเลือกเดี่ยว</div>';
+      } else {
+        bossSoloEl.innerHTML = bossSolo.map(tk => {
+          const bH = m.boss.holdings.find(h => h.ticker === tk);
+          return `
+            <div style="background:#0f172a;padding:8px 12px;border-radius:8px;border:1px solid var(--boss-gold-border);">
+              <div style="display:flex;justify-content:space-between;font-weight:700;">
+                <span class="tk-symbol" onclick="openStockChartModal('${tk}')">${tk}</span>
+                <span style="color:${(bH?.pnlPct||0)>=0?'var(--up)':'var(--dn)'};">${fmtPct(bH?.pnlPct)}</span>
+              </div>
+              <div style="font-size:0.75rem;color:var(--text-dim);margin-top:2px;">
+                ทุน ${fmtMoney(bH?.buyPrice)} · ถือ ${fmtShares(bH?.shares)} หุ้น
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Render Bot Solo
+      const botSoloEl = document.getElementById('botSoloList');
+      if (botSolo.length === 0) {
+        botSoloEl.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:1rem;">ไม่มีหุ้นที่บอทเลือกเดี่ยว</div>';
+      } else {
+        botSoloEl.innerHTML = botSolo.map(tk => {
+          const btH = m.bot.holdings.find(h => h.ticker === tk);
+          return `
+            <div style="background:#0f172a;padding:8px 12px;border-radius:8px;border:1px solid var(--bot-cyan-border);">
+              <div style="display:flex;justify-content:space-between;font-weight:700;">
+                <span class="tk-symbol" onclick="openStockChartModal('${tk}')">${tk}</span>
+                <span style="color:${(btH?.pnlPct||0)>=0?'var(--up)':'var(--dn)'};">${fmtPct(btH?.pnlPct)}</span>
+              </div>
+              <div style="font-size:0.75rem;color:var(--text-dim);margin-top:2px;">
+                ทุน ${fmtMoney(btH?.buyPrice)} · ถือ ${fmtShares(btH?.shares)} หุ้น
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // Closed Trades History
+    function renderHistory() {
+      const m = arena[currentMarket];
+      const tbody = document.getElementById('historyBody');
+      const allTrades = [
+        ...m.boss.history.map(t => ({ ...t, port: '👑 บอส' })),
+        ...m.bot.history.map(t => ({ ...t, port: '🤖 บอท' }))
+      ];
+      allTrades.sort((a, b) => new Date(b.sellDate) - new Date(a.sellDate));
+
+      if (allTrades.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted);">ยังไม่มีประวัติการขาย</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = allTrades.map(t => {
+        const pnlCls = t.pnl >= 0 ? 'color:var(--up)' : 'color:var(--dn)';
+        return `
+          <tr>
+            <td><strong>${t.port}</strong></td>
+            <td><strong class="tk-symbol" onclick="openStockChartModal('${t.ticker}')">${t.ticker}</strong></td>
+            <td>${t.buyDate} → ${t.sellDate}</td>
+            <td>${fmtMoney(t.buyPrice)}</td>
+            <td>${fmtMoney(t.sellPrice)}</td>
+            <td style="${pnlCls}"><strong>${t.pnl>=0?'+':''}${fmtMoney(t.pnl)}</strong></td>
+            <td style="${pnlCls}"><strong>${fmtPct(t.pnlPct)}</strong></td>
+            <td style="color:var(--text-dim);">${t.reason || 'สั่งขายปกติ'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ==========================================
+    // STOCK CARD GRAPH MODAL (เหมือน RS Dashboard)
+    // ==========================================
+    let activeChartTicker = null;
+    let activeChartTF = '1y';
+    let chartInstance = null;
+    let candleSeries = null;
+    let volumeSeries = null;
+    let smaSeriesMap = {};
+
+    async function openStockChartModal(tk) {
+      activeChartTicker = tk;
+      activeChartTF = '1y';
+
+      const s = scanData.find(x => x.ticker === tk) || {};
+      const sym = currentMarket === 'th' ? '฿' : '$';
+      const chgCls = (s.change || 0) >= 0 ? 'color:var(--up)' : 'color:var(--dn)';
+      const chgSign = (s.change || 0) >= 0 ? '+' : '';
+
+      document.getElementById('modalTkSymbol').innerText = tk;
+      document.getElementById('modalTkFullName').innerText = s.name || '';
+      document.getElementById('modalTkRs').innerText = `RS ${Math.round(s.rs || 0)}`;
+      document.getElementById('modalTkTag').innerText = currentMarket === 'th' ? (s.group === 'mai/Small' ? 'mai' : 'SET') : 'US';
+      document.getElementById('modalTkPriceDisplay').innerText = `${sym}${fmtNum(s.price || 0)}`;
+      document.getElementById('modalTkChangeDisplay').innerHTML = `<span style="${chgCls}">${chgSign}${fmtNum(s.change || 0)}%</span>`;
+
+      document.getElementById('modalTkSector').innerText = s.sector || s.industry || '-';
+      document.getElementById('modalTkMcap').innerText = s.mcap ? fmtNum(s.mcap / 1e9) + 'B' : '-';
+      document.getElementById('modalTkVol').innerText = s.volume ? fmtNum(s.volume) : '-';
+      document.getElementById('modalTkHi52').innerText = s.hi52 ? fmtNum(((s.hi52 / s.price) - 1) * 100) + '%' : '-';
+
+      // Reset TF buttons
+      document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tf1y').classList.add('active');
+
+      document.getElementById('stockChartModal').classList.add('open');
+      loadAndRenderCandleChart(tk, '1y');
+    }
+
+    function closeStockChartModal() {
+      document.getElementById('stockChartModal').classList.remove('open');
+      if (chartInstance) {
+        chartInstance.remove();
+        chartInstance = null;
+      }
+    }
+
+    function changeChartTF(tf) {
+      activeChartTF = tf;
+      document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`tf${tf}`).classList.add('active');
+      if (activeChartTicker) {
+        loadAndRenderCandleChart(activeChartTicker, tf);
+      }
+    }
+
+    function onBuyFromChartModal() {
+      if (!activeChartTicker) return;
+      const s = scanData.find(x => x.ticker === activeChartTicker) || {};
+      const sigMap = rshistData?.sig || {};
+      const sigPrice = sigMap[activeChartTicker] ? sigMap[activeChartTicker][3] : s.price;
+      closeStockChartModal();
+      openBuyModal(activeChartTicker, s.price, sigPrice, s.name);
+    }
+
+    async function loadAndRenderCandleChart(tk, tf) {
+      const container = document.getElementById('lwcContainer');
+      container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#38bdf8;">กำลังดึงข้อมูลแท่งเทียน...</div>';
+
+      try {
+        const isTh = currentMarket === 'th';
+        const mktParam = isTh ? 'thailand' : 'america';
+        const ivParam = tf === '1y' ? '1d' : tf;
+        const rangeParam = tf === '30m' ? '1mo' : (tf === '1mo' ? '5y' : (tf === '1wk' ? '2y' : '1y'));
+
+        const res = await fetch(`https://rsdashclean.vercel.app/api/chart?market=${mktParam}&symbol=${encodeURIComponent(tk)}&interval=${ivParam}&range=${rangeParam}`);
+        const j = await res.json();
+        const rawBars = (j && j.data) || [];
+
+        if (!rawBars.length) {
+          container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);">ไม่มีข้อมูลกราฟสำหรับหุ้นนี้</div>';
+          return;
+        }
+
+        container.innerHTML = '';
+        renderLwcChart(container, rawBars, tk);
+      } catch (err) {
+        console.error("Chart load err:", err);
+        container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dn);">เกิดข้อผิดพลาดในการโหลดกราฟ</div>';
+      }
+    }
+
+    function renderLwcChart(container, bars, tk) {
+      const w = container.clientWidth || 800;
+      const h = container.clientHeight || 420;
+
+      chartInstance = LightweightCharts.createChart(container, {
+        width: w,
+        height: h,
+        autoSize: true,
+        layout: {
+          background: { color: '#0b0f19' },
+          textColor: '#9ca3af'
+        },
+        grid: {
+          vertLines: { visible: false },
+          horzLines: { color: 'rgba(255,255,255,0.05)' }
+        },
+        rightPriceScale: { borderVisible: false },
+        timeScale: { borderVisible: false }
+      });
+
+      // 1. Candlestick series
+      candleSeries = chartInstance.addCandlestickSeries({
+        upColor: '#10b981',
+        downColor: '#f43f5e',
+        borderVisible: false,
+        wickUpColor: '#10b981',
+        wickDownColor: '#f43f5e'
+      });
+      candleSeries.setData(bars);
+
+      // 2. Volume series
+      const hasVol = bars.some(b => b.volume > 0);
+      if (hasVol) {
+        volumeSeries = chartInstance.addHistogramSeries({
+          priceFormat: { type: 'volume' },
+          priceScaleId: 'vol',
+          priceLineVisible: false
+        });
+        volumeSeries.setData(bars.map(d => ({
+          time: d.time,
+          value: d.volume,
+          color: d.close >= d.open ? 'rgba(16, 185, 129, 0.4)' : 'rgba(244, 63, 94, 0.4)'
+        })));
+        chartInstance.priceScale('vol').applyOptions({
+          scaleMargins: { top: 0.8, bottom: 0 }
+        });
+      }
+
+      // 3. Moving Averages
+      function calcMAs(period) {
+        const res = [];
+        for (let i = period - 1; i < bars.length; i++) {
+          let sum = 0;
+          for (let j = 0; j < period; j++) sum += bars[i - j].close;
+          res.push({ time: bars[i].time, value: sum / period });
+        }
+        return res;
+      }
+
+      const sma20 = chartInstance.addLineSeries({ color: '#f59e0b', lineWidth: 1, priceLineVisible: false });
+      sma20.setData(calcMAs(20));
+
+      const sma50 = chartInstance.addLineSeries({ color: '#38bdf8', lineWidth: 1.5, priceLineVisible: false });
+      sma50.setData(calcMAs(50));
+
+      const sma150 = chartInstance.addLineSeries({ color: '#c084fc', lineWidth: 1, priceLineVisible: false });
+      sma150.setData(calcMAs(150));
+
+      const sma200 = chartInstance.addLineSeries({ color: '#94a3b8', lineWidth: 1.5, priceLineVisible: false });
+      sma200.setData(calcMAs(200));
+
+      // 4. Buy Markers
+      const buyDates = rshistData?.bh?.[tk] || [];
+      const markers = [];
+      buyDates.forEach(d => {
+        if (bars.some(b => b.time === d)) {
+          markers.push({
+            time: d,
+            position: 'belowBar',
+            color: '#10b981',
+            shape: 'arrowUp',
+            text: 'BUY'
+          });
+        }
+      });
+      if (markers.length) candleSeries.setMarkers(markers);
+
+      chartInstance.timeScale().fitContent();
+    }
+
+    // ==========================================
+    // REALISTIC PAPER BUY MODAL INTERACTION
+    // ==========================================
+    let targetStock = null;
+    let closedExecMode = 'close'; // 'close' | 'nextOpen'
+
+    function openBuyModal(ticker, marketPrice, signalPrice, name) {
+      const s = scanData.find(x => x.ticker === ticker) || {};
+      targetStock = { ticker, marketPrice, signalPrice: signalPrice || marketPrice, name, row: s };
+
+      document.getElementById('modalTickerName').innerText = ticker;
+      document.getElementById('modalTickerSub').innerText = name || '';
+      document.getElementById('modalCurrentPriceDisplay').innerText = fmtMoney(marketPrice);
+      document.getElementById('modalSignalPriceDisplay').innerText = `ราคาปิดสัญญาณ: ${fmtMoney(signalPrice || marketPrice)}`;
+
+      // Check market status
+      const mkt = getMarketStatus(currentMarket);
+      const openBox = document.getElementById('mktOpenBox');
+      const closedBox = document.getElementById('mktClosedBox');
+      const input = document.getElementById('modalEntryPriceInput');
+
+      if (mkt.isOpen) {
+        openBox.style.display = 'block';
+        closedBox.style.display = 'none';
+        input.value = marketPrice;
+      } else {
+        openBox.style.display = 'none';
+        closedBox.style.display = 'block';
+
+        // Calculate Next Open estimation
+        const nextOpenEst = Math.round((marketPrice * (1 + ((s.change || 0) >= 0 ? 0.005 : -0.005))) * 100) / 100;
+        document.getElementById('lblClosePx').innerText = fmtMoney(marketPrice);
+        document.getElementById('lblNextOpenPx').innerText = fmtMoney(nextOpenEst);
+
+        setClosedExecPrice('close');
+      }
+
+      setStopLossPct(arena[currentMarket].defaultStopLoss || 8);
+
+      const sharesInput = document.getElementById('modalSharesInput');
+      const sharesLabel = document.getElementById('modalSharesLabel');
+      const ruleBadge = document.getElementById('modalSharesRuleBadge');
+      if (currentMarket === 'th') {
+        sharesLabel.innerText = 'จำนวนหุ้น (Board Lot 100)';
+        sharesInput.step = '100';
+        sharesInput.min = '100';
+        ruleBadge.innerHTML = '📌 <strong>ตลาดไทย (SET/mai):</strong> ขั้นต่ำ 100 หุ้น (Board Lot = 100)';
+      } else {
+        sharesLabel.innerText = 'จำนวนหุ้น (Fractional Shares)';
+        sharesInput.step = '0.0001';
+        sharesInput.min = '0.0001';
+        ruleBadge.innerHTML = '📱 <strong>ตลาดสหรัฐฯ (US):</strong> ซื้อเป็นเศษหุ้นได้ (ทศนิยม 4 ตำแหน่ง)';
+      }
+
+      applySizingPct(10); // default 10%
+
+      document.getElementById('buyModal').classList.add('open');
+    }
+
+    function closeBuyModal() {
+      document.getElementById('buyModal').classList.remove('open');
+    }
+
+    function setClosedExecPrice(mode) {
+      closedExecMode = mode;
+      document.getElementById('pillPxClose').classList.toggle('active', mode === 'close');
+      document.getElementById('pillPxNextOpen').classList.toggle('active', mode === 'nextOpen');
+
+      const s = targetStock.row;
+      const input = document.getElementById('modalEntryPriceInput');
+      if (mode === 'close') {
+        input.value = targetStock.marketPrice;
+      } else {
+        const nextOpenEst = Math.round((targetStock.marketPrice * (1 + ((s.change || 0) >= 0 ? 0.005 : -0.005))) * 100) / 100;
+        input.value = nextOpenEst;
+      }
+
+      updateBuyCalculation();
+      updateStopLossCalc();
+    }
+
+    function applySizingPct(pct) {
+      document.getElementById('modalPctInput').value = pct;
+      onPctInputChanged();
+    }
+
+    function onPctInputChanged() {
+      if (!targetStock) return;
+      const m = arena[currentMarket];
+      let bossHoldVal = 0;
+      m.boss.holdings.forEach(h => { bossHoldVal += (h.currentPrice * h.shares); });
+      const bossEquity = m.boss.cash + bossHoldVal;
+
+      const pct = Number(document.getElementById('modalPctInput').value) || 0;
+      const targetAmount = (bossEquity * pct) / 100;
+      const price = Number(document.getElementById('modalEntryPriceInput').value) || targetStock.marketPrice;
+
+      if (currentMarket === 'th') {
+        const step = 100;
+        const shares = Math.max(step, Math.floor((targetAmount / price) / step) * step);
+        document.getElementById('modalSharesInput').value = shares;
+      } else {
+        // US Fractional Shares
+        const shares = Math.max(0.0001, Number((targetAmount / price).toFixed(4)));
+        document.getElementById('modalSharesInput').value = shares;
+      }
+
+      updateBuyCalculation();
+    }
+
+    function onSharesInputChanged() {
+      if (!targetStock) return;
+      const m = arena[currentMarket];
+      let bossHoldVal = 0;
+      m.boss.holdings.forEach(h => { bossHoldVal += (h.currentPrice * h.shares); });
+      const bossEquity = m.boss.cash + bossHoldVal;
+
+      const shares = Number(document.getElementById('modalSharesInput').value) || 0;
+      const price = Number(document.getElementById('modalEntryPriceInput').value) || targetStock.marketPrice;
+      const cost = shares * price;
+      const pct = bossEquity > 0 ? (cost / bossEquity) * 100 : 0;
+      document.getElementById('modalPctInput').value = pct.toFixed(1);
+
+      updateBuyCalculation();
+    }
+
+    function updateBuyCalculation() {
+      if (!targetStock) return;
+      const m = arena[currentMarket];
+      const shares = Number(document.getElementById('modalSharesInput').value) || 0;
+      const price = Number(document.getElementById('modalEntryPriceInput').value) || targetStock.marketPrice;
+      const cost = shares * price;
+
+      document.getElementById('modalCostVal').innerText = fmtMoney(cost);
+      const remain = m.boss.cash - cost;
+      const elRemain = document.getElementById('modalCashRemaining');
+      elRemain.innerText = fmtMoney(remain);
+      elRemain.style.color = remain >= 0 ? 'var(--text)' : 'var(--dn)';
+
+      // Exposure calculation
+      let bossHoldVal = 0;
+      m.boss.holdings.forEach(h => { bossHoldVal += (h.currentPrice * h.shares); });
+      const bossEquity = m.boss.cash + bossHoldVal;
+      const newExposure = bossEquity > 0 ? ((bossHoldVal + cost) / bossEquity) * 100 : 0;
+      document.getElementById('modalNewExposure').innerText = `${newExposure.toFixed(1)}% (เพดานไฟตลาด: ${marketGate.cap}%)`;
+
+      const warnEl = document.getElementById('modalGateWarning');
+      if (newExposure > marketGate.cap) {
+        warnEl.style.display = 'block';
+        warnEl.innerText = `⚠️ การซื้อไม้นี้จะทำให้พอร์ตมี Exposure รวม ${newExposure.toFixed(1)}% ซึ่งเกินเพดานไฟตลาด (${marketGate.cap}%) แนะนำลดขนาดไม้ลง`;
+      } else {
+        warnEl.style.display = 'none';
+      }
+    }
+
+    function setStopLossPct(pct) {
+      document.querySelectorAll('#buyModal .chip-sl').forEach(c => c.classList.remove('active'));
+      const inputPct = document.getElementById('modalStopLossPctInput');
+      const inputPx = document.getElementById('modalStopLossPriceInput');
+      const notice = document.getElementById('modalSlModeNotice');
+
+      if (pct === 'none' || pct === 0 || pct === null) {
+        document.getElementById('chipSlNone')?.classList.add('active');
+        inputPct.value = '';
+        inputPct.placeholder = 'ไม่ตั้ง Stop';
+        inputPx.value = '';
+        inputPx.placeholder = 'กดขายเอง';
+        if (notice) notice.innerText = 'สถานะ: ✋ ปล่อยขายเอง (ไม่ Stop)';
+      } else {
+        const chip = document.getElementById(`chipSl${pct}`);
+        if (chip) chip.classList.add('active');
+        inputPct.placeholder = '';
+        inputPx.placeholder = '';
+        inputPct.value = pct;
+        if (notice) notice.innerText = `สถานะ: ตั้งคัทลอส -${pct}%`;
+        updateStopLossCalc();
+      }
+    }
+
+    function updateStopLossCalc() {
+      const price = Number(document.getElementById('modalEntryPriceInput').value) || targetStock?.marketPrice || 0;
+      const raw = document.getElementById('modalStopLossPctInput').value;
+      const notice = document.getElementById('modalSlModeNotice');
+      if (raw === '' || raw == null) {
+        document.getElementById('modalStopLossPriceInput').value = '';
+        if (notice) notice.innerText = 'สถานะ: ✋ ปล่อยขายเอง (ไม่ Stop)';
+        return;
+      }
+      const slPct = Number(raw);
+      if (slPct <= 0) {
+        document.getElementById('modalStopLossPriceInput').value = '';
+        if (notice) notice.innerText = 'สถานะ: ✋ ปล่อยขายเอง (ไม่ Stop)';
+        return;
+      }
+      const slPrice = price * (1 - (slPct / 100));
+      document.getElementById('modalStopLossPriceInput').value = slPrice.toFixed(2);
+      if (notice) notice.innerText = `สถานะ: ตั้งคัทลอส -${slPct}%`;
+    }
+
+    function updateStopLossFromPrice() {
+      const price = Number(document.getElementById('modalEntryPriceInput').value) || targetStock?.marketPrice || 0;
+      const slPrice = Number(document.getElementById('modalStopLossPriceInput').value) || 0;
+      const notice = document.getElementById('modalSlModeNotice');
+      if (price > 0 && slPrice > 0 && slPrice < price) {
+        const pct = ((price - slPrice) / price) * 100;
+        document.getElementById('modalStopLossPctInput').value = pct.toFixed(1);
+        document.querySelectorAll('#buyModal .chip-sl').forEach(c => c.classList.remove('active'));
+        if (notice) notice.innerText = `สถานะ: ตั้งคัทลอส -${pct.toFixed(1)}%`;
+      } else if (slPrice <= 0) {
+        document.getElementById('modalStopLossPctInput').value = '';
+        document.querySelectorAll('#buyModal .chip-sl').forEach(c => c.classList.remove('active'));
+        document.getElementById('chipSlNone')?.classList.add('active');
+        if (notice) notice.innerText = 'สถานะ: ✋ ปล่อยขายเอง (ไม่ Stop)';
+      }
+    }
+
+    function confirmBuy() {
+      if (!targetStock) return;
+      const shares = Number(document.getElementById('modalSharesInput').value) || 0;
+      const price = Number(document.getElementById('modalEntryPriceInput').value) || targetStock.marketPrice;
+      const rawSlPct = document.getElementById('modalStopLossPctInput').value;
+      const slPct = (rawSlPct === '' || rawSlPct == null || Number(rawSlPct) <= 0) ? null : Number(rawSlPct);
+      const rawSlPrice = document.getElementById('modalStopLossPriceInput').value;
+      const slPrice = slPct != null ? (Number(rawSlPrice) || (price * (1 - (slPct / 100)))) : null;
+      const cost = shares * price;
+      const m = arena[currentMarket];
+
+      if (cost <= 0) return alert('กรุณาระบุจำนวนหุ้นที่ถูกต้อง');
+      if (currentMarket === 'th') {
+        if (shares < 100 || shares % 100 !== 0) {
+          return alert('กฎตลาดหุ้นไทย (SET/mai): ต้องซื้อขั้นต่ำ 100 หุ้น และเป็นจำนวนเท่าของ 100 หุ้น (Board Lot)');
+        }
+      } else {
+        if (shares <= 0) return alert('กรุณาระบุจำนวนหุ้นที่มากกว่า 0');
+      }
+      if (cost > m.boss.cash) return alert('เงินสดในพอร์ตไม่เพียงพอ!');
+
+      m.boss.cash -= cost;
+      m.boss.holdings.push({
+        ticker: targetStock.ticker,
+        name: targetStock.name,
+        buyPrice: price,
+        currentPrice: targetStock.marketPrice,
+        shares: shares,
+        buyDate: new Date().toISOString().slice(0, 10),
+        stopLossPct: slPct,
+        stopLossPrice: slPrice,
+        pnl: 0,
+        pnlPct: 0
+      });
+
+      saveState();
+      closeBuyModal();
+      recordEquitySnapshot();
+      renderScoreboard();
+      drawEquityChart();
+      setTab('boss');
+      showToast(`⚡ เคาะซื้อ <strong>${targetStock.ticker}</strong> เข้าพอร์ตจำลองบอสสำเร็จ (${fmtShares(shares)} หุ้น @ ${fmtMoney(price)})`);
+    }
+
+    // Sell Modal
+    let sellTargetIdx = null;
+    function openSellModal(idx) {
+      sellTargetIdx = idx;
+      const m = arena[currentMarket];
+      const h = m.boss.holdings[idx];
+      if (!h) return;
+
+      document.getElementById('sellStockName').innerHTML = `<span>${h.ticker}</span> <span>${fmtMoney(h.currentPrice)}</span>`;
+      document.getElementById('sellStockSub').innerHTML = `<span>ทุน: ${fmtMoney(h.buyPrice)}</span> <span>ถือ: ${fmtShares(h.shares)} หุ้น</span>`;
+      document.getElementById('sellPriceInput').value = h.currentPrice;
+
+      updateSellPnlPreview();
+      document.getElementById('sellModal').classList.add('open');
+    }
+
+    function closeSellModal() {
+      document.getElementById('sellModal').classList.remove('open');
+    }
+
+    function updateSellPnlPreview() {
+      if (sellTargetIdx == null) return;
+      const m = arena[currentMarket];
+      const h = m.boss.holdings[sellTargetIdx];
+      if (!h) return;
+
+      const exitPx = h.currentPrice;
+      const pnl = (exitPx - h.buyPrice) * h.shares;
+      const pnlPct = ((exitPx - h.buyPrice) / h.buyPrice) * 100;
+      const pnlCls = pnl >= 0 ? 'color:var(--up)' : 'color:var(--dn)';
+
+      document.getElementById('sellPnlPreview').innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span>เงินที่จะได้รับคืน:</span>
+          <strong>${fmtMoney(exitPx * h.shares)}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span>กำไร/ขาดทุนสุทธิ:</span>
+          <strong style="${pnlCls}">${pnl>=0?'+':''}${fmtMoney(pnl)} (${fmtPct(pnlPct)})</strong>
+        </div>
+      `;
+    }
+
+    function confirmSellPosition() {
+      if (sellTargetIdx == null) return;
+      const m = arena[currentMarket];
+      const h = m.boss.holdings[sellTargetIdx];
+      if (!h) return;
+
+      const exitPx = h.currentPrice;
+      const reason = document.getElementById('sellReasonSelect').value;
+      const pnl = (exitPx - h.buyPrice) * h.shares;
+      const pnlPct = ((exitPx - h.buyPrice) / h.buyPrice) * 100;
+
+      m.boss.cash += h.shares * exitPx;
+      m.boss.history.push({
+        ticker: h.ticker,
+        buyDate: h.buyDate,
+        sellDate: new Date().toISOString().slice(0, 10),
+        buyPrice: h.buyPrice,
+        sellPrice: exitPx,
+        shares: h.shares,
+        pnl: pnl,
+        pnlPct: pnlPct,
+        reason: reason
+      });
+
+      m.boss.holdings.splice(sellTargetIdx, 1);
+      saveState();
+      closeSellModal();
+      recordEquitySnapshot();
+      renderScoreboard();
+      renderBossHoldings();
+      drawEquityChart();
+      showToast(`💰 ขาย <strong>${h.ticker}</strong> ออกจากพอร์ตจำลองแล้ว (${pnl>=0?'+':''}${fmtMoney(pnl)})`);
+    }
+
+    // Manual Entry
+    function openManualBuyModal() {
+      document.getElementById('manualBuyModal').classList.add('open');
+    }
+    function closeManualBuyModal() {
+      document.getElementById('manualBuyModal').classList.remove('open');
+    }
+    function confirmManualBuy() {
+      const ticker = (document.getElementById('manualTickerInput').value || '').trim().toUpperCase();
+      const price = Number(document.getElementById('manualPriceInput').value);
+      const shares = Number(document.getElementById('manualSharesInput').value);
+
+      if (!ticker || price <= 0 || shares <= 0) return alert('กรุณากรอกข้อมูลหุ้นให้ครบถ้วน');
+
+      const m = arena[currentMarket];
+      const cost = price * shares;
+      if (cost > m.boss.cash) return alert('เงินสดในพอร์ตไม่เพียงพอ!');
+
+      m.boss.cash -= cost;
+      m.boss.holdings.push({
+        ticker: ticker,
+        name: ticker,
+        buyPrice: price,
+        currentPrice: price,
+        shares: shares,
+        buyDate: new Date().toISOString().slice(0, 10),
+        stopLossPct: m.defaultStopLoss,
+        stopLossPrice: price * (1 - (m.defaultStopLoss / 100)),
+        pnl: 0,
+        pnlPct: 0
+      });
+
+      saveState();
+      closeManualBuyModal();
+      recordEquitySnapshot();
+      renderScoreboard();
+      drawEquityChart();
+      setTab('boss');
+    }
+
+    // Settings Modal
+    function openConfigModal() {
+      const m = arena[currentMarket];
+      document.getElementById('cfgCapital').value = m.initialCapital;
+      document.getElementById('cfgCapGreen').value = m.capGreen || 100;
+      document.getElementById('cfgCapYellow').value = m.capYellow || 50;
+      document.getElementById('cfgCapRed').value = m.capRed || 20;
+      document.getElementById('cfgMaxSlice').value = m.maxSlicePct || 20;
+      document.getElementById('cfgDefaultSL').value = m.defaultStopLoss || 8;
+      document.getElementById('configModal').classList.add('open');
+    }
+    function closeConfigModal() {
+      document.getElementById('configModal').classList.remove('open');
+    }
+    function saveConfigSettings() {
+      const m = arena[currentMarket];
+      const cap = Number(document.getElementById('cfgCapital').value);
+      if (cap > 0) m.initialCapital = cap;
+      m.capGreen = Number(document.getElementById('cfgCapGreen').value) || 100;
+      m.capYellow = Number(document.getElementById('cfgCapYellow').value) || 50;
+      m.capRed = Number(document.getElementById('cfgCapRed').value) || 20;
+      m.maxSlicePct = Number(document.getElementById('cfgMaxSlice').value) || 20;
+      m.defaultStopLoss = Number(document.getElementById('cfgDefaultSL').value) || 8;
+
+      calcMarketGate();
+      saveState();
+      closeConfigModal();
+      renderScoreboard();
+      drawEquityChart();
+    }
+
+    // Backup & Restore
+    function openBackupModal() {
+      document.getElementById('backupTextarea').value = JSON.stringify(arena, null, 2);
+      document.getElementById('backupModal').classList.add('open');
+    }
+    function closeBackupModal() {
+      document.getElementById('backupModal').classList.remove('open');
+    }
+    function exportBackupData() {
+      const text = document.getElementById('backupTextarea').value;
+      navigator.clipboard.writeText(text).then(() => alert('คัดลอกข้อมูล JSON เรียบร้อยแล้ว!'));
+    }
+    function downloadBackupFile() {
+      const blob = new Blob([JSON.stringify(arena, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `rs_arena_backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+    }
+    function importBackupData() {
+      try {
+        const text = document.getElementById('backupTextarea').value;
+        const parsed = JSON.parse(text);
+        if (parsed && parsed.th && parsed.us) {
+          arena = parsed;
+          saveState();
+          alert('นำเข้าข้อมูลสำเร็จ!');
+          closeBackupModal();
+          calcMarketGate();
+          renderScoreboard();
+          drawEquityChart();
+          setTab('feed');
+        } else {
+          alert('รูปแบบ JSON ไม่ถูกต้อง');
+        }
+      } catch (e) {
+        alert('เกิดข้อผิดพลาดในการอ่าน JSON: ' + e.message);
+      }
+    }
+
+    function resetBattle() {
+      if (!confirm('ยืนยันล้างข้อมูลและเริ่มประลองใหม่ทั้งหมด?')) return;
+      arena[currentMarket].boss = { cash: arena[currentMarket].initialCapital, holdings: [], history: [], equityHistory: [] };
+      arena[currentMarket].bot = { cash: arena[currentMarket].initialCapital, holdings: [], history: [], equityHistory: [] };
+      saveState();
+      renderScoreboard();
+      drawEquityChart();
+      setTab('feed');
+    }
+
+    // ==========================================
+    // EDIT STOP LOSS MODAL INTERACTION
+    // ==========================================
+    let editingSlIdx = null;
+
+    function openEditStopLossModal(idx) {
+      editingSlIdx = idx;
+      const m = arena[currentMarket];
+      const h = m.boss.holdings[idx];
+      if (!h) return;
+
+      document.getElementById('editSlTicker').innerText = h.ticker;
+      document.getElementById('editSlBuyPx').innerText = fmtMoney(h.buyPrice);
+      document.getElementById('editSlCurrentPx').innerText = fmtMoney(h.currentPrice);
+      const pnlSign = h.pnl >= 0 ? '+' : '';
+      const pnlColor = h.pnl >= 0 ? 'var(--up)' : 'var(--dn)';
+      document.getElementById('editSlCurrentPnl').innerHTML = `<span style="color:${pnlColor};">${pnlSign}${fmtMoney(h.pnl)} (${fmtPct(h.pnlPct)})</span>`;
+
+      const pctInput = document.getElementById('editSlPctInput');
+      const pxInput = document.getElementById('editSlPriceInput');
+
+      if (h.stopLossPct != null && h.stopLossPct >= 0) {
+        pctInput.value = h.stopLossPct;
+        pctInput.placeholder = '';
+        pxInput.value = h.stopLossPrice ? h.stopLossPrice.toFixed(2) : (h.buyPrice * (1 - (h.stopLossPct / 100))).toFixed(2);
+        pxInput.placeholder = '';
+      } else {
+        pctInput.value = '';
+        pxInput.value = '';
+        pctInput.placeholder = 'ไม่ตั้ง Stop (ขายมือเอง)';
+        pxInput.placeholder = 'ขายมือเอง';
+      }
+
+      document.querySelectorAll('#editStopLossModal .chip-btn').forEach(c => c.classList.remove('active'));
+      if (h.stopLossPct == null || h.stopLossPct < 0) {
+        document.getElementById('editChipNone')?.classList.add('active');
+      } else if (h.stopLossPct === 0) {
+        document.getElementById('editChipBe')?.classList.add('active');
+      }
+
+      document.getElementById('editStopLossModal').classList.add('open');
+    }
+
+    function closeEditStopLossModal() {
+      document.getElementById('editStopLossModal').classList.remove('open');
+      editingSlIdx = null;
+    }
+
+    function setEditSlChoice(choice) {
+      if (editingSlIdx == null) return;
+      const m = arena[currentMarket];
+      const h = m.boss.holdings[editingSlIdx];
+      if (!h) return;
+
+      document.querySelectorAll('#editStopLossModal .chip-btn').forEach(c => c.classList.remove('active'));
+      const pctInput = document.getElementById('editSlPctInput');
+      const pxInput = document.getElementById('editSlPriceInput');
+
+      if (choice === 'none') {
+        document.getElementById('editChipNone')?.classList.add('active');
+        pctInput.value = '';
+        pctInput.placeholder = 'ไม่ตั้ง Stop (ขายมือเอง)';
+        pxInput.value = '';
+        pxInput.placeholder = 'ขายมือเอง';
+      } else if (choice === 'be') {
+        document.getElementById('editChipBe')?.classList.add('active');
+        pctInput.value = '0';
+        pctInput.placeholder = '';
+        pxInput.value = h.buyPrice.toFixed(2);
+        pxInput.placeholder = '';
+      } else {
+        const pct = Number(choice);
+        const chip = document.getElementById(`editChip${pct}`);
+        if (chip) chip.classList.add('active');
+        pctInput.placeholder = '';
+        pxInput.placeholder = '';
+        pctInput.value = pct;
+        const slPx = h.buyPrice * (1 - (pct / 100));
+        pxInput.value = slPx.toFixed(2);
+      }
+    }
+
+    function onEditSlPctChanged() {
+      if (editingSlIdx == null) return;
+      const m = arena[currentMarket];
+      const h = m.boss.holdings[editingSlIdx];
+      if (!h) return;
+
+      document.querySelectorAll('#editStopLossModal .chip-btn').forEach(c => c.classList.remove('active'));
+      const raw = document.getElementById('editSlPctInput').value;
+      if (raw === '' || raw == null) {
+        document.getElementById('editSlPriceInput').value = '';
+        document.getElementById('editChipNone')?.classList.add('active');
+        return;
+      }
+      const pct = Number(raw);
+      const slPx = h.buyPrice * (1 - (pct / 100));
+      document.getElementById('editSlPriceInput').value = slPx.toFixed(2);
+    }
+
+    function onEditSlPriceChanged() {
+      if (editingSlIdx == null) return;
+      const m = arena[currentMarket];
+      const h = m.boss.holdings[editingSlIdx];
+      if (!h) return;
+
+      document.querySelectorAll('#editStopLossModal .chip-btn').forEach(c => c.classList.remove('active'));
+      const slPx = Number(document.getElementById('editSlPriceInput').value) || 0;
+      if (slPx > 0 && h.buyPrice > 0) {
+        const pct = ((h.buyPrice - slPx) / h.buyPrice) * 100;
+        document.getElementById('editSlPctInput').value = pct.toFixed(1);
+      } else if (slPx <= 0) {
+        document.getElementById('editSlPctInput').value = '';
+        document.getElementById('editChipNone')?.classList.add('active');
+      }
+    }
+
+    function saveEditStopLoss() {
+      if (editingSlIdx == null) return;
+      const m = arena[currentMarket];
+      const h = m.boss.holdings[editingSlIdx];
+      if (!h) return;
+
+      const rawPct = document.getElementById('editSlPctInput').value;
+      const rawPx = document.getElementById('editSlPriceInput').value;
+
+      if (rawPct === '' || rawPct == null || Number(rawPct) < 0) {
+        h.stopLossPct = null;
+        h.stopLossPrice = null;
+      } else {
+        const pct = Number(rawPct);
+        const px = Number(rawPx) || (h.buyPrice * (1 - (pct / 100)));
+        h.stopLossPct = pct;
+        h.stopLossPrice = px;
+      }
+
+      saveState();
+      renderBossHoldings();
+      closeEditStopLossModal();
+      showToast(`🛡️ อัปเดต Stop Loss ของ <strong>${h.ticker}</strong> สำเร็จ (${h.stopLossPct != null ? (h.stopLossPct === 0 ? 'เลื่อนเท่าทุน 0%' : '-' + h.stopLossPct + '%') : '🚫 ไม่ตั้ง / กดขายเอง'})`);
+    }
+
+    // Equity Canvas Chart
+    function drawEquityChart() {
+      const canvas = document.getElementById('equityChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = canvas.parentElement.clientWidth;
+      const h = canvas.height = canvas.parentElement.clientHeight;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Grid
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.lineWidth = 1;
+      for (let y = 30; y < h - 25; y += 45) {
+        ctx.beginPath();
+        ctx.moveTo(35, y);
+        ctx.lineTo(w - 20, y);
+        ctx.stroke();
+      }
+
+      const midY = h * 0.55;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(35, midY);
+      ctx.lineTo(w - 20, midY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '10px var(--font-mono)';
+      ctx.fillText('0.00% (ทุน)', 40, midY - 6);
+
+      const m = arena[currentMarket];
+      const bossHist = (m.boss.equityHistory && m.boss.equityHistory.length > 0) ? m.boss.equityHistory : [{ equity: m.initialCapital }];
+      const botHist = (m.bot.equityHistory && m.bot.equityHistory.length > 0) ? m.bot.equityHistory : [{ equity: m.initialCapital }];
+
+      const count = Math.max(bossHist.length, botHist.length, 5);
+      const bossPts = [];
+      const botPts = [];
+      const benchPts = [];
+
+      for (let i = 0; i < count; i++) {
+        const bVal = bossHist[Math.min(i, bossHist.length - 1)].equity;
+        const btVal = botHist[Math.min(i, botHist.length - 1)].equity;
+
+        const bRet = (bVal - m.initialCapital) / m.initialCapital;
+        const btRet = (btVal - m.initialCapital) / m.initialCapital;
+        const benchRet = Math.sin(i * 0.5) * 0.012;
+
+        bossPts.push(midY - (bRet * midY * 3));
+        botPts.push(midY - (btRet * midY * 3));
+        benchPts.push(midY - (benchRet * midY * 3));
+      }
+
+      function drawPath(pts, color, width = 2.5) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.beginPath();
+        for (let i = 0; i < pts.length; i++) {
+          const x = 50 + (i * (w - 90) / (pts.length - 1));
+          const y = pts[i];
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      drawPath(benchPts, '#475569', 1.5);
+      drawPath(bossPts, '#f59e0b', 2.5);
+      drawPath(botPts, '#06b6d4', 2.5);
+    }
+
+    window.addEventListener('resize', drawEquityChart);
+
+    // Initial Bootstrap
+    loadState();
+    updateTabLabels();
+    loadMarketData();
+  </script>
+</body>
+</html>
