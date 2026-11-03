@@ -1991,7 +1991,7 @@ const grpThHtml=k=>{ const t=grpTh(k); return t?' <span class="mf-th">('+t+')</s
 const MF_Q={Leading:['นำตลาด','q-L'],Improving:['กำลังดีขึ้น','q-I'],Weakening:['ชะลอตัว','q-W'],Lagging:['ตามหลัง','q-G']};
 const MF_TYPE={index:'Index',country:'Country',region:'Region',asset:'Asset'};
 const mfJ=u=>MF.cache[u]||(MF.cache[u]=fetch(API+u).then(r=>r.json()).then(j=>{ if(j.error) throw new Error(j.error); return j; }).catch(e=>{ delete MF.cache[u]; throw e; }));
-const mfScanRows=mk=>mfJ('/api/scan?market='+mk).then(j=>{ const d=j.data||[]; try{ setLogoIds(mk,d); }catch(e){} return d; });
+const mfScanRows=mk=>mfJ('/api/scan?market='+mk).then(j=>{ const d=j.data||[]; try{ setLogoIds(mk,d); }catch(e){} try{ _rsOverrideRows(d); }catch(e){} return d; });   // RS ตามฐานที่เลือก (3M/6M/1Y/รวม) — ให้ตรงกับ stockDB (บอส 3 พ.ย.: แถวโชว์ 98 แต่ป็อปอัปโชว์ 97)
 const mfPct=v=>v==null?'<span class="mu">–</span>':'<b class="'+(v>=0?'pos':'neg')+'">'+(v>=0?'+':'')+(v*100).toFixed(Math.abs(v)<0.1?2:1)+'%</b>';
 const mfR=(s,i0)=>{ const a=s[i0],b=s[s.length-1]; return (a!=null&&b!=null&&a>0)?b/a-1:null; };
 function mfSma(s,n){ const w=s.filter(x=>x!=null).slice(-n); return w.length>=n?w.reduce((a,b)=>a+b,0)/n:null; }
@@ -3437,7 +3437,11 @@ function clearMarketData(){
 let RS_BASE = '3m';
 try{ const _sb=localStorage.getItem('rsd_rs'); if(['3m','6m','1y','all'].includes(_sb)) RS_BASE=_sb; }catch(e){}
 const RS_FLD = { '3m':'rs3', '6m':'rs6', '1y':'rs1', all:null };   // all = สูตรรวมเดิม (s.rs ของ backend)
-function _rsOverrideRows(rows){ const f = RS_FLD[RS_BASE]; if(!f || !Array.isArray(rows)) return rows;
+function _rsOverrideRows(rows){ const f = RS_FLD[RS_BASE]; if(!Array.isArray(rows)) return rows;
+  if(!f){   // "รวม" = สูตรรวมเดิมของ backend — คืนค่าเดิม (บั๊กที่เจอ 3 พ.ย.: กดรวมแล้วยังค้างค่า 3M)
+    rows.forEach(s=>{ if(!s || s._rsAll===undefined) return; s.rs = s._rsAll; if(s._rTAll!==undefined) s.rT = s._rTAll; });
+    return rows;
+  }
   rows.forEach(s=>{ if(!s) return; if(s._rsAll===undefined){ s._rsAll = s.rs; s._rTAll = s.rT; } s.rs = (s[f] != null) ? s[f] : s._rsAll; });
   // อันดับ #N ที่โชว์ข้างค่า RS = ลำดับเรียงตามฐานที่เลือก (ก่อนหน้าโชว์รวมเดิมทุกฐาน บอส 3 พ.ย. "อันดับไม่เปลี่ยนเมื่อสลับฐาน")
   const arr = [...rows].filter(s=>s && Number.isFinite(Number(s.rs))).sort((a,b)=>b.rs-a.rs);

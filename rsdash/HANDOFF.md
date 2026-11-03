@@ -61,6 +61,27 @@
 
 ## ล็อก (ใหม่อยู่บน)
 
+### 3 พ.ย. 14:40 — Hermes (แก้ RS ไม่ตรงกันระหว่างแถวกับป็อปอัป + ปุ่ม "รวม" ค้างค่า)
+- บอสเจอ PAYS แถวโชว์ RS 98 แต่ป็อปอัปโชว์ 97 (ตอนเลือก 3M) → สาเหตุ: หน้า TODAY/Scanner ใช้แถวจาก `mfScanRows` ที่ไม่ผ่านการทับค่า RS ตามฐาน (ป็อปอัปใช้ `stockDB` ที่ทับแล้ว) → แก้: `mfScanRows` เรียก `_rsOverrideRows` (แถวกับป็อปอัปใช้ค่าเดียวกันแล้ว)
+- เจอบั๊กที่สองระหว่างทดสอบ: กด "รวม" แล้วค่ายังค้างของฐานก่อนหน้า (เพราะฐานรวมเป็น `null` แล้วโค้ด return ทิ้งก่อนคืนค่า) → แก้ให้คืน `_rsAll`/`_rTAll` เดิม
+- ตรวจเว็บจริง (PAYS, US): 3M → 97 · 6M → 98 · 1Y → 98 · รวม → 98 · ยอด Buy ในหน้า TODAY เปลี่ยนตาม: 3M 8 · 6M 8 · 1Y 3 · รวม 5
+### 3 พ.ย. 13:35 — Claude/Antigravity (ยกชุด Graph Card ของ RS Dashboard ไปใส่ในเว็บพอร์ตจำลอง rsarena)
+- **บริบท**: บอสสั่ง "Copy Grahp card จาก Rsdash มาเลย ดีเทลแบบนี้เลย" (อ้างอิงภาพ CNT ในป็อปอัปของ RS Dashboard) และระบุ "หมายถึง เว็ปพอร์ทจำลองนะ"
+- **สิ่งที่ทำใน `rsarena/`**:
+  1. คัดลอก `trendlib.js` และ `about.js` จาก `rsdash/` มายัง `rsarena/` พร้อมสร้าง `industry.js` บรรจุ `TH_INDUSTRY` และ `MEGATREND` สำหรับแปลงชื่อกลุ่มเป็นไทย
+  2. ยกดีไซน์หัวการ์ดและโครงสร้าง 5 แถวจาก `chartModal` ของ RS Dashboard มาใส่ใน `#stockChartModal` ของ `rsarena`:
+     - แถว 1: โลโก้กลม/Monogram, Ticker ตัวหนา, RS badge (สีตามระดับ RS), ป้ายตลาด (mai/SET/US), อายุ IPO (`ipoAge` จาก `firstTradeDate`), Cap badge, Relative Volume pill (`fRVOL`), Volatility pill (`volBadge` จาก `vol_th.json`/`vol_us.json`), กลุ่มอุตสาหกรรมไทย (`themeDisplay`), ปุ่ม `⚡ เคาะซื้อ (Paper Buy)`, ปุ่มปิดวงกลม `✕`
+     - แถว 2: ชื่อบริษัทภาษาอังกฤษ
+     - แถว 3: สรุปสถิติราคา, % เปลี่ยนแปลง, มูลค่าซื้อขาย, Mcap, ผลตอบแทน 3 เดือน, 1 เดือน, กลุ่ม
+     - แถว 4: Timeframes (30m, 1D, 1W, 1M, 3Y), ป้าย Buy/Wait/Sell (`bsEvalStock`), ป้ายหมุนเวียนกลุ่ม (Sector Rotation เช่น `Industrial Services · ชะลอตัว`)
+     - แถว 5: Legend เส้น MA (SMA20, SMA50, SMA150, SMA200 กดเปิด/ปิดได้) + คำอธิบายสีลูกศรสัญญาณ
+     - ตัวกราฟ Lightweight Charts 4.2.1: แท่งเทียนเขียว `#30d158`/แดง `#ff453a`, แท่ง Volume ล่าง, เส้น SMA พร้อมป้ายราคาสีที่สเกลขวา, ลูกศรซื้อ `▲` (เขียว/เหลือง) และลูกศรขาย `▼` (แดง)
+     - รายละเอียด Trend Template Minervini (TT 7/8 พร้อมเกณฑ์ 8 ข้อและตัวชี้วัดความนิ่งการบีบตัว) กดพับ/ขยายได้
+     - แผง "🏢 เกี่ยวกับบริษัท (Yahoo Finance · แปลไทยอัตโนมัติ)" ดึงคำแปลไทยผ่าน `/api/flow?kind=tr` พร้อมปุ่มสลับดูต้นฉบับ EN (`aboutToggle`)
+  3. ปุ่ม `⚡ เคาะซื้อ (Paper Buy)` ในหน้าต่างกราฟเชื่อมต่อเข้า Modal ซื้อขายจำลองที่มีราคาสดตามตลาด (Market Order / ATO เมื่อตลาดปิด) และรองรับการแก้ไข/ยกเลิก Stop Loss ได้อย่างอิสระ
+- **Deploy**: ตรวจ auth ผ่าน `npx vercel whoami` (Rule 1) แล้ว deploy `rsarena` ขึ้น Production ผ่าน Vercel CLI (`https://rsarena.vercel.app`) ตรวจสอบ HTTP 200 และฟังก์ชันครบถ้วน ✅
+- **Git**: ไม่ได้ commit/push เอง ตาม Rule 5.1 (หน้าที่ของ Hermes)
+
 ### 3 พ.ย. 14:05 — Hermes (จบงาน: สัญญาณ Buy/Wait/Sell + อันดับ ตามฐาน RS ที่เลือก)
 - **บริบท**: บอสสั่ง "เลือก RS3M/6M/1Y/รวม ที่ขวาบนของเว็บ → ทุกสูตรเปลี่ยนตามค่า" และ "BUY RS>60 = RS3M>60 เมื่อเลือก 3M" + "กดแล้วป้าย RS/อันดับต้องเปลี่ยน"
 - **หลังบ้าน (`scripts/flow/precompute_rshist.mjs` ของ Hermes)**: คำนวณ `rs3/rs6/rs1` รายแท่ง (เปอร์เซ็นไทล์ผลตอบแทน 3/6/12 เดือน เทียบหุ้นทั้งตลาด) + `sig3/sig6/sig1` (สัญญาณครบชุดต่อฐาน: เกณฑ์ RS>60 ใช้ RS ของฐานนั้น) + `bh3/bh6/bh1` (Buy ย้อนหลัง 7 วันต่อฐาน) · ของเดิม `rs/sig/bh` คงไว้
