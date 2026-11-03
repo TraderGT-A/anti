@@ -119,7 +119,7 @@ export async function computeMarket(mk) {
   //   flags: 1=3M ไม่บวก (ปิด ≤ ปิด 63 แท่งก่อน) · 2=SMA50≤SMA200 · 4=ปิด ≤ SMA150 · 8=RS ≤ 60 · 16=ไม่ย่อ (ไม่ใช่ ปิด<SMA20 และปิดเขียว) · 32=ปริมาณไม่เพิ่มจากแท่งก่อน
   const sig = {}, sigB = { rs3: {}, rs6: {}, rs1: {} }, Li = outDates.length - 1;
   for (const t of tk) {
-    if (!shown.has(t)) continue; const b = rows[t], n = b.length, L = n - 1;
+    const b = rows[t]; if (!b) continue; const n = b.length, L = n - 1;
     if (n < 200 || b[L][0] !== outDates[Li]) continue;
     const cs = [0]; b.forEach((x, i) => cs.push(cs[i] + x[1])); const avg = (k) => (cs[n] - cs[n - k]) / k;
     const px = b[L][1], s20 = avg(20), s50 = avg(50), s150 = avg(150), s200 = avg(200);
@@ -159,8 +159,8 @@ export async function computeMarket(mk) {
   const buy7 = buy7s.rs;
   log(mk, "Buy ย้อนหลัง 8 แท่ง:", Object.keys(buy7).length, "ตัว · ฐาน 3M", Object.keys(buy7s.rs3).length, "/ 6M", Object.keys(buy7s.rs6).length, "/ 1Y", Object.keys(buy7s.rs1).length);
   const cnt3 = [0, 0, 0]; Object.values(sig).forEach((x) => cnt3[x[0]]++); log(mk, "สัญญาณ ณ", outDates[Li], "· Sell", cnt3[0], "Wait", cnt3[1], "Buy", cnt3[2]);
-  const rsOut = {}; for (const t of tk) if (shown.has(t)) rsOut[t] = rs[t];   // เก็บเฉพาะหุ้นที่แสดงในแดชบอร์ด (จัดอันดับใช้ทั้งตลาด)
-  const rsBOut = {}; for (const bk of ['rs3', 'rs6', 'rs1']) { rsBOut[bk] = {}; for (const t of tk) if (shown.has(t)) rsBOut[bk][t] = rsB[bk][t]; }
+  const rsOut = {}; for (const t of tk) rsOut[t] = rs[t];   // เก็บเฉพาะหุ้นที่แสดงในแดชบอร์ด (จัดอันดับใช้ทั้งตลาด)
+  const rsBOut = {}; for (const bk of ['rs3', 'rs6', 'rs1']) { rsBOut[bk] = {}; for (const t of tk) rsBOut[bk][t] = rsB[bk][t]; }
   const j = { generatedAt: new Date().toISOString(), mk, dates: outDates, rs: rsOut, rs3: rsBOut.rs3, rs6: rsBOut.rs6, rs1: rsBOut.rs1, sig3: sigB.rs3, sig6: sigB.rs6, sig1: sigB.rs1, bh3: buy7s.rs3, bh6: buy7s.rs6, bh1: buy7s.rs1, sig, bh: buy7, sigAsOf: outDates[Li], universe: N, shown: Object.keys(rsOut).length, check: { n, meanAbsDiff: +(abs / n).toFixed(2), within5: +(within5 / n).toFixed(3), same70: +(same70 / n).toFixed(3) } };
   const f = path.join(OUT, `rshist_${mk}.json`); fs.writeFileSync(f + ".tmp", JSON.stringify(j)); fs.renameSync(f + ".tmp", f);
   // พ่น data.js ให้ Vercel serverless (/api/scan) import ได้แน่นอน (บอส 3 พ.ย.: CNT เกิดสัญญาณเมื่อวาน วันนี้หาย — ให้หุ้นข้อสถานะอยู่ครบไม่หายกลางวัน)

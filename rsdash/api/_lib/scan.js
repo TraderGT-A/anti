@@ -176,11 +176,12 @@ export async function scanMarket(market = "thailand") {
   // RS แยกฐานช่วง (บอส 3 พ.ย.: "มีให้เลือก RS3M / RS6M / RS1ปี · default 3M ทั้งเว็บ · เลือกจากจุดขวาบนของเว็บ ใช้ทั้งหมด")
   // นิยามตรงชื่อ: อันดับเปอร์เซ็นไทล์ของผลตอบแทนช่วงนั้นเทียบหุ้นทั้งตลาด (หุ้นครบชุดเดียวกับ rs เดิม)
   // → rs3 = p3m, rs6 = p6m, rs1 = p1y (แหว่งแถวขาด = null → เว็บแสดง '–' และไม่เรียงหัวหน้าตาม RS ที่เลือก)
-  const _base = (key, fld) => {
+  const _base = (key, fld, rtfld) => {
     const arr = [...raw].sort((a, b) => ((b[key] ?? -1e9) - (a[key] ?? -1e9)) || (b.score - a.score));
-    arr.forEach((s, i) => { if (s[key] != null) s[fld] = percentile(i, arr.length); });
+    arr.forEach((s, i) => { if (s[key] != null) { s[fld] = percentile(i, arr.length); s[rtfld] = i + 1; } });
   };
-  _base('p3m', 'rs3'); _base('p6m', 'rs6'); _base('p1y', 'rs1');   // 0–99 เทียบหุ้นทั้งตลาด
+  // ชุดละฐาน: rs (0–99) + อันดับในกระดานเดียวกัน (rT) — ให้แถว/ป็อปอัปโชว์ "#N" ตรงกันทุกที่ ไม่ขึ้นกับว่าหน้าไหนโหลดมาก่อน
+  _base('p3m', 'rs3', 'rT3'); _base('p6m', 'rs6', 'rT6'); _base('p1y', 'rs1', 'rT1');
 
   const byMcap = [...raw].sort((a, b) => b.mcap - a.mcap);
   raw.forEach(s => {

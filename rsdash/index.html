@@ -2636,7 +2636,7 @@ async function tdRender(){
     const days=rhB.dates.slice(-8,-1).reverse(), dl=d=>{ const p=d.split('-'); return +p[2]+' '+ERN_MON[+p[1]-1]; }, byD={}, rowOf=new Map(rows.filter(s=>s.ticker&&!s.isDR).map(s=>[s.ticker,s]));
     const hb={}; Object.entries(rhB.bh).forEach(([tk,ds])=>{ if(!rowOf.has(tk)) return; const ok=ds.filter(d=>days.indexOf(d)>=0); if(!ok.length) return; hb[tk]=ok; ok.forEach(d=>{ (byD[d]=byD[d]||[]).push(tk); }); });
     if(TD.bd!=='all'&&days.indexOf(TD.bd)<0) TD.bd='all';
-    const uniq=new Set(Object.values(byD).flat()), rsOf=tk=>Number((rhB.sig&&rhB.sig[tk]?rhB.sig[tk][2]:null)??rowOf.get(tk).rs)||0;
+    const uniq=new Set(Object.values(byD).flat()), rsOf=tk=>Number(rowOf.get(tk) && rowOf.get(tk).rs != null ? rowOf.get(tk).rs : (rhB.sig&&rhB.sig[tk]?rhB.sig[tk][2]:0))||0;   // RS ที่โชว์ = ฐานที่เลือก (scan)
     let pick=TD.bd==='all'?[...uniq]:(byD[TD.bd]||[]);
     pick=pick.sort((a,b)=>TD.bd==='all'?((hb[b].length-hb[a].length)||(rsOf(b)-rsOf(a))):(rsOf(b)-rsOf(a)));
     const lim=TD.n?TD.n*2:pick.length, shown=pick.slice(0,lim), items=shown.map(tk=>{ const s=rowOf.get(tk); return {s,gi:bsGrpOf(TDG,s),rsv:rsOf(tk)||null,tag:TD.bd==='all'?hb[tk].map(d=>dl(d)).reverse().join(' · '):''}; });
@@ -2680,9 +2680,12 @@ async function bsScanLoad(m){
       const NM=[[1,'3M ไม่เป็นบวก'],[2,'SMA50 ≤ SMA200'],[4,'ปิดต่ำกว่า SMA150'],[8,'RS ≤ '+BS_RS],[16,'ยังไม่ย่อ'],[32,'ปริมาณไม่เพิ่ม']];
       for(const s of rows){
         if(!s.ticker||s.isDR||!(Number(s.price)>0)) continue;
-        const e=sg[s.ticker], it={s,gi:bsGrpOf(g,s),why:'',rsv:e?e[2]:null,cl:e?e[3]:null};
+        const e=sg[s.ticker];
+        // RS ที่แสดง/ตัดสิน = ค่า RS ของฐานที่เลือกจาก /api/scan (s.rs) — ให้ตัวเลขตรงกันทุกที่ (บอส 3 พ.ย.: TASCO ฟ้อง 94 vs 83)
+        const _rsUse = (Number.isFinite(Number(s.rs)) ? Number(s.rs) : (e && e[2] != null ? e[2] : null));
+        const it={s,gi:bsGrpOf(g,s),why:'',rsv:_rsUse,cl:e?e[3]:null};
         if(!e){ miss.push(s); continue; }
-        let f=e[1]; if(e[2]!=null) f=(e[2]>BS_RS)?(f&~8):(f|8);   // RS เทียบเกณฑ์ปัจจุบันจากค่า RS ในไฟล์ (ไฟล์เก่าอาจคิดด้วยเกณฑ์เดิม)
+        let f=e[1]; if(_rsUse!=null) f=(_rsUse>BS_RS)?(f&~8):(f|8);   // เกณฑ์ RS ใช้ตัวเลขเดียวกับที่โชว์
         const cd=(f&6)?0:(f&57)?1:2;   // Sell = แนวโน้มหลักเสีย (บิต 2,4) · Wait = ขาด 3M/RS/ย่อ/ปริมาณ (บิต 1,8,16,32)
         if(cd===0){ it.why=NM.filter(x=>(x[0]&6)&&(f&x[0])).map(x=>x[1]).join(' · '); out.Sell.push(it); }
         else if(cd===1){ it.why=NM.filter(x=>(x[0]&57)&&(f&x[0])).map(x=>x[1]).join(' · '); out.Wait.push(it); }
@@ -3436,17 +3439,18 @@ function clearMarketData(){
    เกณฑ์ Buy/Wait/Sell/จุดข่าว ไม่เปลี่ยน (สูตรสัญญาณเป็นของตัวเองตามกติกาเดิม) */
 let RS_BASE = '3m';
 try{ const _sb=localStorage.getItem('rsd_rs'); if(['3m','6m','1y','all'].includes(_sb)) RS_BASE=_sb; }catch(e){}
-const RS_FLD = { '3m':'rs3', '6m':'rs6', '1y':'rs1', all:null };   // all = สูตรรวมเดิม (s.rs ของ backend)
+const RS_FLD = { '3m':'rs3', '6m':'rs6', '1y':'rs1', all:null };
+const RT_FLD = { '3m':'rT3', '6m':'rT6', '1y':'rT1', all:'rT_full' };   // อันดับต่อฐานจาก backend (ทุกฐานคิดบนกระดานเต็มชุด 877/2.5k — ตรงกับตัวเลข RS)   // all = สูตรรวมเดิม (s.rs ของ backend)
 function _rsOverrideRows(rows){ const f = RS_FLD[RS_BASE]; if(!Array.isArray(rows)) return rows;
   if(!f){   // "รวม" = สูตรรวมเดิมของ backend — คืนค่าเดิม (บั๊กที่เจอ 3 พ.ย.: กดรวมแล้วยังค้างค่า 3M)
     rows.forEach(s=>{ if(!s || s._rsAll===undefined) return; s.rs = s._rsAll; if(s._rTAll!==undefined) s.rT = s._rTAll; });
     return rows;
   }
-  rows.forEach(s=>{ if(!s) return; if(s._rsAll===undefined){ s._rsAll = s.rs; s._rTAll = s.rT; } s.rs = (s[f] != null) ? s[f] : s._rsAll; });
-  // อันดับ #N ที่โชว์ข้างค่า RS = ลำดับเรียงตามฐานที่เลือก (ก่อนหน้าโชว์รวมเดิมทุกฐาน บอส 3 พ.ย. "อันดับไม่เปลี่ยนเมื่อสลับฐาน")
-  const arr = [...rows].filter(s=>s && Number.isFinite(Number(s.rs))).sort((a,b)=>b.rs-a.rs);
-  arr.forEach((s,i)=>{ s.rT = i+1; });
-  rows.forEach(s=>{ if(s && !(Number.isFinite(Number(s.rs)))) s.rT = null; });
+  rows.forEach(s=>{ if(!s) return; if(s._rsAll===undefined){ s._rsAll = s.rs; s._rTAll = s.rT; }
+    s.rs = (s[f] != null) ? s[f] : s._rsAll;
+    // อันดับ #N = อันดับจาก backend ของฐานนั้น (คำนวณบนกระดานเต็มชุดเดียว) — กันการคำนวณซ้ำฝั่งหน้าแล้วได้เลขไม่ตรงกัน
+    const rt = s[RT_FLD[RS_BASE]]; if(rt != null) s.rT = rt;
+  });
   return rows; }
 function rsOverrideAll(mk){ try{ _rsOverrideRows(stockDB[mk]); _rsOverrideRows(topRSData[mk]); if(mk===currentMarket) _rsOverrideRows(stockData); }catch(e){} }
 function rsSet(b){ RS_BASE=b; try{ localStorage.setItem('rsd_rs', b); }catch(e){}
