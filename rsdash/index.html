@@ -3604,7 +3604,7 @@ function capBadge(grp){
 }
 function buildCard(tk, nm, grp, ind, rs, px, ch, vol, val, p3, xn, rd, isDR, rv, mc){
   const cid='chart_'+tk.replace(/[^a-z0-9]/gi,'_');
-  const rdx = (rd===null||rd===undefined) ? '' : (rd>0 ? '<span class="rk pos"><i class="ar">▲</i> '+rd+'</span>' : (rd<0 ? '<span class="rk neg"><i class="ar">▼</i> '+Math.abs(rd)+'</span>' : '<span class="rk mu">–</span>'));
+  const rdx = (RS_BASE!=='all' || rd===null||rd===undefined) ? '' : (rd>0 ? '<span class="rk pos"><i class="ar">▲</i> '+rd+'</span>' : (rd<0 ? '<span class="rk neg"><i class="ar">▼</i> '+Math.abs(rd)+'</span>' : '<span class="rk mu">–</span>'));
   const ntag = xn ? '<span class="pill text-slate-300">#'+xn+'</span>' : '';
   const cap = currentMarket==='america' ? idxBadge(tk, currentMarket) : capBadge(grp);
     const drBadge = isDR ? '<span class="pill text-amber-400 border-amber-700/60" title="Depositary Receipt — ตราสารอ้างอิงหุ้นนอก">DR</span>' : '';
@@ -4964,7 +4964,7 @@ function openModal(tk,nm,mkt){
   const _drd = document.getElementById('modalDRBadge');
   if(_drd) _drd.innerHTML = (found && found.isDR) ? '<span class="pill text-amber-400 border-amber-700/60" title="Depositary Receipt — ตราสารอ้างอิงหุ้นนอก">DR</span>' : '';
   // 3) อันดับ RS + การเปลี่ยนอันดับ (เหมือน pill บนการ์ด)
-  const _rd = found ? found.rD : null, _rt = found ? found.rT : null;
+  const _rd = (RS_BASE!=='all') ? null : (found ? found.rD : null), _rt = found ? found.rT : null;   // อันดับเมื่อวานเป็นฐานรวม — ซ่อนลูกศรเมื่อเลือกฐานอื่น (บอส 3 พ.ย.)
   const _rtag = (_rt!=null) ? '<span class="pill text-slate-300" title="อันดับ RS วันนี้ (เทียบทั้งกระดาน)">#'+_rt+'</span>' : '';
   const _rdx = (_rd===null||_rd===undefined) ? ''
     : (_rd>0 ? '<span class="pill pos" title="อันดับดีขึ้นจากเมื่อวาน">▲ +'+_rd+'</span>'
