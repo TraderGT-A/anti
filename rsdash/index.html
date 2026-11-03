@@ -4293,7 +4293,12 @@ function toggleBsRed(){
 }
 async function bsApplyMarks(ser,data,tk,m){
   if(!ser||!tk) return;
-  try{ const s=await bsStockOf(tk,m); const [rh,ctx]=await Promise.all([bsRsHist(m),bsCtx(tk,m,s).catch(()=>null)]); const all=bsMarks(bsClosed(data,m),rh?bsRsFn(rh,tk):null,!!rh,ctx);
+  try{ const s=await bsStockOf(tk,m); const [rh,ctx]=await Promise.all([bsRsHist(m),bsCtx(tk,m,s).catch(()=>null)]);
+    // หุ้นที่ไม่มี RS ย้อนหลังในไฟล์ (ดึงราคาไม่สำเร็จ/ไม่อยู่ในชุด) → ใช้ RS ปัจจุบันของฐานที่เลือกเป็นค่าคงที่
+    // เพื่อให้กราฟยังวาดลูกศรได้ และสอดคล้องกับป้าย Buy/Wait ที่ใช้ค่า RS เดียวกัน (บอส 3 พ.ย.: PAYS Buy แต่ไม่มีลูกศร)
+    let rsfn = rh ? bsRsFn(rh,tk) : null;
+    if(!rsfn){ const rsNow=Number(s&&s.rs); if(Number.isFinite(rsNow)) rsfn = ()=>rsNow; }
+    const all=bsMarks(bsClosed(data,m),rsfn,true,ctx);
     const k=BSM_REG.findIndex(e=>e.ser===ser); if(k>=0) BSM_REG.splice(k,1); BSM_REG.push({ser,all}); if(BSM_REG.length>400) BSM_REG.shift();
     ser.setMarkers(bsFilt(all)); }catch(e){}
 }

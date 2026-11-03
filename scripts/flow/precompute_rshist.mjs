@@ -75,6 +75,17 @@ export async function computeMarket(mk) {
   const cut = lastClosedDate(mk);   // ตัดแท่งที่ยังไม่ปิด (วันนี้ก่อนเวลาปิดตลาด) ออก
   const parts = Array.from({ length: conc }, (_, i) => pool.filter((_, j) => j % conc === i));
   await Promise.all(parts.map(async (list) => { for (const s of list) { const r = await withRetry(() => getRows(s)); rows[s.ticker] = r ? r.filter((x) => x[0] <= cut) : null; if (rows[s.ticker] && rows[s.ticker].length < 100) rows[s.ticker] = null; if (++done % 400 === 0) log(mk, "ดึงราคา", done, "/", pool.length); } }));
+  // รอบสอง: ตัวที่ดึงราคาไม่สำเร็จ (websocket หลุด/timeout) — ลองซ้ำแบบเรียงลำดับทีละตัว (สำคัญ: หุ้นใหญ่ที่ไม่มี RS = กราฟไม่มีลูกศร)
+  const fail1 = pool.filter((s) => !rows[s.ticker]);
+  if (fail1.length) {
+    log(mk, "ดึงราคาไม่สำเร็จรอบแรก", fail1.length, "ตัว — ลองซ้ำ");
+    for (const s of fail1) {
+      const r = await withRetry(() => getRows(s));
+      rows[s.ticker] = r ? r.filter((x) => x[0] <= cut) : null;
+      if (rows[s.ticker] && rows[s.ticker].length < 100) rows[s.ticker] = null;
+    }
+    log(mk, "หลังลองซ้ำ เหลือไม่สำเร็จ", pool.filter((s) => !rows[s.ticker]).length, "ตัว");
+  }
   log(mk, "ใช้แท่งที่ปิดแล้วถึง", cut);
   const got = pool.filter((s) => rows[s.ticker]);
   log(mk, "ได้ราคา", got.length, "จาก", pool.length);
