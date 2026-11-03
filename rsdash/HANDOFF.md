@@ -48,7 +48,7 @@
 - กดชื่อกลุ่ม/ธีม และหัวกล่องสรุป (ผู้นำ/อ่อนตัว/Upcoming/Downcoming/ขึ้น-ลงอันดับ) → หน้าต่างรายชื่อ มุมมองกราฟ/รายการ + เลือก 1–6 ต่อแถว
 - ปฏิทินงบหน้าภาพรวมเป็นปฏิทินรายเดือน (deploy แล้ว) · ป็อปอัปหุ้นมี "เกี่ยวกับบริษัท" แปลไทยอัตโนมัติ (`/api/flow?kind=tr`) พร้อมปุ่มดูต้นฉบับ EN (deploy แล้ว)
 - **หน้า "เงินไหล" (deploy แล้ว 1 พ.ย. ดึก)**: 5 แท็บ Focus TH vs US / ข้ามสินทรัพย์ / Cross Market ETF ประเทศ / Rotation US / Rotation TH — เป็นเครื่องมือจัดลำดับการบ้าน ไม่ใช่สัญญาณซื้อ
-- **ยังไม่ได้ commit — รอ Hermes** (deploy แล้ว · งาน 1 พ.ย.: `rsdash/index.html`, `rsdash/notes.js`, `rsdash/about.js`, `rsdash/api/idxchart.js`, `rsdash/api/flow.js`, `rsdash/api/_lib/flow_*.js`, `rsdash/package.json`, `tests/rsdash_notes.test.mjs`, `scripts/etf/*`, `research/etf/candidates.json`, `research/PREREG_rotation_quadrants_us_2026-11-01.md` (ร่าง)) · push รอบอสสั่งเท่านั้น
+- **Commit + push แล้ว 3 พ.ย. (Hermes, `1b247d4`)** (งาน 1 พ.ย.: `rsdash/index.html`, `rsdash/notes.js`, `rsdash/about.js`, `rsdash/api/idxchart.js`, `rsdash/api/flow.js`, `rsdash/api/_lib/flow_*.js`, `rsdash/package.json`, `tests/rsdash_notes.test.mjs`, `scripts/etf/*`, `research/etf/candidates.json`, `research/PREREG_rotation_quadrants_us_2026-11-01.md` (ร่าง)) · push รอบอสสั่งเท่านั้น
 
 ## ยังไม่ได้ตรวจ / ค้าง
 - (แก้แล้วด้วย `api/idxchart.js` — ตรวจบนเว็บจริงผ่านแล้ว; ถ้า TradingView ปิดทางนี้ ให้ Hermes บันทึกปิดรายวันสะสมแทน)
@@ -61,6 +61,10 @@
 
 ## ล็อก (ใหม่อยู่บน)
 
+### 3 พ.ย. 09:50 — Hermes
+- **Commit + push งานค้างทั้งหมด**: commit `1b247d4` (งาน 1–3 พ.ย. ของ Claude/Antigravity: index/notes/about/api ใหม่ทั้งหมด, flowg_us_*, rshist_*, set_filed_th.json, scripts/flow, rsarena/ เต็มโปรเจกต์, tests, PREREG, .gitignore เพิ่ม node_modules) · push ขึ้น origin/main แล้ว (รวม `8842cc5` PREREG ที่ค้าง)
+- ก่อน commit ตรวจเว็บจริง 3 พ.ย. 09:45: index.html เว็บ=ต้นทางตรงเป๊ะ (629,770B) · API ครบ (heatmap 100/502, scan 174+eN, flow ทุก kind, idxchart SET 780 แท่ง, pre 1,746, surp 597) · rsarena.vercel.app ตรงเครื่อง · ΔRANK TH เบ้ตามข้อยกเว้น snapshot 29 ต.ค., US เบ้ลงสอดคล้องตลาดปิดลงแรง (ไม่ใช่บั๊ก)
+- .vercel ของ rsarena ไม่ commit (token deploy — ถูก ignore อยู่แล้ว)
 ### 3 พ.ย. 2026 (ดึกมาก++++++++++++++++++) — Antigravity · ปรับแก้ Stop Loss อิสระ + ปลด Webull ออกทั้งหมดจาก RS Arena (deploy แล้ว)
 - ถอด Webull ออกทั้งหมดจาก RS Arena: เปลี่ยนตลาดสหรัฐฯ เป็น "🇺🇸 หุ้นสหรัฐฯ (US)" คลีนหน้าเว็บ ไม่สับสน เอาแบนเนอร์และ Modal Webull ออกทั้งหมด
 - ฟังก์ชัน Stop Loss อิสระตามใจบอส:
@@ -197,7 +201,8 @@
 - openModal แถว modalStats เพิ่ม Mcap (fCap) · ถ้า found ไม่มี mcap (เช่น เปิดหุ้นอีกตลาด) ดึงจากข้อมูลสแกนด้วย bsStockOf แล้วเติมใน #modalMcap
 
 ### 2 พ.ย. 2026 (ดึก+++++) — Claude · TODAY: เลือกจำนวนหุ้นต่อกล่อง Buy/Wait (deploy แล้ว)
-- ปุ่ม 10/20/50/ทั้งหมด (ค่าตั้งต้น 10, จำ localStorage sd_tdn) ใช้กับกล่อง Buy และ Wait (TD.n, 	dSetN) · ลบ tdWaitAll
+- ปุ่ม 10/20/50/ทั้งหมด (ค่าตั้งต้น 10, จำ localStorage 
+sd_tdn) ใช้กับกล่อง Buy และ Wait (TD.n, 	dSetN) · ลบ tdWaitAll
 
 ### 2 พ.ย. 2026 (ดึก++++) — Claude · TODAY: รายการหุ้นเป็นแบบ Minimal เหมือนกล่อง TOP GAIN/LOSS (deploy แล้ว)
 - Buy / Wait = 2 กล่องคู่กัน · Top 20 = 2 กล่อง (1–10, 11–20) ต่อชิปกลุ่ม · แถวละ โลโก้+ชื่อย่อ+ชื่อบริษัท+% วันนี้ กดเปิดกราฟ (	dMini/	dBox) · ลบตาราง tdRow/tdTable · ปฏิทินงบ/ข่าว/การ์ดดัชนีเหมือนเดิม
@@ -298,8 +303,10 @@
 
 ### 2 พ.ย. 2026 — Claude · หน้าเงินไหล US: คำนวณกลุ่มครบทุกตัวล่วงหน้าบนเครื่อง (แทน ~220 ตัว) + deploy ทุกอย่างที่ค้าง
 - **ที่มา**: ผู้ใช้สั่งให้คำนวณหุ้นสหรัฐครบทุกตัว (ไม่ใช้ Hermes) ถ้ามีปัญหาให้สลับไป ~220 ตัวเดิม
-- สคริปต์ scripts/flow/precompute_groups_us.mjs (ใช้ buildGroups/alignBench/closes จาก pi/_lib/flow_th.js) ดึงราคา 1 ปีของหุ้นสหรัฐทุกตัวที่ผ่านเกณฑ์ (~1,822 จาก 1,840, ~41 วินาที) → เขียน sdash/flowg_us_{sector|theme}_{0|70|80|90}.json (8 ไฟล์ ~0.8MB รวม) · ได้หุ้นน้อยกว่า 85% = ไม่เขียนทับไฟล์เดิม
-- **ตั้งเวลา**: Windows Task Scheduler งาน sdash_flow_groups_us ทุกวัน 08:30 (เวลาเครื่อง) รัน 
+- สคริปต์ scripts/flow/precompute_groups_us.mjs (ใช้ buildGroups/alignBench/closes จาก pi/_lib/flow_th.js) ดึงราคา 1 ปีของหุ้นสหรัฐทุกตัวที่ผ่านเกณฑ์ (~1,822 จาก 1,840, ~41 วินาที) → เขียน 
+sdash/flowg_us_{sector|theme}_{0|70|80|90}.json (8 ไฟล์ ~0.8MB รวม) · ได้หุ้นน้อยกว่า 85% = ไม่เขียนทับไฟล์เดิม
+- **ตั้งเวลา**: Windows Task Scheduler งาน 
+sdash_flow_groups_us ทุกวัน 08:30 (เวลาเครื่อง) รัน 
 ode scripts\flow\precompute_groups_us.mjs (ตลาด US ปิดแล้ว) · log: %LOCALAPPDATA%\rsdash\precompute.log (เวลาใน log เป็น UTC) · เครื่องต้องเปิดและล็อกอินอยู่ (ตั้ง StartWhenAvailable ไว้: ถ้าพลาดจะรันเมื่อเปิดเครื่อง)
 - ไฟล์ขึ้นเว็บพร้อม deploy ปกติ (cron 17:40 ของ Hermes ต้อง deploy จากโฟลเดอร์ rsdash/ ที่มีไฟล์ flowg_* — **ห้ามลบ/ไม่ย้ายไฟล์ flowg_us_*.json ออกจาก rsdash/**)
 - pi/_lib/flow_th.js: mk=us + by=sector|theme + rs∈{0,70,80,90} → อ่าน /flowg_us_{by}_{rs}.json ก่อน ถ้า generatedAt ไม่เกิน 72 ชม. และ universe≥100 → ตอบ source:"full" ไม่งั้นคำนวณสด ~220 ตัว (source:"top220") เหมือนเดิม · rs อื่นที่ผู้ใช้พิมพ์เอง = สด 220 · ฝั่งไทยไม่เปลี่ยน (ครบทุกตัวอยู่แล้ว)
