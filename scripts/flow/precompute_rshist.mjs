@@ -146,6 +146,10 @@ export async function computeMarket(mk) {
   const rsOut = {}; for (const t of tk) if (shown.has(t)) rsOut[t] = rs[t];   // เก็บเฉพาะหุ้นที่แสดงในแดชบอร์ด (จัดอันดับใช้ทั้งตลาด)
   const j = { generatedAt: new Date().toISOString(), mk, dates: outDates, rs: rsOut, sig, bh: buy7, sigAsOf: outDates[Li], universe: N, shown: Object.keys(rsOut).length, check: { n, meanAbsDiff: +(abs / n).toFixed(2), within5: +(within5 / n).toFixed(3), same70: +(same70 / n).toFixed(3) } };
   const f = path.join(OUT, `rshist_${mk}.json`); fs.writeFileSync(f + ".tmp", JSON.stringify(j)); fs.renameSync(f + ".tmp", f);
+  // พ่น data.js ให้ Vercel serverless (/api/scan) import ได้แน่นอน (บอส 3 พ.ย.: CNT เกิดสัญญาณเมื่อวาน วันนี้หาย — ให้หุ้นข้อสถานะอยู่ครบไม่หายกลางวัน)
+  const fData = path.resolve(OUT, "api", "_lib", `rshist_${mk}_data.js`);
+  fs.writeFileSync(fData + ".tmp", "// สร้างอัตโนมัติจาก rshist_" + mk + ".json (precompute) — ห้ามแก้มือ\nexport default " + JSON.stringify(j) + ";\n");
+  fs.renameSync(fData + ".tmp", fData);
   log(mk, "เขียน", path.basename(f), "หุ้น", N, "วัน", outDates.length, (fs.statSync(f).size / 1024).toFixed(0) + "KB", "ใช้เวลา", Math.round((Date.now() - t0) / 1000), "วินาที");
 }
 

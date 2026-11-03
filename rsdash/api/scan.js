@@ -3,6 +3,8 @@ import { scanMarket, toCommonStocks, breadthFull, getIndexMembership } from "./_
 
 // force=1 ข้ามแคชได้ แต่ไม่ให้สแกน TradingView + เขียน Supabase ถี่กว่านี้ (กันผู้เข้าชมหลายคน/auto-refresh รัวใส่)
 const FORCE_COOLDOWN_MS = 30_000;
+// แคช rshist (สถานะ Buy/Wait ล่าสุดของหุ้น — คำนวณหลังปิดตลาดทุกวัน 17:00/18:30) — ใช้เติมหุ้นที่หลุด liquidity กลางวัน (บอส 3 พ.ย.)
+const SIG_CACHE = {};
 import { loadPreviousSnapshot, saveSnapshot, marketToday, supabase } from "./_lib/supabase.js";
 import "../trendlib.js";
 import "../fundlog.js";   // globalThis.FundLog — บันทึก EPS แบบ point-in-time
@@ -146,7 +148,8 @@ export default async function handler(req, res) {
 
   const t0 = Date.now();
   try {
-    const { raw, clean } = await scanMarket(market);
+    const { raw, clean: clean0 } = await scanMarket(market);
+    let clean = clean0;   // let เพื่อเติมหุ้นสถานะ Buy/Wait กลางวัน (บางวันหลุด liquidity ตอนตลาดยังไม่ปิด)
 
     // Yesterday's Rank map from Supabase (แยกตาม market)
     const { snapshot } = await loadPreviousSnapshot(market);
@@ -278,6 +281,30 @@ export default async function handler(req, res) {
         .map(s=>({ticker:s.ticker,name:s.name,rs:s.rs,rD:s.rD,rT:s.rT,change:s.change,p1m:s.p1m,industry:s.industry})),
       generated_at: new Date().toISOString(),
     };
+
+    // ── เติมหุ้นที่ยังมีสถานะ Buy/Wait ล่าสุด (จาก rshist) แต่หลุดเกณฑ์สภาพคล่องกลางวัน (บอส 3 พ.ย.:
+    //     "CNT ขึ้นสัญญาณเมื่อวาน วันนี้หายไปละเหมือนไม่มีอะไรเกิดขึ้น แบบนี้วัดไม่ได้") ──
+    // หอมเก็บ: เพิ่มจาก raw ด้วยข้อมูลจริงของมัน ไม่แตะ rT/rD (ตัวเติมไม่มีอันดับเมื่อวาน — ลูกศรจะไม่แสดง ซึ่งถูกต้อง)
+    try {
+      if (!SIG_CACHE[market]) {
+        const j = await import("./_lib/" + (market === "thailand" ? "rshist_th_data.js" : "rshist_us_data.js"));
+        SIG_CACHE[market] = { ts: Date.now(), sig: (j.default && j.default.sig) || {} };
+      }
+      const sigMap = SIG_CACHE[market].sig;
+      const have = new Set(clean.map(s => s.ticker));
+      const keep = [];
+      for (const [tk, s] of Object.entries(sigMap)) {
+        if (!Array.isArray(s) || (s[0] !== 1 && s[0] !== 2)) continue;  // เอา Wait(1)/Buy(2) เท่านั้น
+        if (have.has(tk)) continue;
+        const r = raw.find(x => x.ticker === tk);
+        if (r) keep.push(r);
+      }
+      if (keep.length) {
+        clean = clean.concat(keep).sort((a, b) => b.score - a.score);
+        // ให rm rT ต่อเนื่อง (อันดับเชิงเรียงใหม่) — ป้าย rD เทียบ oldRank เดิมยังทำงาน (ตัวเติมไม่มี oldRank → rD เป็น undefined ไม่โชว์ลูกศร ปกติ)
+        clean.forEach((s, i) => { if (s.rT == null) s.rT = i + 1; });
+      }
+    } catch (e) { /* ไม่มีไฟล์ rshist ใน cwd → ยังทำงานเดิมทั้งหมด */ }
 
     // Industry money flow — NOTE: ไม่ส่ง 'industries' (Value traded) ออกไปแล้ว เพราะ
     // มันถูกเข้าใจผิดเป็น Money Flow (ค่า Value ≠ เงินไหล) เราใช้ moneyFlow.byIndustry แทน
