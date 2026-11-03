@@ -2675,16 +2675,18 @@ async function bsScanLoad(m){
     const [rows,g,rh]=await Promise.all([mfScanRows(m),bsSecGroups(m),bsRsHist(m)]);
     const sg=(rh&&rh.sig&&rh.sigAsOf&&Date.now()-Date.parse(rh.generatedAt)<4*864e5)?rh.sig:null;   // สรุปสัญญาณ ณ แท่งที่ปิดแล้ว (สคริปต์รายวันหลังปิดตลาด)
     BSS.asOf[m]=sg?rh.sigAsOf:null;
-    // เกณฑ์สภาพคล่องขั้นต่ำ (บอส 3 พ.ย.): หุ้นที่มูลค่าซื้อขายเฉลี่ย 20 วันต่ำกว่าเกณฑ์ = ไม่ขึ้นสัญญาณ Buy/Wait/Sell
+    // สภาพคล่อง: ตัดเฉพาะหุ้นที่ "ไม่มีสถานะในไฟล์" (ไม่เคยผ่านเกณฑ์เลย) — หุ้นที่วันนี้ตกเกณฑ์แต่เคยขึ้นสัญญาณ ต้องยังโชว์
+    // (บอส 3 พ.ย.: "ขึ้น Buy เมื่อวาน วันนี้มูลค่าไม่ถึงเกณฑ์ สัญญาณเมื่อวานต้องไม่หาย") — เซิร์ฟเวอร์ใช้สถานะแท่งล่าสุดที่ผ่านเกณฑ์ให้แล้ว
     const LIQ=(rh&&rh.liq)||null, LIQMIN=(rh&&rh.liqMin)||0; BSS.liqMin[m]=LIQMIN; BSS.liqCut[m]=0;
-    const liqOk = tk => !LIQ || LIQ[tk]==null || Number(LIQ[tk])>=LIQMIN;   // ไม่มีข้อมูล = ไม่ตัด (เดิม)
     let liqCut=0;
     const out={Buy:[],Wait:[],Sell:[]}, miss=[];   // miss = หุ้นที่ไม่อยู่ในไฟล์สรุปสัญญาณ (เช่น mai/หุ้นเล็กที่ไฟล์ไม่เก็บ) → ตัดสินสดจากกราฟ ไม่ตัดเป็น Sell
     if(sg){
       const NM=[[1,'3M ไม่เป็นบวก'],[2,'SMA50 ≤ SMA200'],[4,'ปิดต่ำกว่า SMA150'],[8,'RS ≤ '+BS_RS],[16,'ยังไม่ย่อ'],[32,'ปริมาณไม่เพิ่ม']];
       for(const s of rows){
         if(!s.ticker||s.isDR||!(Number(s.price)>0)) continue;
-        if(!liqOk(s.ticker)){ liqCut++; BSS.liqCut[m]=(BSS.liqCut[m]||0)+1; continue; }   // ตัดออกเพราะสภาพคล่องไม่ถึงเกณฑ์
+        // สัญญาณที่ "แท่งอ้างอิง" เก่าเกิน 10 แท่ง = ถือว่าหมดอายุ (กันสัญญาณเก่าค้าง เพราะวันนี้สภาพคล่องไม่ถึง)
+        const _sd=(rh&&rh.sigDate&&rh.sigDate[s.ticker])||null;
+        if(_sd && rh.dates){ const _i=rh.dates.indexOf(_sd); if(_i>=0 && (rh.dates.length-1-_i)>10) continue; }
         const e=sg[s.ticker];
         // RS ที่แสดง/ตัดสิน = ค่า RS ของฐานที่เลือกจาก /api/scan (s.rs) — ให้ตัวเลขตรงกันทุกที่ (บอส 3 พ.ย.: TASCO ฟ้อง 94 vs 83)
         const _rsUse = (Number.isFinite(Number(s.rs)) ? Number(s.rs) : (e && e[2] != null ? e[2] : null));

@@ -71,7 +71,10 @@ export async function computeMarket(mk) {
   const rows = {}; let done = 0;
   // ไทย: ราคาจาก TradingView (ให้ตรงกับที่ระบบใช้) · สหรัฐ: Yahoo
   const conc = mk === "th" ? Math.min(CONC, 8) : CONC;
-  const getRows = mk === "th" ? (s) => tvCloses(s.tv || "SET:" + s.ticker, tz) : (s) => yRows(ysym(s.ticker), tz);
+  // ไทย: TradingView ก่อน (ให้ตรงระบบ) — ถ้าดึงไม่ได้ให้ถอยไป Yahoo (.BK) กันหุ้นหายจากไฟล์เมื่อ websocket สะดุด
+  const getRows = mk === "th"
+    ? async (s) => (await tvCloses(s.tv || "SET:" + s.ticker, tz)) || (await yRows(s.ticker.replace(/\./g, '-') + ".BK", tz))
+    : (s) => yRows(ysym(s.ticker), tz);
   const cut = lastClosedDate(mk);   // ตัดแท่งที่ยังไม่ปิด (วันนี้ก่อนเวลาปิดตลาด) ออก
   const parts = Array.from({ length: conc }, (_, i) => pool.filter((_, j) => j % conc === i));
   await Promise.all(parts.map(async (list) => { for (const s of list) { const r = await withRetry(() => getRows(s)); rows[s.ticker] = r ? r.filter((x) => x[0] <= cut) : null; if (rows[s.ticker] && rows[s.ticker].length < 100) rows[s.ticker] = null; if (++done % 400 === 0) log(mk, "ดึงราคา", done, "/", pool.length); } }));
@@ -130,42 +133,56 @@ export async function computeMarket(mk) {
   //   flags: 1=3M ไม่บวก (ปิด ≤ ปิด 63 แท่งก่อน) · 2=SMA50≤SMA200 · 4=ปิด ≤ SMA150 · 8=RS ≤ 60 · 16=ไม่ย่อ (ไม่ใช่ ปิด<SMA20 และปิดเขียว) · 32=ปริมาณไม่เพิ่มจากแท่งก่อน
   // ── เกณฑ์สภาพคล่องขั้นต่ำสำหรับ "การขึ้นสัญญาณ" (บอส 3 พ.ย.: สัญญาณขึ้นเยอะเกินไป ต้องคัดหุ้นที่มีสภาพคล่องจริง) ──
   // มูลค่าซื้อขายเฉลี่ย 20 แท่งล่าสุด = mean(close × volume) เทียบเกณฑ์ต่อตลาด (ไทย บาท/วัน · สหรัฐ USD/วัน)
-  const LIQ_MIN = mk === 'us' ? 10_000_000 : 5_000_000;   // สหรัฐ USD 10 ล้าน/วัน · ไทย 5 ล้านบาท/วัน (ตรงกับเกณฑ์ขั้นต่ำของ scan)
-  const liq = {}, liqFail = [];
+  // ── เกณฑ์สภาพคล่อง "ต่อแท่ง" (บอส 3 พ.ย.: หุ้นที่ผ่านเกณฑ์เมื่อวานแล้วขึ้น Buy วันนี้ตกเกณฑ์ ต้องไม่ทำให้สัญญาณเมื่อวานหาย) ──
+  // นิยาม: มูลค่าซื้อขายเฉลี่ย 20 แท่ง ณ วันที่เกิดสัญญาณ (close×volume) ต้อง ≥ เกณฑ์ของตลาด
+  // ไทย ≥ 5,000,000 บาท/วัน · สหรัฐ ≥ 10,000,000 USD/วัน
+  const LIQ_MIN = mk === 'us' ? 10_000_000 : 5_000_000;
+  const liqNow = {};   // มูลค่าเฉลี่ย ณ แท่งล่าสุด (ไว้โชว์/กรองในอนาคต)
+  const liqAt = (b, j) => {   // b = bars, j = index ของแท่ง, ค่าเฉลี่ย 20 แท่งย้อนหลังรวมแท่ง j
+    if (!b || j < 19) return 0;
+    let sum = 0;
+    for (let q = j - 19; q <= j; q++) sum += (b[q][1] || 0) * (b[q][3] || 0);
+    return Math.round(sum / 20);
+  };
+  const sig = {}, sigB = { rs3: {}, rs6: {}, rs1: {} }, sigDate = {}, Li = outDates.length - 1;
+  let nLiqSkip = 0;
   for (const t of tk) {
-    const b = rows[t]; if (!b || b.length < 25) { liq[t] = 0; continue; }
-    const seg = b.slice(-20); let sum = 0;
-    for (const x of seg) sum += (x[1] || 0) * (x[3] || 0);
-    liq[t] = Math.round(sum / seg.length);
-    if (liq[t] < LIQ_MIN) liqFail.push(t);
-  }
-  log(mk, "สภาพคล่อง: ผ่าน", Object.keys(liq).length - liqFail.length, "ตัว · ไม่ผ่าน", liqFail.length, "ตัว (เกณฑ์", LIQ_MIN.toLocaleString(), "ต่อวัน)");
-  const liqOk = new Set(Object.keys(liq).filter((t) => liq[t] >= LIQ_MIN));
-  const sig = {}, sigB = { rs3: {}, rs6: {}, rs1: {} }, Li = outDates.length - 1;
-  for (const t of tk) {
-    if (!liqOk.has(t)) continue;   // ไม่ผ่านเกณฑ์สภาพคล่อง → ไม่ขึ้นสัญญาณ
     const b = rows[t]; if (!b) continue; const n = b.length, L = n - 1;
-    if (n < 200 || b[L][0] !== outDates[Li]) continue;
-    const cs = [0]; b.forEach((x, i) => cs.push(cs[i] + x[1])); const avg = (k) => (cs[n] - cs[n - k]) / k;
-    const px = b[L][1], s20 = avg(20), s50 = avg(50), s150 = avg(150), s200 = avg(200);
+    if (n < 200) continue;
+    liqNow[t] = liqAt(b, L);
+    if (b[L][0] !== outDates[Li]) continue;      // ไม่มีแท่งของวันล่าสุด = ไม่มีสถานะวันนี้
+    // หาแท่งล่าสุดที่ "สภาพคล่องผ่านเกณฑ์" (ถ้าวันนี้ตกเกณฑ์ ใช้สถานะของแท่งก่อนหน้า = สัญญาณไม่หาย)
+    // ยอมให้ใช้สถานะจากแท่งก่อนหน้าได้ไม่เกิน 10 แท่ง (≈2 สัปดาห์) — กันสัญญาณเก่าค้างเป็นปี
+    const JMIN = Math.max(199, L - 10);
+    let j = L;
+    while (j > JMIN && liqAt(b, j) < LIQ_MIN) j--;
+    if (j === JMIN && liqAt(b, j) < LIQ_MIN) { nLiqSkip++; continue; }
+    if (j < 199) { nLiqSkip++; continue; }       // ไม่เคยผ่านเกณฑ์เลยในประวัติที่ใช้ = ไม่ขึ้นสัญญาณ
+    const cs = [0]; b.forEach((x, i) => cs.push(cs[i] + x[1])); const avgAt = (k) => (cs[j + 1] - cs[j + 1 - k]) / k;
+    const px = b[j][1], s20 = avgAt(20), s50 = avgAt(50), s150 = avgAt(150), s200 = avgAt(200);
+    // RS ของแท่งที่ใช้ (ถ้าเป็นแท่งก่อนหน้า ใช้ RS ณ แท่งนั้น)
+    const qIdx = outDates.indexOf(b[j][0]);
+    const qi = qIdx >= 0 ? qIdx : Li;
     let f0 = 0;
-    if (!(px > b[L - 63][1])) f0 |= 1;
+    if (!(px > b[j - 63][1])) f0 |= 1;
     if (!(s50 > s200)) f0 |= 2;
     if (!(px > s150)) f0 |= 4;
-    if (!(px < s20 && b[L][2] != null && px > b[L][2])) f0 |= 16;
-    if (!(b[L][3] != null && b[L - 1][3] != null && b[L][3] > b[L - 1][3])) f0 |= 32;
-    // สัญญาณครบทุกฐาน RS: rs = สูตรรวมเดิม · rs3/rs6/rs1 = RS ของฐานนั้น (เกณฑ์ RS>60 เปลี่ยนตามฐานที่ผู้ใช้เลือก)
+    if (!(px < s20 && b[j][2] != null && px > b[j][2])) f0 |= 16;
+    if (!(b[j][3] != null && b[j - 1][3] != null && b[j][3] > b[j - 1][3])) f0 |= 32;
     for (const bk of ['rs', 'rs3', 'rs6', 'rs1']) {
-      const rsv = bk === 'rs' ? rs[t][Li] : rsB[bk][t][Li];
+      const rsv = bk === 'rs' ? rs[t][qi] : rsB[bk][t][qi];
       const f = f0 | ((!(rsv > 60)) ? 8 : 0);
       (bk === 'rs' ? sig : sigB[bk])[t] = [(f & 6) ? 0 : (f & 57) ? 1 : 2, f, rsv, +px.toFixed(4)];
-    }   // [รหัส, flags, RS, ราคาปิดแท่งล่าสุดที่ปิดแล้ว — ใช้คิดระยะห่างจากจุดสูง 52 สัปดาห์]
+    }
+    sigDate[t] = b[j][0];   // วันที่ของแท่งที่ใช้ตัดสิน (อาจเป็นแท่งก่อนหน้า ถ้าวันนี้สภาพคล่องยังไม่ผ่าน)
   }
+  const liqPassNow = Object.keys(liqNow).filter((t) => liqNow[t] >= LIQ_MIN).length;
+  log(mk, "สภาพคล่อง (ต่อแท่ง): วันนี้ผ่าน", liqPassNow, "ตัว · ตกเกณฑ์แต่ออกสัญญาณจากแท่งก่อนหน้า", Object.keys(sigDate).length - liqPassNow, "ตัว · ไม่เคยผ่านเลย", nLiqSkip, "ตัว (เกณฑ์", LIQ_MIN.toLocaleString(), "ต่อวัน)");
+
   // ประวัติสัญญาณ Buy 8 แท่งล่าสุด (7 แท่งก่อนหน้า + แท่งล่าสุดที่หน้า TODAY ไม่นับเป็นย้อนหลัง) (ทุกตัวที่มีราคา): วันที่ที่ผ่านเงื่อนไข Buy ครบ (กฎเดียวกับ bsEval/bsMarks) → bh[ticker] = [วันที่, …] — ใช้ในหน้า TODAY "Buy ย้อนหลัง 7 วัน"
   const buy7s = { rs: {}, rs3: {}, rs6: {}, rs1: {} };
   for (const t of tk) {
-    if (!liqOk.has(t)) continue;
-    const b = rows[t]; if (!b || b.length < 230) continue;
+    const b = rows[t]; if (!b || b.length < 230) continue;   // สภาพคล่องเช็ก "รายวัน" ภายในลูปแล้ว
     const bm = new Map(b.map((x, i) => [x[0], i])), cs2 = [0]; b.forEach((x, i) => cs2.push(cs2[i] + x[1]));
     for (const bk of ['rs', 'rs3', 'rs6', 'rs1']) {
     const RQ = bk === 'rs' ? rs[t] : rsB[bk][t];
@@ -173,6 +190,7 @@ export async function computeMarket(mk) {
     for (let q = Math.max(0, Li - 7); q <= Li; q++) {
       const j = bm.get(outDates[q]); if (j == null || j < 199) continue;
       const px = b[j][1], r = RQ[q]; if (!(r > 60)) continue;
+      if (liqAt(b, j) < LIQ_MIN) continue;   // วันนั้นต้องผ่านสภาพคล่องด้วย (สัญญาณเก่าไม่ถูกลบเพราะวันนี้ตกเกณฑ์)
       const a = (k) => (cs2[j + 1] - cs2[j + 1 - k]) / k, s20 = a(20), s150 = a(150);
       if (!(px > b[j - 63][1] && a(50) > a(200) && px > s150)) continue;
       if (!(px < s20 && b[j][2] != null && px > b[j][2])) continue;
@@ -187,7 +205,7 @@ export async function computeMarket(mk) {
   const cnt3 = [0, 0, 0]; Object.values(sig).forEach((x) => cnt3[x[0]]++); log(mk, "สัญญาณ ณ", outDates[Li], "· Sell", cnt3[0], "Wait", cnt3[1], "Buy", cnt3[2]);
   const rsOut = {}; for (const t of tk) rsOut[t] = rs[t];   // เก็บเฉพาะหุ้นที่แสดงในแดชบอร์ด (จัดอันดับใช้ทั้งตลาด)
   const rsBOut = {}; for (const bk of ['rs3', 'rs6', 'rs1']) { rsBOut[bk] = {}; for (const t of tk) rsBOut[bk][t] = rsB[bk][t]; }
-  const j = { generatedAt: new Date().toISOString(), mk, dates: outDates, rs: rsOut, rs3: rsBOut.rs3, rs6: rsBOut.rs6, rs1: rsBOut.rs1, sig3: sigB.rs3, sig6: sigB.rs6, sig1: sigB.rs1, liq, liqMin: LIQ_MIN, bh3: buy7s.rs3, bh6: buy7s.rs6, bh1: buy7s.rs1, sig, bh: buy7, sigAsOf: outDates[Li], universe: N, shown: Object.keys(rsOut).length, check: { n, meanAbsDiff: +(abs / n).toFixed(2), within5: +(within5 / n).toFixed(3), same70: +(same70 / n).toFixed(3) } };
+  const j = { generatedAt: new Date().toISOString(), mk, dates: outDates, rs: rsOut, rs3: rsBOut.rs3, rs6: rsBOut.rs6, rs1: rsBOut.rs1, sig3: sigB.rs3, sig6: sigB.rs6, sig1: sigB.rs1, liq: liqNow, liqMin: LIQ_MIN, sigDate, bh3: buy7s.rs3, bh6: buy7s.rs6, bh1: buy7s.rs1, sig, bh: buy7, sigAsOf: outDates[Li], universe: N, shown: Object.keys(rsOut).length, check: { n, meanAbsDiff: +(abs / n).toFixed(2), within5: +(within5 / n).toFixed(3), same70: +(same70 / n).toFixed(3) } };
   const f = path.join(OUT, `rshist_${mk}.json`); fs.writeFileSync(f + ".tmp", JSON.stringify(j)); fs.renameSync(f + ".tmp", f);
   // พ่น data.js ให้ Vercel serverless (/api/scan) import ได้แน่นอน (บอส 3 พ.ย.: CNT เกิดสัญญาณเมื่อวาน วันนี้หาย — ให้หุ้นข้อสถานะอยู่ครบไม่หายกลางวัน)
   const fData = path.resolve(OUT, "api", "_lib", `rshist_${mk}_data.js`);
