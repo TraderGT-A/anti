@@ -128,8 +128,22 @@ export async function computeMarket(mk) {
   if (!(n > 0) || abs / n > 8) throw new Error(mk + ": RS ที่คำนวณต่างจากระบบมากผิดปกติ — ไม่เขียนไฟล์");
   // สัญญาณ Buy/Wait/Sell ณ แท่งที่ปิดล่าสุด — กฎเดียวกับ bsEval ใน index.html: [รหัส 0=Sell(บิต 2,4) 1=Wait(บิต 1,8,16,32) 2=Buy, flags, RS]
   //   flags: 1=3M ไม่บวก (ปิด ≤ ปิด 63 แท่งก่อน) · 2=SMA50≤SMA200 · 4=ปิด ≤ SMA150 · 8=RS ≤ 60 · 16=ไม่ย่อ (ไม่ใช่ ปิด<SMA20 และปิดเขียว) · 32=ปริมาณไม่เพิ่มจากแท่งก่อน
+  // ── เกณฑ์สภาพคล่องขั้นต่ำสำหรับ "การขึ้นสัญญาณ" (บอส 3 พ.ย.: สัญญาณขึ้นเยอะเกินไป ต้องคัดหุ้นที่มีสภาพคล่องจริง) ──
+  // มูลค่าซื้อขายเฉลี่ย 20 แท่งล่าสุด = mean(close × volume) เทียบเกณฑ์ต่อตลาด (ไทย บาท/วัน · สหรัฐ USD/วัน)
+  const LIQ_MIN = mk === 'us' ? 10_000_000 : 5_000_000;   // สหรัฐ USD 10 ล้าน/วัน · ไทย 5 ล้านบาท/วัน (ตรงกับเกณฑ์ขั้นต่ำของ scan)
+  const liq = {}, liqFail = [];
+  for (const t of tk) {
+    const b = rows[t]; if (!b || b.length < 25) { liq[t] = 0; continue; }
+    const seg = b.slice(-20); let sum = 0;
+    for (const x of seg) sum += (x[1] || 0) * (x[3] || 0);
+    liq[t] = Math.round(sum / seg.length);
+    if (liq[t] < LIQ_MIN) liqFail.push(t);
+  }
+  log(mk, "สภาพคล่อง: ผ่าน", Object.keys(liq).length - liqFail.length, "ตัว · ไม่ผ่าน", liqFail.length, "ตัว (เกณฑ์", LIQ_MIN.toLocaleString(), "ต่อวัน)");
+  const liqOk = new Set(Object.keys(liq).filter((t) => liq[t] >= LIQ_MIN));
   const sig = {}, sigB = { rs3: {}, rs6: {}, rs1: {} }, Li = outDates.length - 1;
   for (const t of tk) {
+    if (!liqOk.has(t)) continue;   // ไม่ผ่านเกณฑ์สภาพคล่อง → ไม่ขึ้นสัญญาณ
     const b = rows[t]; if (!b) continue; const n = b.length, L = n - 1;
     if (n < 200 || b[L][0] !== outDates[Li]) continue;
     const cs = [0]; b.forEach((x, i) => cs.push(cs[i] + x[1])); const avg = (k) => (cs[n] - cs[n - k]) / k;
@@ -150,6 +164,7 @@ export async function computeMarket(mk) {
   // ประวัติสัญญาณ Buy 8 แท่งล่าสุด (7 แท่งก่อนหน้า + แท่งล่าสุดที่หน้า TODAY ไม่นับเป็นย้อนหลัง) (ทุกตัวที่มีราคา): วันที่ที่ผ่านเงื่อนไข Buy ครบ (กฎเดียวกับ bsEval/bsMarks) → bh[ticker] = [วันที่, …] — ใช้ในหน้า TODAY "Buy ย้อนหลัง 7 วัน"
   const buy7s = { rs: {}, rs3: {}, rs6: {}, rs1: {} };
   for (const t of tk) {
+    if (!liqOk.has(t)) continue;
     const b = rows[t]; if (!b || b.length < 230) continue;
     const bm = new Map(b.map((x, i) => [x[0], i])), cs2 = [0]; b.forEach((x, i) => cs2.push(cs2[i] + x[1]));
     for (const bk of ['rs', 'rs3', 'rs6', 'rs1']) {
@@ -172,7 +187,7 @@ export async function computeMarket(mk) {
   const cnt3 = [0, 0, 0]; Object.values(sig).forEach((x) => cnt3[x[0]]++); log(mk, "สัญญาณ ณ", outDates[Li], "· Sell", cnt3[0], "Wait", cnt3[1], "Buy", cnt3[2]);
   const rsOut = {}; for (const t of tk) rsOut[t] = rs[t];   // เก็บเฉพาะหุ้นที่แสดงในแดชบอร์ด (จัดอันดับใช้ทั้งตลาด)
   const rsBOut = {}; for (const bk of ['rs3', 'rs6', 'rs1']) { rsBOut[bk] = {}; for (const t of tk) rsBOut[bk][t] = rsB[bk][t]; }
-  const j = { generatedAt: new Date().toISOString(), mk, dates: outDates, rs: rsOut, rs3: rsBOut.rs3, rs6: rsBOut.rs6, rs1: rsBOut.rs1, sig3: sigB.rs3, sig6: sigB.rs6, sig1: sigB.rs1, bh3: buy7s.rs3, bh6: buy7s.rs6, bh1: buy7s.rs1, sig, bh: buy7, sigAsOf: outDates[Li], universe: N, shown: Object.keys(rsOut).length, check: { n, meanAbsDiff: +(abs / n).toFixed(2), within5: +(within5 / n).toFixed(3), same70: +(same70 / n).toFixed(3) } };
+  const j = { generatedAt: new Date().toISOString(), mk, dates: outDates, rs: rsOut, rs3: rsBOut.rs3, rs6: rsBOut.rs6, rs1: rsBOut.rs1, sig3: sigB.rs3, sig6: sigB.rs6, sig1: sigB.rs1, liq, liqMin: LIQ_MIN, bh3: buy7s.rs3, bh6: buy7s.rs6, bh1: buy7s.rs1, sig, bh: buy7, sigAsOf: outDates[Li], universe: N, shown: Object.keys(rsOut).length, check: { n, meanAbsDiff: +(abs / n).toFixed(2), within5: +(within5 / n).toFixed(3), same70: +(same70 / n).toFixed(3) } };
   const f = path.join(OUT, `rshist_${mk}.json`); fs.writeFileSync(f + ".tmp", JSON.stringify(j)); fs.renameSync(f + ".tmp", f);
   // พ่น data.js ให้ Vercel serverless (/api/scan) import ได้แน่นอน (บอส 3 พ.ย.: CNT เกิดสัญญาณเมื่อวาน วันนี้หาย — ให้หุ้นข้อสถานะอยู่ครบไม่หายกลางวัน)
   const fData = path.resolve(OUT, "api", "_lib", `rshist_${mk}_data.js`);

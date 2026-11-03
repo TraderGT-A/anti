@@ -1067,7 +1067,7 @@ html .cal-leg i{display:inline-block;width:14px;height:8px;border-radius:999px;b
                     </div>
                     <div class="dot-legend"><span><i class="lg-news"></i>ข่าว: มีข่าวใน 7 วัน (กดจุดอ่านสรุป)</span><span><i class="lg-ssf"></i>SSF: มีสัญญาซื้อขายล่วงหน้ารายตัวที่ TFEX</span><span><i class="lg-dr"></i>DR: หุ้นเมกาที่ซื้อในไทยได้ผ่าน DR</span><span><i class="lg-ern"></i>งบ: ใกล้ประกาศ / ประกาศแล้ว (ป้ายข้างชื่อ)</span></div>
                     <div id="ldCardGrid" class="ld-grid" style="display:none"></div>
-                    <div id="ldTableWrap" class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-[10px] uppercase text-slate-500 border-b border-[#1e2634]"><tr><th class="p-2">#</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('ticker')" title="กดเพื่อเรียง">หุ้น</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('mtd')" title="กดเพื่อเรียง — ผลตอบแทนตั้งแต่ปิดเดือนก่อนถึงปิดล่าสุด">เดือนนี้</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('rs')" title="กดเพื่อเรียง — คะแนนความแข็งแกร่ง 1–99">RS</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('price')" title="กดเพื่อเรียง">ราคา</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('val')" title="กดเพื่อเรียง — มูลค่าซื้อขายต่อวัน">มูลค่า/วัน</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p3m')" title="กดเพื่อเรียง">3M</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p6m')" title="กดเพื่อเรียง">6M</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p1y')" title="กดเพื่อเรียง">1Y</th><th class="p-2 text-slate-500" title="เส้นค่าเฉลี่ย 50 วัน vs 200 วัน — ขาขึ้นเมื่อ MA50 > MA200">MA50/200</th></tr></thead><tbody id="ldBody"></tbody></table></div>
+                    <div id="ldTableWrap" class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-[10px] uppercase text-slate-500 border-b border-[#1e2634]"><tr><th class="p-2">#</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('ticker')" title="กดเพื่อเรียง">หุ้น</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p1m')" title="กดเพื่อเรียง — ผลตอบแทนย้อนหลัง 1 เดือน (rolling)">1 เดือน</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('rs')" title="กดเพื่อเรียง — คะแนนความแข็งแกร่ง 1–99">RS</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('price')" title="กดเพื่อเรียง">ราคา</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('val')" title="กดเพื่อเรียง — มูลค่าซื้อขายต่อวัน">มูลค่า/วัน</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p3m')" title="กดเพื่อเรียง">3M</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p6m')" title="กดเพื่อเรียง">6M</th><th class="p-2 cursor-pointer hover:text-slate-300" onclick="ldSortBy('p1y')" title="กดเพื่อเรียง">1Y</th><th class="p-2 text-slate-500" title="เส้นค่าเฉลี่ย 50 วัน vs 200 วัน — ขาขึ้นเมื่อ MA50 > MA200">MA50/200</th></tr></thead><tbody id="ldBody"></tbody></table></div>
                   </div>
 
                   <!-- 🔥 Heatmap: TradingView Stock Heatmap (วิดเจ็ตล้วน — เอาแค่วิดเจ็ต ไม่มีปุ่ม) -->
@@ -2619,7 +2619,7 @@ async function tdRender(){
       return '<div class="td-ic" role="button" tabindex="0" title="กดดูกราฟ '+x.label+'" onclick="openIndexModal(\''+x.key+'\')"><div class="t"><span class="nm">'+x.label+(x.live?' <i class="lv" title="ข้อมูลสด">●</i>':'')+'</span><span class="'+(up?'pos':'neg')+'">'+(up?'▲ +':'▼ ')+x.changePct.toFixed(2)+'%</span></div><div class="n">'+p[0]+(p[1]!=null?'<span class="dc">.'+p[1]+'</span>':'')+'</div></div>'; }).join(''):'<div class="mu">กำลังโหลดดัชนี…</div>')+'</div></div></div>';
   /* 2) Buy / Wait — ตารางแยก Buy กับ Wait */
   const r=BSS.res[m], tag=(a,l)=>a.map(x=>Object.assign(x,{l}));
-  let s2='<div class="td-sec"><h3>หุ้น Buy / Wait · '+fl+(r&&!r.err?' <small>Buy '+r.Buy.length+' · Wait '+r.Wait.length+'</small>':'')+'</h3><div class="td-sub">RS&gt;'+BS_RS+(BSS.asOf[m]?' · แท่งปิด '+BSS.asOf[m]:'')+'</div>';
+  let s2='<div class="td-sec"><h3>หุ้น Buy / Wait · '+fl+(r&&!r.err?' <small>Buy '+r.Buy.length+' · Wait '+r.Wait.length+'</small>':'')+'</h3><div class="td-sub">RS&gt;'+BS_RS+(BSS.asOf[m]?' · แท่งปิด '+BSS.asOf[m]:'')+((BSS.liqMin&&BSS.liqMin[m])?' · สภาพคล่อง ≥ '+fCap(BSS.liqMin[m],m)+'/วัน'+(BSS.liqCut[m]?' (ตัดออก '+BSS.liqCut[m]+' ตัว)':''):'')+'</div>';
   if(!r) s2+='<div class="mu">กำลังคำนวณ…</div>'; else if(r.err) s2+='<div class="mu">โหลดไม่สำเร็จ ('+r.err+')</div>';
   else{
     const buy=tag(r.Buy,'Buy'), wait=tag(r.Wait,'Wait'), N=TD.n, bl=N?buy.slice(0,N):buy, wl=N?wait.slice(0,N):wait;
@@ -2668,18 +2668,23 @@ async function tdRender(){
    Wait/Sell ตัดสินจากข้อมูลสแกน (SMA50/150/200, 3M, RS) · ตัวที่ผ่านเทคนิคและมีแนวโน้มย่อ (แท่งเขียว + ราคาใกล้/ต่ำกว่า EMA20) ตรวจกับกราฟรายวันจริง
    ป้ายกลุ่ม = Sector (TradingView) ในหน้าเงินไหล ความไวปกติ */
 const BS_RS=60;   // เกณฑ์ RS ของ Buy/Wait/Sell และลูกศร ▲ (RS > BS_RS)
-const BSS={lab:'Buy',res:{},busy:{},grp:'all',sk:'rs',sd:-1,asOf:{}};   // แสดงเฉพาะตลาดที่เลือกด้านบน (TH/US) · grp = กรองกลุ่ม · sk/sd = คอลัมน์/ทิศทางการเรียง
+const BSS={lab:'Buy',res:{},busy:{},grp:'all',sk:'rs',sd:-1,asOf:{},liqMin:{},liqCut:{}};   // liqMin/liqCut = เกณฑ์สภาพคล่องขั้นต่ำ + จำนวนที่ถูกตัดออก   // แสดงเฉพาะตลาดที่เลือกด้านบน (TH/US) · grp = กรองกลุ่ม · sk/sd = คอลัมน์/ทิศทางการเรียง
 async function bsScanLoad(m){
   if(BSS.res[m]||BSS.busy[m]) return; BSS.busy[m]=true; bsScanDraw();
   try{
     const [rows,g,rh]=await Promise.all([mfScanRows(m),bsSecGroups(m),bsRsHist(m)]);
     const sg=(rh&&rh.sig&&rh.sigAsOf&&Date.now()-Date.parse(rh.generatedAt)<4*864e5)?rh.sig:null;   // สรุปสัญญาณ ณ แท่งที่ปิดแล้ว (สคริปต์รายวันหลังปิดตลาด)
     BSS.asOf[m]=sg?rh.sigAsOf:null;
+    // เกณฑ์สภาพคล่องขั้นต่ำ (บอส 3 พ.ย.): หุ้นที่มูลค่าซื้อขายเฉลี่ย 20 วันต่ำกว่าเกณฑ์ = ไม่ขึ้นสัญญาณ Buy/Wait/Sell
+    const LIQ=(rh&&rh.liq)||null, LIQMIN=(rh&&rh.liqMin)||0; BSS.liqMin[m]=LIQMIN; BSS.liqCut[m]=0;
+    const liqOk = tk => !LIQ || LIQ[tk]==null || Number(LIQ[tk])>=LIQMIN;   // ไม่มีข้อมูล = ไม่ตัด (เดิม)
+    let liqCut=0;
     const out={Buy:[],Wait:[],Sell:[]}, miss=[];   // miss = หุ้นที่ไม่อยู่ในไฟล์สรุปสัญญาณ (เช่น mai/หุ้นเล็กที่ไฟล์ไม่เก็บ) → ตัดสินสดจากกราฟ ไม่ตัดเป็น Sell
     if(sg){
       const NM=[[1,'3M ไม่เป็นบวก'],[2,'SMA50 ≤ SMA200'],[4,'ปิดต่ำกว่า SMA150'],[8,'RS ≤ '+BS_RS],[16,'ยังไม่ย่อ'],[32,'ปริมาณไม่เพิ่ม']];
       for(const s of rows){
         if(!s.ticker||s.isDR||!(Number(s.price)>0)) continue;
+        if(!liqOk(s.ticker)){ liqCut++; BSS.liqCut[m]=(BSS.liqCut[m]||0)+1; continue; }   // ตัดออกเพราะสภาพคล่องไม่ถึงเกณฑ์
         const e=sg[s.ticker];
         // RS ที่แสดง/ตัดสิน = ค่า RS ของฐานที่เลือกจาก /api/scan (s.rs) — ให้ตัวเลขตรงกันทุกที่ (บอส 3 พ.ย.: TASCO ฟ้อง 94 vs 83)
         const _rsUse = (Number.isFinite(Number(s.rs)) ? Number(s.rs) : (e && e[2] != null ? e[2] : null));
@@ -2868,7 +2873,7 @@ async function wlExport(kind, how, btn){
 }
 // ===== ผู้นำรายเดือน (ไทย): ขึ้นมากสุดเดือนนี้ + ขาขึ้น MA50>MA200 + ผ่านสภาพคล่อง =====
 // ข้อมูลจาก monthly_leaders_th.json (gen_monthly_leaders.py) — ตลาดสหรัฐฯ ใช้รายชื่อแบบเดิม (renderLeadersUS)
-let ldRows=[], ldSortKey='mtd', ldSortDir=-1, ldMarket='thailand';
+let ldRows=[], ldSortKey='p1m', ldSortDir=-1, ldMarket='thailand';   // ค่าเริ่มต้น = ผลตอบแทน 1 เดือนย้อนหลัง (MTD เพิ่งเริ่มเดือน = ยังไม่เป็น 'ผู้นำรายเดือน' จริง — บอส 3 พ.ย.)
 function ldSortBy(k){
   if(ldSortKey===k){ ldSortDir=-ldSortDir; } else { ldSortKey=k; ldSortDir=(k==='ticker'||k==='name')?1:-1; }
   ldApply();
@@ -2920,7 +2925,7 @@ function ldApply(){
     return c*ldSortDir;
   });
   const show=rows.slice(0,n);
-  const lbl={mtd:'เดือนนี้',rs:'RS',ticker:'ตัวอักษร',price:'ราคา',val:'มูลค่า',p3m:'3M',p6m:'6M',p1y:'1Y'}[ldSortKey]||ldSortKey;
+  const lbl={mtd:'เดือนนี้ (MTD)',p1m:'1 เดือน',rs:'RS',ticker:'ตัวอักษร',price:'ราคา',val:'มูลค่า',p3m:'3M',p6m:'6M',p1y:'1Y'}[ldSortKey]||ldSortKey;
   const sh=document.getElementById('ldShown');
   if(sh) sh.textContent='— แสดง '+show.length+' จาก '+rows.length+' ตัว · เรียงตาม'+lbl+' '+(ldSortDir<0?'มาก→น้อย':'น้อย→มาก');
   const tw=document.getElementById('ldTableWrap'), cg=document.getElementById('ldCardGrid');
@@ -2935,13 +2940,13 @@ function ldApply(){
       return '<div class="ldc" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')">'+
         '<div class="ldc-top"><span class="ldc-l"><span class="ldc-n">#'+(i+1)+'</span><span class="bs-slot"></span></span><span class="rsr'+(p.rs<70?' lo':'')+'">'+p.rs+'</span></div>'+
         '<div class="tkcell"><span class="tkrow">'+tkL(p.ticker,ldMarket,22)+'<b class="ldc-tk">'+p.ticker+'</b>'+ldTags(p.ticker)+'</span>'+(ec?'<span class="ern-wrap">'+ec+'</span>':'')+'</div>'+
-        '<div class="ldc-big">'+pc(p.mtd)+'<small>เดือนนี้</small></div>'+
+        '<div class="ldc-big">'+pc(Number.isFinite(Number(p.p1m))?p.p1m:p.mtd)+'<small>1 เดือน</small></div>'+
         '<div id="tchart_'+ldMarket+'_'+String(p.ticker).replace(/[^a-z0-9]/gi,'_')+'" class="chart ldc-chart" data-tk="'+p.ticker+'" data-m="'+ldMarket+'"></div>'+
         '<div class="ldc-sub"><span><i>ราคา</i>'+fx(p.price)+'</span><span><i>3M</i>'+pc(p.p3m)+'</span><span><i>1Y</i>'+pc(p.p1y)+'</span></div>'+
       '</div>'; }).join('') || '<div class="trs-empty">ไม่มีข้อมูล</div>') : '';
     if(ldView==='card' && show.length){ try{ loadTop20Charts(show, ldMarket); }catch(e){} }
   }
-  body.innerHTML=show.map((p,i)=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')"><td class="p-2 text-slate-400">'+(i+1)+'</td><td class="p-2"><div class="tkcell"><span class="tkrow">'+tkL(p.ticker,ldMarket,18)+'<b class="text-sky-400">'+p.ticker+'</b>'+ldTags(p.ticker)+'</span>'+(ernBy(p.ticker,ldMarket,true)?'<span class="ern-wrap">'+ernBy(p.ticker,ldMarket,true)+'</span>':'')+'</div></td><td class="p-2"><b class="pos">+'+p.mtd.toFixed(1)+'%</b></td><td class="p-2"><span class="rsr'+(p.rs<70?' lo':'')+'">'+p.rs+'</span></td><td class="p-2">'+fx(p.price)+'</td><td class="p-2">'+fb(p.val)+'</td><td class="p-2 '+(p.p3m>=0?'pos':'neg')+'">'+p.p3m.toFixed(1)+'%</td><td class="p-2 '+(p.p6m>=0?'pos':'neg')+'">'+p.p6m.toFixed(1)+'%</td><td class="p-2 '+(p.p1y>=0?'pos':'neg')+'">'+p.p1y.toFixed(1)+'%</td><td class="p-2 text-[11px] text-slate-400" title="MA50 '+fx(p.sma50)+' เหนือ MA200 '+fx(p.sma200)+'">'+fx(p.sma50)+'/'+fx(p.sma200)+'</td></tr>').join('')||'<tr><td colspan="10" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
+  body.innerHTML=show.map((p,i)=>'<tr class="hover:bg-[#111827] border-b border-[#1e2634] cursor-pointer" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')"><td class="p-2 text-slate-400">'+(i+1)+'</td><td class="p-2"><div class="tkcell"><span class="tkrow">'+tkL(p.ticker,ldMarket,18)+'<b class="text-sky-400">'+p.ticker+'</b>'+ldTags(p.ticker)+'</span>'+(ernBy(p.ticker,ldMarket,true)?'<span class="ern-wrap">'+ernBy(p.ticker,ldMarket,true)+'</span>':'')+'</div></td><td class="p-2"><b class="'+(Number(p.p1m)>=0?'pos':'neg')+'">'+(Number(p.p1m)>=0?'+':'')+Number(p.p1m).toFixed(1)+'%</b></td><td class="p-2"><span class="rsr'+(p.rs<70?' lo':'')+'">'+p.rs+'</span></td><td class="p-2">'+fx(p.price)+'</td><td class="p-2">'+fb(p.val)+'</td><td class="p-2 '+(p.p3m>=0?'pos':'neg')+'">'+p.p3m.toFixed(1)+'%</td><td class="p-2 '+(p.p6m>=0?'pos':'neg')+'">'+p.p6m.toFixed(1)+'%</td><td class="p-2 '+(p.p1y>=0?'pos':'neg')+'">'+p.p1y.toFixed(1)+'%</td><td class="p-2 text-[11px] text-slate-400" title="MA50 '+fx(p.sma50)+' เหนือ MA200 '+fx(p.sma200)+'">'+fx(p.sma50)+'/'+fx(p.sma200)+'</td></tr>').join('')||'<tr><td colspan="10" class="p-4 text-center text-slate-500">ไม่มีข้อมูล</td></tr>';
 }
 async function renderLeaders(){
   const isUs = currentMarket==='america';
@@ -2955,7 +2960,10 @@ async function renderLeaders(){
     const ml=document.getElementById('ldMtdLabel'); if(ml) ml.textContent=j.metric_label||'เดือนนี้';
     ldMarket = currentMarket;
     window._wl_leaders=(j.data||[]).map(p=>({ticker:p.ticker, tv:p.tv||(isUs?'NASDAQ:':'SET:')+p.ticker, name:p.name}));
-    ldRows=(j.data||[]).map(p=>({ticker:p.ticker, name:p.name||'', mtd:+p.mtd||0, rs:+p.rs||0, price:+p.price||0, val:+p.val||0, p3m:+p.p3m||0, p6m:+p.p6m||0, p1y:+p.p1y||0, sma50:+p.sma50||0, sma200:+p.sma200||0}));
+    // RS ที่โชว์ = ฐานที่เลือก (3M/6M/1Y/รวม) จากข้อมูล scan — ไม่ใช้ rs ในไฟล์ (ไฟล์คิดด้วยสูตรรวมอย่างเดียว) บอส 3 พ.ย.
+    let rsLive={};
+    try{ const rows=(stockDB[currentMarket]&&stockDB[currentMarket].length)?stockDB[currentMarket]:(await mfScanRows(currentMarket)); rows.forEach(s=>{ if(s&&s.ticker) rsLive[s.ticker]=s.rs; }); }catch(e){}
+    ldRows=(j.data||[]).map(p=>({ticker:p.ticker, name:p.name||'', mtd:+p.mtd||0, p1m:+p.p1m||0, rs:(rsLive[p.ticker]!=null?Number(rsLive[p.ticker]):(+p.rs||0)), price:+p.price||0, val:+p.val||0, p3m:+p.p3m||0, p6m:+p.p6m||0, p1y:+p.p1y||0, sma50:+p.sma50||0, sma200:+p.sma200||0}));
     const warn=document.getElementById('ldWarn');
     if(warn) warn.innerHTML='<b>เกณฑ์:</b> '+(j.criteria||'')+'<br>ข้อมูล <b>'+j.asOf+'</b>'+(j.base?(' · เทียบกับปิด <b>'+j.base+'</b>'):'')+' · ผ่านทั้งหมด <b>'+j.count+' ตัว</b> · '+(j.rs_formula||'');
     const fx=v=>Number.isFinite(v)?Number(v).toFixed(2):'-';
@@ -3460,7 +3468,7 @@ function rsSet(b){ RS_BASE=b; try{ localStorage.setItem('rsd_rs', b); }catch(e){
   try{ BSS.res={}; }catch(e){}
   try{ Object.keys(stockDB).forEach(mk=>rsOverrideAll(mk)); }catch(e){}
   // วาดใหม่ทุกหน้าที่โชว์ RS (เงียบ ๆ ถ้าฟังก์ชันไหนไม่มี)
-  ['renderTopRs','renderThemes','renderSummary','renderMarketBreadth','renderMarketBrief','renderTopGL','renderMegatrend','tdRender','bsScanDraw','pfRender','renderHeatmap','rDhtml','buildCards','renderStocks'].forEach(n=>{ try{ if(typeof window[n]==='function') window[n](); }catch(e){} });
+  ['renderTopRs','renderThemes','renderSummary','renderMarketBreadth','renderMarketBrief','renderTopGL','renderMegatrend','tdRender','bsScanDraw','pfRender','renderHeatmap','rDhtml','buildCards','renderStocks','renderLeaders','renderLeadersUS'].forEach(n=>{ try{ if(typeof window[n]==='function') window[n](); }catch(e){} });
   // หน้า Scanner/TODAY: reload รายการสัญญาณตาม base ใหม่ (bsScanLoad อ่านแคช BSS.res ที่เคลียร์แล้ว)
   try{['thailand','america'].forEach(mk=>{ BSS.res[mk]=null; BSS.busy[mk]=null; }); if(curPage==='scanner') bsScanLoad(currentMarket); }catch(e){}
   try{ renderFlow(); }catch(e){}
