@@ -288,13 +288,17 @@ export default async function handler(req, res) {
     try {
       if (!SIG_CACHE[market]) {
         const j = await import("./_lib/" + (market === "thailand" ? "rshist_th_data.js" : "rshist_us_data.js"));
-        SIG_CACHE[market] = { ts: Date.now(), sig: (j.default && j.default.sig) || {} };
+        const dj = (j.default || {});
+        // เก็บรายชื่อที่ "มีสถานะ/เคยมีสัญญาณ" ทุกฐาน — sig (วันนี้) + bh* (Buy ย้อนหลัง) เพื่อไม่ให้หุ้นที่ดึงราคาไม่สำเร็จหลุดจากรายการ
+        const keepSet = {};
+        for (const k of ['sig', 'sig3', 'sig6', 'sig1']) for (const [tk, v] of Object.entries(dj[k] || {})) { if (Array.isArray(v) && v[0] >= 1) keepSet[tk] = 1; }
+        for (const k of ['bh', 'bh3', 'bh6', 'bh1']) for (const tk of Object.keys(dj[k] || {})) keepSet[tk] = 1;
+        SIG_CACHE[market] = { ts: Date.now(), sig: (dj.sig || {}), keep: keepSet };
       }
-      const sigMap = SIG_CACHE[market].sig;
+      const KEEP = SIG_CACHE[market].keep || {};
       const have = new Set(clean.map(s => s.ticker));
       const keep = [];
-      for (const [tk, s] of Object.entries(sigMap)) {
-        if (!Array.isArray(s) || (s[0] !== 1 && s[0] !== 2)) continue;  // เอา Wait(1)/Buy(2) เท่านั้น
+      for (const tk of Object.keys(KEEP)) {
         if (have.has(tk)) continue;
         const r = raw.find(x => x.ticker === tk);
         if (r) keep.push(r);

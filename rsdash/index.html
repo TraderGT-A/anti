@@ -3437,13 +3437,24 @@ function clearMarketData(){
 let RS_BASE = '3m';
 try{ const _sb=localStorage.getItem('rsd_rs'); if(['3m','6m','1y','all'].includes(_sb)) RS_BASE=_sb; }catch(e){}
 const RS_FLD = { '3m':'rs3', '6m':'rs6', '1y':'rs1', all:null };   // all = สูตรรวมเดิม (s.rs ของ backend)
-function _rsOverrideRows(rows){ const f = RS_FLD[RS_BASE]; if(!f || !Array.isArray(rows)) return rows; rows.forEach(s=>{ if(!s) return; if(s._rsAll===undefined) s._rsAll = s.rs; s.rs = (s[f] != null) ? s[f] : s._rsAll; }); return rows; }
+function _rsOverrideRows(rows){ const f = RS_FLD[RS_BASE]; if(!f || !Array.isArray(rows)) return rows;
+  rows.forEach(s=>{ if(!s) return; if(s._rsAll===undefined){ s._rsAll = s.rs; s._rTAll = s.rT; } s.rs = (s[f] != null) ? s[f] : s._rsAll; });
+  // อันดับ #N ที่โชว์ข้างค่า RS = ลำดับเรียงตามฐานที่เลือก (ก่อนหน้าโชว์รวมเดิมทุกฐาน บอส 3 พ.ย. "อันดับไม่เปลี่ยนเมื่อสลับฐาน")
+  const arr = [...rows].filter(s=>s && Number.isFinite(Number(s.rs))).sort((a,b)=>b.rs-a.rs);
+  arr.forEach((s,i)=>{ s.rT = i+1; });
+  rows.forEach(s=>{ if(s && !(Number.isFinite(Number(s.rs)))) s.rT = null; });
+  return rows; }
 function rsOverrideAll(mk){ try{ _rsOverrideRows(stockDB[mk]); _rsOverrideRows(topRSData[mk]); if(mk===currentMarket) _rsOverrideRows(stockData); }catch(e){} }
 function rsSet(b){ RS_BASE=b; try{ localStorage.setItem('rsd_rs', b); }catch(e){}
   ['3m','6m','1y','all'].forEach(k=>{ const el=document.getElementById('rsBtn'+k); if(el) el.classList.toggle('active', k===b); });
+  // เคลียร์แคชที่ผูกกับฐาน RS (สัญญาณ/ลูกศร ทั้ง 4 ชุดตาม base — บอส 3 พ.ย. 13:xx: เลือกค่าไหนทุกสูตรเปลี่ยนหมดตามค่า)
+  try{ Object.keys(RSH).forEach(k=>delete RSH[k]); }catch(e){}
+  try{ BSS.res={}; }catch(e){}
   try{ Object.keys(stockDB).forEach(mk=>rsOverrideAll(mk)); }catch(e){}
   // วาดใหม่ทุกหน้าที่โชว์ RS (เงียบ ๆ ถ้าฟังก์ชันไหนไม่มี)
   ['renderTopRs','renderThemes','renderSummary','renderMarketBreadth','renderMarketBrief','renderTopGL','renderMegatrend','tdRender','bsScanDraw','pfRender','renderHeatmap','rDhtml','buildCards','renderStocks'].forEach(n=>{ try{ if(typeof window[n]==='function') window[n](); }catch(e){} });
+  // หน้า Scanner/TODAY: reload รายการสัญญาณตาม base ใหม่ (bsScanLoad อ่านแคช BSS.res ที่เคลียร์แล้ว)
+  try{['thailand','america'].forEach(mk=>{ BSS.res[mk]=null; BSS.busy[mk]=null; }); if(curPage==='scanner') bsScanLoad(currentMarket); }catch(e){}
   try{ renderFlow(); }catch(e){}
 }
 document.addEventListener('DOMContentLoaded', ()=>{ rsSet(RS_BASE); });
@@ -3701,6 +3712,7 @@ function rsColor(r){ return r>=80?'text-emerald-400':(r>=50?'text-yellow-400':'t
 function rDhtml(x){
   const d=x.rD;
   if(d===null||d===undefined) return '';
+  if(RS_BASE!=='all') return '<span class="rk mu" title="อันดับเมื่อวานเป็นฐาน "รวม" — เลือก "รวม" เพื่อดูการเปลี่ยนอันดับ">–</span>';   // กันกลืนข้ามฐาน (บอส 3 พ.ย. 13:xx)
   if(d>0) return '<span class="rk pos"><i class="ar">▲</i> '+d+'</span>';
   if(d<0) return '<span class="rk neg"><i class="ar">▼</i> '+Math.abs(d)+'</span>';
   return '<span class="rk mu">–</span>';
@@ -4229,6 +4241,13 @@ function bsRsHist(m){
   const k=m==='america'?'us':'th';
   return RSH[k]||(RSH[k]=fetch('/rshist_'+k+'.json').then(r=>r.ok?r.json():null).then(j=>{
     if(!j||!j.dates||!j.rs||!j.generatedAt||Date.now()-Date.parse(j.generatedAt)>7*864e5) return null;
+    // ฐาน RS ที่เลือก (3M/6M/1Y/รวม — ปุ่มขวาบน) — สัญญาณ Buy/Wait/Sell + ลูกศรใช้ชุดตาม base (บอส 3 พ.ย. 13:xx)
+    // (ไฟล์จาก 3 พ.ย. ก่อนรุ่นนี้ไม่มี sig3/sig6/sig1 → ถอยทั้งหมดเป็นชุดรวม)
+    const sf = (RS_BASE==='3m')?'3':(RS_BASE==='6m')?'6':(RS_BASE==='1y')?'1':'';
+    const bs = { rs: (j['rs'+sf] && Object.keys(j['rs'+sf]).length) ? j['rs'+sf] : j.rs,
+                 sig: (j['sig'+sf] && Object.keys(j['sig'+sf]).length) ? j['sig'+sf] : j.sig,
+                 bh: (j['bh'+sf] && Object.keys(j['bh'+sf]).length) ? j['bh'+sf] : j.bh };
+    j.rs = bs.rs; j.sig = bs.sig; j.bh = bs.bh;
     j.ix={}; j.dates.forEach((d,i)=>{ j.ix[d]=i; }); return j; }).catch(()=>null));
 }
 function bsRsFn(rh,tk){

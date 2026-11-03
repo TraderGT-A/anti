@@ -92,15 +92,23 @@ export async function computeMarket(mk) {
   const start = back.findIndex((b) => b.every((i) => i >= 0));
   if (start < 0) throw new Error(mk + ": ประวัติราคาสั้นเกินไป");
   const outDates = dates.slice(start), rs = {}; tk.forEach((t) => (rs[t] = new Array(outDates.length).fill(0)));
+  // RS แยกฐาน 3M/6M/1Y (บอส 3 พ.ย. 26: "เลือก RS ค่าไหนทุกสูตรเปลี่ยนหมดตามค่า" — สัญญาณ Buy RS>60 ต้องเป็น RS ของฐานที่เลือก)
+  const rsB = { rs3: {}, rs6: {}, rs1: {} }; tk.forEach((t) => { rsB.rs3[t] = new Array(outDates.length).fill(0); rsB.rs6[t] = new Array(outDates.length).fill(0); rsB.rs1[t] = new Array(outDates.length).fill(0); });
   for (let t = start; t < T; t++) {
-    const sc = [];
+    const sc = [], scB = { rs3: [], rs6: [], rs1: [] };
     for (let k = 0; k < N; k++) {
       const c = C[k]; if (c[t] == null) continue; let s = 0, ok = true;
-      for (let q = 0; q < LBM.length; q++) { const p = c[back[t][q]]; if (p == null || !(p > 0)) { ok = false; break; } s += LBM[q][1] * (c[t] / p - 1) * 100; }
-      if (ok) sc.push([k, s]);
+      const pr = [0, 0, 0];
+      for (let q = 0; q < LBM.length; q++) {
+        const p = c[back[t][q]]; if (p == null || !(p > 0)) { ok = false; break; }
+        const r = (c[t] / p - 1) * 100; s += LBM[q][1] * r;
+        if (q > 0) pr[q - 1] = r;   // q=1 → 3M · q=2 → 6M · q=3 → 12M
+      }
+      if (ok) { sc.push([k, s]); scB.rs3.push([k, pr[0]]); scB.rs6.push([k, pr[1]]); scB.rs1.push([k, pr[2]]); }
     }
     sc.sort((a, b) => b[1] - a[1]);
     sc.forEach(([k], i) => { rs[tk[k]][t - start] = pctile(i, sc.length); });
+    for (const bk of ['rs3', 'rs6', 'rs1']) { const arr = scB[bk]; arr.sort((a, b) => b[1] - a[1]); arr.forEach(([k], i) => { rsB[bk][tk[k]][t - start] = pctile(i, arr.length); }); }
   }
   // ตรวจเทียบกับ RS ปัจจุบันจากระบบ (ต่างได้เล็กน้อยเพราะนิยามช่วงเวลา)
   const cur = new Map(got.filter((s) => shown.has(s.ticker)).map((s) => [s.ticker, Number(s.rs)])); let n = 0, abs = 0, within5 = 0, same70 = 0;
@@ -109,42 +117,51 @@ export async function computeMarket(mk) {
   if (!(n > 0) || abs / n > 8) throw new Error(mk + ": RS ที่คำนวณต่างจากระบบมากผิดปกติ — ไม่เขียนไฟล์");
   // สัญญาณ Buy/Wait/Sell ณ แท่งที่ปิดล่าสุด — กฎเดียวกับ bsEval ใน index.html: [รหัส 0=Sell(บิต 2,4) 1=Wait(บิต 1,8,16,32) 2=Buy, flags, RS]
   //   flags: 1=3M ไม่บวก (ปิด ≤ ปิด 63 แท่งก่อน) · 2=SMA50≤SMA200 · 4=ปิด ≤ SMA150 · 8=RS ≤ 60 · 16=ไม่ย่อ (ไม่ใช่ ปิด<SMA20 และปิดเขียว) · 32=ปริมาณไม่เพิ่มจากแท่งก่อน
-  const sig = {}, Li = outDates.length - 1;
+  const sig = {}, sigB = { rs3: {}, rs6: {}, rs1: {} }, Li = outDates.length - 1;
   for (const t of tk) {
     if (!shown.has(t)) continue; const b = rows[t], n = b.length, L = n - 1;
     if (n < 200 || b[L][0] !== outDates[Li]) continue;
     const cs = [0]; b.forEach((x, i) => cs.push(cs[i] + x[1])); const avg = (k) => (cs[n] - cs[n - k]) / k;
-    const px = b[L][1], s20 = avg(20), s50 = avg(50), s150 = avg(150), s200 = avg(200), rsv = rs[t][Li];
-    let f = 0;
-    if (!(px > b[L - 63][1])) f |= 1;
-    if (!(s50 > s200)) f |= 2;
-    if (!(px > s150)) f |= 4;
-    if (!(rsv > 60)) f |= 8;
-    if (!(px < s20 && b[L][2] != null && px > b[L][2])) f |= 16;
-    if (!(b[L][3] != null && b[L - 1][3] != null && b[L][3] > b[L - 1][3])) f |= 32;
-    sig[t] = [(f & 6) ? 0 : (f & 57) ? 1 : 2, f, rsv, +px.toFixed(4)];   // [รหัส, flags, RS, ราคาปิดแท่งล่าสุดที่ปิดแล้ว — ใช้คิดระยะห่างจากจุดสูง 52 สัปดาห์]
+    const px = b[L][1], s20 = avg(20), s50 = avg(50), s150 = avg(150), s200 = avg(200);
+    let f0 = 0;
+    if (!(px > b[L - 63][1])) f0 |= 1;
+    if (!(s50 > s200)) f0 |= 2;
+    if (!(px > s150)) f0 |= 4;
+    if (!(px < s20 && b[L][2] != null && px > b[L][2])) f0 |= 16;
+    if (!(b[L][3] != null && b[L - 1][3] != null && b[L][3] > b[L - 1][3])) f0 |= 32;
+    // สัญญาณครบทุกฐาน RS: rs = สูตรรวมเดิม · rs3/rs6/rs1 = RS ของฐานนั้น (เกณฑ์ RS>60 เปลี่ยนตามฐานที่ผู้ใช้เลือก)
+    for (const bk of ['rs', 'rs3', 'rs6', 'rs1']) {
+      const rsv = bk === 'rs' ? rs[t][Li] : rsB[bk][t][Li];
+      const f = f0 | ((!(rsv > 60)) ? 8 : 0);
+      (bk === 'rs' ? sig : sigB[bk])[t] = [(f & 6) ? 0 : (f & 57) ? 1 : 2, f, rsv, +px.toFixed(4)];
+    }   // [รหัส, flags, RS, ราคาปิดแท่งล่าสุดที่ปิดแล้ว — ใช้คิดระยะห่างจากจุดสูง 52 สัปดาห์]
   }
   // ประวัติสัญญาณ Buy 8 แท่งล่าสุด (7 แท่งก่อนหน้า + แท่งล่าสุดที่หน้า TODAY ไม่นับเป็นย้อนหลัง) (ทุกตัวที่มีราคา): วันที่ที่ผ่านเงื่อนไข Buy ครบ (กฎเดียวกับ bsEval/bsMarks) → bh[ticker] = [วันที่, …] — ใช้ในหน้า TODAY "Buy ย้อนหลัง 7 วัน"
-  const buy7 = {};
+  const buy7s = { rs: {}, rs3: {}, rs6: {}, rs1: {} };
   for (const t of tk) {
     const b = rows[t]; if (!b || b.length < 230) continue;
     const bm = new Map(b.map((x, i) => [x[0], i])), cs2 = [0]; b.forEach((x, i) => cs2.push(cs2[i] + x[1]));
+    for (const bk of ['rs', 'rs3', 'rs6', 'rs1']) {
+    const RQ = bk === 'rs' ? rs[t] : rsB[bk][t];
     const days = [];
     for (let q = Math.max(0, Li - 7); q <= Li; q++) {
       const j = bm.get(outDates[q]); if (j == null || j < 199) continue;
-      const px = b[j][1], r = rs[t][q]; if (!(r > 60)) continue;
+      const px = b[j][1], r = RQ[q]; if (!(r > 60)) continue;
       const a = (k) => (cs2[j + 1] - cs2[j + 1 - k]) / k, s20 = a(20), s150 = a(150);
       if (!(px > b[j - 63][1] && a(50) > a(200) && px > s150)) continue;
       if (!(px < s20 && b[j][2] != null && px > b[j][2])) continue;
       if (!(b[j][3] != null && b[j - 1][3] != null && b[j][3] > b[j - 1][3])) continue;
       days.push(outDates[q]);
     }
-    if (days.length) buy7[t] = days;
+    if (days.length) buy7s[bk][t] = days;
+    }
   }
-  log(mk, "Buy ย้อนหลัง 8 แท่ง: หุ้นที่เคยเข้า Buy", Object.keys(buy7).length, "ตัว");
+  const buy7 = buy7s.rs;
+  log(mk, "Buy ย้อนหลัง 8 แท่ง:", Object.keys(buy7).length, "ตัว · ฐาน 3M", Object.keys(buy7s.rs3).length, "/ 6M", Object.keys(buy7s.rs6).length, "/ 1Y", Object.keys(buy7s.rs1).length);
   const cnt3 = [0, 0, 0]; Object.values(sig).forEach((x) => cnt3[x[0]]++); log(mk, "สัญญาณ ณ", outDates[Li], "· Sell", cnt3[0], "Wait", cnt3[1], "Buy", cnt3[2]);
   const rsOut = {}; for (const t of tk) if (shown.has(t)) rsOut[t] = rs[t];   // เก็บเฉพาะหุ้นที่แสดงในแดชบอร์ด (จัดอันดับใช้ทั้งตลาด)
-  const j = { generatedAt: new Date().toISOString(), mk, dates: outDates, rs: rsOut, sig, bh: buy7, sigAsOf: outDates[Li], universe: N, shown: Object.keys(rsOut).length, check: { n, meanAbsDiff: +(abs / n).toFixed(2), within5: +(within5 / n).toFixed(3), same70: +(same70 / n).toFixed(3) } };
+  const rsBOut = {}; for (const bk of ['rs3', 'rs6', 'rs1']) { rsBOut[bk] = {}; for (const t of tk) if (shown.has(t)) rsBOut[bk][t] = rsB[bk][t]; }
+  const j = { generatedAt: new Date().toISOString(), mk, dates: outDates, rs: rsOut, rs3: rsBOut.rs3, rs6: rsBOut.rs6, rs1: rsBOut.rs1, sig3: sigB.rs3, sig6: sigB.rs6, sig1: sigB.rs1, bh3: buy7s.rs3, bh6: buy7s.rs6, bh1: buy7s.rs1, sig, bh: buy7, sigAsOf: outDates[Li], universe: N, shown: Object.keys(rsOut).length, check: { n, meanAbsDiff: +(abs / n).toFixed(2), within5: +(within5 / n).toFixed(3), same70: +(same70 / n).toFixed(3) } };
   const f = path.join(OUT, `rshist_${mk}.json`); fs.writeFileSync(f + ".tmp", JSON.stringify(j)); fs.renameSync(f + ".tmp", f);
   // พ่น data.js ให้ Vercel serverless (/api/scan) import ได้แน่นอน (บอส 3 พ.ย.: CNT เกิดสัญญาณเมื่อวาน วันนี้หาย — ให้หุ้นข้อสถานะอยู่ครบไม่หายกลางวัน)
   const fData = path.resolve(OUT, "api", "_lib", `rshist_${mk}_data.js`);
