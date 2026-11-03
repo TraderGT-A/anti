@@ -173,6 +173,15 @@ export async function scanMarket(market = "thailand") {
   raw.sort((a, b) => b.score - a.score);
   raw.forEach((s, i) => { s.rs = percentile(i, raw.length); s.rT_full = i + 1; });
 
+  // RS แยกฐานช่วง (บอส 3 พ.ย.: "มีให้เลือก RS3M / RS6M / RS1ปี · default 3M ทั้งเว็บ · เลือกจากจุดขวาบนของเว็บ ใช้ทั้งหมด")
+  // นิยามตรงชื่อ: อันดับเปอร์เซ็นไทล์ของผลตอบแทนช่วงนั้นเทียบหุ้นทั้งตลาด (หุ้นครบชุดเดียวกับ rs เดิม)
+  // → rs3 = p3m, rs6 = p6m, rs1 = p1y (แหว่งแถวขาด = null → เว็บแสดง '–' และไม่เรียงหัวหน้าตาม RS ที่เลือก)
+  const _base = (key, fld) => {
+    const arr = [...raw].sort((a, b) => ((b[key] ?? -1e9) - (a[key] ?? -1e9)) || (b.score - a.score));
+    arr.forEach((s, i) => { if (s[key] != null) s[fld] = percentile(i, arr.length); });
+  };
+  _base('p3m', 'rs3'); _base('p6m', 'rs6'); _base('p1y', 'rs1');   // 0–99 เทียบหุ้นทั้งตลาด
+
   const byMcap = [...raw].sort((a, b) => b.mcap - a.mcap);
   raw.forEach(s => {
     if (market === "thailand") {
@@ -194,9 +203,27 @@ export async function scanMarket(market = "thailand") {
   // → ถ้าใช้แต่ยอดวันนี้ รายชื่อจะผอมผิดปกติตอนเช้า แล้วค่อยขยายตอนบ่าย
   // ต้องผ่านทั้งปริมาณและมูลค่า "ในชุดเดียวกัน": (วันนี้ผ่านทั้งคู่) หรือ (เฉลี่ย 10 วันผ่านทั้งคู่)
   // ไม่ใช่ผ่านอย่างใดอย่างหนึ่ง — กันหุ้นที่จำนวนหุ้นถึงเกณฑ์แต่มูลค่าซื้อขายเล็กมากหลุดเข้ามา
-  const okLiq = (s, minV, minVal) =>
-    ((s.volume || 0) >= minV && (s.val || 0) >= minVal) ||
-    ((s.avgVol || 0) >= minV && (s.avgVol || 0) * (s.price || 0) >= minVal);
+  // ตลาดยังไม่ปิด (กลางวัน) → ปริมาณ/มูลค่า "วันนี้" ยังไม่ครบ ตัดเกณฑ์ด้วย vol สดจะทำให้หุ้นที่ผ่านเมื่อวานเพิ่งหายกลางวัน
+  // (เจอจริง 3 พ.ย.: CNT เกิดสัญญาณ Buy เมื่อวาน กลางวันนี้ val=49k/vol=16.5k ยังไม่ถึง 1M/100k → หลุดทั้งหน้า Create เงื่อนไขป้าย Buy บนฐานรshist แต่ไฟล์ stockData ไม่มีตัวมัน = วัดไม่ได้ บอสพาดพิง 3 พ.ย.)
+  // → ถ้าตลาดเปิด (TH 09:30-17:00 ไทย, US 04:00-16:00 ET วันทำการ): ตัดสินด้วย "เฉลี่ย 10 วัน" เท่านั้น
+  //   (วันปิดปกติ: ตัดสินด้วย vol/val วันนั้นเต็ม = ค่าเดิม)
+  const _hV = (z) => { try { return new Date().toLocaleString("en-GB", { timeZone: z, hour12: false, weekday: "short", hour: "2-digit", minute: "2-digit" }); } catch { return ""; } };
+  const _inSession = (z, o, c) => {
+    const s = _hV(z);          // "Tue 11:06"
+    if (!s || /Sat|Sun/.test(s)) return false;
+    const m = s.match(/(\d{2}):(\d{2})/); if (!m) return false;
+    const t = (+m[1]) + (+m[2]) / 60;
+    return t >= o && t < c;
+  };
+  const marketLive = market === "thailand"
+    ? _inSession("Asia/Bangkok", 9.5, 17.0)
+    : _inSession("America/New_York", 4.0, 16.0);
+  const okLiq = (s, minV, minVal) => {
+    if (marketLive)
+      return (s.avgVol || 0) >= minV && (s.avgVol || 0) * (s.price || 0) >= minVal;
+    return ((s.volume || 0) >= minV && (s.val || 0) >= minVal) ||
+           ((s.avgVol || 0) >= minV && (s.avgVol || 0) * (s.price || 0) >= minVal);
+  };
 
   let clean = raw.filter(s => s.price >= M.min_price && s.mcap >= M.min_mcap && okLiq(s, M.min_vol, M.min_value));
 
