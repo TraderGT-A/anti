@@ -167,6 +167,16 @@ def main():
     codes = {u: _code(u) for u in CHECK_URLS}
     bad = {u: c for u, c in codes.items() if c != 200}
     print("ตรวจผล: " + " | ".join("%s=%s" % (u.replace(BASE, ""), c) for u, c in codes.items()), flush=True)
+    # งบ/count: ยิง /api/scan ต้องมีฟิลด์ eN และรายชื่อไม่หด (ฐานขั้นต่ำ 150 — คอสสั่ง 29 ต.ค.: เดิม 180 สูงเกิน + ปกติแกว่ง 176)
+    try:
+        scan = get(BASE + "/api/scan?market=thailand", 120)
+        n_th = len(scan.get("data") or [])
+        has_en = "eN" in (scan.get("data") or [{}])[0]
+        print("ตรวจงบ: TH count=%s | eN=%s" % (n_th, has_en), flush=True)
+        if n_th < 150 or not has_en:
+            bad["/api/scan(filter+งบ)"] = min(codes.values()) if bad else 0
+    except Exception as e:
+        print("WARN: ยิงงบตรวจไม่สำเร็จ (%s)" % e, flush=True)
     if bad:
         print("ERROR: URL ไม่ผ่าน %s — กู้คืน %s" % (bad, old_url), flush=True)
         if old_url:

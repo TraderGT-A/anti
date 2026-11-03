@@ -52,3 +52,6 @@ rsdash/rsdash_clean_deploy/
 # rsdash node_modules (ws dependency)
 rsdash/node_modules/
 rsarena/node_modules/
+
+scripts/set_filed/node_modules/
+scripts/set_filed/run.log
