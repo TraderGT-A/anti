@@ -3868,7 +3868,12 @@ function fPctExact(v){ const n=Number(v); if(!Number.isFinite(n)) return '<span 
 function fBilExact(n, mk){ const v=Number(n); if(!Number.isFinite(v)) return '-'; return ((mk||currentMarket)==='america'?'$':'฿')+ (v>=1e9?(v/1e9).toFixed(2)+'B':(v/1e6).toFixed(1)+'M'); }
 function rsColor(r){ return r>=80?'text-emerald-400':(r>=50?'text-yellow-400':'text-red-400'); }
 function rDhtml(x){
-  const d=x.rD;
+  const _bk = RS_BASE==='3m'?'rD3':(RS_BASE==='6m'?'rD6':(RS_BASE==='1y'?'rD1':null));
+  if(_bk){ const dv=x[_bk];
+    if(dv===null||dv===undefined) return '<span class="rk mu" title="ยังไม่มีอันดับเมื่อวานของฐานนี้ — ระบบจะเริ่มเก็บให้ครบทุกฐานตั้งแต่รอบถัดไป">–</span>';
+    return dv>0 ? '<span class="rk pos"><i class="ar">▲</i> '+dv+'</span>' : (dv<0 ? '<span class="rk neg"><i class="ar">▼</i> '+Math.abs(dv)+'</span>' : '<span class="rk mu">0</span>');
+  }
+  const d = x.rD;   // fallback (เฉพาะกรณีไม่มีฐาน)
   if(d===null||d===undefined) return '';
   // โชว์ทุกฐาน (อันดับเมื่อวานอ้างอิง snapshot ฐาน 1Y — ใช้ดูทิศทางได้)
   if(d>0) return '<span class="rk pos"><i class="ar">▲</i> '+d+'</span>';

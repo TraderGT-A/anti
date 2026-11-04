@@ -218,6 +218,7 @@ export default async function handler(req, res) {
     // Yesterday's Rank map from Supabase (แยกตาม market)
     const { snapshot } = await loadPreviousSnapshot(market);
     const oldRank = {};
+    const prevRanks = (snapshot && snapshot.payload && snapshot.payload.ranks) || null;   // อันดับรายฐานเมื่อวาน (ถ้ามี)
     if (snapshot && snapshot.payload) {
       // ⚠️ อ่าน "อันดับเมื่อวาน" ให้อยู่บนฐานเดียวกับ rT วันนี้ (clean เรียงตาม score) เสมอ
       // บั๊กที่เจอ 29 ต.ค. 2026: snapshot บางวันถูกเขียนจากชุดใหญ่ (~250 แถว ปน DR/กองทุน
@@ -402,9 +403,28 @@ export default async function handler(req, res) {
       themes,
       marketSummary,
       data: clean,
+      // อันดับรายฐานสำหรับเทียบΔRank วันถัดไป (ชุดกรอง = rT3/rT6/rT1 · ชุดทั้งตลาด = rk3/rk6/rk1 จากไฟล์)
+      ranks: (() => {
+        try {
+          const cl = CLOSED_CACHE[market] || {};
+          const pick = (f) => Object.fromEntries(clean.map(x => [x.ticker, x[f]]).filter(([, v]) => v != null));
+          return { f3: pick('rT3'), f6: pick('rT6'), f1: pick('rT1'), a3: cl.rk?.rs3 || {}, a6: cl.rk?.rs6 || {}, a1: cl.rk?.rs1 || {} };
+        } catch (e) { return null; }
+      })(),
     };
     // ★ จัดอันดับครั้งสุดท้ายบนชุดที่จะส่งออกจริง (กันเลขซ้ำ/หลุดจากโค้ดที่แก้ทีหลัง)
     try { applyClosedRS(await closedMaps(market), clean); } catch (e) {}
+    // ΔRank รายฐาน (ต้องเทียบฐานเดียวกันเท่านั้น): rD3/rD6/rD1 จากอันดับเมื่อวานของฐานนั้น
+    try {
+      if (prevRanks) {
+        clean.forEach(x => {
+          const m3 = prevRanks.f3 && prevRanks.f3[x.ticker], m6 = prevRanks.f6 && prevRanks.f6[x.ticker], m1 = prevRanks.f1 && prevRanks.f1[x.ticker];
+          x.rD3 = (m3 != null && x.rT3 != null) ? m3 - x.rT3 : null;
+          x.rD6 = (m6 != null && x.rT6 != null) ? m6 - x.rT6 : null;
+          x.rD1 = (m1 != null && x.rT1 != null) ? m1 - x.rT1 : null;
+        });
+      }
+    } catch (e) {}
 
     // snapshot เก็บเฉพาะฟิลด์หลัก — ฟิลด์ Scanner (SMA150/EMA20/52w/ATR/vol) คำนวณสดทุกสแกน ไม่ต้องบวม DB
     const SCANNER_ONLY = ["sma150", "ema20", "hi52", "lo52", "atr", "eN", "eL", "niY", "rvY", "niQ", "rvQ"];
