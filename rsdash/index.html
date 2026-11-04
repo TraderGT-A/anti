@@ -2024,7 +2024,7 @@ const mfJ=u=>MF.cache[u]||(MF.cache[u]=fetch(API+u).then(r=>r.json()).then(j=>{ 
 // (บั๊ก 4 พ.ย.: เดิมใช้ชุดที่แสดงผลแค่ ~190 ตัว → ไทยขึ้น 66-72% ทั้งที่ทั้งกระดานจริง ~43%)
 const MF_ALL={};
 const mfScanAll=mk=>MF_ALL[mk]||(MF_ALL[mk]=mfJ('/api/scan?universe=all&market='+mk).then(j=>j.data||[]).catch(e=>{ delete MF_ALL[mk]; throw e; }));
-const mfScanRows=mk=>mfJ('/api/scan?market='+mk).then(j=>{ const d=j.data||[]; try{ setLogoIds(mk,d); }catch(e){} try{ _rsOverrideRows(d); }catch(e){} return d; });   // RS ตามฐานที่เลือก (3M/6M/1Y/รวม) — ให้ตรงกับ stockDB (บอส 3 พ.ย.: แถวโชว์ 98 แต่ป็อปอัปโชว์ 97)
+const mfScanRows=mk=>mfJ('/api/scan?market='+mk+'&nc='+Math.floor(Date.now()/60000)).then(j=>{ const d=j.data||[]; try{ setLogoIds(mk,d); }catch(e){} try{ _rsOverrideRows(d); }catch(e){} return d; });   // RS ตามฐานที่เลือก (3M/6M/1Y/รวม) — ให้ตรงกับ stockDB (บอส 3 พ.ย.: แถวโชว์ 98 แต่ป็อปอัปโชว์ 97)
 const mfPct=v=>v==null?'<span class="mu">–</span>':'<b class="'+(v>=0?'pos':'neg')+'">'+(v>=0?'+':'')+(v*100).toFixed(Math.abs(v)<0.1?2:1)+'%</b>';
 const mfR=(s,i0)=>{ const a=s[i0],b=s[s.length-1]; return (a!=null&&b!=null&&a>0)?b/a-1:null; };
 function mfSma(s,n){ const w=s.filter(x=>x!=null).slice(-n); return w.length>=n?w.reduce((a,b)=>a+b,0)/n:null; }
@@ -2703,7 +2703,7 @@ function tdCalHtml(mk){
 let TDG=null;   // กลุ่มเงินไหล (Sector) ของตลาดที่เปิด ใช้ทำปุ่มกลุ่มข้างหุ้น
 function tdOpenList(k){ const L=TD.lists&&TD.lists[k]; if(L&&L.length) openStockList(({buy:'Buy',wait:'Wait',top:'Top 20 ขึ้นแรงวันนี้',hist:'Buy ย้อนหลัง 7 วัน'})[k]+' · '+(currentMarket==='america'?'US':'TH'),'หน้า TODAY',L,currentMarket); }
 function tdMini(x,m,i){ const s=x.s, ch=Number(s.change), up=ch>=0, ec=ernChips(s,m,true), rs=(x.rsv!=null?x.rsv:s.rs), rsh=Number.isFinite(Number(rs))?'<span class="rsr'+(rs<70?' lo':'')+'" title="RS">'+rs+'</span>':'';
-  return '<div class="td-mr" onclick="openModal(\''+jq(s.ticker)+'\',\''+jq(s.name)+'\',\''+m+'\')"><span class="l">'+(i!=null?'<i class="rk">'+(i+1)+'</i>':'')+rsh+tkL(s.ticker,m,16)+'<b>'+s.ticker+'</b>'+tkT(s.ticker,m)+(ec?'<span class="ern-wrap">'+ec+'</span>':'')+'</span><span class="g">'+bsGrpHtml(x.gi)+'</span>'+(x.tag?'<span class="tg">'+x.tag+'</span>':'')+(Number.isFinite(ch)?'<span class="v '+(up?'pos':'neg')+'">'+(up?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div>'; }
+  return '<div class="td-mr" onclick="openModal(\''+jq(s.ticker)+'\',\''+jq(s.name)+'\',\''+m+'\')"><span class="l">'+(i!=null?'<i class="rk">'+(i+1)+'</i>':'')+rsh+tkL(s.ticker,m,16)+'<b>'+s.ticker+'</b>'+tkT(s.ticker,m)+(x.stale?'<span class="pill" style="font-size:9px" title="'+(x.staleWhy||'').replace(/"/g,'')+'">ค้าง</span>':'')+(ec?'<span class="ern-wrap">'+ec+'</span>':'')+'</span><span class="g">'+bsGrpHtml(x.gi)+'</span>'+(x.tag?'<span class="tg">'+x.tag+'</span>':'')+(Number.isFinite(ch)?'<span class="v '+(up?'pos':'neg')+'">'+(up?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div>'; }
 function tdBox(title,cls,n,list,m,empty,r0,key){
   return '<div class="td-bx">'+(title?'<div class="td-bxh '+cls+'"><span>'+title+(n!=null?' <small>'+n+'</small>':'')+'</span>'+(key&&n?'<button class="tf-chip td-bxb" onclick="event.stopPropagation();tdOpenList(\''+key+'\')">การ์ดกราฟ '+n+'</button>'+wlBtn('td_'+key,'td-bxb'):'')+'</div>':'')+(list.length?list.map((x,i)=>tdMini(x,m,r0==null?null:r0+i)).join(''):'<div class="mu" style="padding:10px 12px">'+empty+'</div>')+'</div>'; }
 /* ปฏิทินงบ (เฉพาะหุ้น Buy/Wait): กริดรายเดือนเหมือนหน้าภาพรวม */
@@ -2830,7 +2830,7 @@ async function bsScanLoad(m){
         const cd=(f&6)?0:(f&57)?1:2;   // Sell = แนวโน้มหลักเสีย (บิต 2,4) · Wait = ขาด 3M/RS/ย่อ/ปริมาณ (บิต 1,8,16,32)
         if(cd===0){ it.why=NM.filter(x=>(x[0]&6)&&(f&x[0])).map(x=>x[1]).join(' · '); out.Sell.push(it); }
         else if(cd===1){ it.why=NM.filter(x=>(x[0]&57)&&(f&x[0])).map(x=>x[1]).join(' · '); out.Wait.push(it); }
-        else out.Buy.push(it);
+        else { if(_rsUse!=null && _rsUse<=BS_RS){ it.stale=1; it.staleWhy='สัญญาณ Buy เกิดตอน RS '+(e&&e[2]!=null?e[2]:'?')+' · วันนี้ RS '+_rsUse+' (คงสถานะไว้ตามกฎ 10 แท่ง)'; } out.Buy.push(it); }
       }
     }
     const lv=sg?miss:rows;
@@ -3284,7 +3284,7 @@ async function ensureTopRS(m){   // ดึงหุ้นที่ผ่าน�
   if(topRSLoading[m]) return topRSLoading[m];
   topRSLoading[m]=(async()=>{
     try{
-      const r=await fetch(API+'/api/scan?market='+m);
+      const r=await fetch(API+'/api/scan?market='+m+'&nc='+Math.floor(Date.now()/60000),{cache:'no-store'});
       const j=await r.json();
       topRSData[m]=(j&&j.data)||[];
       stockDB[m]=topRSData[m]; rsOverrideAll(m);
@@ -5036,9 +5036,9 @@ function renderView(){
     // table ย่อยเหมือน card: ต่อ pager เข้ากับ table (อยู่ก่อน/หลังแถว)
     tb.innerHTML=`
       <tr class="border-b border-[#1e2634]"><td colspan="9" class="p-0"><div class="col-span-full w-full">${pager}</div></td></tr>`;
-          visible.forEach((x,vi)=>{
+          visible.forEach(x=>{
       tb.innerHTML+=`<tr id="row_${x.ticker}" class="hover:bg-[#111827] border-b border-[#1e2634]">
-        <td class="p-4 text-left"><span class="rsr${x.rs<70?' lo':''}">${x.rs}</span> <b class="ml-1 text-slate-400 text-xs" title="ลำดับในหน้านี้ (เรียงตาม RS) · อันดับทั้งกระดาน #${x.rT}">#${start+vi+1}</b></td>
+        <td class="p-4 text-left"><span class="rsr${x.rs<70?' lo':''}">${x.rs}</span> <b class="ml-1 text-slate-400 text-xs" title="อันดับทั้งกระดานตาม RS (RS เท่ากัน = อันดับเดียวกัน)">#${x.rT}</b></td>
         <td class="p-4 text-left"><span class="tkrow"><button onclick="openModal('${x.ticker}','${jq(x.name)}','${currentMarket}')" class="font-bold text-sky-400 hover:underline">${lg(x.ticker,currentMarket,20)}${x.ticker}</button>${tkT(x.ticker,currentMarket)}${x.isDR?' <span class="text-[9px] font-bold text-amber-400 bg-amber-400/10 border border-amber-500/40 rounded px-1">DR</span>':''}${currentMarket==='america'?(' '+drShort(x.ticker)):''}</span></td>
         <td class="p-4 font-bold tprice">${fNum(x.price)}</td>
         <td class="p-4"><span class="tchg">${fPct(x.change)}</span></td>

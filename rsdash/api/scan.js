@@ -10,6 +10,41 @@ import "../trendlib.js";
 import "../fundlog.js";   // globalThis.FundLog — บันทึก EPS แบบ point-in-time
 import "../leaders.js";   // globalThis.Leaders — ผู้นำหุ้นไทย + paper-trade (กฎล็อกใน research/PREREG_forward_th_leaders_2026-10-10.md)   // ตั้ง globalThis.TrendLib (ไฟล์เดียวกับที่เว็บ/เทสต์ใช้ — อยู่นอก api/ จึงไม่นับเป็น Function)
 
+
+// ── RS จาก "แท่งปิดเท่านั้น" (บอส 4 พ.ย.) — ใช้ร่วมกันทั้ง scan ปกติและ universe=all ──
+const CLOSED_CACHE = {};
+async function closedMaps(market) {
+  if (CLOSED_CACHE[market]) return CLOSED_CACHE[market];
+  try {
+    const dj = (await import("./_lib/" + (market === "thailand" ? "rshist_th_data.js" : "rshist_us_data.js"))).default || {};
+    const closed = {}, freq = {};
+    for (const k of ["rs", "rs3", "rs6", "rs1"]) {
+      const m = {}, f = new Array(100).fill(0);
+      for (const [tk, arr] of Object.entries(dj[k] || {})) {
+        const v = Array.isArray(arr) ? arr[arr.length - 1] : null;
+        if (typeof v === "number" && v > 0 && v <= 99) { m[tk] = v; f[v]++; }
+      }
+      closed[k] = m; freq[k] = f;
+    }
+    CLOSED_CACHE[market] = { closed, freq, asOf: dj.sigAsOf || null };
+  } catch (e) { CLOSED_CACHE[market] = null; }
+  return CLOSED_CACHE[market];
+}
+function applyClosedRS(cl, rows) {
+  if (!cl || !cl.closed) return rows;
+  const rankOf = (f, v) => { let n = 1; for (let x = v + 1; x < 100; x++) n += f[x]; return n; };
+  const MAP = [["rs", "rT_full"], ["rs3", "rT3"], ["rs6", "rT6"], ["rs1", "rT1"]];
+  for (const s of rows) {
+    for (const [fld, rf] of MAP) {
+      const v = cl.closed[fld] && cl.closed[fld][s.ticker];
+      if (v == null) continue;
+      s[fld] = v; s[rf] = rankOf(cl.freq[fld], v);
+    }
+    if (cl.asOf) s.rsAsOf = cl.asOf;
+  }
+  return rows;
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -128,6 +163,7 @@ export default async function handler(req, res) {
       // ใช้ raw ของ scanMarket → RS ฐานเดียวกันกับ Dashboard (เลข RS ตรงกันทุกหน้า)
       const { raw } = await scanMarket(market);
       const rows = toCommonStocks(raw);
+      try { applyClosedRS(await closedMaps(market), rows); } catch (e) {}
       const payload = {
         market, universe: "all", source: "tradingview_scan_common",
         total_market: raw.length, count: rows.length, data: rows,
@@ -141,7 +177,8 @@ export default async function handler(req, res) {
   }
 
   // Simple in-memory TTL cache per (market) — เฉพาะ scan ปกติ (universe ว่าง)
-  const ck = global.__scanCache?.[market];
+  const CACHE_VER = 'closed1';   // เปลี่ยนเมื่อนิยาม RS/อันดับเปลี่ยน (กัน in-memory cache คืนค่าเก่า)
+  const ck = global.__scanCache?.[market + '|' + CACHE_VER];
   if (ck && ck.data && (force ? now - ck.ts < FORCE_COOLDOWN_MS : now - ck.ts < 300_000)) {
     return res.status(200).json(ck.data);
   }
@@ -293,7 +330,18 @@ export default async function handler(req, res) {
         const keepSet = {};
         for (const k of ['sig', 'sig3', 'sig6', 'sig1']) for (const [tk, v] of Object.entries(dj[k] || {})) { if (Array.isArray(v) && v[0] >= 1) keepSet[tk] = 1; }
         for (const k of ['bh', 'bh3', 'bh6', 'bh1']) for (const tk of Object.keys(dj[k] || {})) keepSet[tk] = 1;
-        SIG_CACHE[market] = { ts: Date.now(), sig: (dj.sig || {}), keep: keepSet };
+        // RS จาก "แท่งปิดเท่านั้น" (บอส 4 พ.ย.: "RS คิดแค่จากราคาปิดแท่ง เกณฑ์ไม่เอาราคาสด")
+        //   เก็บค่าล่าสุดของแต่ละฐาน + ตารางความถี่ (0–99) เพื่อคิดอันดับแบบ RS เท่ากัน = อันดับเดียวกัน
+        const closed = {}, freq = {};
+        for (const k of ['rs', 'rs3', 'rs6', 'rs1']) {
+          const m = {}, f = new Array(100).fill(0);
+          for (const [tk, arr] of Object.entries(dj[k] || {})) {
+            const v = Array.isArray(arr) ? arr[arr.length - 1] : null;
+            if (typeof v === 'number' && v > 0 && v <= 99) { m[tk] = v; f[v]++; }
+          }
+          closed[k] = m; freq[k] = f;
+        }
+        SIG_CACHE[market] = { ts: Date.now(), sig: (dj.sig || {}), keep: keepSet, closed, freq, asOf: dj.sigAsOf || null };
       }
       const KEEP = SIG_CACHE[market].keep || {};
       const have = new Set(clean.map(s => s.ticker));
@@ -309,6 +357,10 @@ export default async function handler(req, res) {
         clean.forEach((s, i) => { s.rT = i + 1; });   // จัดอันดับใหม่ทั้งชุดหลังเติมหุ้น (กันหมายเลขอับดับซ้ำกัน 2 ตัว — บอส 4 พ.ย.)
       }
     } catch (e) { /* ไม่มีไฟล์ rshist ใน cwd → ยังทำงานเดิมทั้งหมด */ }
+
+    // RS/อันดับจากแท่งปิด
+    try { applyClosedRS(await closedMaps(market), raw); } catch (e) {}
+
 
     // Industry money flow — NOTE: ไม่ส่ง 'industries' (Value traded) ออกไปแล้ว เพราะ
     // มันถูกเข้าใจผิดเป็น Money Flow (ค่า Value ≠ เงินไหล) เราใช้ moneyFlow.byIndustry แทน
@@ -330,7 +382,7 @@ export default async function handler(req, res) {
     const SCANNER_ONLY = ["sma150", "ema20", "hi52", "lo52", "atr", "eN", "eL", "niY", "rvY", "niQ", "rvQ"];
     await saveSnapshot({ ...payload, data: clean.map(s => { const c = { ...s }; SCANNER_ONLY.forEach(k => delete c[k]); return c; }) });   // persist to Supabase (แยก snapshot ต่อ market)
     if (!global.__scanCache) global.__scanCache = {};
-    global.__scanCache[market] = { data: payload, ts: Date.now() };
+    global.__scanCache[market + '|' + CACHE_VER] = { data: payload, ts: Date.now() };
     return res.status(200).json(payload);
   } catch (e) {
     return res.status(500).json({ error: e.message });
