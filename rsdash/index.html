@@ -963,6 +963,8 @@ html #poBox .po-sec{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
 #poBox .po-cb .tf-chip{font-size:10.5px;padding:2px 6px}
 #poBox .po-2side{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
 @media(max-width:700px){ html #poBox .po-2side{grid-template-columns:1fr} }
+#poBox .po-h{display:flex;align-items:center;justify-content:space-between;gap:6px}
+#poBox .po-hb .tf-chip{font-size:10.5px;padding:2px 6px}
 #poBox .po-h.up{color:#10b981}
 #poBox .po-h.dn{color:#f43f5e}
 #poBox .po-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:6px}
@@ -2397,7 +2399,9 @@ function poDraw(){
     let dn=rows.filter(x=>x.chg<0).sort((a,b)=>PO.sort==='val'?b.val-a.val:a.chg-b.chg);   // Gap down: ลบแรงสุดก่อน
     if(PO.topn>0){ up=up.slice(0,PO.topn); dn=dn.slice(0,PO.topn); }
     const crumb=PO.sel!=='all'?'<div class="po-crumb">กลุ่ม: <b>'+PO.sel+'</b> · '+tot+' ตัว <button class="tf-chip" onclick="poSet(\'sel\',\'all\');poSet(\'view\',\'group\')">✕ กลับไปดูทุกกลุ่ม</button></div>':'';
-    const tb=(arr,lab,cls)=>'<div class="po-side"><div class="po-h '+cls+'">'+lab+' · '+arr.length+' ตัว</div><div class="mf-scroll"><table class="mf-tbl mf-fv"><thead><tr><th>หุ้น</th><th class="r">ราคา pre</th><th class="r">Gap</th><th class="r">มูลค่า</th></tr></thead><tbody>'+
+    window.__PO_UP=up; window.__PO_DN=dn;
+    const tb=(arr,lab,cls)=>'<div class="po-side"><div class="po-h '+cls+'"><span>'+lab+' · '+arr.length+' ตัว</span>'+
+      '<span class="po-hb"><button class="tf-chip" onclick="poCards(window.__PO_'+(cls==='up'?'UP':'DN')+',\''+lab+'\')">กราฟ</button><button class="tf-chip" onclick="poTV(window.__PO_'+(cls==='up'?'UP':'DN')+',this)">TV list</button></span></div><div class="mf-scroll"><table class="mf-tbl mf-fv"><thead><tr><th>หุ้น</th><th class="r">ราคา pre</th><th class="r">Gap</th><th class="r">มูลค่า</th></tr></thead><tbody>'+
       (arr.length?arr.map(poRow).join(''):'<tr><td colspan="4" class="mu">ไม่มีหุ้นเข้าเงื่อนไข</td></tr>')+'</tbody></table></div></div>';
     const all=up.concat(dn); window.__PO_ROWS=all;
     const tools='<div class="mf-tools" style="padding:4px 0"><span class="grp"><button class="tf-chip" onclick="poCards(window.__PO_ROWS,\''+(PO.sel==='all'?'ทุกกลุ่ม':PO.sel)+'\')">เปิดการ์ดกราฟ '+all.length+' ตัว</button><button class="tf-chip" onclick="poTV(window.__PO_ROWS,this)">TV list</button></span></div>';
@@ -4412,7 +4416,7 @@ function bsStreakApply(tk, mk){
     const sp=document.createElement('span');
     sp.className='pill text-slate-400 stk-streak';
     sp.title='RS '+st.rs+' ต่อเนื่อง '+st.rsDays+' แท่ง · อันดับ #'+st.rank+' ต่อเนื่อง '+st.rkDays+' แท่ง · หุ้น RS เท่ากัน '+st.tieN+' ตัว (นับวันทำการ · ข้อมูลถึง '+(st.asOf||'-')+')';
-    sp.textContent='RS '+st.rs+(st.tieN>1?' (เท่ากับอีก '+(st.tieN-1)+' ตัว)':'')+' มา '+st.rsDays+' วัน · อันดับ #'+st.rank+' มา '+st.rkDays+' วัน';
+    sp.textContent='ค่า RS เดิมมา '+st.rsDays+' วัน · อันดับเดิมมา '+st.rkDays+' วัน';
     el.appendChild(sp);
   }catch(e){}
 }
@@ -5168,7 +5172,7 @@ function openModal(tk,nm,mkt){
   if(_drd) _drd.innerHTML = (found && found.isDR) ? '<span class="pill text-amber-400 border-amber-700/60" title="Depositary Receipt — ตราสารอ้างอิงหุ้นนอก">DR</span>' : '';
   // 3) อันดับ RS + การเปลี่ยนอันดับ (เหมือน pill บนการ์ด)
   const _rd = (RS_BASE!=='all') ? null : (found ? found.rD : null), _rt = found ? found.rT : null;   // อันดับเมื่อวานเป็นฐานรวม — ซ่อนลูกศรเมื่อเลือกฐานอื่น (บอส 3 พ.ย.)
-  let _rtag = (_rt!=null) ? '<span class="pill text-slate-300" title="อันดับ RS วันนี้ (เทียบทั้งกระดาน)">#'+_rt+'</span>' : '';
+  let _rtag = (_rt!=null) ? '<span class="pill text-slate-300" title="อันดับทั้งกระดาน (ทั้งตลาด ตามฐาน RS ที่เลือก) — ไม่ใช่ลำดับแถวในตาราง">#'+_rt+'</span>' : '';
 
   const _rdx = (_rd===null||_rd===undefined) ? ''
     : (_rd>0 ? '<span class="pill pos" title="อันดับดีขึ้นจากเมื่อวาน">▲ +'+_rd+'</span>'
