@@ -11,7 +11,7 @@ import thg from "./_lib/flow_th.js";
 import tr from "./_lib/flow_tr.js";
 import surp from "./_lib/flow_surp.js";
 import cal from "./_lib/flow_cal.js";
-import pre from "./_lib/flow_pre.js";
+import pre, { preopenSummary } from "./_lib/flow_pre.js";
 
 export default async function handler(req, res) {
   const k = String(req.query.kind || "");
@@ -20,8 +20,13 @@ export default async function handler(req, res) {
   if (k === "groups") return thg(req, res);
   if (k === "tr") return tr(req, res);
   if (k === "surp") return surp(req, res);   // ส่วนต่างงบเทียบประมาณการ (เกินคาด/ต่ำกว่าคาด)
-  if (k === "pre") return pre(req, res);   // Pre-market สหรัฐ
+  if (k === "pre") return pre(req, res);   // Pre-market สหรัฐ (ดิบ รายหุ้น)
+  if (k === "preopen") {                   // สรุปบรรยากาศก่อนเปิดตลาด (top/bottom/sector)
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    try { const j = await preopenSummary(); res.setHeader("Cache-Control","public, s-maxage=45, stale-while-revalidate=120"); return res.status(200).json(j); }
+    catch (e) { res.setHeader("Cache-Control","no-store"); return res.status(502).json({ error: String((e&&e.message)||e).slice(0,120) }); }
+  }
   if (k === "cal") return cal(req, res);   // ปฏิทินเศรษฐกิจ
   res.setHeader("Access-Control-Allow-Origin", "*");
-  return res.status(400).json({ error: "kind must be etf|groups|tr|surp|cal|pre" });
+  return res.status(400).json({ error: "kind must be etf|groups|tr|surp|cal|pre|preopen" });
 }

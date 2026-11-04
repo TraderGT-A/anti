@@ -945,6 +945,16 @@ html .cal-leg i{display:inline-block;width:14px;height:8px;border-radius:999px;b
 
 .cal-tools{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;margin:8px 0 2px} .cal-tools .grp{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center} .cal-tools .lbl{font-size:11px;color:var(--muted);margin-right:2px}
 </style>
+<style id="poCss">
+html #poBox .po-r{display:grid;grid-template-columns:64px 64px 1fr;gap:2px 8px;align-items:baseline;padding:3px 0;border-top:1px solid var(--line);cursor:pointer;font-size:12.5px}
+html #poBox .po-r:hover b{color:var(--gold)}
+html #poBox .po-r i{grid-column:1 / -1;color:var(--faint);font-size:10.5px;font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html #poBox .po-tot{color:var(--muted);font-size:12px;margin:2px 0 6px}
+html #poBox .po-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+html #poBox .po-h{font-size:11px;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+html #poBox .po-sec{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+@media(max-width:640px){ html #poBox .po-2col{grid-template-columns:1fr} }
+</style>
 </head>
 <body class="py-3 sm:py-4 md:py-6">
 <div class="max-w-7xl mx-auto w-full px-2 sm:px-4 md:px-6">
@@ -2308,8 +2318,56 @@ function pfFilters(){
   return '<span class="grp"><span class="lbl">กรอง RS ≥</span>'+pfChips('rsMin',[[0,'ทั้งหมด'],...q.map(n=>[n,String(n)])],PF.rsMin)+'<input class="mf-days" type="number" min="0" max="99" placeholder="RS" value="'+(PF.rsMin>0&&!q.includes(PF.rsMin)?PF.rsMin:'')+'" onchange="pfSet(\'rsMin\',this.value||0)" title="กำหนด RS ขั้นต่ำเอง"></span>'+
     '<span class="grp"><span class="lbl">กรองผลตอบแทน '+lbl+'</span>'+pfChips('pf',[['all','ทั้งหมด'],['pos','เฉพาะบวก (+)'],['neg','เฉพาะลบ (−)'],['10','≥ +10%'],['20','≥ +20%'],['50','≥ +50%']],PF.pf)+'</span>';
 }
+
+/* ── Pre-open (US): บรรยากาศก่อนตลาดสหรัฐเปิด — ดึง /api/flow?kind=preopen (TradingView premarket) ──
+   แสดงเฉพาะตลาด US · ตัวเลขกรองมูลค่า pre-market ≥ $1M · เวลาอ้างอิงนิวยอร์ก (ET) */
+const PO={d:null,ts:0,busy:false,tm:null};
+function poMoney(v){ v=Number(v)||0; return v>=1e9?(v/1e9).toFixed(2)+'B':(v/1e6).toFixed(0)+'M'; }
+function poCls(x){ return x>0?'pos':(x<0?'neg':''); }
+function poRow(x){
+  return '<div class="po-r" onclick="openModalByTk(\''+x.t+'\')"><b>'+x.t+'</b>'+
+    '<span class="'+poCls(x.chg)+'">'+(x.chg>0?'+':'')+x.chg.toFixed(2)+'%</span>'+
+    '<small>'+poMoney(x.val)+'</small><i>'+String(x.sec||'').slice(0,18)+'</i></div>';
+}
+function poDraw(){
+  const el=document.getElementById('poBox'); if(!el) return;
+  const d=PO.d;
+  if(!d){ el.innerHTML=''; return; }
+  if(d.err){ el.innerHTML='<h3>Pre-open · สหรัฐ</h3><div class="mu">โหลดข้อมูล pre-market ไม่สำเร็จ</div>'; return; }
+  const st={pre:['ก่อนเปิด','#f59e0b'],open:['ตลาดเปิดแล้ว','#10b981'],closed:['ตลาดปิด','#64748b']}[d.session]||['-','#64748b'];
+  const stale=(d.session!=='pre');
+  const tot='<div class="po-tot">หุ้นมีราคา pre '+d.n+' ตัว · เขียว '+d.up+' · แดง '+d.down+' · มูลค่าซื้อขาย '+poMoney(d.val)+' USD</div>';
+  const head='<h3>Pre-open · สหรัฐ <small><span class="pill" style="color:'+st[1]+'">'+st[0]+' · '+d.asOfET+' ET</span>'+(stale?' <span class="pill">ตัวเลขรอบ pre-market ล่าสุด (ไม่ใช่ราคาปัจจุบัน)</span>':'')+'</small></h3>';
+  const top=(d.top||[]).slice(0,10).map(poRow).join(''), bot=(d.bottom||[]).slice(0,10).map(poRow).join('');
+  const secs=(d.sectors||[]);
+  const secHtml='<div class="po-sec">'+secs.slice(0,5).map(s=>'<span class="pill"><b>'+s.sec+'</b> <span class="'+poCls(s.chg)+'">'+(s.chg>0?'+':'')+s.chg.toFixed(2)+'%</span></span>').join('')+
+    (secs.length?'<span class="mu">· อ่อนสุด: </span>'+secs.slice(-3).reverse().map(s=>'<span class="pill"><b>'+s.sec+'</b> <span class="'+poCls(s.chg)+'">'+s.chg.toFixed(2)+'%</span></span>').join(''):'')+'</div>';
+  el.innerHTML=head+tot+'<div class="po-2col"><div><div class="po-h">ขึ้นแรงสุด</div>'+top+'</div><div><div class="po-h">ลงแรงสุด</div>'+bot+'</div></div>'+secHtml+
+    '<div class="mu" style="font-size:11px">ข้อมูล pre-market ดีเลย์ ~15 นาที · กรองเฉพาะตัวที่มีมูลค่าซื้อขาย ≥ $1M · ใช้ดูบรรยากาศ ไม่ใช่สัญญาณซื้อขาย</div>';
+}
+function poTick(){
+  if(currentMarket!=='america') return;
+  poLoad();
+}
+async function poLoad(){
+  if(currentMarket!=='america'||PO.busy) return;
+  PO.busy=true;
+  try{ const r=await fetch(API+'/api/flow?kind=preopen'); const j=await r.json(); PO.d=j||{err:1}; PO.ts=Date.now(); }
+  catch(e){ if(!PO.d) PO.d={err:1}; }
+  PO.busy=false; poDraw();
+  clearTimeout(PO.tm);
+  const pre=(PO.d&&PO.d.session==='pre');
+  PO.tm=setTimeout(poTick, pre?60000:600000);   // ช่วง pre-open รีเฟรช 60 วิ · นอกเวลา 10 นาที
+}
+function poEnsure(){
+  const b=document.getElementById('perfBody'); if(!b) return;
+  if(currentMarket!=='america'){ const x=document.getElementById('poBox'); if(x) x.remove(); return; }
+  if(!document.getElementById('poBox')){ b.insertAdjacentHTML('afterbegin','<div id="poBox" class="td-sec"></div>'); }
+  poLoad();
+}
+
 async function pfRender(){
-  const _t=pfTok+1; await pfRender0(); if(pfTok!==_t) return;
+  const _t=pfTok+1; await pfRender0(); if(pfTok!==_t) return; poEnsure();
   const b=document.getElementById('perfBody'); if(b&&!b.querySelector('.mf-help')&&!b.querySelector('.mf-empty')) b.insertAdjacentHTML('afterbegin',await uniHelp());
 }
 async function pfRender0(){
@@ -2649,7 +2707,9 @@ async function tdRender(){
     const days=rhB.dates.slice(-8,-1).reverse(), dl=d=>{ const p=d.split('-'); return +p[2]+' '+ERN_MON[+p[1]-1]; }, byD={}, rowOf=new Map(rows.filter(s=>s.ticker&&!s.isDR).map(s=>[s.ticker,s]));
     const hb={}; Object.entries(rhB.bh).forEach(([tk,ds])=>{ if(!rowOf.has(tk)) return; const ok=ds.filter(d=>days.indexOf(d)>=0); if(!ok.length) return; hb[tk]=ok; ok.forEach(d=>{ (byD[d]=byD[d]||[]).push(tk); }); });
     if(TD.bd!=='all'&&days.indexOf(TD.bd)<0) TD.bd='all';
-    const uniq=new Set(Object.values(byD).flat()), rsOf=tk=>Number(rowOf.get(tk) && rowOf.get(tk).rs != null ? rowOf.get(tk).rs : (rhB.sig&&rhB.sig[tk]?rhB.sig[tk][2]:0))||0;   // RS ที่โชว์ = ฐานที่เลือก (scan)
+    const rsOf=tk=>Number(rowOf.get(tk) && rowOf.get(tk).rs != null ? rowOf.get(tk).rs : (rhB.sig&&rhB.sig[tk]?rhB.sig[tk][2]:0))||0;
+    // Buy แสดงเฉพาะตัวที่ RS (ฐานที่เลือก) > 60 จริง — กันกรณีไฟล์ sig บอก Buy แต่ RS ที่โชว์ไม่ถึง (FTK/GWRE/SSNC 4 พ.ย.)
+    const uniq=new Set([...new Set(Object.values(byD).flat())].filter(tk=>rsOf(tk)>60));   // RS ที่โชว์ = ฐานที่เลือก (scan)
     let pick=TD.bd==='all'?[...uniq]:(byD[TD.bd]||[]);
     pick=pick.sort((a,b)=>TD.bd==='all'?((hb[b].length-hb[a].length)||(rsOf(b)-rsOf(a))):(rsOf(b)-rsOf(a)));
     const lim=TD.n?TD.n*2:pick.length, shown=pick.slice(0,lim), items=shown.map(tk=>{ const s=rowOf.get(tk); return {s,gi:bsGrpOf(TDG,s),rsv:rsOf(tk)||null,tag:TD.bd==='all'?hb[tk].map(d=>dl(d)).reverse().join(' · '):''}; });
