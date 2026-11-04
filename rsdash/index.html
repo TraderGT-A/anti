@@ -1924,7 +1924,7 @@ function renderTopRs(){
   if(!list.length){ tb.innerHTML='<tr><td colspan="6" class="trs-empty">กำลังโหลด…</td></tr>'; return; }
   const pc=(v)=>Number.isFinite(v)?('<i class="ar">'+(v>=0?'▲':'▼')+'</i> '+Math.abs(v).toFixed(1)+'%'):'–';
   const cl=(v)=>Number.isFinite(v)?(v>=0?'pos':'neg'):'';
-  tb.innerHTML=list.map(s=>`<tr><td class="c"><span class="trs-rs">${s.rs}</span></td><td><span class="tkrow"><a href="#" class="trs-tk" onclick="openModalByTk('${String(s.ticker).replace(/'/g,"")}');return false;">${lg(s.ticker,currentMarket,20)}${s.ticker}</a>${tkT(s.ticker,currentMarket)}</span></td><td class="r">${Number(s.price).toFixed(2)}</td><td class="r ${cl(s.change)}">${pc(s.change)}</td><td class="r ${cl(s.p3m)}">${pc(s.p3m)}</td><td class="trs-grp">${s.industry||s.sector||''}</td></tr>`).join('');
+  tb.innerHTML=list.map(s=>`<tr><td class="c"><span class="trs-rs">${s.rs}</span><b class="ml-1 text-slate-400 text-[10px]">${s.rT!=null?'#'+s.rT:'–'}</b></td><td><span class="tkrow"><a href="#" class="trs-tk" onclick="openModalByTk('${String(s.ticker).replace(/'/g,"")}');return false;">${lg(s.ticker,currentMarket,20)}${s.ticker}</a>${tkT(s.ticker,currentMarket)}</span></td><td class="r">${Number(s.price).toFixed(2)}</td><td class="r ${cl(s.change)}">${pc(s.change)}</td><td class="r ${cl(s.p3m)}">${pc(s.p3m)}</td><td class="trs-grp">${s.industry||s.sector||''}</td></tr>`).join('');
 }
 function toggleTheme(){ const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'; try{ localStorage.setItem('rsd_theme',n); }catch(e){} try{ sessionStorage.setItem('rsd_keepPage',curPage); }catch(e){} location.reload(); }function fontZoom(delta){
   const base=parseFloat(localStorage.getItem('rsd_zoom')||'1');
@@ -3595,7 +3595,9 @@ function _rsOverrideRows(rows){ const f = RS_FLD[RS_BASE]; if(!Array.isArray(row
   rows.forEach(s=>{ if(!s) return; if(s._rsAll===undefined){ s._rsAll = s.rs; s._rTAll = s.rT; }
     s.rs = (s[f] != null) ? s[f] : s._rsAll;
     // อันดับ #N = อันดับจาก backend ของฐานนั้น (คำนวณบนกระดานเต็มชุดเดียว) — กันการคำนวณซ้ำฝั่งหน้าแล้วได้เลขไม่ตรงกัน
-    const rt = s[RT_FLD[RS_BASE]]; if(rt != null) s.rT = rt;
+    const rt = s[RT_FLD[RS_BASE]];
+    if(rt != null) s.rT = rt;
+    else if(s.rT == null) s.rT = (s.rT_full != null ? s.rT_full : (s.rT3 != null ? s.rT3 : (s.rT6 != null ? s.rT6 : (s.rT1 != null ? s.rT1 : null))));   // กัน #undefined (โหมด universe=all)
   });
   return rows; }
 function rsOverrideAll(mk){ try{ _rsOverrideRows(stockDB[mk]); _rsOverrideRows(topRSData[mk]); if(mk===currentMarket) _rsOverrideRows(stockData); }catch(e){} }
@@ -5053,7 +5055,7 @@ function renderView(){
       <tr class="border-b border-[#1e2634]"><td colspan="9" class="p-0"><div class="col-span-full w-full">${pager}</div></td></tr>`;
           visible.forEach(x=>{
       tb.innerHTML+=`<tr id="row_${x.ticker}" class="hover:bg-[#111827] border-b border-[#1e2634]">
-        <td class="p-4 text-left"><span class="rsr${x.rs<70?' lo':''}">${x.rs}</span> <b class="ml-1 text-slate-400 text-xs" title="อันดับทั้งกระดานตาม RS (RS เท่ากัน = อันดับเดียวกัน)">#${x.rT}</b></td>
+        <td class="p-4 text-left"><span class="rsr${x.rs<70?' lo':''}">${x.rs}</span> <b class="ml-1 text-slate-400 text-xs" title="อันดับทั้งกระดานตาม RS (RS เท่ากันดูมูลค่าตลาด)">${x.rT!=null?'#'+x.rT:'–'}</b></td>
         <td class="p-4 text-left"><span class="tkrow"><button onclick="openModal('${x.ticker}','${jq(x.name)}','${currentMarket}')" class="font-bold text-sky-400 hover:underline">${lg(x.ticker,currentMarket,20)}${x.ticker}</button>${tkT(x.ticker,currentMarket)}${x.isDR?' <span class="text-[9px] font-bold text-amber-400 bg-amber-400/10 border border-amber-500/40 rounded px-1">DR</span>':''}${currentMarket==='america'?(' '+drShort(x.ticker)):''}</span></td>
         <td class="p-4 font-bold tprice">${fNum(x.price)}</td>
         <td class="p-4"><span class="tchg">${fPct(x.change)}</span></td>
@@ -5186,7 +5188,7 @@ function openModal(tk,nm,mkt){
   const _drd = document.getElementById('modalDRBadge');
   if(_drd) _drd.innerHTML = (found && found.isDR) ? '<span class="pill text-amber-400 border-amber-700/60" title="Depositary Receipt — ตราสารอ้างอิงหุ้นนอก">DR</span>' : '';
   // 3) อันดับ RS + การเปลี่ยนอันดับ (เหมือน pill บนการ์ด)
-  const _rd = (RS_BASE!=='all') ? null : (found ? found.rD : null), _rt = found ? found.rT : null;   // อันดับเมื่อวานเป็นฐานรวม — ซ่อนลูกศรเมื่อเลือกฐานอื่น (บอส 3 พ.ย.)
+  const _rd = (RS_BASE!=='all') ? null : (found ? found.rD : null), _rt = found ? (found.rT != null ? found.rT : (found.rT_full != null ? found.rT_full : (found.rT3 != null ? found.rT3 : (found.rT6 != null ? found.rT6 : found.rT1)))) : null;   // กัน #undefined (โหมดรวมหุ้นสภาพคล่องต่ำ)
   let _rtag = (_rt!=null) ? '<span class="pill text-slate-300" title="อันดับทั้งกระดาน (ทั้งตลาด ตามฐาน RS ที่เลือก) — ไม่ใช่ลำดับแถวในตาราง">#'+_rt+'</span>' : '';
 
   const _rdx = (_rd===null||_rd===undefined) ? ''
