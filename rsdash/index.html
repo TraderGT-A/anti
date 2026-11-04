@@ -4401,7 +4401,9 @@ async function bsStamp(el,data){
   const tk=el.dataset.tk, m=el.dataset.m||currentMarket;
   const s=await bsStockOf(tk,m); if(!s||!el.isConnected) return;
   const old=el.previousElementSibling; if(old&&old.classList.contains('bsw')) old.remove();
-  const cb=bsClosed(data,m); if(!cb.length) return; const rh=await bsRsHist(m); if(!el.isConnected) return;
+  const cb0=bsClosed(data,m); if(!cb0.length) return; const rh=await bsRsHist(m); if(!el.isConnected) return;
+  const cut=(rh&&((rh.sigDate&&rh.sigDate[tk])||rh.sigAsOf))||null;
+  const cb=cut?cb0.filter(b=>String(b.time)<=cut):cb0;
   const r=bsEval(s,cb,(s&&Number.isFinite(Number(s.rs)))?Number(s.rs):bsRsAt(rh,tk,cb[cb.length-1].time)), badge='<span class="bsb bs-'+r.v+'" title="'+r.why.join('\n').replace(/"/g,'')+'">'+r.v+'</span>';
   const root=el.closest('.scard,.ldc'), slot=root&&root.querySelector('.bs-slot'); let host;
   if(slot){ slot.innerHTML=badge; host=slot; }   // ป้ายเล็กในหัวการ์ด ข้างลำดับ ไม่ทับกราฟ
@@ -4411,7 +4413,9 @@ async function bsStamp(el,data){
 async function bsModal(data,tk,m){
   const b=document.getElementById('modalBS'), w=document.getElementById('modalBSWhy'); if(!b||!data||!data.length||typeof data[data.length-1].time!=='string') return;
   const s=await bsStockOf(tk,m); if(activeTicker!==tk) return; if(!s){ b.innerHTML=''; return; }
-  const cb=bsClosed(data,m); if(!cb.length) return; const rh=await bsRsHist(m); if(activeTicker!==tk) return;
+  const cb0=bsClosed(data,m); if(!cb0.length) return; const rh=await bsRsHist(m); if(activeTicker!==tk) return;
+  const cut=(rh&&((rh.sigDate&&rh.sigDate[tk])||rh.sigAsOf))||null;   // ใช้วันเดียวกับที่ไฟล์ตัดสิน (ให้ Buy/Wait ตรงกับรายการ)
+  const cb=cut?cb0.filter(b=>String(b.time)<=cut):cb0;
   const r=bsEval(s,cb,(s&&Number.isFinite(Number(s.rs)))?Number(s.rs):bsRsAt(rh,tk,cb[cb.length-1].time));   // RS ที่ตัดสิน = ค่าเดียวกับรายการ (scan ฐานที่เลือก)
   if(r.v==='Buy'){ b.innerHTML='<span class="bsb in big bs-Buy" title="คิดจากแท่งที่ปิดแล้ว ณ '+r.asOf+'">Buy</span>'; if(w){ w.hidden=true; w.innerHTML=''; } }
   else{
