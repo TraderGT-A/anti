@@ -5055,7 +5055,7 @@ function renderView(){
       <tr class="border-b border-[#1e2634]"><td colspan="9" class="p-0"><div class="col-span-full w-full">${pager}</div></td></tr>`;
           visible.forEach(x=>{
       tb.innerHTML+=`<tr id="row_${x.ticker}" class="hover:bg-[#111827] border-b border-[#1e2634]">
-        <td class="p-4 text-left"><span class="rsr${x.rs<70?' lo':''}">${x.rs}</span> <b class="ml-1 text-slate-400 text-xs" title="อันดับทั้งกระดานตาม RS (RS เท่ากันดูมูลค่าตลาด)">${x.rT!=null?'#'+x.rT:'–'}</b></td>
+        <td class="p-4 text-left"><span class="rsr${x.rs<70?' lo':''}">${x.rs}</span> <b class="ml-1 text-slate-400 text-xs" title="อันดับ RS ในชุดที่แสดง (เรียงตาม RS · เท่ากันดูผลตอบแทนของฐานนั้น)">${x.rT!=null?'#'+x.rT:'–'}</b></td>
         <td class="p-4 text-left"><span class="tkrow"><button onclick="openModal('${x.ticker}','${jq(x.name)}','${currentMarket}')" class="font-bold text-sky-400 hover:underline">${lg(x.ticker,currentMarket,20)}${x.ticker}</button>${tkT(x.ticker,currentMarket)}${x.isDR?' <span class="text-[9px] font-bold text-amber-400 bg-amber-400/10 border border-amber-500/40 rounded px-1">DR</span>':''}${currentMarket==='america'?(' '+drShort(x.ticker)):''}</span></td>
         <td class="p-4 font-bold tprice">${fNum(x.price)}</td>
         <td class="p-4"><span class="tchg">${fPct(x.change)}</span></td>
@@ -5189,7 +5189,7 @@ function openModal(tk,nm,mkt){
   if(_drd) _drd.innerHTML = (found && found.isDR) ? '<span class="pill text-amber-400 border-amber-700/60" title="Depositary Receipt — ตราสารอ้างอิงหุ้นนอก">DR</span>' : '';
   // 3) อันดับ RS + การเปลี่ยนอันดับ (เหมือน pill บนการ์ด)
   const _rd = (RS_BASE!=='all') ? null : (found ? found.rD : null), _rt = found ? (found.rT != null ? found.rT : (found.rT_full != null ? found.rT_full : (found.rT3 != null ? found.rT3 : (found.rT6 != null ? found.rT6 : found.rT1)))) : null;   // กัน #undefined (โหมดรวมหุ้นสภาพคล่องต่ำ)
-  let _rtag = (_rt!=null) ? '<span class="pill text-slate-300" title="อันดับทั้งกระดาน (ทั้งตลาด ตามฐาน RS ที่เลือก) — ไม่ใช่ลำดับแถวในตาราง">#'+_rt+'</span>' : '';
+  let _rtag = (_rt!=null) ? '<span class="pill text-slate-300" title="อันดับ RS ในชุดที่แสดง ตามฐานที่เลือก">#'+_rt+'</span>' : '';
 
   const _rdx = (_rd===null||_rd===undefined) ? ''
     : (_rd>0 ? '<span class="pill pos" title="อันดับดีขึ้นจากเมื่อวาน">▲ +'+_rd+'</span>'

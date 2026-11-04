@@ -33,15 +33,16 @@ async function closedMaps(market) {
 function applyClosedRS(cl, rows) {
   if (!cl || !cl.closed) return rows;
   // อันดับต้องไม่ซ้ำ: RS เท่ากัน → เรียงต่อด้วยมูลค่าตลาด (ใหญ่ก่อน) แล้วตามชื่อย่อ
-  const MAP = [["rs", "rT_full"], ["rs3", "rT3"], ["rs6", "rT6"], ["rs1", "rT1"]];
-  for (const [fld, rf] of MAP) {
+  // อันดับ: RS มาก→น้อย · RS เท่ากันดู "ผลตอบแทนของฐานนั้น" มากก่อน (ตรงกับคอลัมน์ที่ผู้ใช้เห็น) · แล้วมูลค่าตลาด · แล้วชื่อย่อ
+  const MAP = [["rs", "rT_full", "score"], ["rs3", "rT3", "p3m"], ["rs6", "rT6", "p6m"], ["rs1", "rT1", "p1y"]];
+  for (const [fld, rf, retF] of MAP) {
     const list = [];
     for (const s of rows) {
       const v = cl.closed[fld] && cl.closed[fld][s.ticker];
       if (v != null) s[fld] = v;
       if (s[fld] != null) list.push(s);   // ตัวที่ไม่มีค่าในไฟล์ ใช้ค่าเดิมของ scan แต่นับอันดับรวมด้วย (กันเลขซ้ำ/ข้าม)
     }
-    list.sort((a, b) => (b[fld] - a[fld]) || ((b.mcap || 0) - (a.mcap || 0)) || String(a.ticker).localeCompare(String(b.ticker)));
+    list.sort((a, b) => (b[fld] - a[fld]) || ((b[retF] ?? -1e9) - (a[retF] ?? -1e9)) || ((b.mcap || 0) - (a.mcap || 0)) || String(a.ticker).localeCompare(String(b.ticker)));
     list.forEach((s, i) => { s[rf] = i + 1; });
   }
   if (cl.asOf) rows.forEach(s => { s.rsAsOf = cl.asOf; });
@@ -180,7 +181,7 @@ export default async function handler(req, res) {
   }
 
   // Simple in-memory TTL cache per (market) — เฉพาะ scan ปกติ (universe ว่าง)
-  const CACHE_VER = 'closed3';   // เปลี่ยนเมื่อนิยาม RS/อันดับเปลี่ยน (กัน in-memory cache คืนค่าเก่า)
+  const CACHE_VER = 'closed5';   // เปลี่ยนเมื่อนิยาม RS/อันดับเปลี่ยน (กัน in-memory cache คืนค่าเก่า)
   const ck = global.__scanCache?.[market + '|' + CACHE_VER];
   if (ck && ck.data && (force ? now - ck.ts < FORCE_COOLDOWN_MS : now - ck.ts < 300_000)) {
     return res.status(200).json(ck.data);
@@ -362,7 +363,7 @@ export default async function handler(req, res) {
     } catch (e) { /* ไม่มีไฟล์ rshist ใน cwd → ยังทำงานเดิมทั้งหมด */ }
 
     // RS/อันดับจากแท่งปิด
-    try { applyClosedRS(await closedMaps(market), raw); } catch (e) {}
+    try { applyClosedRS(await closedMaps(market), clean); } catch (e) {}
 
 
     // Industry money flow — NOTE: ไม่ส่ง 'industries' (Value traded) ออกไปแล้ว เพราะ
