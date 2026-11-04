@@ -1623,6 +1623,7 @@ let sortKey = 'rs', sortAsc = false;
 let sortKey2 = null, sortAsc2 = false;   // คอลัมน์รอง (secondary) — shift+คลิก
 let perPage = 10;         // 10 ตัวต่อหน้า (บอสขอ.)
 let page = 1;             // หน้าปัจจุบัน (1-based)
+const NC = String(Date.now());   // กันแคช: เปลี่ยนทุกครั้งที่เปิดหน้า (กันข้อมูลเก่าค้างทั้งหน้า)
 
 function sortCmp(a,b,key,asc){
   let va=a[key], vb=b[key];
@@ -2027,7 +2028,7 @@ const mfJ=u=>MF.cache[u]||(MF.cache[u]=fetch(API+u).then(r=>r.json()).then(j=>{ 
 // (บั๊ก 4 พ.ย.: เดิมใช้ชุดที่แสดงผลแค่ ~190 ตัว → ไทยขึ้น 66-72% ทั้งที่ทั้งกระดานจริง ~43%)
 const MF_ALL={};
 const mfScanAll=mk=>MF_ALL[mk]||(MF_ALL[mk]=mfJ('/api/scan?universe=all&market='+mk).then(j=>j.data||[]).catch(e=>{ delete MF_ALL[mk]; throw e; }));
-const mfScanRows=mk=>mfJ('/api/scan?market='+mk+'&nc='+Math.floor(Date.now()/60000)).then(j=>{ const d=j.data||[]; try{ setLogoIds(mk,d); }catch(e){} try{ _rsOverrideRows(d); }catch(e){} return d; });   // RS ตามฐานที่เลือก (3M/6M/1Y/รวม) — ให้ตรงกับ stockDB (บอส 3 พ.ย.: แถวโชว์ 98 แต่ป็อปอัปโชว์ 97)
+const mfScanRows=mk=>mfJ('/api/scan?market='+mk+'&nc='+NC).then(j=>{ const d=j.data||[]; try{ setLogoIds(mk,d); }catch(e){} try{ _rsOverrideRows(d); }catch(e){} return d; });   // RS ตามฐานที่เลือก (3M/6M/1Y/รวม) — ให้ตรงกับ stockDB (บอส 3 พ.ย.: แถวโชว์ 98 แต่ป็อปอัปโชว์ 97)
 const mfPct=v=>v==null?'<span class="mu">–</span>':'<b class="'+(v>=0?'pos':'neg')+'">'+(v>=0?'+':'')+(v*100).toFixed(Math.abs(v)<0.1?2:1)+'%</b>';
 const mfR=(s,i0)=>{ const a=s[i0],b=s[s.length-1]; return (a!=null&&b!=null&&a>0)?b/a-1:null; };
 function mfSma(s,n){ const w=s.filter(x=>x!=null).slice(-n); return w.length>=n?w.reduce((a,b)=>a+b,0)/n:null; }
@@ -3287,7 +3288,7 @@ async function ensureTopRS(m){   // ดึงหุ้นที่ผ่าน�
   if(topRSLoading[m]) return topRSLoading[m];
   topRSLoading[m]=(async()=>{
     try{
-      const r=await fetch(API+'/api/scan?market='+m+'&nc='+Math.floor(Date.now()/60000),{cache:'no-store'});
+      const r=await fetch(API+'/api/scan?market='+m+'&nc='+NC,{cache:'no-store'});
       const j=await r.json();
       topRSData[m]=(j&&j.data)||[];
       stockDB[m]=topRSData[m]; rsOverrideAll(m);
@@ -4421,7 +4422,7 @@ function bsStreakApply(tk, mk){
     const sp=document.createElement('span');
     sp.className='pill text-slate-400 stk-streak';
     sp.title='RS '+st.rs+' ต่อเนื่อง '+st.rsDays+' แท่ง · อันดับ #'+st.rank+' ต่อเนื่อง '+st.rkDays+' แท่ง · หุ้น RS เท่ากัน '+st.tieN+' ตัว (นับวันทำการ · ข้อมูลถึง '+(st.asOf||'-')+')';
-    sp.textContent='ค่า RS เดิมมา '+st.rsDays+' วัน · อันดับเดิมมา '+st.rkDays+' วัน';
+    sp.textContent='RS ค่านี้มา '+st.rsDays+' วัน';
     el.appendChild(sp);
   }catch(e){}
 }

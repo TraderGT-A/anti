@@ -61,7 +61,7 @@ export default async function handler(req, res) {
   if (force) {
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   } else {
-    res.setHeader("Cache-Control", "public, s-maxage=45, stale-while-revalidate=120");
+    res.setHeader("Cache-Control", "no-store, max-age=0");   // ไม่ให้ CDN/เบราว์เซอร์ค้างชุดข้อมูลเก่า (อันดับ/RS เพี้ยนข้ามรอบ — บอส 4 พ.ย.)
   }
 
   // universe 'all' → หุ้นสามัญล้วนทั้งตลาด (Top20 จริง ไม่อิงเกณฑ์ RS/สภาพคล่อง)
@@ -165,9 +165,13 @@ export default async function handler(req, res) {
     }
     try {
       // ใช้ raw ของ scanMarket → RS ฐานเดียวกันกับ Dashboard (เลข RS ตรงกันทุกหน้า)
-      const { raw } = await scanMarket(market);
+      const { raw, clean } = await scanMarket(market);
       const rows = toCommonStocks(raw);
-      try { applyClosedRS(await closedMaps(market), rows); } catch (e) {}
+      // อันดับต้องชุดเดียวกับหน้า RS Ranking ปกติ (นับบนชุดที่ผ่านเกณฑ์สภาพคล่อง) — กันเลขไม่ตรงกันระหว่างหน้า
+      try {
+        const cl = await closedMaps(market);
+        applyClosedRS(cl, rows);
+      } catch (e) {}
       const payload = {
         market, universe: "all", source: "tradingview_scan_common",
         total_market: raw.length, count: rows.length, data: rows,
@@ -181,7 +185,7 @@ export default async function handler(req, res) {
   }
 
   // Simple in-memory TTL cache per (market) — เฉพาะ scan ปกติ (universe ว่าง)
-  const CACHE_VER = 'closed5';   // เปลี่ยนเมื่อนิยาม RS/อันดับเปลี่ยน (กัน in-memory cache คืนค่าเก่า)
+  const CACHE_VER = 'closed12';   // เปลี่ยนเมื่อนิยาม RS/อันดับเปลี่ยน (กัน in-memory cache คืนค่าเก่า)
   const ck = global.__scanCache?.[market + '|' + CACHE_VER];
   if (ck && ck.data && (force ? now - ck.ts < FORCE_COOLDOWN_MS : now - ck.ts < 300_000)) {
     return res.status(200).json(ck.data);
@@ -190,7 +194,11 @@ export default async function handler(req, res) {
   const t0 = Date.now();
   try {
     const { raw, clean: clean0 } = await scanMarket(market);
-    let clean = clean0;   // let เพื่อเติมหุ้นสถานะ Buy/Wait กลางวัน (บางวันหลุด liquidity ตอนตลาดยังไม่ปิด)
+    let clean = clean0;
+    try {
+      // อันดับนับใน "ชุดที่แสดง" (ต่อเนื่อง 1..N ไม่มีเลขข้าม) — ป็อปอัปกับตารางใช้ชุดเดียวกันจึงตรงกันเสมอ
+      applyClosedRS(await closedMaps(market), clean);
+    } catch (e) {}   // let เพื่อเติมหุ้นสถานะ Buy/Wait กลางวัน (บางวันหลุด liquidity ตอนตลาดยังไม่ปิด)
 
     // Yesterday's Rank map from Supabase (แยกตาม market)
     const { snapshot } = await loadPreviousSnapshot(market);
@@ -362,8 +370,7 @@ export default async function handler(req, res) {
       }
     } catch (e) { /* ไม่มีไฟล์ rshist ใน cwd → ยังทำงานเดิมทั้งหมด */ }
 
-    // RS/อันดับจากแท่งปิด
-    try { applyClosedRS(await closedMaps(market), clean); } catch (e) {}
+    // แถวที่เติมกลับมา (ค้างสถานะ) ไม่มีอันดับในชุดหลัก → เคลียร์อันดับ กันเลขชน
 
 
     // Industry money flow — NOTE: ไม่ส่ง 'industries' (Value traded) ออกไปแล้ว เพราะ
@@ -381,6 +388,8 @@ export default async function handler(req, res) {
       marketSummary,
       data: clean,
     };
+    // ★ จัดอันดับครั้งสุดท้ายบนชุดที่จะส่งออกจริง (กันเลขซ้ำ/หลุดจากโค้ดที่แก้ทีหลัง)
+    try { applyClosedRS(await closedMaps(market), clean); } catch (e) {}
 
     // snapshot เก็บเฉพาะฟิลด์หลัก — ฟิลด์ Scanner (SMA150/EMA20/52w/ATR/vol) คำนวณสดทุกสแกน ไม่ต้องบวม DB
     const SCANNER_ONLY = ["sma150", "ema20", "hi52", "lo52", "atr", "eN", "eL", "niY", "rvY", "niQ", "rvQ"];
