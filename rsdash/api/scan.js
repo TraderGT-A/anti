@@ -306,7 +306,7 @@ export default async function handler(req, res) {
       if (keep.length) {
         clean = clean.concat(keep).sort((a, b) => b.score - a.score);
         // ให rm rT ต่อเนื่อง (อันดับเชิงเรียงใหม่) — ป้าย rD เทียบ oldRank เดิมยังทำงาน (ตัวเติมไม่มี oldRank → rD เป็น undefined ไม่โชว์ลูกศร ปกติ)
-        clean.forEach((s, i) => { if (s.rT == null) s.rT = i + 1; });
+        clean.forEach((s, i) => { s.rT = i + 1; });   // จัดอันดับใหม่ทั้งชุดหลังเติมหุ้น (กันหมายเลขอับดับซ้ำกัน 2 ตัว — บอส 4 พ.ย.)
       }
     } catch (e) { /* ไม่มีไฟล์ rshist ใน cwd → ยังทำงานเดิมทั้งหมด */ }
 

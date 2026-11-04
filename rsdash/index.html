@@ -1991,6 +1991,10 @@ const grpThHtml=k=>{ const t=grpTh(k); return t?' <span class="mf-th">('+t+')</s
 const MF_Q={Leading:['นำตลาด','q-L'],Improving:['กำลังดีขึ้น','q-I'],Weakening:['ชะลอตัว','q-W'],Lagging:['ตามหลัง','q-G']};
 const MF_TYPE={index:'Index',country:'Country',region:'Region',asset:'Asset'};
 const mfJ=u=>MF.cache[u]||(MF.cache[u]=fetch(API+u).then(r=>r.json()).then(j=>{ if(j.error) throw new Error(j.error); return j; }).catch(e=>{ delete MF.cache[u]; throw e; }));
+// ทั้งกระดาน (ไม่กรองสภาพคล่อง/ราคา) — ใช้คำนวณ % เหนือ MA50/MA200 ของ Flow เท่านั้น
+// (บั๊ก 4 พ.ย.: เดิมใช้ชุดที่แสดงผลแค่ ~190 ตัว → ไทยขึ้น 66-72% ทั้งที่ทั้งกระดานจริง ~43%)
+const MF_ALL={};
+const mfScanAll=mk=>MF_ALL[mk]||(MF_ALL[mk]=mfJ('/api/scan?universe=all&market='+mk).then(j=>j.data||[]).catch(e=>{ delete MF_ALL[mk]; throw e; }));
 const mfScanRows=mk=>mfJ('/api/scan?market='+mk).then(j=>{ const d=j.data||[]; try{ setLogoIds(mk,d); }catch(e){} try{ _rsOverrideRows(d); }catch(e){} return d; });   // RS ตามฐานที่เลือก (3M/6M/1Y/รวม) — ให้ตรงกับ stockDB (บอส 3 พ.ย.: แถวโชว์ 98 แต่ป็อปอัปโชว์ 97)
 const mfPct=v=>v==null?'<span class="mu">–</span>':'<b class="'+(v>=0?'pos':'neg')+'">'+(v>=0?'+':'')+(v*100).toFixed(Math.abs(v)<0.1?2:1)+'%</b>';
 const mfR=(s,i0)=>{ const a=s[i0],b=s[s.length-1]; return (a!=null&&b!=null&&a>0)?b/a-1:null; };
@@ -2223,7 +2227,7 @@ function mfMkt(rows,idx,items){
   return {trend,r3,b50,b200,near,lead,n:ok.length,score:Math.round(100*comp.filter(x=>x!=null).reduce((a,b)=>a+b,0)/comp.filter(x=>x!=null).length)};
 }
 async function mfFocus(){
-  const [sec,th,cm,sTH,sUS]=await Promise.all([mfJ('/api/flow?kind=etf&set=sector'),mfJ('/api/flow?kind=thgroups'),mfJ('/api/flow?kind=etf&set=country'),mfScanRows('thailand'),mfScanRows('america')]);
+  const [sec,th,cm,sTH,sUS]=await Promise.all([mfJ('/api/flow?kind=etf&set=sector'),mfJ('/api/flow?kind=thgroups'),mfJ('/api/flow?kind=etf&set=country'),mfScanAll('thailand'),mfScanAll('america')]);   // breadth ใช้ทั้งกระดาน
   sec.meta.forEach(m=>MF.names['rus:'+m.k]=m.n+' ('+m.k+')'); Object.keys(th.series).forEach(k=>MF.names['rth:'+k]=mfNameTh(k));
   const iU=mfRotItems(sec,sec.series.SPY,sec.meta.map(m=>m.k)), iT=mfRotItems(th,th.bench,Object.keys(th.series));
   const U=mfMkt(sUS,sec.series.SPY,iU), T=mfMkt(sTH,th.bench,iT);
