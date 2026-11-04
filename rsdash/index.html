@@ -1836,7 +1836,7 @@ function stampLeadStars(){
       const q = (g && g[el.dataset.sec]) ? g[el.dataset.sec].q : null;
       const want = q === 'Leading';
       const has = !!el.querySelector('.st');
-      if (want && !has) el.insertAdjacentHTML('beforeend', '<b class="st" title="กลุ่มนำตลาด (RRG)">★</b>');
+      if (want && !has) { /* minimal: ไม่ติดดาวแล้ว (บอส 5 พ.ย.) */ }
       if (!want && has) { const b = el.querySelector('.st'); if (b) b.remove(); }
     });
   };
@@ -5512,7 +5512,6 @@ window.renderHowto=function(){
 };
 })();
 
-try{ new MutationObserver(function(){ clearTimeout(window.__stT); window.__stT=setTimeout(function(){ try{ stampLeadStars(); }catch(e){} }, 200); }).observe(document.body,{childList:true,subtree:true}); }catch(e){}
 </script>
 </body>
 </html>
