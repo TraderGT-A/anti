@@ -171,14 +171,21 @@ export async function scanMarket(market = "thailand") {
   }
 
   raw.sort((a, b) => b.score - a.score);
-  raw.forEach((s, i) => { s.rs = percentile(i, raw.length); s.rT_full = i + 1; });
+  raw.forEach((s, i) => { s.rs = percentile(i, raw.length); });
+  const _allRs = raw.map(s => s.rs);
+  raw.forEach(s => { s.rT_full = 1 + _allRs.filter(v => v > s.rs).length; });
 
   // RS แยกฐานช่วง (บอส 3 พ.ย.: "มีให้เลือก RS3M / RS6M / RS1ปี · default 3M ทั้งเว็บ · เลือกจากจุดขวาบนของเว็บ ใช้ทั้งหมด")
   // นิยามตรงชื่อ: อันดับเปอร์เซ็นไทล์ของผลตอบแทนช่วงนั้นเทียบหุ้นทั้งตลาด (หุ้นครบชุดเดียวกับ rs เดิม)
   // → rs3 = p3m, rs6 = p6m, rs1 = p1y (แหว่งแถวขาด = null → เว็บแสดง '–' และไม่เรียงหัวหน้าตาม RS ที่เลือก)
+  // อันดับ (rT*) ต้อง "เรียงตามค่า RS ที่โชว์" เป๊ะ ๆ: RS เท่ากัน (ปัดเป็นจำนวนเต็มแล้ว) ให้เรียงตามชื่อย่อ A→Z
+  //   เหตุผล (บอส 4 พ.ย.: "อันดับ # มันเรียงยังไง"): เดิมอันดับเรียงตามค่าเป๊ะไม่ปัด → หุ้น RS 98 เท่ากันแต่ได้ #6 กับ #11 ดูขัดกัน
   const _base = (key, fld, rtfld) => {
     const arr = [...raw].sort((a, b) => ((b[key] ?? -1e9) - (a[key] ?? -1e9)) || (b.score - a.score));
-    arr.forEach((s, i) => { if (s[key] != null) { s[fld] = percentile(i, arr.length); s[rtfld] = i + 1; } });
+    arr.forEach((s, i) => { if (s[key] != null) s[fld] = percentile(i, arr.length); });
+    // RS เท่ากัน = อันดับเดียวกัน (ไม่ตัดสินด้วยชื่อย่อ) → ตัวที่ RS สูงกว่ามี N ตัว อันดับคือ N+1
+    const vals = arr.map(s => s[fld]).filter(v => v != null);
+    arr.forEach(s => { if (s[fld] != null) s[rtfld] = 1 + vals.filter(v => v > s[fld]).length; });
   };
   // ชุดละฐาน: rs (0–99) + อันดับในกระดานเดียวกัน (rT) — ให้แถว/ป็อปอัปโชว์ "#N" ตรงกันทุกที่ ไม่ขึ้นกับว่าหน้าไหนโหลดมาก่อน
   _base('p3m', 'rs3', 'rT3'); _base('p6m', 'rs6', 'rT6'); _base('p1y', 'rs1', 'rT1');
