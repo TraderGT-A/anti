@@ -3870,7 +3870,7 @@ function rsColor(r){ return r>=80?'text-emerald-400':(r>=50?'text-yellow-400':'t
 function rDhtml(x){
   const d=x.rD;
   if(d===null||d===undefined) return '';
-  if(RS_BASE!=='all') return '<span class="rk mu" title="อันดับเมื่อวานเป็นฐาน "รวม" — เลือก "รวม" เพื่อดูการเปลี่ยนอันดับ">–</span>';   // กันกลืนข้ามฐาน (บอส 3 พ.ย. 13:xx)
+  // โชว์ทุกฐาน (อันดับเมื่อวานอ้างอิง snapshot ฐาน 1Y — ใช้ดูทิศทางได้)
   if(d>0) return '<span class="rk pos"><i class="ar">▲</i> '+d+'</span>';
   if(d<0) return '<span class="rk neg"><i class="ar">▼</i> '+Math.abs(d)+'</span>';
   return '<span class="rk mu">–</span>';
@@ -4264,7 +4264,8 @@ async function renderTopGL(){
   try{
     // ใช้ ensureTopAll ดึงหุ้นสามัญทั้งตลาด (universe=all) มีแคชเร็ว ไม่ยิงเครือข่ายซ้ำ
     const allStocks = await ensureTopAll(glMarket);
-    if(allStocks && allStocks.length) { stockDB[glMarket] = allStocks; rsOverrideAll(glMarket); }
+    // ⚠️ ห้ามเขียน stockDB ด้วยข้อมูล universe=all (จะทำให้ป็อปอัปโชว์ RS/อันดับคนละชุดกับตาราง) — บอส 4 พ.ย.
+    if(allStocks && allStocks.length) { rsOverrideAll(glMarket); }
     let arr=(allStocks||[]).filter(s=>{
       const ok=(valMin<=0 || (s.val||0)>=valMin) && s.change!==null && s.change!==undefined;
       if(!ok) return false;
@@ -5190,7 +5191,7 @@ function openModal(tk,nm,mkt){
   const _drd = document.getElementById('modalDRBadge');
   if(_drd) _drd.innerHTML = (found && found.isDR) ? '<span class="pill text-amber-400 border-amber-700/60" title="Depositary Receipt — ตราสารอ้างอิงหุ้นนอก">DR</span>' : '';
   // 3) อันดับ RS + การเปลี่ยนอันดับ (เหมือน pill บนการ์ด)
-  const _rd = (RS_BASE!=='all') ? null : (found ? found.rD : null), _rt = found ? (found.rT != null ? found.rT : (found.rT_full != null ? found.rT_full : (found.rT3 != null ? found.rT3 : (found.rT6 != null ? found.rT6 : found.rT1)))) : null;   // กัน #undefined (โหมดรวมหุ้นสภาพคล่องต่ำ)
+  const _rd = (found ? found.rD : null), _rt = found ? (found.rT != null ? found.rT : (found.rT_full != null ? found.rT_full : (found.rT3 != null ? found.rT3 : (found.rT6 != null ? found.rT6 : found.rT1)))) : null;   // กัน #undefined (โหมดรวมหุ้นสภาพคล่องต่ำ)
   let _rtag = (_rt!=null) ? '<span class="pill text-slate-300" title="อันดับ RS ในชุดที่แสดง ตามฐานที่เลือก">#'+_rt+'</span>' : '';
 
   const _rdx = (_rd===null||_rd===undefined) ? ''
