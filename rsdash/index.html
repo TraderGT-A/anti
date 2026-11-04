@@ -1831,7 +1831,8 @@ function sgChip(tk, m){
   const v = s[k]; if(v==null) return '';
   const lab = v===2?'Buy':(v===1?'Wait':'Sell'), ch = v===2?'B':(v===1?'W':'S');
   const cls = v===2?'pos':(v===0?'neg':'mu');
-  return '<span class="sgc '+cls+'" title="สัญญาณ '+lab+(s.lead?' · กลุ่มนำตลาด':'')+'">'+ch+(s.lead?'★':'')+'</span>';
+  // ไม่ใส่ดาวที่นี่ — สถานะกลุ่มใช้ตัวเดียวกับป็อปอัป (RRG quadrant จากหน้าเงินไหล) จะได้ไม่ขัดกัน
+  return '<span class="sgc '+cls+'" title="สัญญาณ '+lab+' (ฐาน RS ที่เลือก)">'+ch+'</span>';
 }
 function ernDot(tk, m){
   try{ const s=_rowOf(tk,m); if(!s) return ''; const i=ernInfo(s, m||currentMarket); if(!i) return '';
