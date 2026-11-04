@@ -42,23 +42,11 @@ function applyClosedRS(cl, rows, fullMarket) {
       if (v != null) s[fld] = v;
       if (s[fld] != null) list.push(s);   // ตัวที่ไม่มีค่าในไฟล์ ใช้ค่าเดิมของ scan แต่นับอันดับรวมด้วย (กันเลขซ้ำ/ข้าม)
     }
-    // อันดับ: เรียงตาม RS ที่โชว์ก่อน → คะแนนดิบ (ทศนิยม) → มูลค่าตลาด → ชื่อย่อ
-    const rkMap = cl.rk && cl.rk[fld], scMap = cl.sc && cl.sc[fld];
-    const fullSet = !!fullMarket;   // true = ชุดทั้งตลาด (ใช้เลขอันดับจากไฟล์) · false = ชุดกรอง (นับใหม่ต่อเนื่อง)
-    const scv = (s) => (scMap && scMap[s.ticker] != null ? scMap[s.ticker] : -1e9);
+    // อันดับ: เรียงตาม RS ที่โชว์ → คะแนนดิบ (ทศนิยม) → มูลค่าตลาด → ชื่อย่อ · แล้วนับ 1..N ในชุดที่ส่งออก
+    const scMap = cl.sc && cl.sc[fld];
+    const scv = (x) => (scMap && scMap[x.ticker] != null ? scMap[x.ticker] : -1e9);
     list.sort((a, b) => (b[fld] - a[fld]) || (scv(b) - scv(a)) || ((b.mcap || 0) - (a.mcap || 0)) || String(a.ticker).localeCompare(String(b.ticker)));
-    // ชุดกรอง → คิด RS ใหม่ภายในชุดนี้ (เปอร์เซ็นไทล์จากคะแนนดิบ) ตามที่บอสกำหนด
-    if (!fullMarket && scMap) {
-      const n = list.length;
-      list.forEach((x, i) => { x[fld] = Math.max(1, Math.min(99, Math.round(((n - i) / Math.max(1, n)) * 99))); });
-    }
-    if (fullSet && rkMap && Object.keys(rkMap).length) {
-      let mx = 0; list.forEach(s => { const r = rkMap[s.ticker]; if (r != null && r > mx) mx = r; });
-      let next = mx + 1;
-      list.forEach(s => { const r = rkMap[s.ticker]; s[rf] = (r != null ? r : next++); });
-    } else {
-      list.forEach((s, i) => { s[rf] = i + 1; });   // ชุดกรอง → อันดับต่อเนื่องในชุดนี้
-    }
+    list.forEach((x, i) => { x[rf] = i + 1; });
   }
   if (cl.asOf) rows.forEach(s => { s.rsAsOf = cl.asOf; });
   return rows;
@@ -200,7 +188,7 @@ export default async function handler(req, res) {
   }
 
   // Simple in-memory TTL cache per (market) — เฉพาะ scan ปกติ (universe ว่าง)
-  const CACHE_VER = 'closed16';   // เปลี่ยนเมื่อนิยาม RS/อันดับเปลี่ยน (กัน in-memory cache คืนค่าเก่า)
+  const CACHE_VER = 'closed18';   // เปลี่ยนเมื่อนิยาม RS/อันดับเปลี่ยน (กัน in-memory cache คืนค่าเก่า)
   const ck = global.__scanCache?.[market + '|' + CACHE_VER];
   if (ck && ck.data && (force ? now - ck.ts < FORCE_COOLDOWN_MS : now - ck.ts < 300_000)) {
     return res.status(200).json(ck.data);
