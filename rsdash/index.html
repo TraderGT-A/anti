@@ -954,6 +954,15 @@ html #poBox .po-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-
 html #poBox .po-h{font-size:11px;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
 html #poBox .po-sec{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
 @media(max-width:640px){ html #poBox .po-2col{grid-template-columns:1fr} }
+#poBox.po-wrap{border:1px solid rgba(245,158,11,.35);border-radius:12px;padding:10px 10px 6px;margin-bottom:14px;background:rgba(245,158,11,.04)}
+#poBox .po-tag{font-size:10.5px;letter-spacing:.08em;color:#f59e0b;font-weight:600;margin-bottom:4px}
+#poBox .po-tag span{color:var(--faint);font-weight:400;letter-spacing:0}
+#poBox .po-crumb{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:4px 0 2px}
+#poBox .po-sec .pill,#poBox .po-cm span{font-size:12px;padding:3px 7px}
+#poBox .po-2side{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+@media(max-width:700px){ html #poBox .po-2side{grid-template-columns:1fr} }
+#poBox .po-h.up{color:#10b981}
+#poBox .po-h.dn{color:#f43f5e}
 #poBox .po-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:6px}
 #poBox .po-c{background:var(--panel,rgba(255,255,255,.03));border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer}
 #poBox .po-c:hover{border-color:var(--gold)}
@@ -2336,7 +2345,7 @@ function poRow(x){
   return '<tr onclick="openModalByTk(\''+x.t+'\')"><td class="nm"><b>'+x.t+'</b><i class="mf-tk">'+String(x.sec||'')+'</i></td><td class="r">'+fNum(x.px)+'</td><td class="r">'+poPc(x.chg)+'</td><td class="r">'+poMoney(x.val)+'</td></tr>';
 }
 function poDraw(){
-  const el=document.getElementById('poBox'); if(!el) return; const d=PO.d;
+  const el=document.querySelector('#poBox .po-in')||document.getElementById('poBox'); if(!el) return; const d=PO.d;
   if(!d){ el.innerHTML=''; return; }
   if(d.err||!d.items&&!d.top){ el.innerHTML='<h3>Pre-open · สหรัฐ</h3><div class="mu">โหลดข้อมูล pre-market ไม่สำเร็จ</div>'; return; }
   const st={pre:['ก่อนเปิด','#f59e0b'],open:['ตลาดเปิดแล้ว','#10b981'],closed:['ตลาดปิด','#64748b']}[d.session]||['-','#64748b'];
@@ -2357,16 +2366,23 @@ function poDraw(){
       a.sort((p,q)=>q.chg-p.chg);
       return {sec:a[0].sec,n:a.length,chg,val:v,up,dn,a};
     }).sort((p,q)=>PO.sort==='val'?q.val-p.val:q.chg-p.chg);
-    body='<div class="po-cards">'+cards.map(c=>'<div class="po-c" onclick="poPickSec(\''+String(c.sec).replace(/'/g,'')+'\')"><div class="po-ct"><b>'+c.sec+'</b><span class="'+poCls(c.chg)+'">'+(c.chg>0?'+':'')+c.chg.toFixed(2)+'%</span></div>'+
+    const cardHtml=c=>'<div class="po-c" onclick="poPickSec(\''+String(c.sec).replace(/'/g,'')+'\')"><div class="po-ct"><b>'+c.sec+'</b><span class="'+poCls(c.chg)+'">'+(c.chg>0?'+':'')+c.chg.toFixed(2)+'%</span></div>'+
       '<div class="po-cs">'+c.n+' ตัว · เขียว '+c.up+' แดง '+c.dn+' · '+poMoney(c.val)+'</div>'+
-      '<div class="po-cm">'+c.a.slice(0,3).map(x=>'<span>'+x.t+' <i class="'+poCls(x.chg)+'">'+(x.chg>0?'+':'')+x.chg.toFixed(1)+'%</i></span>').join('')+'</div></div>').join('')+'</div>'+
-      '<div class="mu" style="font-size:11px;padding:6px 2px">กดการ์ดกลุ่ม = ดูรายตัวในกลุ่มนั้น · กรองเฉพาะหุ้นที่มีมูลค่าซื้อขาย pre ≥ '+poMoney(PO.min)+'</div>';
+      '<div class="po-cm">'+c.a.slice(0,3).map(x=>'<span>'+x.t+' <i class="'+poCls(x.chg)+'">'+(x.chg>0?'+':'')+x.chg.toFixed(1)+'%</i></span>').join('')+'</div></div>';
+    const gUp=cards.filter(c=>c.chg>0), gDn=cards.filter(c=>c.chg<0);
+    body='<div class="po-side"><div class="po-h up">กลุ่ม Gap up · '+gUp.length+'</div><div class="po-cards">'+(gUp.map(cardHtml).join('')||'<div class="mu">ไม่มี</div>')+'</div></div>'+
+      '<div class="po-side"><div class="po-h dn">กลุ่ม Gap down · '+gDn.length+'</div><div class="po-cards">'+(gDn.map(cardHtml).join('')||'<div class="mu">ไม่มี</div>')+'</div></div>'+
+      '<div class="mu" style="font-size:11px;padding:6px 2px">กดการ์ดกลุ่ม = ดูรายตัวในกลุ่มนั้น (แยก Gap up / Gap down) · กรองเฉพาะหุ้นที่มีมูลค่าซื้อขาย pre ≥ '+poMoney(PO.min)+'</div>';
   } else {
     let rows=items.filter(x=>PO.sel==='all'||x.sec===PO.sel);
-    rows.sort((a,b)=>PO.sort==='val'?b.val-a.val:b.chg-a.chg);
-    const tot=rows.length; if(PO.topn>0) rows=rows.slice(0,PO.topn);
-    body='<div class="mf-scroll"><table class="mf-tbl mf-fv"><thead><tr><th>หุ้น ('+tot+' ตัว)</th><th class="r">ราคา pre</th><th class="r">% เปลี่ยน</th><th class="r">มูลค่า</th></tr></thead><tbody>'+
-      (rows.length?rows.map(poRow).join(''):'<tr><td colspan="4" class="mu">ไม่มีหุ้นเข้าเงื่อนไข</td></tr>')+'</tbody></table></div>';
+    const tot=rows.length;
+    let up=rows.filter(x=>x.chg>0).sort((a,b)=>PO.sort==='val'?b.val-a.val:b.chg-a.chg);   // Gap up: มาก→น้อย
+    let dn=rows.filter(x=>x.chg<0).sort((a,b)=>PO.sort==='val'?b.val-a.val:a.chg-b.chg);   // Gap down: ลบแรงสุดก่อน
+    if(PO.topn>0){ up=up.slice(0,PO.topn); dn=dn.slice(0,PO.topn); }
+    const crumb=PO.sel!=='all'?'<div class="po-crumb">กลุ่ม: <b>'+PO.sel+'</b> · '+tot+' ตัว <button class="tf-chip" onclick="poSet(\'sel\',\'all\');poSet(\'view\',\'group\')">✕ กลับไปดูทุกกลุ่ม</button></div>':'';
+    const tb=(arr,lab,cls)=>'<div class="po-side"><div class="po-h '+cls+'">'+lab+' · '+arr.length+' ตัว</div><div class="mf-scroll"><table class="mf-tbl mf-fv"><thead><tr><th>หุ้น</th><th class="r">ราคา pre</th><th class="r">Gap</th><th class="r">มูลค่า</th></tr></thead><tbody>'+
+      (arr.length?arr.map(poRow).join(''):'<tr><td colspan="4" class="mu">ไม่มีหุ้นเข้าเงื่อนไข</td></tr>')+'</tbody></table></div></div>';
+    body=crumb+'<div class="po-2side">'+tb(up,'Gap up','up')+tb(dn,'Gap down','dn')+'</div>';
   }
   const secs=(d.sectors||[]);
   const secBar=secs.length?'<div class="po-sec"><span class="mu">แรงสุด:</span>'+secs.slice(0,4).map(s=>'<span class="pill" onclick="poPickSec(\''+String(s.sec).replace(/'/g,'')+'\')" style="cursor:pointer"><b>'+s.sec+'</b> '+poPc(s.chg)+'</span>').join('')+
@@ -2384,7 +2400,7 @@ async function poLoad(){
 function poEnsure(){
   const b=document.getElementById('perfBody'); if(!b) return;
   if(currentMarket!=='america'){ const x=document.getElementById('poBox'); if(x) x.remove(); return; }
-  if(!document.getElementById('poBox')) b.insertAdjacentHTML('afterbegin','<div id="poBox" class="td-sec"></div>');
+  if(!document.getElementById('poBox')) b.insertAdjacentHTML('afterbegin','<div id="poBox" class="td-sec po-wrap"><div class="po-tag">PRE-OPEN · US <span>ก่อนตลาดสหรัฐเปิด — คนละส่วนกับ Performance ด้านล่าง</span></div><div class="po-in"></div></div>');
   poLoad();
 }
 async function pfRender(){
