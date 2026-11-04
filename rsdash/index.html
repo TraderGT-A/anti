@@ -456,6 +456,8 @@ html .td-hi{display:inline-block;font-size:10px;font-weight:600;border-radius:99
 html .bsleg{font-size:11px;color:var(--muted,#8b97a8);margin-left:10px;white-space:nowrap}
 html .dly{font-size:.88em;opacity:.8;white-space:nowrap;cursor:help}
 html .mf-th{font-size:10px;font-weight:400;opacity:.85;white-space:nowrap}
+html .sgc{font-size:9.5px;font-weight:700;padding:1px 5px;border:1px solid currentColor;border-radius:6px;margin-left:4px;vertical-align:middle;line-height:1.3}
+html .edot{width:6px;height:6px;background:#f59e0b;border-radius:50%;display:inline-block;margin-left:4px;vertical-align:middle}
 html .bs-slot{display:inline-flex;align-items:center;gap:4px;min-width:0;vertical-align:middle} html .bs-slot:empty{display:none}
 html .bs-slot .bsb{position:static;font-size:9.5px;padding:2px 7px;flex:none} html .bs-slot .bsg{font-size:9.5px;padding:1px 7px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block}
 html .ldc-l{display:flex;align-items:center;gap:6px;min-width:0;flex:1 1 auto} html .ldc-top{gap:6px}
@@ -1821,7 +1823,23 @@ function lg(tk, mk, px){
 /* จุดสถานะข้างชื่อหุ้น (ใช้ทุกหน้า ทั้งไทย/เมกา): ข่าว = จุดน้ำเงินหน้าชื่อ (กดอ่าน) · SSF = จุดเขียว · DR = จุดม่วง */
 function newsDot(tk, m){ try{ const mm=m||currentMarket; return Notes.badgeHtml(noteOf(mm,tk), mm, tk); }catch(e){ return ''; } }
 function tkL(tk, m, px){ return lg(tk,m,px); }   // โลโก้ (ห้ามวางใน <button>/<a>) · จุดข่าวอยู่หลังชื่อหุ้น ใน tkT
-function tkT(tk, m){ const mm=m||currentMarket; return newsDot(tk,mm)+ssfBadge(tk,mm)+drLabel(tk,mm); }
+/* ── ป้ายย่อบนการ์ด/ลิสต์: สัญญาณ B/W/S + ดาวถ้ากลุ่มนำตลาด · จุดเหลือง = มีงบในสัปดาห์นี้ ── */
+function _rowOf(tk, m){ const mm=m||currentMarket; return ((stockDB[mm]||[]).find(x=>x.ticker===tk)) || ((stockData||[]).find(x=>x.ticker===tk)) || null; }
+function sgChip(tk, m){
+  const s=_rowOf(tk,m); if(!s) return '';
+  const k = RS_BASE==='3m' ? 'sg3' : (RS_BASE==='6m' ? 'sg6' : 'sg1');
+  const v = s[k]; if(v==null) return '';
+  const lab = v===2?'Buy':(v===1?'Wait':'Sell'), ch = v===2?'B':(v===1?'W':'S');
+  const cls = v===2?'pos':(v===0?'neg':'mu');
+  return '<span class="sgc '+cls+'" title="สัญญาณ '+lab+(s.lead?' · กลุ่มนำตลาด':'')+'">'+ch+(s.lead?'★':'')+'</span>';
+}
+function ernDot(tk, m){
+  try{ const s=_rowOf(tk,m); if(!s) return ''; const i=ernInfo(s, m||currentMarket); if(!i) return '';
+    if(i.st==='soon'||i.st==='today') return '<i class="edot" title="มีงบในสัปดาห์นี้ ('+ernLbl(i.d,i.tn)+')"></i>';
+  }catch(e){}
+  return '';
+}
+function tkT(tk, m){ const mm=m||currentMarket; return newsDot(tk,mm)+ssfBadge(tk,mm)+drLabel(tk,mm)+ernDot(tk,mm); }
 function tkTs(tk, m){ const mm=m||currentMarket; return ssfBadge(tk,mm)+drLabel(tk,mm); }   // ไม่มีจุดข่าว (จุดข่าวเป็น <button>) — ใช้เมื่ออยู่ใน <button>/<a> เท่านั้น (HTML ห้ามซ้อน button)   // ต่อท้ายชื่อหุ้น: จุดข่าว(น้ำเงิน) + SSF + DR
 function ernBy(tk, mk, compact){
   const arr=(mk==='america'?stockDB.america:stockDB.thailand)||[];
@@ -3078,7 +3096,7 @@ function ldApply(){
     cg.innerHTML = ldView==='card' ? (show.map((p,i)=>{
       const ec=ernBy(p.ticker,ldMarket,true);
       return '<div class="ldc" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')">'+
-        '<div class="ldc-top"><span class="ldc-l"><span class="ldc-n">#'+(i+1)+'</span><span class="bs-slot"></span></span><span class="rsr'+(p.rs<70?' lo':'')+'">'+p.rs+'</span></div>'+
+        '<div class="ldc-top"><span class="ldc-l"><span class="ldc-n">#'+(i+1)+'</span>'+sgChip(tk,m)+'<span class="bs-slot"></span></span><span class="rsr'+(p.rs<70?' lo':'')+'">'+p.rs+'</span></div>'+
         '<div class="tkcell"><span class="tkrow">'+tkL(p.ticker,ldMarket,22)+'<b class="ldc-tk">'+p.ticker+'</b>'+ldTags(p.ticker)+'</span>'+(ec?'<span class="ern-wrap">'+ec+'</span>':'')+'</div>'+
         '<div class="ldc-big">'+pc(Number.isFinite(Number(p.p1m))?p.p1m:p.mtd)+'<small>1 เดือน</small></div>'+
         '<div id="tchart_'+ldMarket+'_'+String(p.ticker).replace(/[^a-z0-9]/gi,'_')+'" class="chart ldc-chart" data-tk="'+p.ticker+'" data-m="'+ldMarket+'"></div>'+
@@ -3451,8 +3469,8 @@ function topCardItems(rows, m){
         <div class="flex items-center gap-2 min-w-0">
           <span class="text-[10px] font-bold text-slate-500">#${i+1}</span>
           ${logo}
-          <button onclick="openModal('${tk}','${jq(s.name)}','${m}')" class="text-[15px] font-bold hover:text-sky-400 truncate" title="${(s.name||'')}">${tk}${drLabel(tk, m)}</button>
-          ${Notes.badgeHtml(noteOf(m,tk),m,tk)}${ssfBadge(tk, m)}<span class="bs-slot"></span>
+          <button onclick="openModal('${tk}','${jq(s.name)}','${m}')" class="text-[15px] font-bold hover:text-sky-400 truncate" title="${(s.name||'')}">${tk}${drLabel(tk, m)}${ernDot(tk,m)}</button>
+          ${sgChip(tk, m)}${Notes.badgeHtml(noteOf(m,tk),m,tk)}${ssfBadge(tk, m)}<span class="bs-slot"></span>
           <span class="tag-market" title="${m==='america'?'ตลาดสหรัฐฯ (US)':'ตลาดไทย'}">${m==='america'?'US':'TH'}</span>
         </div>
         ${topRSHTML(s,true)}
@@ -3774,7 +3792,7 @@ function buildCard(tk, nm, grp, ind, rs, px, ch, vol, val, p3, xn, rd, isDR, rv,
       <span class="c-rs ${rsColor(Number(rs))}" title="RS เปอร์เซ็นต์ไทล์ เทียบทั้งตลาด">${rs}</span>
     </div>
     <div class="c-name" title="${nm||''}">${nm||''}</div>
-    <div class="c-tags"><span class="bs-slot"></span>${cap}${ind?`<span class="pill c-ind" title="กลุ่ม/หมวด">${ind}</span>`:''}</div>
+    <div class="c-tags">${sgChip(tk, currentMarket)}<span class="bs-slot"></span>${cap}${ind?`<span class="pill c-ind" title="กลุ่ม/หมวด">${ind}</span>`:''}</div>
     <div class="c-price">
       <b id="price_${tk}" class="text-white">${fNum(px)}</b> <span id="chg_${tk}">${fPct(ch)}</span>${preChip(tk,currentMarket)}
       <span class="text-slate-400" title="มูลค่าซื้อขาย">${fBil(val||0)}</span>
@@ -4611,7 +4629,7 @@ function clCard(s,i){
 function clRow(s){
   const m=clState.m, tk=s.ticker, rs=Number.isFinite(Number(s.rs)) ? '<span class="rsr'+(s.rs<70?' lo':'')+'">'+s.rs+'</span>' : '';
   return '<div class="cl-row" onclick="openModal(\''+jq(tk)+'\',\''+jq(s.name)+'\',\''+m+'\')">'+
-    '<div class="l"><span class="tkrow">'+tkL(tk,m,18)+'<b>'+tk+'</b>'+tkT(tk,m)+'</span><span class="nm">'+(s.name||'')+'</span></div>'+
+    '<div class="l"><span class="tkrow">'+tkL(tk,m,18)+'<b>'+tk+'</b>'+tkT(tk,m)+sgChip(tk,m)+'</span><span class="nm">'+(s.name||'')+'</span></div>'+
     '<div class="st">'+rs+'<span>'+fNum(s.price)+'</span>'+clPc(s.change)+'<span class="mu">'+(s.val!=null?fBilExact(s.val,m):'')+'</span></div></div>';
 }
 function clRender(){

@@ -357,7 +357,7 @@ export default async function handler(req, res) {
           }
           closed[k] = m; freq[k] = f;
         }
-        SIG_CACHE[market] = { ts: Date.now(), sig: (dj.sig || {}), keep: keepSet, closed, freq, asOf: dj.sigAsOf || null };
+        SIG_CACHE[market] = { ts: Date.now(), sig: (dj.sig || {}), sig3: (dj.sig3 || {}), sig6: (dj.sig6 || {}), sig1: (dj.sig1 || {}), keep: keepSet, closed, freq, asOf: dj.sigAsOf || null };
       }
       const KEEP = SIG_CACHE[market].keep || {};
       const have = new Set(clean.map(s => s.ticker));
@@ -402,6 +402,24 @@ export default async function handler(req, res) {
     };
     // ★ จัดอันดับครั้งสุดท้ายบนชุดที่จะส่งออกจริง (กันเลขซ้ำ/หลุดจากโค้ดที่แก้ทีหลัง)
     try { applyClosedRS(await closedMaps(market), clean); } catch (e) {}
+    // สถานะสัญญาณย่อ (ให้การ์ดทุกใบแสดง Buy/Wait/Sell ได้โดยไม่ต้องโหลดไฟล์ย้อนหลัง) + กลุ่มนำตลาด
+    try {
+      const SC = SIG_CACHE[market];
+      if (SC) {
+        const g = (m, tk) => (m && m[tk] ? m[tk][0] : null);
+        clean.forEach(x => {
+          x.sg3 = g(SC.sig3, x.ticker); x.sg6 = g(SC.sig6, x.ticker); x.sg1 = g(SC.sig1, x.ticker);
+        });
+        // กลุ่มนำตลาด = ค่าเฉลี่ย RS ของ sector สูงกว่าค่ากลางของตลาด
+        const byS = {};
+        clean.forEach(x => { const k = x.sector || 'Other'; (byS[k] = byS[k] || []).push(x.rs3 || 0); });
+        const avg = {}; Object.entries(byS).forEach(([k, a]) => { avg[k] = a.reduce((p, c) => p + c, 0) / a.length; });
+        const vals = Object.values(avg).sort((a, b) => a - b);
+        const cut = vals.length ? vals[Math.floor(vals.length * 0.75)] : 0;
+        clean.forEach(x => { x.lead = (avg[x.sector || 'Other'] || 0) >= cut && (avg[x.sector || 'Other'] || 0) > 0; });
+      }
+    } catch (e) {}
+
     // ΔRank รายฐาน (ต้องเทียบฐานเดียวกันเท่านั้น): rD3/rD6/rD1 จากอันดับเมื่อวานของฐานนั้น
     try {
       if (prevRanks) {
