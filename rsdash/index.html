@@ -5196,7 +5196,8 @@ function openModal(tk,nm,mkt){
   const _drd = document.getElementById('modalDRBadge');
   if(_drd) _drd.innerHTML = (found && found.isDR) ? '<span class="pill text-amber-400 border-amber-700/60" title="Depositary Receipt — ตราสารอ้างอิงหุ้นนอก">DR</span>' : '';
   // 3) อันดับ RS + การเปลี่ยนอันดับ (เหมือน pill บนการ์ด)
-  const _rd = (found ? found.rD : null), _rt = found ? (found.rT != null ? found.rT : (found.rT_full != null ? found.rT_full : (found.rT3 != null ? found.rT3 : (found.rT6 != null ? found.rT6 : found.rT1)))) : null;   // กัน #undefined (โหมดรวมหุ้นสภาพคล่องต่ำ)
+  const _db = RS_BASE==='3m'?'rD3':(RS_BASE==='6m'?'rD6':(RS_BASE==='1y'?'rD1':null));
+  const _rd = found ? (_db ? (found[_db] != null ? found[_db] : null) : found.rD) : null, _rt = found ? (found.rT != null ? found.rT : (found.rT_full != null ? found.rT_full : (found.rT3 != null ? found.rT3 : (found.rT6 != null ? found.rT6 : found.rT1)))) : null;   // กัน #undefined (โหมดรวมหุ้นสภาพคล่องต่ำ)
   let _rtag = (_rt!=null) ? '<span class="pill text-slate-300" title="อันดับ RS ในชุดที่แสดง ตามฐานที่เลือก">#'+_rt+'</span>' : '';
 
   const _rdx = (_rd===null||_rd===undefined) ? ''
