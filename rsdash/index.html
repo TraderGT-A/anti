@@ -2731,7 +2731,7 @@ async function bsScanLoad(m){
       let v=null, sh=null;
       try{ const key=m+'_'+it.s.ticker; let bars=topCharts[key];
         if(!bars){ const j=await (await fetch(API+'/api/chart?market='+m+'&symbol='+encodeURIComponent(it.s.ticker)+'&interval=1d&range=3y')).json(); bars=(j&&j.data)||[]; if(bars.length) topCharts[key]=bars; }
-        if(bars.length>=200){ const r=bsEval(it.s,bsClosed(patchedBars(bars,it.s.ticker,m),m),null); v=r.v; sh=r.short; } }catch(e){}
+        if(bars.length>=200){ const r=bsEval(it.s,bsClosed(patchedBars(bars,it.s.ticker,m),m),(it.s&&Number.isFinite(Number(it.s.rs)))?Number(it.s.rs):null); v=r.v; sh=r.short; } }catch(e){}
       if(!v){ v='Wait'; sh=['ตรวจกราฟไม่ได้ — ยังไม่ยืนยัน Buy']; }   // ดึงกราฟไม่ได้ → ไม่ยืนยัน Buy (ต้องเช็กปริมาณ/SMA20 จากกราฟจริง)
       if(v==='Buy') out.Buy.push(it); else if(v==='Wait'){ it.why=(sh&&sh.length?sh.join(' · '):'ยังไม่ถึง Buy'); out.Wait.push(it); } else { it.why='ไม่ผ่านเกณฑ์เทคนิคตามกราฟ'; out.Sell.push(it); }
     }));
@@ -4267,7 +4267,7 @@ function bsMarks(data,rsFn,needRs,ctx){
   return out;
 }
 // RS ย้อนหลัง (precompute_rshist.mjs · ใหม่ไม่เกิน 7 วัน) — โหลดครั้งเดียวต่อตลาด · ไม่มีไฟล์/เก่า → null (วาดเครื่องหมายด้วยเทคนิค+ปริมาณ ไม่รวม RS)
-const RSH={};
+const RSH={}, RSH_OBJ={};   // RSH = promise กันโหลดซ้ำ · RSH_OBJ = ข้อมูลจริงที่โหลดเสร็จ
 function bsRsHist(m){
   const k=m==='america'?'us':'th';
   return RSH[k]||(RSH[k]=fetch('/rshist_'+k+'.json').then(r=>r.ok?r.json():null).then(j=>{
@@ -4279,10 +4279,25 @@ function bsRsHist(m){
                  sig: (j['sig'+sf] && Object.keys(j['sig'+sf]).length) ? j['sig'+sf] : j.sig,
                  bh: (j['bh'+sf] && Object.keys(j['bh'+sf]).length) ? j['bh'+sf] : j.bh };
     j.rs = bs.rs; j.sig = bs.sig; j.bh = bs.bh;
-    j.ix={}; j.dates.forEach((d,i)=>{ j.ix[d]=i; }); return j; }).catch(()=>null));
+    j.ix={}; j.dates.forEach((d,i)=>{ j.ix[d]=i; }); j.__ready=true; RSH_OBJ[k]=j; return j; }).catch(()=>null));
 }
 // นับว่า "RS ค่านี้" และ "อันดับนี้" ต่อเนื่องมากี่แท่งแล้ว (ใช้ rshist ของฐานที่เลือก)
 // อันดับต่อแท่ง = 1 + จำนวนหุ้นที่ RS สูงกว่า (เทียบทั้งชุดในไฟล์) — คำนวณเฉพาะตอนเปิดป็อปอัป เร็วพอ
+// เติมป้าย "RS นี้ N วัน · #นี้ N วัน" ลงใน #modalRank (เรียกซ้ำได้ ปลอดภัยถ้า element ถูกวาดใหม่)
+function bsStreakApply(tk, mk){
+  try{
+    const el=document.getElementById('modalRank'); if(!el || !tk) return;
+    const rh=RSH_OBJ[mk==='america'?'us':'th'];
+    if(!rh || !rh.__ready) return;                       // ยังโหลดไม่เสร็จ
+    const st=rsStreak(rh, tk); if(!st) return;
+    el.querySelectorAll('.stk-streak').forEach(e=>e.remove());
+    const sp=document.createElement('span');
+    sp.className='pill text-slate-400 stk-streak';
+    sp.title='RS '+st.rs+' ต่อเนื่อง '+st.rsDays+' แท่ง · อันดับ #'+st.rank+' ต่อเนื่อง '+st.rkDays+' แท่ง (นับวันทำการ · ข้อมูลถึง '+(st.asOf||'-')+')';
+    sp.textContent='RS นี้ '+st.rsDays+' วัน · #นี้ '+st.rkDays+' วัน';
+    el.appendChild(sp);
+  }catch(e){}
+}
 function rsStreak(rh, tk){
   try{
     const arr=rh&&rh.rs&&rh.rs[tk]; if(!arr||!arr.length) return null;
@@ -4387,7 +4402,7 @@ async function bsStamp(el,data){
   const s=await bsStockOf(tk,m); if(!s||!el.isConnected) return;
   const old=el.previousElementSibling; if(old&&old.classList.contains('bsw')) old.remove();
   const cb=bsClosed(data,m); if(!cb.length) return; const rh=await bsRsHist(m); if(!el.isConnected) return;
-  const r=bsEval(s,cb,bsRsAt(rh,tk,cb[cb.length-1].time)), badge='<span class="bsb bs-'+r.v+'" title="'+r.why.join('\n').replace(/"/g,'')+'">'+r.v+'</span>';
+  const r=bsEval(s,cb,(s&&Number.isFinite(Number(s.rs)))?Number(s.rs):bsRsAt(rh,tk,cb[cb.length-1].time)), badge='<span class="bsb bs-'+r.v+'" title="'+r.why.join('\n').replace(/"/g,'')+'">'+r.v+'</span>';
   const root=el.closest('.scard,.ldc'), slot=root&&root.querySelector('.bs-slot'); let host;
   if(slot){ slot.innerHTML=badge; host=slot; }   // ป้ายเล็กในหัวการ์ด ข้างลำดับ ไม่ทับกราฟ
   else{ const w=document.createElement('div'); w.className='bsw'; w.innerHTML='<span class="bsrow">'+badge+'</span>'; el.insertAdjacentElement('beforebegin',w); host=w.firstChild; }
@@ -4397,7 +4412,7 @@ async function bsModal(data,tk,m){
   const b=document.getElementById('modalBS'), w=document.getElementById('modalBSWhy'); if(!b||!data||!data.length||typeof data[data.length-1].time!=='string') return;
   const s=await bsStockOf(tk,m); if(activeTicker!==tk) return; if(!s){ b.innerHTML=''; return; }
   const cb=bsClosed(data,m); if(!cb.length) return; const rh=await bsRsHist(m); if(activeTicker!==tk) return;
-  const r=bsEval(s,cb,bsRsAt(rh,tk,cb[cb.length-1].time));
+  const r=bsEval(s,cb,(s&&Number.isFinite(Number(s.rs)))?Number(s.rs):bsRsAt(rh,tk,cb[cb.length-1].time));   // RS ที่ตัดสิน = ค่าเดียวกับรายการ (scan ฐานที่เลือก)
   if(r.v==='Buy'){ b.innerHTML='<span class="bsb in big bs-Buy" title="คิดจากแท่งที่ปิดแล้ว ณ '+r.asOf+'">Buy</span>'; if(w){ w.hidden=true; w.innerHTML=''; } }
   else{
     b.innerHTML='<button type="button" class="bsb in big bs-'+r.v+'" onclick="bsToggleWhy()" title="กดดูเหตุผล">'+r.v+' <small>กดดูเหตุผล ▾</small></button>';
@@ -5018,15 +5033,10 @@ function openModal(tk,nm,mkt){
     : (_rd<0 ? '<span class="pill neg" title="อันดับแย่ลงจากเมื่อวาน">▼ '+Math.abs(_rd)+'</span>' : '<span class="pill text-slate-500">—</span>'));
   const _rk = document.getElementById('modalRank');
   if(_rk) _rk.innerHTML = _rtag + _rdx;
-  // อยู่ค่า RS / อันดับนี้มากี่วันแล้ว — เติมแบบ async (ไม่บล็อกการเปิดป็อปอัป)
-  try{
-    if(_rk && _rt!=null) bsRsHist(mk).then(rh=>{
-      if(activeTicker!==tk || activeModal===undefined) return;
-      const st = rh ? rsStreak(rh, tk) : null; if(!st) return;
-      const el=document.getElementById('modalRank'); if(!el) return;
-      el.insertAdjacentHTML('beforeend','<span class="pill text-slate-400" title="RS '+st.rs+' ต่อเนื่อง '+st.rsDays+' แท่ง · อันดับ #'+st.rank+' ต่อเนื่อง '+st.rkDays+' แท่ง (นับวันทำการ · ข้อมูลถึง '+(st.asOf||'-')+')">RS นี้ '+st.rsDays+' วัน · #นี้ '+st.rkDays+' วัน</span>');
-    }).catch(()=>{});
-  }catch(e){}
+  // ป้ายนับวัน (RS/อันดับเดิมมากี่วัน) — เติมทันทีถ้ามีข้อมูลแล้ว และเติมอีกครั้งเมื่อโหลด rshist เสร็จ
+  bsStreakApply(tk, mk);
+  bsRsHist(mk).then(()=>{ if(document.getElementById('chartModal') && document.getElementById('chartModal').style.display!=='none') bsStreakApply(tk, mk); });
+
   // 4) แถวข้อมูลราคา/เปลี่ยน%/มูลค่าซื้อขาย/3M/กลุ่ม — ชุดเดียวกับที่การ์ดโชว์
   const _ms = document.getElementById('modalStats');
   if(_ms) _ms.innerHTML = found ? (
