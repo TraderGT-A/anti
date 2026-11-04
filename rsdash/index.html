@@ -2691,7 +2691,7 @@ async function bsScanLoad(m){
         // RS ที่แสดง/ตัดสิน = ค่า RS ของฐานที่เลือกจาก /api/scan (s.rs) — ให้ตัวเลขตรงกันทุกที่ (บอส 3 พ.ย.: TASCO ฟ้อง 94 vs 83)
         const _rsUse = (Number.isFinite(Number(s.rs)) ? Number(s.rs) : (e && e[2] != null ? e[2] : null));
         const it={s,gi:bsGrpOf(g,s),why:'',rsv:_rsUse,cl:e?e[3]:null};
-        if(!e){ miss.push(s); continue; }
+        if(!e){ continue; }   // ไม่มีสถานะในไฟล์ = ไม่มีสัญญาณ (ไม่คำนวณสดข้ามเกณฑ์สภาพคล่อง/RS ของไฟล์) — ให้ยอดบนเว็บตรงกับไฟล์เป๊ะ
         let f=e[1]; if(_rsUse!=null) f=(_rsUse>BS_RS)?(f&~8):(f|8);   // เกณฑ์ RS ใช้ตัวเลขเดียวกับที่โชว์
         const cd=(f&6)?0:(f&57)?1:2;   // Sell = แนวโน้มหลักเสีย (บิต 2,4) · Wait = ขาด 3M/RS/ย่อ/ปริมาณ (บิต 1,8,16,32)
         if(cd===0){ it.why=NM.filter(x=>(x[0]&6)&&(f&x[0])).map(x=>x[1]).join(' · '); out.Sell.push(it); }
