@@ -1249,6 +1249,7 @@ html #poBox .po-sec{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
             <option value="80">RS ≥ 80</option>
             <option value="90">RS ≥ 90</option>
     </select>
+    <button id="btnAllLow" class="tf-chip" onclick="toggleAllLow(this)" title="แสดงหุ้นทั้งกระดาน รวมตัวที่มูลค่าซื้อขายต่ำกว่าเกณฑ์สภาพคล่อง (ปกติซ่อนไว้)">รวมหุ้นสภาพคล่องต่ำ</button>
     <span class="wl-btns inline-flex items-center gap-1" title="ส่งออกรายชื่อนี้ไป Watchlist ของ TradingView: คัดลอกแล้ววางในช่อง Add symbol หรือดาวน์โหลด .txt แล้วใช้ Watchlist ▸ Import list"><button class="tf-chip" onclick="wlExport('stocks','copy',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg> TV</button><button class="tf-chip" onclick="wlExport('stocks','file',this)"><svg class="b-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> .txt</button></span>
             <select id="sortMain" onchange="setSortMain(this.value)" class="bg-[#0d1219] border border-[#243044] rounded-lg px-3 py-2 text-sm outline-none text-white" title="เรียงหลัก (ใช้ได้ทั้ง Card และ Table)">
       <option value="rs">เรียง: RS</option>
@@ -4411,7 +4412,7 @@ function bsStreakApply(tk, mk){
     const el=document.getElementById('modalRank'); if(!el || !tk) return;
     const rh=RSH_OBJ[mk==='america'?'us':'th'];
     if(!rh || !rh.__ready) return;                       // ยังโหลดไม่เสร็จ
-    const st=rsStreak(rh, tk); if(!st) return;
+    const st=rsStreak(rh, tk, mk); if(!st) return;
     el.querySelectorAll('.stk-streak').forEach(e=>e.remove());
     const sp=document.createElement('span');
     sp.className='pill text-slate-400 stk-streak';
@@ -4420,14 +4421,21 @@ function bsStreakApply(tk, mk){
     el.appendChild(sp);
   }catch(e){}
 }
-function rsStreak(rh, tk){
+let _mcCache={mk:null,map:{}};
+function mcapMapOf(mk){ if(_mcCache.mk===mk) return _mcCache.map; const m={}; try{ (stockDB[mk]||[]).forEach(s=>{ if(s&&s.ticker) m[s.ticker]=s.mcap||0; }); }catch(e){} _mcCache={mk,map:m}; return m; }
+function rsStreak(rh, tk, mk){
   try{
     const arr=rh&&rh.rs&&rh.rs[tk]; if(!arr||!arr.length) return null;
     const L=arr.length-1; const my=arr[L]; if(!(my>0)) return null;
-    // อันดับต้อง "ไม่ซ้ำ" — หุ้น RS เท่ากันให้เรียงตามชื่อย่อ (ticker) เป็นตัวตัดสิน ไม่งั้นหุ้น RS 99 หลายตัวจะอ้างเป็น #1 พร้อมกัน
+    // อันดับต้องตรงกับที่ API คิด: RS มาก→น้อย · เท่ากันดูมูลค่าตลาด (ใหญ่ก่อน) · แล้วชื่อย่อ
     const others=Object.entries(rh.rs).filter(([k])=>k!==tk);
+    const mc=mcapMapOf(mk||currentMarket);
+    const myMc=Number(mc[tk])||0;
     const rankAt=d=>{ const base=arr[d]; if(!(base>0)) return null; let n=1;
-      for(const [t,a] of others){ const v=a[d]; if(v==null) continue; if(v>base) n++; } return n; };   // RS เท่ากัน = อันดับเดียวกัน
+      for(const [t,a] of others){ const v=a[d]; if(v==null) continue;
+        if(v>base) n++;
+        else if(v===base){ const o=Number(mc[t])||0; if(o>myMc||(o===myMc&&t<tk)) n++; }
+      } return n; };   // RS เท่ากัน = อันดับเดียวกัน
     const tieN=others.filter(([,a])=>a[L]===arr[L]).length+1;   // จำนวนหุ้นที่ RS เท่ากัน ณ แท่งล่าสุด
     const rNow=rankAt(L); if(rNow==null) return null;
     let dRs=1; for(let d=L-1; d>=0; d--){ if(arr[d]!==my) break; dRs++; }
@@ -4822,6 +4830,13 @@ function renderThemes(){
     </div>`).join('');
 }
 
+let RD_ALL = false;   // รวมหุ้นสภาพคล่องต่ำ (universe=all) — บอส 4 พ.ย.
+function toggleAllLow(btn){
+  RD_ALL = !RD_ALL;
+  const b = btn || document.getElementById('btnAllLow');
+  if(b) b.classList.toggle('active', RD_ALL);
+  runUpdate(true);
+}
 async function runUpdate(force){
   const btn=document.getElementById('btnUpdate');
   btn.disabled=true; startTimer(); setProgress(5,'⏳ เชื่อมต่อ...');
@@ -4830,7 +4845,7 @@ async function runUpdate(force){
   try{
     setProgress(15,'สแกน '+(currentMarket==='america'?'ตลาดอเมริกา (US)':'ตลาดไทย')+' (TradingView)...');
     const mk0=currentMarket;   // จำตลาดตอนยิง — ถ้าผู้ใช้สลับตลาดระหว่างรอ ห้ามเอาผลของตลาดเก่ามาทับ
-    const res=await fetch(API+'/api/scan?market='+mk0+(force?'&force=1':''));
+    const res=await fetch(API+'/api/scan?market='+mk0+(RD_ALL?'&universe=all':'')+(force?'&force=1':''));
     if(!res.ok) throw new Error('HTTP '+res.status);
     setProgress(60,'คำนวณ RS / จัดกลุ่ม...');
     const data=await res.json(); if(data.error) throw new Error(data.error);

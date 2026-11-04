@@ -32,16 +32,19 @@ async function closedMaps(market) {
 }
 function applyClosedRS(cl, rows) {
   if (!cl || !cl.closed) return rows;
-  const rankOf = (f, v) => { let n = 1; for (let x = v + 1; x < 100; x++) n += f[x]; return n; };
+  // อันดับต้องไม่ซ้ำ: RS เท่ากัน → เรียงต่อด้วยมูลค่าตลาด (ใหญ่ก่อน) แล้วตามชื่อย่อ
   const MAP = [["rs", "rT_full"], ["rs3", "rT3"], ["rs6", "rT6"], ["rs1", "rT1"]];
-  for (const s of rows) {
-    for (const [fld, rf] of MAP) {
+  for (const [fld, rf] of MAP) {
+    const list = [];
+    for (const s of rows) {
       const v = cl.closed[fld] && cl.closed[fld][s.ticker];
-      if (v == null) continue;
-      s[fld] = v; s[rf] = rankOf(cl.freq[fld], v);
+      if (v != null) s[fld] = v;
+      if (s[fld] != null) list.push(s);   // ตัวที่ไม่มีค่าในไฟล์ ใช้ค่าเดิมของ scan แต่นับอันดับรวมด้วย (กันเลขซ้ำ/ข้าม)
     }
-    if (cl.asOf) s.rsAsOf = cl.asOf;
+    list.sort((a, b) => (b[fld] - a[fld]) || ((b.mcap || 0) - (a.mcap || 0)) || String(a.ticker).localeCompare(String(b.ticker)));
+    list.forEach((s, i) => { s[rf] = i + 1; });
   }
+  if (cl.asOf) rows.forEach(s => { s.rsAsOf = cl.asOf; });
   return rows;
 }
 
@@ -177,7 +180,7 @@ export default async function handler(req, res) {
   }
 
   // Simple in-memory TTL cache per (market) — เฉพาะ scan ปกติ (universe ว่าง)
-  const CACHE_VER = 'closed1';   // เปลี่ยนเมื่อนิยาม RS/อันดับเปลี่ยน (กัน in-memory cache คืนค่าเก่า)
+  const CACHE_VER = 'closed3';   // เปลี่ยนเมื่อนิยาม RS/อันดับเปลี่ยน (กัน in-memory cache คืนค่าเก่า)
   const ck = global.__scanCache?.[market + '|' + CACHE_VER];
   if (ck && ck.data && (force ? now - ck.ts < FORCE_COOLDOWN_MS : now - ck.ts < 300_000)) {
     return res.status(200).json(ck.data);
