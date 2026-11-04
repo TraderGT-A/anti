@@ -1680,7 +1680,9 @@ function toggleSortDir(){
 function sortNow(a,b){
   let c=sortCmp(a,b,sortKey||'rs',sortAsc);
   if(c===0 && (sortKey||'rs')==='rs'){
-    c = (b.score||0) - (a.score||0);
+    // RS เท่ากัน → เรียงตาม "อันดับจริง" (rT) ให้แถวเรียง 1,2,3 ตรงกับเลข # ที่แสดง
+    const ra=(a.rT==null?1e9:a.rT), rb=(b.rT==null?1e9:b.rT);
+    c = ra - rb;
     if(sortAsc) c = -c;
   }
   if(c===0 && sortKey2 && sortKey2!==sortKey) c=sortCmp(a,b,sortKey2,sortAsc2);
@@ -1920,7 +1922,7 @@ function renderEarnPanel(){
 function renderTopRs(){
   try{ renderEarnPanel(); }catch(e){}
   const tb=document.getElementById('topRsBody'); if(!tb) return;
-  const list=(stockData||[]).filter(s=>Number.isFinite(s.rs)).slice().sort((a,b)=>(b.rs-a.rs)||((b.score||0)-(a.score||0))).slice(0,8);
+  const list=(stockData||[]).filter(s=>Number.isFinite(s.rs)).slice().sort((a,b)=>((a.rT==null?1e9:a.rT)-(b.rT==null?1e9:b.rT))||(b.rs-a.rs)).slice(0,8);
   if(!list.length){ tb.innerHTML='<tr><td colspan="6" class="trs-empty">กำลังโหลด…</td></tr>'; return; }
   const pc=(v)=>Number.isFinite(v)?('<i class="ar">'+(v>=0?'▲':'▼')+'</i> '+Math.abs(v).toFixed(1)+'%'):'–';
   const cl=(v)=>Number.isFinite(v)?(v>=0?'pos':'neg'):'';
