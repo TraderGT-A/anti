@@ -26,11 +26,11 @@ async function closedMaps(market) {
       }
       closed[k] = m; freq[k] = f;
     }
-    CLOSED_CACHE[market] = { closed, freq, asOf: dj.sigAsOf || null };
+    CLOSED_CACHE[market] = { closed, freq, asOf: dj.sigAsOf || null, rk: { rs3: dj.rk3 || null, rs6: dj.rk6 || null, rs1: dj.rk1 || null }, sc: { rs3: dj.sc3 || null, rs6: dj.sc6 || null, rs1: dj.sc1 || null }, universe: dj.universe || 0 };
   } catch (e) { CLOSED_CACHE[market] = null; }
   return CLOSED_CACHE[market];
 }
-function applyClosedRS(cl, rows) {
+function applyClosedRS(cl, rows, fullMarket) {
   if (!cl || !cl.closed) return rows;
   // อันดับต้องไม่ซ้ำ: RS เท่ากัน → เรียงต่อด้วยมูลค่าตลาด (ใหญ่ก่อน) แล้วตามชื่อย่อ
   // อันดับ: RS มาก→น้อย · RS เท่ากันดู "ผลตอบแทนของฐานนั้น" มากก่อน (ตรงกับคอลัมน์ที่ผู้ใช้เห็น) · แล้วมูลค่าตลาด · แล้วชื่อย่อ
@@ -42,8 +42,23 @@ function applyClosedRS(cl, rows) {
       if (v != null) s[fld] = v;
       if (s[fld] != null) list.push(s);   // ตัวที่ไม่มีค่าในไฟล์ ใช้ค่าเดิมของ scan แต่นับอันดับรวมด้วย (กันเลขซ้ำ/ข้าม)
     }
-    list.sort((a, b) => (b[fld] - a[fld]) || ((b[retF] ?? -1e9) - (a[retF] ?? -1e9)) || ((b.mcap || 0) - (a.mcap || 0)) || String(a.ticker).localeCompare(String(b.ticker)));
-    list.forEach((s, i) => { s[rf] = i + 1; });
+    // อันดับ: เรียงตาม RS ที่โชว์ก่อน → คะแนนดิบ (ทศนิยม) → มูลค่าตลาด → ชื่อย่อ
+    const rkMap = cl.rk && cl.rk[fld], scMap = cl.sc && cl.sc[fld];
+    const fullSet = !!fullMarket;   // true = ชุดทั้งตลาด (ใช้เลขอันดับจากไฟล์) · false = ชุดกรอง (นับใหม่ต่อเนื่อง)
+    const scv = (s) => (scMap && scMap[s.ticker] != null ? scMap[s.ticker] : -1e9);
+    list.sort((a, b) => (b[fld] - a[fld]) || (scv(b) - scv(a)) || ((b.mcap || 0) - (a.mcap || 0)) || String(a.ticker).localeCompare(String(b.ticker)));
+    // ชุดกรอง → คิด RS ใหม่ภายในชุดนี้ (เปอร์เซ็นไทล์จากคะแนนดิบ) ตามที่บอสกำหนด
+    if (!fullMarket && scMap) {
+      const n = list.length;
+      list.forEach((x, i) => { x[fld] = Math.max(1, Math.min(99, Math.round(((n - i) / Math.max(1, n)) * 99))); });
+    }
+    if (fullSet && rkMap && Object.keys(rkMap).length) {
+      let mx = 0; list.forEach(s => { const r = rkMap[s.ticker]; if (r != null && r > mx) mx = r; });
+      let next = mx + 1;
+      list.forEach(s => { const r = rkMap[s.ticker]; s[rf] = (r != null ? r : next++); });
+    } else {
+      list.forEach((s, i) => { s[rf] = i + 1; });   // ชุดกรอง → อันดับต่อเนื่องในชุดนี้
+    }
   }
   if (cl.asOf) rows.forEach(s => { s.rsAsOf = cl.asOf; });
   return rows;
@@ -170,7 +185,7 @@ export default async function handler(req, res) {
       // อันดับต้องชุดเดียวกับหน้า RS Ranking ปกติ (นับบนชุดที่ผ่านเกณฑ์สภาพคล่อง) — กันเลขไม่ตรงกันระหว่างหน้า
       try {
         const cl = await closedMaps(market);
-        applyClosedRS(cl, rows);
+        applyClosedRS(cl, rows, true);
       } catch (e) {}
       const payload = {
         market, universe: "all", source: "tradingview_scan_common",
@@ -185,7 +200,7 @@ export default async function handler(req, res) {
   }
 
   // Simple in-memory TTL cache per (market) — เฉพาะ scan ปกติ (universe ว่าง)
-  const CACHE_VER = 'closed12';   // เปลี่ยนเมื่อนิยาม RS/อันดับเปลี่ยน (กัน in-memory cache คืนค่าเก่า)
+  const CACHE_VER = 'closed16';   // เปลี่ยนเมื่อนิยาม RS/อันดับเปลี่ยน (กัน in-memory cache คืนค่าเก่า)
   const ck = global.__scanCache?.[market + '|' + CACHE_VER];
   if (ck && ck.data && (force ? now - ck.ts < FORCE_COOLDOWN_MS : now - ck.ts < 300_000)) {
     return res.status(200).json(ck.data);

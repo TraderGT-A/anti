@@ -106,24 +106,40 @@ export async function computeMarket(mk) {
   const start = back.findIndex((b) => b.every((i) => i >= 0));
   if (start < 0) throw new Error(mk + ": ประวัติราคาสั้นเกินไป");
   const outDates = dates.slice(start), rs = {}; tk.forEach((t) => (rs[t] = new Array(outDates.length).fill(0)));
-  // RS แยกฐาน 3M/6M/1Y (บอส 3 พ.ย. 26: "เลือก RS ค่าไหนทุกสูตรเปลี่ยนหมดตามค่า" — สัญญาณ Buy RS>60 ต้องเป็น RS ของฐานที่เลือก)
-  const rsB = { rs3: {}, rs6: {}, rs1: {} }; tk.forEach((t) => { rsB.rs3[t] = new Array(outDates.length).fill(0); rsB.rs6[t] = new Array(outDates.length).fill(0); rsB.rs1[t] = new Array(outDates.length).fill(0); });
+  // ── RS ตามนิยามใหม่ (บอส 4 พ.ย. 26): ทุก TF ใช้สูตรเดียวกันถ่วง 0.3/0.3/0.2/0.2 กับหน้าต่าง 1/12, 1/4, 1/2, เต็ม ของ TF ──
+  // 3M = 63 แท่ง · 6M = 126 · 1Y = 252 (ราคาปิดเท่านั้น) · rs (คอลัมน์เดิม) = ชุด 1Y
+  const TFS = [["rs3", 63], ["rs6", 126], ["rs1", 252]];
+  const W4 = [0.3, 0.3, 0.2, 0.2];
+  const offsOf = (n) => [Math.round(n / 12), Math.round(n / 4), Math.round(n / 2), n];
+  const lastSc = { rs3: [], rs6: [], rs1: [] };   // คะแนนทศนิยม (ใช้จัดอันดับให้ไม่ซ้ำ)
+  const rsB = { rs3: {}, rs6: {}, rs1: {} };
+  tk.forEach((t) => { rsB.rs3[t] = new Array(outDates.length).fill(0); rsB.rs6[t] = new Array(outDates.length).fill(0); rsB.rs1[t] = new Array(outDates.length).fill(0); });
   for (let t = start; t < T; t++) {
-    const sc = [], scB = { rs3: [], rs6: [], rs1: [] };
+    const buckets = { rs3: [], rs6: [], rs1: [] };
     for (let k = 0; k < N; k++) {
-      const c = C[k]; if (c[t] == null) continue; let s = 0, ok = true;
-      const pr = [0, 0, 0];
-      for (let q = 0; q < LBM.length; q++) {
-        const p = c[back[t][q]]; if (p == null || !(p > 0)) { ok = false; break; }
-        const r = (c[t] / p - 1) * 100; s += LBM[q][1] * r;
-        if (q > 0) pr[q - 1] = r;   // q=1 → 3M · q=2 → 6M · q=3 → 12M
+      const c = C[k]; if (c[t] == null || !(c[t] > 0)) continue;
+      for (const [bk, n] of TFS) {
+        const offs = offsOf(n);
+        let sum = 0, ok = true;
+        for (let q = 0; q < 4; q++) {
+          const i = t - offs[q];
+          if (i < 0) { ok = false; break; }
+          const pv = c[i];
+          if (pv == null || !(pv > 0)) { ok = false; break; }
+          sum += W4[q] * (c[t] / pv - 1) * 100;
+        }
+        if (ok) buckets[bk].push([k, sum]);
       }
-      if (ok) { sc.push([k, s]); scB.rs3.push([k, pr[0]]); scB.rs6.push([k, pr[1]]); scB.rs1.push([k, pr[2]]); }
     }
-    sc.sort((a, b) => b[1] - a[1]);
-    sc.forEach(([k], i) => { rs[tk[k]][t - start] = pctile(i, sc.length); });
-    for (const bk of ['rs3', 'rs6', 'rs1']) { const arr = scB[bk]; arr.sort((a, b) => b[1] - a[1]); arr.forEach(([k], i) => { rsB[bk][tk[k]][t - start] = pctile(i, arr.length); }); }
+    for (const bk of ["rs3", "rs6", "rs1"]) {
+      const arr = buckets[bk]; arr.sort((a, b) => b[1] - a[1]);
+      arr.forEach(([k], i) => { rsB[bk][tk[k]][t - start] = pctile(i, arr.length); });
+    }
+    if (t === T - 1) for (const bk of ["rs3", "rs6", "rs1"]) lastSc[bk] = buckets[bk].map(([k, v]) => [tk[k], v]);
+    // คอลัมน์ rs เดิม = ชุด 1Y (ให้โค้ดเก่าที่ยังอ่าน rs ทำงานได้)
+    for (let j = 0; j < outDates.length; j++) { /* เติมด้านล่างหลังจบ loop */ }
   }
+  for (const t of tk) { for (let j = 0; j < outDates.length; j++) { rs[t][j] = rsB.rs1[t][j] || rs[t][j]; } }
   // ตรวจเทียบกับ RS ปัจจุบันจากระบบ (ต่างได้เล็กน้อยเพราะนิยามช่วงเวลา)
   const cur = new Map(got.filter((s) => shown.has(s.ticker)).map((s) => [s.ticker, Number(s.rs)])); let n = 0, abs = 0, within5 = 0, same70 = 0;
   for (const t of tk) { if (!shown.has(t)) continue; const a = rs[t][outDates.length - 1], b = cur.get(t); if (a > 0 && b > 0) { n++; abs += Math.abs(a - b); if (Math.abs(a - b) <= 5) within5++; if ((a > 70) === (b > 70)) same70++; } }
@@ -205,7 +221,13 @@ export async function computeMarket(mk) {
   const cnt3 = [0, 0, 0]; Object.values(sig).forEach((x) => cnt3[x[0]]++); log(mk, "สัญญาณ ณ", outDates[Li], "· Sell", cnt3[0], "Wait", cnt3[1], "Buy", cnt3[2]);
   const rsOut = {}; for (const t of tk) rsOut[t] = rs[t];   // เก็บเฉพาะหุ้นที่แสดงในแดชบอร์ด (จัดอันดับใช้ทั้งตลาด)
   const rsBOut = {}; for (const bk of ['rs3', 'rs6', 'rs1']) { rsBOut[bk] = {}; for (const t of tk) rsBOut[bk][t] = rsB[bk][t]; }
-  const j = { generatedAt: new Date().toISOString(), mk, dates: outDates, rs: rsOut, rs3: rsBOut.rs3, rs6: rsBOut.rs6, rs1: rsBOut.rs1, sig3: sigB.rs3, sig6: sigB.rs6, sig1: sigB.rs1, liq: liqNow, liqMin: LIQ_MIN, sigDate, bh3: buy7s.rs3, bh6: buy7s.rs6, bh1: buy7s.rs1, sig, bh: buy7, sigAsOf: outDates[Li], universe: N, shown: Object.keys(rsOut).length, check: { n, meanAbsDiff: +(abs / n).toFixed(2), within5: +(within5 / n).toFixed(3), same70: +(same70 / n).toFixed(3) } };
+  const rkF = { rs3: {}, rs6: {}, rs1: {} };
+  for (const bk of ["rs3", "rs6", "rs1"]) { const a = lastSc[bk].slice().sort((x, y) => y[1] - x[1]); a.forEach(([t], i) => { rkF[bk][t] = i + 1; }); }
+  const j = { generatedAt: new Date().toISOString(), mk, dates: outDates, rs: rsOut, rs3: rsBOut.rs3, rs6: rsBOut.rs6, rs1: rsBOut.rs1,
+    rk3: rkF.rs3, rk6: rkF.rs6, rk1: rkF.rs1,
+    // คะแนนดิบ (ทศนิยม) แท่งล่าสุด — ให้ /api/scan จัดอันดับชุดที่กรองเองได้แบบไม่ปัดเศษ
+    sc3: Object.fromEntries(lastSc.rs3), sc6: Object.fromEntries(lastSc.rs6), sc1: Object.fromEntries(lastSc.rs1),
+    sig3: sigB.rs3, sig6: sigB.rs6, sig1: sigB.rs1, liq: liqNow, liqMin: LIQ_MIN, sigDate, bh3: buy7s.rs3, bh6: buy7s.rs6, bh1: buy7s.rs1, sig, bh: buy7, sigAsOf: outDates[Li], universe: N, shown: Object.keys(rsOut).length, check: { n, meanAbsDiff: +(abs / n).toFixed(2), within5: +(within5 / n).toFixed(3), same70: +(same70 / n).toFixed(3) } };
   const f = path.join(OUT, `rshist_${mk}.json`); fs.writeFileSync(f + ".tmp", JSON.stringify(j)); fs.renameSync(f + ".tmp", f);
   // พ่น data.js ให้ Vercel serverless (/api/scan) import ได้แน่นอน (บอส 3 พ.ย.: CNT เกิดสัญญาณเมื่อวาน วันนี้หาย — ให้หุ้นข้อสถานะอยู่ครบไม่หายกลางวัน)
   const fData = path.resolve(OUT, "api", "_lib", `rshist_${mk}_data.js`);
