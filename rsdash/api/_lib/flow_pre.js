@@ -16,7 +16,7 @@ function etNow() {
   const session = (dow === 0 || dow === 6) ? "closed" : mins >= 240 && mins < 750 ? "pre" : mins >= 750 && mins < 960 ? "open" : "closed";   // เปิด 09:30 ET
   return { off, session, label: String(et.getUTCHours()).padStart(2, "0") + ":" + String(et.getUTCMinutes()).padStart(2, "0") };
 }
-export async function preopenSummary() {
+export async function preopenSummary(full) {
   const COLS = ["name","premarket_close","premarket_volume","premarket_change","sector","market_cap_basic","close","volume"];
   const r = await fetch("https://scanner.tradingview.com/america/scan", {
     method: "POST", headers: { "Content-Type": "application/json" },
@@ -42,8 +42,10 @@ export async function preopenSummary() {
   const sectors = Object.values(sm).map(s => ({ ...s, chg: s.val ? Math.round((s.wsum / s.val) * 100) / 100 : 0 }))
     .filter(s => s.n >= 3).sort((a, b) => b.chg - a.chg);
   const et = etNow();
-  return { t: Date.now(), asOfET: et.label, session: et.session, tzOff: et.off, n, up, down, val: Math.round(valAll), valMin: VAL_MIN,
+  const out = { t: Date.now(), asOfET: et.label, session: et.session, tzOff: et.off, n, up, down, val: Math.round(valAll), valMin: VAL_MIN,
            top: items.slice(0, 15), bottom: items.slice(-15).reverse(), sectors };
+  if (full) out.items = items.slice(0, 2500);   // ให้หน้าเว็บทำมุมมองกลุ่ม/รายตัวเองได้
+  return out;
 }
 
 

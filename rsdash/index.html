@@ -954,6 +954,12 @@ html #poBox .po-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-
 html #poBox .po-h{font-size:11px;color:var(--faint);letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
 html #poBox .po-sec{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
 @media(max-width:640px){ html #poBox .po-2col{grid-template-columns:1fr} }
+#poBox .po-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:6px}
+#poBox .po-c{background:var(--panel,rgba(255,255,255,.03));border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer}
+#poBox .po-c:hover{border-color:var(--gold)}
+#poBox .po-ct{display:flex;justify-content:space-between;gap:6px;font-size:12.5px}
+#poBox .po-cs{color:var(--faint);font-size:11px;margin:2px 0 4px}
+#poBox .po-cm{display:flex;flex-wrap:wrap;gap:6px;font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body class="py-3 sm:py-4 md:py-6">
@@ -2319,53 +2325,68 @@ function pfFilters(){
     '<span class="grp"><span class="lbl">กรองผลตอบแทน '+lbl+'</span>'+pfChips('pf',[['all','ทั้งหมด'],['pos','เฉพาะบวก (+)'],['neg','เฉพาะลบ (−)'],['10','≥ +10%'],['20','≥ +20%'],['50','≥ +50%']],PF.pf)+'</span>';
 }
 
-/* ── Pre-open (US): บรรยากาศก่อนตลาดสหรัฐเปิด — ดึง /api/flow?kind=preopen (TradingView premarket) ──
-   แสดงเฉพาะตลาด US · ตัวเลขกรองมูลค่า pre-market ≥ $1M · เวลาอ้างอิงนิวยอร์ก (ET) */
-const PO={d:null,ts:0,busy:false,tm:null};
-function poMoney(v){ v=Number(v)||0; return v>=1e9?(v/1e9).toFixed(2)+'B':(v/1e6).toFixed(0)+'M'; }
+/* ── Pre-open (US): บรรยากาศก่อนตลาดสหรัฐเปิด — ใช้ตัวเลือกแบบเดียวกับ Perf (กลุ่ม/รายตัว + การ์ด) ── */
+const PO={d:null,ts:0,busy:false,tm:null,view:'group',sort:'chg',topn:50,min:1e6,sel:'all'};
+function poMoney(v){ v=Number(v)||0; return v>=1e9?(v/1e9).toFixed(2)+'B':v>=1e6?(v/1e6).toFixed(0)+'M':Math.round(v).toLocaleString(); }
 function poCls(x){ return x>0?'pos':(x<0?'neg':''); }
+function poPc(x){ return '<span class="'+poCls(x)+'">'+(x>0?'+':'')+Number(x||0).toFixed(2)+'%</span>'; }
+function poSet(k,v){ if(k==='view'||k==='sort'||k==='sel') PO[k]=v; else if(k==='topn'||k==='min') PO[k]=Number(v); poDraw(); }
+function poPickSec(s){ PO.sel=s; PO.view='stock'; poDraw(); }
 function poRow(x){
-  return '<div class="po-r" onclick="openModalByTk(\''+x.t+'\')"><b>'+x.t+'</b>'+
-    '<span class="'+poCls(x.chg)+'">'+(x.chg>0?'+':'')+x.chg.toFixed(2)+'%</span>'+
-    '<small>'+poMoney(x.val)+'</small><i>'+String(x.sec||'').slice(0,18)+'</i></div>';
+  return '<tr onclick="openModalByTk(\''+x.t+'\')"><td class="nm"><b>'+x.t+'</b><i class="mf-tk">'+String(x.sec||'')+'</i></td><td class="r">'+fNum(x.px)+'</td><td class="r">'+poPc(x.chg)+'</td><td class="r">'+poMoney(x.val)+'</td></tr>';
 }
 function poDraw(){
-  const el=document.getElementById('poBox'); if(!el) return;
-  const d=PO.d;
+  const el=document.getElementById('poBox'); if(!el) return; const d=PO.d;
   if(!d){ el.innerHTML=''; return; }
-  if(d.err){ el.innerHTML='<h3>Pre-open · สหรัฐ</h3><div class="mu">โหลดข้อมูล pre-market ไม่สำเร็จ</div>'; return; }
+  if(d.err||!d.items&&!d.top){ el.innerHTML='<h3>Pre-open · สหรัฐ</h3><div class="mu">โหลดข้อมูล pre-market ไม่สำเร็จ</div>'; return; }
   const st={pre:['ก่อนเปิด','#f59e0b'],open:['ตลาดเปิดแล้ว','#10b981'],closed:['ตลาดปิด','#64748b']}[d.session]||['-','#64748b'];
-  const stale=(d.session!=='pre');
-  const tot='<div class="po-tot">หุ้นมีราคา pre '+d.n+' ตัว · เขียว '+d.up+' · แดง '+d.down+' · มูลค่าซื้อขาย '+poMoney(d.val)+' USD</div>';
-  const head='<h3>Pre-open · สหรัฐ <small><span class="pill" style="color:'+st[1]+'">'+st[0]+' · '+d.asOfET+' ET</span>'+(stale?' <span class="pill">ตัวเลขรอบ pre-market ล่าสุด (ไม่ใช่ราคาปัจจุบัน)</span>':'')+'</small></h3>';
-  const top=(d.top||[]).slice(0,10).map(poRow).join(''), bot=(d.bottom||[]).slice(0,10).map(poRow).join('');
+  const stale=d.session!=='pre';
+  const head='<h3>Pre-open · สหรัฐ <small><span class="pill" style="color:'+st[1]+'">'+st[0]+' · '+(d.asOfET||'-')+' ET</span>'+(stale?' <span class="pill">ตัวเลขรอบ pre-market ล่าสุด</span>':'')+'</small></h3>'+
+    '<div class="po-tot">หุ้นมีราคา pre '+d.n+' ตัว · เขียว '+d.up+' · แดง '+d.down+' · มูลค่าซื้อขาย '+poMoney(d.val)+' USD</div>';
+  const items=(d.items||[]).filter(x=>x.val>=(PO.min||0));
+  const chips='<div class="mf-tools"><span class="grp"><span class="lbl">มุมมอง</span><button class="tf-chip'+(PO.view==='group'?' active':'')+'" onclick="poSet(\'view\',\'group\')">กลุ่ม</button><button class="tf-chip'+(PO.view==='stock'?' active':'')+'" onclick="poSet(\'view\',\'stock\')">รายตัว</button></span>'+
+    '<span class="grp"><span class="lbl">เรียงตาม</span><button class="tf-chip'+(PO.sort==='chg'?' active':'')+'" onclick="poSet(\'sort\',\'chg\')">% เปลี่ยน</button><button class="tf-chip'+(PO.sort==='val'?' active':'')+'" onclick="poSet(\'sort\',\'val\')">มูลค่า</button></span>'+
+    '<span class="grp"><span class="lbl">มูลค่า pre ≥</span>'+[[1e6,'$1M'],[5e6,'$5M'],[1e7,'$10M']].map(([v,l])=>'<button class="tf-chip'+(PO.min===v?' active':'')+'" onclick="poSet(\'min\',\''+v+'\')">'+l+'</button>').join('')+'</span>'+
+    (PO.view==='stock'?'<span class="grp"><span class="lbl">จำนวน</span>'+[[20,'Top 20'],[50,'Top 50'],[0,'ทั้งหมด']].map(([v,l])=>'<button class="tf-chip'+(PO.topn===v?' active':'')+'" onclick="poSet(\'topn\',\''+v+'\')">'+l+'</button>').join('')+'</span>'+(PO.sel!=='all'?'<span class="grp"><button class="tf-chip active" onclick="poSet(\'sel\',\'all\')">'+PO.sel+' ✕</button></span>':''):'')+'</div>';
+  let body='';
+  if(PO.view==='group'){
+    const g={}; items.forEach(x=>{ const k=x.sec||'Other'; (g[k]=g[k]||[]).push(x); });
+    const cards=Object.values(g).filter(a=>a.length>=2).map(a=>{
+      const v=a.reduce((s,x)=>s+x.val,0), w=a.reduce((s,x)=>s+x.chg*x.val,0), chg=v?w/v:0;
+      const up=a.filter(x=>x.chg>0).length, dn=a.filter(x=>x.chg<0).length;
+      a.sort((p,q)=>q.chg-p.chg);
+      return {sec:a[0].sec,n:a.length,chg,val:v,up,dn,a};
+    }).sort((p,q)=>PO.sort==='val'?q.val-p.val:q.chg-p.chg);
+    body='<div class="po-cards">'+cards.map(c=>'<div class="po-c" onclick="poPickSec(\''+String(c.sec).replace(/'/g,'')+'\')"><div class="po-ct"><b>'+c.sec+'</b><span class="'+poCls(c.chg)+'">'+(c.chg>0?'+':'')+c.chg.toFixed(2)+'%</span></div>'+
+      '<div class="po-cs">'+c.n+' ตัว · เขียว '+c.up+' แดง '+c.dn+' · '+poMoney(c.val)+'</div>'+
+      '<div class="po-cm">'+c.a.slice(0,3).map(x=>'<span>'+x.t+' <i class="'+poCls(x.chg)+'">'+(x.chg>0?'+':'')+x.chg.toFixed(1)+'%</i></span>').join('')+'</div></div>').join('')+'</div>'+
+      '<div class="mu" style="font-size:11px;padding:6px 2px">กดการ์ดกลุ่ม = ดูรายตัวในกลุ่มนั้น · กรองเฉพาะหุ้นที่มีมูลค่าซื้อขาย pre ≥ '+poMoney(PO.min)+'</div>';
+  } else {
+    let rows=items.filter(x=>PO.sel==='all'||x.sec===PO.sel);
+    rows.sort((a,b)=>PO.sort==='val'?b.val-a.val:b.chg-a.chg);
+    const tot=rows.length; if(PO.topn>0) rows=rows.slice(0,PO.topn);
+    body='<div class="mf-scroll"><table class="mf-tbl mf-fv"><thead><tr><th>หุ้น ('+tot+' ตัว)</th><th class="r">ราคา pre</th><th class="r">% เปลี่ยน</th><th class="r">มูลค่า</th></tr></thead><tbody>'+
+      (rows.length?rows.map(poRow).join(''):'<tr><td colspan="4" class="mu">ไม่มีหุ้นเข้าเงื่อนไข</td></tr>')+'</tbody></table></div>';
+  }
   const secs=(d.sectors||[]);
-  const secHtml='<div class="po-sec">'+secs.slice(0,5).map(s=>'<span class="pill"><b>'+s.sec+'</b> <span class="'+poCls(s.chg)+'">'+(s.chg>0?'+':'')+s.chg.toFixed(2)+'%</span></span>').join('')+
-    (secs.length?'<span class="mu">· อ่อนสุด: </span>'+secs.slice(-3).reverse().map(s=>'<span class="pill"><b>'+s.sec+'</b> <span class="'+poCls(s.chg)+'">'+s.chg.toFixed(2)+'%</span></span>').join(''):'')+'</div>';
-  el.innerHTML=head+tot+'<div class="po-2col"><div><div class="po-h">ขึ้นแรงสุด</div>'+top+'</div><div><div class="po-h">ลงแรงสุด</div>'+bot+'</div></div>'+secHtml+
-    '<div class="mu" style="font-size:11px">ข้อมูล pre-market ดีเลย์ ~15 นาที · กรองเฉพาะตัวที่มีมูลค่าซื้อขาย ≥ $1M · ใช้ดูบรรยากาศ ไม่ใช่สัญญาณซื้อขาย</div>';
+  const secBar=secs.length?'<div class="po-sec"><span class="mu">แรงสุด:</span>'+secs.slice(0,4).map(s=>'<span class="pill" onclick="poPickSec(\''+String(s.sec).replace(/'/g,'')+'\')" style="cursor:pointer"><b>'+s.sec+'</b> '+poPc(s.chg)+'</span>').join('')+
+    '<span class="mu">· อ่อนสุด:</span>'+secs.slice(-3).reverse().map(s=>'<span class="pill" onclick="poPickSec(\''+String(s.sec).replace(/'/g,'')+'\')" style="cursor:pointer"><b>'+s.sec+'</b> '+poPc(s.chg)+'</span>').join('')+'</div>':'';
+  el.innerHTML=head+chips+body+secBar+'<div class="mu" style="font-size:11px;padding:4px 2px 8px">ข้อมูล pre-market ดีเลย์ ~15 นาที · ใช้ดูบรรยากาศก่อนเปิด ไม่ใช่สัญญาณซื้อขาย · กดแถว/การ์ด = เปิดกราฟ</div>';
 }
-function poTick(){
-  if(currentMarket!=='america') return;
-  poLoad();
-}
+function poTick(){ if(currentMarket!=='america') return; poLoad(); }
 async function poLoad(){
-  if(currentMarket!=='america'||PO.busy) return;
-  PO.busy=true;
-  try{ const r=await fetch(API+'/api/flow?kind=preopen'); const j=await r.json(); PO.d=j||{err:1}; PO.ts=Date.now(); }
+  if(currentMarket!=='america'||PO.busy) return; PO.busy=true;
+  try{ const r=await fetch(API+'/api/flow?kind=preopen&full=1'); const j=await r.json(); PO.d=j||{err:1}; PO.ts=Date.now(); }
   catch(e){ if(!PO.d) PO.d={err:1}; }
-  PO.busy=false; poDraw();
-  clearTimeout(PO.tm);
-  const pre=(PO.d&&PO.d.session==='pre');
-  PO.tm=setTimeout(poTick, pre?60000:600000);   // ช่วง pre-open รีเฟรช 60 วิ · นอกเวลา 10 นาที
+  PO.busy=false; poDraw(); clearTimeout(PO.tm);
+  PO.tm=setTimeout(poTick, (PO.d&&PO.d.session==='pre')?60000:600000);
 }
 function poEnsure(){
   const b=document.getElementById('perfBody'); if(!b) return;
   if(currentMarket!=='america'){ const x=document.getElementById('poBox'); if(x) x.remove(); return; }
-  if(!document.getElementById('poBox')){ b.insertAdjacentHTML('afterbegin','<div id="poBox" class="td-sec"></div>'); }
+  if(!document.getElementById('poBox')) b.insertAdjacentHTML('afterbegin','<div id="poBox" class="td-sec"></div>');
   poLoad();
 }
-
 async function pfRender(){
   const _t=pfTok+1; await pfRender0(); if(pfTok!==_t) return; poEnsure();
   const b=document.getElementById('perfBody'); if(b&&!b.querySelector('.mf-help')&&!b.querySelector('.mf-empty')) b.insertAdjacentHTML('afterbegin',await uniHelp());

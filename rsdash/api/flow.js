@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   if (k === "pre") return pre(req, res);   // Pre-market สหรัฐ (ดิบ รายหุ้น)
   if (k === "preopen") {                   // สรุปบรรยากาศก่อนเปิดตลาด (top/bottom/sector)
     res.setHeader("Access-Control-Allow-Origin", "*");
-    try { const j = await preopenSummary(); res.setHeader("Cache-Control","public, s-maxage=45, stale-while-revalidate=120"); return res.status(200).json(j); }
+    try { const j = await preopenSummary(req.query.full === '1'); res.setHeader("Cache-Control","public, s-maxage=45, stale-while-revalidate=120"); return res.status(200).json(j); }
     catch (e) { res.setHeader("Cache-Control","no-store"); return res.status(502).json({ error: String((e&&e.message)||e).slice(0,120) }); }
   }
   if (k === "cal") return cal(req, res);   // ปฏิทินเศรษฐกิจ
