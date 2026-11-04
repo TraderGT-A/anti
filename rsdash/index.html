@@ -2227,10 +2227,19 @@ function mfMkt(rows,idx,items){
   return {trend,r3,b50,b200,near,lead,n:ok.length,score:Math.round(100*comp.filter(x=>x!=null).reduce((a,b)=>a+b,0)/comp.filter(x=>x!=null).length)};
 }
 async function mfFocus(){
-  const [sec,th,cm,sTH,sUS]=await Promise.all([mfJ('/api/flow?kind=etf&set=sector'),mfJ('/api/flow?kind=thgroups'),mfJ('/api/flow?kind=etf&set=country'),mfScanAll('thailand'),mfScanAll('america')]);   // breadth ใช้ทั้งกระดาน
+  const [sec,th,cm,sTH,sUS,mb]=await Promise.all([mfJ('/api/flow?kind=etf&set=sector'),mfJ('/api/flow?kind=thgroups'),mfJ('/api/flow?kind=etf&set=country'),mfScanAll('thailand'),mfScanAll('america'),mfJ('/api/market-breadth')]);
   sec.meta.forEach(m=>MF.names['rus:'+m.k]=m.n+' ('+m.k+')'); Object.keys(th.series).forEach(k=>MF.names['rth:'+k]=mfNameTh(k));
   const iU=mfRotItems(sec,sec.series.SPY,sec.meta.map(m=>m.k)), iT=mfRotItems(th,th.bench,Object.keys(th.series));
   const U=mfMkt(sUS,sec.series.SPY,iU), T=mfMkt(sTH,th.bench,iT);
+  // ⚠️ ตัวเลข breadth ต้องตรงกับหน้าภาพรวม (บอส 4 พ.ย.: "% ไม่ตรงกัน") → ใช้ /api/market-breadth แหล่งเดียวกับหน้าภาพรวม
+  try{
+    const bm={}; (mb.markets||[]).forEach(x=>{ bm[x.market]=x; });
+    [['thailand',T],['america',U]].forEach(([mk,o])=>{
+      const b=bm[mk]; if(!b||!b.total) return;
+      o.n=b.total; o.b50=b.a50/b.total; o.b200=b.a200/b.total;
+      o.score=Math.round(100*[o.trend,o.b50,o.b200,(o.near!=null?Math.min(1,o.near*3):null),o.lead,(o.r3!=null?(o.r3>0?1:0):null)].filter(x=>x!=null).reduce((a,c)=>a+c,0)/[o.trend,o.b50,o.b200,(o.near!=null?Math.min(1,o.near*3):null),o.lead,(o.r3!=null?(o.r3>0?1:0):null)].filter(x=>x!=null).length);
+    });
+  }catch(e){}
   const pc=v=>v==null?'–':(v*100).toFixed(0)+'%', tr=v=>v>=1?'<b class="pos">เหนือ MA50+200</b>':v>=0.6?'<span class="pos">เหนือ MA200</span>':v>=0.4?'<span style="color:#e0a800">เหนือ MA50 ใต้ 200</span>':'<b class="neg">ใต้ MA ทั้งคู่</b>';
   const first=U.score===T.score?null:(U.score>T.score?'US':'TH');
   const verdict=first?'<div class="mf-verdict"><span>เริ่มทำการบ้านจากตลาด</span><b>'+(first==='US'?'🇺🇸 สหรัฐฯ':'🇹🇭 ไทย')+'</b><span>คะแนน '+(first==='US'?U.score:T.score)+' vs '+(first==='US'?T.score:U.score)+'</span></div>':'<div class="mf-verdict"><span>สองตลาดคะแนนเท่ากัน — ดูกลุ่มด้านล่าง</span></div>';
@@ -4272,6 +4281,20 @@ function bsRsHist(m){
     j.rs = bs.rs; j.sig = bs.sig; j.bh = bs.bh;
     j.ix={}; j.dates.forEach((d,i)=>{ j.ix[d]=i; }); return j; }).catch(()=>null));
 }
+// นับว่า "RS ค่านี้" และ "อันดับนี้" ต่อเนื่องมากี่แท่งแล้ว (ใช้ rshist ของฐานที่เลือก)
+// อันดับต่อแท่ง = 1 + จำนวนหุ้นที่ RS สูงกว่า (เทียบทั้งชุดในไฟล์) — คำนวณเฉพาะตอนเปิดป็อปอัป เร็วพอ
+function rsStreak(rh, tk){
+  try{
+    const arr=rh&&rh.rs&&rh.rs[tk]; if(!arr||!arr.length) return null;
+    const L=arr.length-1; const my=arr[L]; if(!(my>0)) return null;
+    const others=Object.values(rh.rs).filter(a=>a!==arr);   // อาเรย์ของหุ้นตัวอื่น (อ้างอิงเดียวกันได้ ไม่ต้องกรองชื่อ)
+    const rankAt=d=>{ const base=arr[d]; if(!(base>0)) return null; let n=1; for(const a of others){ const v=a[d]; if(v!=null&&v>base) n++; } return n; };
+    const rNow=rankAt(L); if(rNow==null) return null;
+    let dRs=1; for(let d=L-1; d>=0; d--){ if(arr[d]!==my) break; dRs++; }
+    let dRk=1; for(let d=L-1; d>=0; d--){ if(rankAt(d)!==rNow) break; dRk++; }
+    return {rs:my, rank:rNow, rsDays:dRs, rkDays:dRk, asOf:rh.dates?rh.dates[L]:null};
+  }catch(e){ return null; }
+}
 function bsRsFn(rh,tk){
   const a=rh&&rh.rs[tk]; if(!a) return null; const L=rh.dates.length-1;
   return d=>{ let i=rh.ix[d]; if(i==null){ if(d>rh.dates[L]) i=L; else return null; } const v=a[i]; return v>0?v:null; };   // วันหลังไฟล์ล่าสุดใช้ RS วันสุดท้ายต่อไป
@@ -4988,12 +5011,22 @@ function openModal(tk,nm,mkt){
   if(_drd) _drd.innerHTML = (found && found.isDR) ? '<span class="pill text-amber-400 border-amber-700/60" title="Depositary Receipt — ตราสารอ้างอิงหุ้นนอก">DR</span>' : '';
   // 3) อันดับ RS + การเปลี่ยนอันดับ (เหมือน pill บนการ์ด)
   const _rd = (RS_BASE!=='all') ? null : (found ? found.rD : null), _rt = found ? found.rT : null;   // อันดับเมื่อวานเป็นฐานรวม — ซ่อนลูกศรเมื่อเลือกฐานอื่น (บอส 3 พ.ย.)
-  const _rtag = (_rt!=null) ? '<span class="pill text-slate-300" title="อันดับ RS วันนี้ (เทียบทั้งกระดาน)">#'+_rt+'</span>' : '';
+  let _rtag = (_rt!=null) ? '<span class="pill text-slate-300" title="อันดับ RS วันนี้ (เทียบทั้งกระดาน)">#'+_rt+'</span>' : '';
+
   const _rdx = (_rd===null||_rd===undefined) ? ''
     : (_rd>0 ? '<span class="pill pos" title="อันดับดีขึ้นจากเมื่อวาน">▲ +'+_rd+'</span>'
     : (_rd<0 ? '<span class="pill neg" title="อันดับแย่ลงจากเมื่อวาน">▼ '+Math.abs(_rd)+'</span>' : '<span class="pill text-slate-500">—</span>'));
   const _rk = document.getElementById('modalRank');
   if(_rk) _rk.innerHTML = _rtag + _rdx;
+  // อยู่ค่า RS / อันดับนี้มากี่วันแล้ว — เติมแบบ async (ไม่บล็อกการเปิดป็อปอัป)
+  try{
+    if(_rk && _rt!=null) bsRsHist(mk).then(rh=>{
+      if(activeTicker!==tk || activeModal===undefined) return;
+      const st = rh ? rsStreak(rh, tk) : null; if(!st) return;
+      const el=document.getElementById('modalRank'); if(!el) return;
+      el.insertAdjacentHTML('beforeend','<span class="pill text-slate-400" title="RS '+st.rs+' ต่อเนื่อง '+st.rsDays+' แท่ง · อันดับ #'+st.rank+' ต่อเนื่อง '+st.rkDays+' แท่ง (นับวันทำการ · ข้อมูลถึง '+(st.asOf||'-')+')">RS นี้ '+st.rsDays+' วัน · #นี้ '+st.rkDays+' วัน</span>');
+    }).catch(()=>{});
+  }catch(e){}
   // 4) แถวข้อมูลราคา/เปลี่ยน%/มูลค่าซื้อขาย/3M/กลุ่ม — ชุดเดียวกับที่การ์ดโชว์
   const _ms = document.getElementById('modalStats');
   if(_ms) _ms.innerHTML = found ? (
