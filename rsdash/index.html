@@ -456,8 +456,8 @@ html .td-hi{display:inline-block;font-size:10px;font-weight:600;border-radius:99
 html .bsleg{font-size:11px;color:var(--muted,#8b97a8);margin-left:10px;white-space:nowrap}
 html .dly{font-size:.88em;opacity:.8;white-space:nowrap;cursor:help}
 html .mf-th{font-size:10px;font-weight:400;opacity:.85;white-space:nowrap}
-html .sgc .st{font-size:8.5px;margin-left:1px;vertical-align:top;color:#fbbf24}
-html .sgc{font-size:9.5px;font-weight:700;padding:1px 5px;border:1px solid currentColor;border-radius:6px;margin-left:4px;vertical-align:middle;line-height:1.3}
+html .sgc .st{font-size:8px;margin:0;line-height:1;color:#fbbf24}
+html .sgc{display:inline-flex;align-items:center;gap:1px;white-space:nowrap;font-size:9.5px;font-weight:700;padding:0 4px;margin-left:4px;border:1px solid currentColor;border-radius:5px;line-height:14px;height:14px;vertical-align:middle;flex:none}
 html .edot{width:6px;height:6px;background:#f59e0b;border-radius:50%;display:inline-block;margin-left:4px;vertical-align:middle}
 html .bs-slot{display:inline-flex;align-items:center;gap:4px;min-width:0;vertical-align:middle} html .bs-slot:empty{display:none}
 html .bs-slot .bsb{position:static;font-size:9.5px;padding:2px 7px;flex:none} html .bs-slot .bsg{font-size:9.5px;padding:1px 7px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block}
@@ -1835,9 +1835,9 @@ function stampLeadStars(){
     document.querySelectorAll('.sgc[data-sec]').forEach(el => {
       const q = (g && g[el.dataset.sec]) ? g[el.dataset.sec].q : null;
       const want = q === 'Leading';
-      const has = !!el.querySelector('.st');
-      if (want && !has) { /* minimal: ไม่ติดดาวแล้ว (บอส 5 พ.ย.) */ }
-      if (!want && has) { const b = el.querySelector('.st'); if (b) b.remove(); }
+      const base = el.textContent.replace(/★/g, '').trim();   // ตัวอักษร B/W/S เท่านั้น
+      const next = want ? base + '★' : base;
+      if (el.textContent !== next) el.textContent = next;      // กันดาวซ้ำจากการเรียกซ้ำ
     });
   };
   if (_leadCache.mk === mk) return apply(_leadCache.map);
@@ -5512,6 +5512,8 @@ window.renderHowto=function(){
 };
 })();
 
+
+try{ new MutationObserver(function(){ clearTimeout(window.__stT); window.__stT=setTimeout(function(){ try{ stampLeadStars(); }catch(e){} }, 200); }).observe(document.body,{childList:true,subtree:true}); }catch(e){}
 </script>
 </body>
 </html>
