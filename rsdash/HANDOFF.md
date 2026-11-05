@@ -80,6 +80,10 @@
 
 ## ล็อก (ใหม่อยู่บน)
 
+### 5 พ.ย. 08:45 — Hermes (ปรับการ์ด Pivot Break เป็นแบบพับได้ + ระบุตำแหน่งให้ชัด)
+- บอสหาไม่เจอ → การ์ดเริ่มต้นแบบพับ (สูง 44px) อยู่ **หน้า "หุ้น"** (ไม่ใช่เมนู Scanner) ถัดจากบรรทัด legend เหนือตาราง: `▸ Pivot Break  [VDU|VCP]  VDU 34 · VCP 2 · ณ 2026-11-04`
+- คลิกหัวแถบเพื่อกาง/พับ (`pvToggle`) · ตัวเลขสรุปทั้งสองแท็บโชว์ตอนพับอยู่
+- ตรวจเว็บสด: พับ 44px, กาง 256px, 34 แถว VDU · 2 แถว VCP
 ### 5 พ.ย. 08:20 — Hermes (Pivot Break: VDU + VCP ในหน้า Scanner ทั้งไทย/สหรัฐ)
 - บอสสั่ง: เพิ่ม Break VDU + VCP ในหน้า Scanner ทั้ง 2 ตลาด **ห้ามแตะของเดิม** และแยกจากสัญญาณ Buy โดยสิ้นเชิง
 - ของใหม่ (ไม่แก้ของเก่า): `scripts/flow/precompute_pivot.mjs` → `rsdash/pivot_{th,us}.json` + `api/_lib/pivot_data.js` · `api/_lib/flow_pivot.js` เปิดผ่าน `/api/flow?kind=pivot&mk=th|us&t=VDU|VCP` · การ์ด `#pivotPanel` ในหน้า Scanner + `pvShow/pvLoad/pvDraw` (คลิกแถวเปิดป๊อปอัปหุ้นเดิม)

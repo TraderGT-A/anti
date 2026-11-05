@@ -1391,8 +1391,8 @@ html body.lding #pageWrap{padding-top:26px}
 
   <div id="stkLegend" class="dot-legend"><span><i class="lg-news"></i>ข่าว: มีข่าวใน 7 วัน (กดจุดอ่านสรุป)</span><span><i class="lg-ssf"></i>SSF: มีสัญญาซื้อขายล่วงหน้ารายตัวที่ TFEX</span><span><i class="lg-dr"></i>DR: หุ้นเมกาที่ซื้อในไทยได้ผ่าน DR</span><span><i class="lg-ern"></i>งบ: ใกล้ประกาศ / ประกาศแล้ว (ป้ายข้างชื่อ)</span></div>
   <div id="pivotPanel" style="display:none">
-  <div class="pv-hd"><span class="pv-tt">Pivot Break</span><span class="pv-tabs"><b data-pv="VDU" class="on">VDU</b><b data-pv="VCP">VCP</b></span><span class="pv-info" id="pvInfo"></span></div>
-  <div id="pvList" class="pv-list"></div>
+  <div class="pv-hd" id="pvHd" role="button"><span class="pv-cv" id="pvCv">▸</span><span class="pv-tt">Pivot Break</span><span class="pv-tabs"><b data-pv="VDU" class="on">VDU</b><b data-pv="VCP">VCP</b></span><span class="pv-info" id="pvInfo"></span></div>
+  <div id="pvList" class="pv-list" style="display:none"></div>
 </div>
 <style>
 #pivotPanel{margin:10px 0 4px;background:#0d1219;border:1px solid #1e2634;border-radius:10px;padding:8px 10px}
@@ -1403,6 +1403,9 @@ html body.lding #pageWrap{padding-top:26px}
 #pivotPanel .pv-tabs b.on{background:#1d2733;color:#cbd5e1}
 #pivotPanel .pv-info{font-size:11px;color:#5d6b7d;margin-left:auto}
 #pivotPanel .pv-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+#pivotPanel .pv-cv{font-size:10px;color:#5d6b7d;width:10px;display:inline-block}
+#pivotPanel .pv-hd{cursor:pointer;user-select:none}
+#pivotPanel.open .pv-cv{color:#94a3b8}
 #pivotPanel .pv-row{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border-radius:6px;background:#121a24;border:1px solid #1e2634;font-size:11.5px;color:#cbd5e1;cursor:pointer;white-space:nowrap}
 #pivotPanel .pv-row:hover{border-color:#2a3846;background:#16202c}
 #pivotPanel .pv-row .t{font-weight:600;color:#e2e8f0}
@@ -2024,6 +2027,14 @@ let curPage = 'overview';
 
 /* ── Pivot Break (VDU / VCP) — แยกจาก Buy/Wait โดยสิ้นเชิง ── */
 const PV = { tab:'VDU', cache:{}, busy:false };
+function pvToggle(force){
+  const p=document.getElementById('pivotPanel'), l=document.getElementById('pvList'), c=document.getElementById('pvCv');
+  if(!p||!l) return;
+  const open = force!=null ? force : (l.style.display==='none');
+  l.style.display = open ? 'flex' : 'none';
+  p.classList.toggle('open', open);
+  if(c) c.textContent = open ? '▾' : '▸';
+}
 function pvShow(on){
   const el=document.getElementById('pivotPanel'); if(!el) return;
   el.style.display = on ? '' : 'none';
@@ -2046,7 +2057,8 @@ function pvDraw(){
   if(!box) return;
   const d=PV.cache[key]||{rows:[]};
   const rows=(d.rows||[]).filter(r=>r.kind===PV.tab);
-  if(info) info.textContent=rows.length+' ตัว · ณ '+(d.asOf||'-');
+  const all=(d.rows||[]), nV=all.filter(r=>r.kind==='VDU').length, nC=all.filter(r=>r.kind==='VCP').length;
+  if(info) info.textContent='VDU '+nV+' · VCP '+nC+' · ณ '+(d.asOf||'-');
   if(!rows.length){ box.innerHTML='<div class="pv-empty">ยังไม่มีตัวที่เข้าเกณฑ์ '+PV.tab+'</div>'; return; }
   box.innerHTML=rows.map(function(r){
     const st=r.st==='BREAK'?'<span class="s b">break</span>':(r.st==='รอ Vol'?'<span class="s w">รอ vol</span>':'<span class="s w">รอเบรก</span>');
@@ -2057,6 +2069,8 @@ function pvDraw(){
   box.querySelectorAll('.pv-row').forEach(function(el){ el.onclick=function(){ try{ openModalByTk(el.dataset.tk); }catch(e){} }; });
 }
 document.addEventListener('click', function(e){
+  const hd=e.target && e.target.closest ? e.target.closest('#pvHd') : null;
+  if(hd && !(e.target.closest('#pivotPanel .pv-tabs b'))) { pvToggle(); return; }
   const b=e.target && e.target.closest ? e.target.closest('#pivotPanel .pv-tabs b') : null; if(!b) return;
   PV.tab=b.dataset.pv;
   document.querySelectorAll('#pivotPanel .pv-tabs b').forEach(function(x){ x.classList.toggle('on', x===b); });
