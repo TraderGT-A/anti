@@ -978,6 +978,17 @@ html #poBox .po-sec{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
 #poBox .po-cm{display:flex;flex-wrap:wrap;gap:6px;font-size:11px;color:var(--muted)}
 </style>
 </head>
+<div id="loadBar" aria-live="polite"><i class="sp"></i><span class="tx">กำลังโหลด…</span><span class="tm"></span></div>
+<style>
+html #loadBar{position:fixed;left:0;right:0;top:0;height:26px;display:none;align-items:center;gap:7px;padding:0 10px;
+  background:rgba(13,18,25,.96);border-bottom:1px solid var(--line);color:var(--muted);font-size:11.5px;z-index:9999;backdrop-filter:blur(6px)}
+html #loadBar.on{display:flex}
+html #loadBar .sp{width:12px;height:12px;border:2px solid rgba(255,255,255,.18);border-top-color:#38bdf8;border-radius:50%;animation:ldspin .8s linear infinite;flex:none}
+html #loadBar .tx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html #loadBar .tm{margin-left:auto;font-variant-numeric:tabular-nums;opacity:.7}
+@keyframes ldspin{to{transform:rotate(360deg)}}
+html body.lding #pageWrap{padding-top:26px}
+</style>
 <body class="py-3 sm:py-4 md:py-6">
 <div class="max-w-7xl mx-auto w-full px-2 sm:px-4 md:px-6">
 <div id="topbar">
@@ -2061,7 +2072,8 @@ const grpTh=k=>{ const s=String(k||''), mai=/ \(mai\)$/.test(s), b=mai?s.replace
 const grpThHtml=k=>{ const t=grpTh(k); return t?' <span class="mf-th">('+t+')</span>':''; };
 const MF_Q={Leading:['นำตลาด','q-L'],Improving:['กำลังดีขึ้น','q-I'],Weakening:['ชะลอตัว','q-W'],Lagging:['ตามหลัง','q-G']};
 const MF_TYPE={index:'Index',country:'Country',region:'Region',asset:'Asset'};
-const mfJ=u=>MF.cache[u]||(MF.cache[u]=fetch(API+u).then(r=>r.json()).then(j=>{ if(j.error) throw new Error(j.error); return j; }).catch(e=>{ delete MF.cache[u]; throw e; }));
+const mfLabel=u=>{ try{ if(u.indexOf('kind=groups')>=0) return 'โหลดกลุ่ม/การหมุนของเงิน'; if(u.indexOf('kind=etf')>=0) return 'โหลด ETF/ราคาปิด'; if(u.indexOf('kind=preopen')>=0) return 'โหลด Pre-market'; if(u.indexOf('universe=all')>=0) return 'โหลดหุ้นทั้งตลาด'; if(u.indexOf('/api/scan')===0) return 'โหลด RS '+((u.match(/market=(\w+)/)||[])[1]==='america'?'สหรัฐ':'ไทย'); if(u.indexOf('/api/flow')>=0) return 'โหลดข้อมูลเงินไหล'; if(u.indexOf('/api/notes')>=0) return 'โหลดข่าว'; return 'กำลังโหลดข้อมูล…'; }catch(e){ return 'กำลังโหลดข้อมูล…'; } };
+const mfJ=u=>MF.cache[u]||(MF.cache[u]=(function(){ loadOn(mfLabel(u)); return fetch(API+u).then(r=>r.json()).then(j=>{ if(j.error) throw new Error(j.error); loadOff(); return j; }).catch(e=>{ loadOff(); delete MF.cache[u]; throw e; }); })());
 // ทั้งกระดาน (ไม่กรองสภาพคล่อง/ราคา) — ใช้คำนวณ % เหนือ MA50/MA200 ของ Flow เท่านั้น
 // (บั๊ก 4 พ.ย.: เดิมใช้ชุดที่แสดงผลแค่ ~190 ตัว → ไทยขึ้น 66-72% ทั้งที่ทั้งกระดานจริง ~43%)
 const MF_ALL={};
@@ -3642,7 +3654,26 @@ function _rsOverrideRows(rows){ const f = RS_FLD[RS_BASE]; if(!Array.isArray(row
   });
   return rows; }
 function rsOverrideAll(mk){ try{ _rsOverrideRows(stockDB[mk]); _rsOverrideRows(topRSData[mk]); if(mk===currentMarket) _rsOverrideRows(stockData); }catch(e){} }
-function rsSet(b){ RS_BASE=b; try{ localStorage.setItem('rsd_rs', b); }catch(e){}
+
+/* ── แถบสถานะโหลด (ทุกครั้งที่ดึงข้อมูล/สลับฐาน/เปิดหน้า) ── */
+let _ldn = 0, _ldT0 = 0, _ldTimer = null, _ldMsg = '';
+function loadOn(msg){
+  _ldMsg = msg || 'กำลังโหลด…';
+  if(!_ldn) _ldT0 = Date.now();
+  _ldn++;
+  const b = document.getElementById('loadBar'); if(!b) return;
+  b.classList.add('on'); document.body.classList.add('lding');
+  b.querySelector('.tx').textContent = _ldMsg;
+  clearInterval(_ldTimer);
+  _ldTimer = setInterval(function(){ const e=b.querySelector('.tm'); if(e) e.textContent=((Date.now()-_ldT0)/1000).toFixed(1)+'s'; }, 200);
+}
+function loadOff(){
+  _ldn = Math.max(0, _ldn - 1); if(_ldn) return;
+  const b = document.getElementById('loadBar'); if(!b) return;
+  b.classList.remove('on'); document.body.classList.remove('lding');
+  clearInterval(_ldTimer); const e=b.querySelector('.tm'); if(e) e.textContent='';
+}
+function rsSet(b){ const _lb={ '3m':'3M','6m':'6M','1y':'1Y','all':'1Y' }[b]||b; RS_BASE=b; try{ localStorage.setItem('rsd_rs', b); }catch(e){} loadOn('สลับฐาน RS เป็น '+_lb+' — กำลังคำนวณใหม่…'); try{ setTimeout(loadOff, 900); }catch(e){}
   ['3m','6m','1y','all'].forEach(k=>{ const el=document.getElementById('rsBtn'+k); if(el) el.classList.toggle('active', k===b); });
   // เคลียร์แคชที่ผูกกับฐาน RS (สัญญาณ/ลูกศร ทั้ง 4 ชุดตาม base — บอส 3 พ.ย. 13:xx: เลือกค่าไหนทุกสูตรเปลี่ยนหมดตามค่า)
   try{ Object.keys(RSH).forEach(k=>delete RSH[k]); }catch(e){}
