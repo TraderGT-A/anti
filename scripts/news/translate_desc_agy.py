@@ -94,7 +94,11 @@ def main():
                     print(f"[tr] ถึง limit {a.limit} แล้ว — หยุด", flush=True)
                     return
                 chunk = todo[i:i + a.batch]
+                # กัน WinError 206: command line ของ Windows จำกัด ~32k → ตัดชุดให้สั้นลงถ้าข้อความยาว
                 items = "\n".join(f'{t}: """{str(src[t])[:1200]}"""' for t in chunk)
+                while len(PROMPT.format(items=items)) > 24000 and len(chunk) > 1:
+                    chunk = chunk[: max(1, len(chunk) // 2)]
+                    items = "\n".join(f'{t}: """{str(src[t])[:1200]}"""' for t in chunk)
                 try:
                     txt = call_agy(PROMPT.format(items=items))
                     got = parse_json_block(txt)
