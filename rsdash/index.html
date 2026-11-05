@@ -1390,7 +1390,29 @@ html body.lding #pageWrap{padding-top:26px}
   </div>
 
   <div id="stkLegend" class="dot-legend"><span><i class="lg-news"></i>ข่าว: มีข่าวใน 7 วัน (กดจุดอ่านสรุป)</span><span><i class="lg-ssf"></i>SSF: มีสัญญาซื้อขายล่วงหน้ารายตัวที่ TFEX</span><span><i class="lg-dr"></i>DR: หุ้นเมกาที่ซื้อในไทยได้ผ่าน DR</span><span><i class="lg-ern"></i>งบ: ใกล้ประกาศ / ประกาศแล้ว (ป้ายข้างชื่อ)</span></div>
-  <div id="cardsView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-3"></div>
+  <div id="pivotPanel" style="display:none">
+  <div class="pv-hd"><span class="pv-tt">Pivot Break</span><span class="pv-tabs"><b data-pv="VDU" class="on">VDU</b><b data-pv="VCP">VCP</b></span><span class="pv-info" id="pvInfo"></span></div>
+  <div id="pvList" class="pv-list"></div>
+</div>
+<style>
+#pivotPanel{margin:10px 0 4px;background:#0d1219;border:1px solid #1e2634;border-radius:10px;padding:8px 10px}
+#pivotPanel .pv-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#pivotPanel .pv-tt{font-size:12.5px;color:#94a3b8}
+#pivotPanel .pv-tabs{display:inline-flex;gap:2px;background:#141b26;border:1px solid #1e2634;border-radius:6px;padding:2px}
+#pivotPanel .pv-tabs b{font-size:11px;font-weight:500;color:#7d8899;padding:2px 9px;border-radius:4px;cursor:pointer;line-height:16px}
+#pivotPanel .pv-tabs b.on{background:#1d2733;color:#cbd5e1}
+#pivotPanel .pv-info{font-size:11px;color:#5d6b7d;margin-left:auto}
+#pivotPanel .pv-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+#pivotPanel .pv-row{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border-radius:6px;background:#121a24;border:1px solid #1e2634;font-size:11.5px;color:#cbd5e1;cursor:pointer;white-space:nowrap}
+#pivotPanel .pv-row:hover{border-color:#2a3846;background:#16202c}
+#pivotPanel .pv-row .t{font-weight:600;color:#e2e8f0}
+#pivotPanel .pv-row .s{font-size:10.5px;padding:0 5px;border-radius:4px}
+#pivotPanel .pv-row .s.b{background:#14301f;color:#5fbf8f}
+#pivotPanel .pv-row .s.w{background:#2e2716;color:#c9a24a}
+#pivotPanel .pv-row .n{color:#7d8899;font-variant-numeric:tabular-nums}
+#pivotPanel .pv-empty{font-size:11.5px;color:#5d6b7d;padding:4px 0}
+</style>
+<div id="cardsView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-3"></div>
 
   <div id="tableView" class="hidden overflow-x-auto bg-[#0d1219] rounded-xl border border-[#1e2634]">
     <table class="w-full text-right text-sm">
@@ -1999,6 +2021,48 @@ document.addEventListener('DOMContentLoaded',()=>{ try{ applyFontZoom(parseFloat
 let currentMarket = 'thailand';
 /* แยกหน้า: ภาพรวมตลาด (breadth/summary/flow/themes) vs หุ้น (cards/table) */
 let curPage = 'overview';
+
+/* ── Pivot Break (VDU / VCP) — แยกจาก Buy/Wait โดยสิ้นเชิง ── */
+const PV = { tab:'VDU', cache:{}, busy:false };
+function pvShow(on){
+  const el=document.getElementById('pivotPanel'); if(!el) return;
+  el.style.display = on ? '' : 'none';
+  if(on) pvLoad();
+}
+function pvLoad(){
+  const mk = (typeof currentMarket!=='undefined' && currentMarket) || 'thailand';
+  const key = mk==='america' ? 'us' : 'th';
+  if(PV.cache[key]){ pvDraw(); return; }
+  if(PV.busy) return;
+  PV.busy=true;
+  try{ loadOn('สแกน Pivot Break '+(key==='us'?'สหรัฐ':'ไทย')+'…'); }catch(e){}
+  fetch(API+'/api/flow?kind=pivot&mk='+key)
+    .then(r=>r.json()).then(j=>{ PV.cache[key]=j; PV.busy=false; try{loadOff();}catch(e){} pvDraw(); })
+    .catch(e=>{ PV.busy=false; try{loadOff();}catch(e2){} const l=document.getElementById('pvList'); if(l) l.innerHTML='<div class="pv-empty">โหลดไม่ได้</div>'; });
+}
+function pvDraw(){
+  const mk=(typeof currentMarket!=='undefined'&&currentMarket)||'thailand';
+  const key=mk==='america'?'us':'th', box=document.getElementById('pvList'), info=document.getElementById('pvInfo');
+  if(!box) return;
+  const d=PV.cache[key]||{rows:[]};
+  const rows=(d.rows||[]).filter(r=>r.kind===PV.tab);
+  if(info) info.textContent=rows.length+' ตัว · ณ '+(d.asOf||'-');
+  if(!rows.length){ box.innerHTML='<div class="pv-empty">ยังไม่มีตัวที่เข้าเกณฑ์ '+PV.tab+'</div>'; return; }
+  box.innerHTML=rows.map(function(r){
+    const st=r.st==='BREAK'?'<span class="s b">break</span>':(r.st==='รอ Vol'?'<span class="s w">รอ vol</span>':'<span class="s w">รอเบรก</span>');
+    const d1=r.dry!=null?('· dry '+r.dry.toFixed(2)+'x'):(r.dep?('· '+r.dep.join('/')+'%'):'');
+    const d2=r.brkVol!=null?('· vol '+r.brkVol.toFixed(2)+'x'):('· อีก '+Math.abs(r.toGo||0).toFixed(1)+'%');
+    return '<span class="pv-row" data-tk="'+r.tk+'" title="pivot '+r.pivot+'"><span class="t">'+r.tk+'</span>'+st+'<span class="n">'+d1+' '+d2+'</span></span>';
+  }).join('');
+  box.querySelectorAll('.pv-row').forEach(function(el){ el.onclick=function(){ try{ openModalByTk(el.dataset.tk); }catch(e){} }; });
+}
+document.addEventListener('click', function(e){
+  const b=e.target && e.target.closest ? e.target.closest('#pivotPanel .pv-tabs b') : null; if(!b) return;
+  PV.tab=b.dataset.pv;
+  document.querySelectorAll('#pivotPanel .pv-tabs b').forEach(function(x){ x.classList.toggle('on', x===b); });
+  pvDraw();
+});
+
 function setPage(pg){
   curPage = pg;
   try{ localStorage.setItem('rsd_curPage', pg); localStorage.setItem('rsd_curMarket', currentMarket); }catch(e){}   // จำหน้า+ตลาดสุดท้ายไว้ (บอส)
@@ -2007,6 +2071,7 @@ function setPage(pg){
   const st = ['searchBar','progressPanel','stkLegend','cardsView','tableView'];
   ov.forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display = (pg==='overview') ? '' : 'none'; });
   st.forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display = (pg==='stocks') ? '' : 'none'; });
+  try{ pvShow(pg==='stocks'); }catch(e){}
   const t20=document.getElementById('top20Panel'); if(t20) t20.style.display = (pg==='top20') ? '' : 'none';
   const rp=document.getElementById('reportPanel'); if(rp) rp.style.display = (pg==='report') ? '' : 'none';
   const htp=document.getElementById('howtoPanel'); if(htp) htp.style.display = (pg==='howto') ? '' : 'none';
@@ -3699,6 +3764,7 @@ function switchMarket(mk){
   loadNotesAll();
   document.getElementById('stockCount').textContent='…';
   fillGroupOptions(mk);  // กลุ่มตามตลาด — ไทยไม่โชว์ S&P500
+  try{ pvLoad(); }catch(e){}   // Pivot Break สลับตลาดตาม
   document.getElementById('groupFilter').value='ALL';
   document.getElementById('rsFilter').value='70';   // default RS ≥ 70 (ตามแนวทางผู้นำ CANSLIM)
 

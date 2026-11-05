@@ -4,6 +4,7 @@
 //   kind=groups&mk=th|us&by=sector|setind|setsec|theme → ดัชนีกลุ่มหุ้นที่สร้างเอง (flow_th.js) · kind=thgroups = ชื่อเดิม
 //   kind=tr&mk=us|th&tk=XXXX           → แปลคำอธิบายบริษัทเป็นไทย            (flow_tr.js)
 //   kind=surp&mk=us|th                 → ส่วนต่างงบล่าสุดเทียบประมาณการ        (flow_surp.js)
+//   kind=pivot&mk=th|us&t=VDU|VCP      → Pivot Break: เบรกยอดฐานจาก VDU/VCP (flow_pivot.js)
 //   kind=pre                           → ราคา Pre-market หุ้นสหรัฐ (flow_pre.js)
 //   kind=cal&mk=us|th                  → ปฏิทินเศรษฐกิจสัปดาห์นี้ (เฉพาะข่าวใหญ่)  (flow_cal.js)
 import etf from "./_lib/flow_etf.js";
@@ -12,6 +13,7 @@ import tr from "./_lib/flow_tr.js";
 import surp from "./_lib/flow_surp.js";
 import cal from "./_lib/flow_cal.js";
 import pre, { preopenSummary } from "./_lib/flow_pre.js";
+import pivot from "./_lib/flow_pivot.js";
 
 export default async function handler(req, res) {
   const k = String(req.query.kind || "");
@@ -20,6 +22,7 @@ export default async function handler(req, res) {
   if (k === "groups") return thg(req, res);
   if (k === "tr") return tr(req, res);
   if (k === "surp") return surp(req, res);   // ส่วนต่างงบเทียบประมาณการ (เกินคาด/ต่ำกว่าคาด)
+  if (k === "pivot") return pivot(req, res);   // Pivot Break (VDU/VCP) — คนละเรื่องกับ Buy/Wait
   if (k === "pre") return pre(req, res);   // Pre-market สหรัฐ (ดิบ รายหุ้น)
   if (k === "preopen") {                   // สรุปบรรยากาศก่อนเปิดตลาด (top/bottom/sector)
     res.setHeader("Access-Control-Allow-Origin", "*");
