@@ -33,120 +33,54 @@
   }
 
   /* ---------- พื้นฐานใต้คำอธิบายบริษัท ---------- */
-  function fundChips(f) {
-    const it = [];
-    if (f.pe != null) it.push(["P/E", fmtN(f.pe)]);
-    if (f.ps != null) it.push(["P/S", fmtN(f.ps, 2)]);
-    if (f.pb != null) it.push(["P/B", fmtN(f.pb, 2)]);
-    if (f.gm != null) it.push(["กำไรขั้นต้น", fmtPct(f.gm)]);
-    if (f.nm != null) it.push(["กำไรสุทธิ", fmtPct(f.nm)]);
-    if (f.dy != null) it.push(["ปันผล", (Number(f.dy) * 100).toFixed(2) + "%"]);
-    if (f.mcap != null) it.push(["Mcap", fmtCap(f.mcap)]);
-    if (f.revG != null) it.push(["รายได้ YoY", fmtPct(f.revG)]);
-    if (f.epsG != null) it.push(["กำไร YoY", fmtPct(f.epsG)]);
-    return it;
+  function fundGroups(f) {
+    const val = [], gro = [];
+    if (f.pe != null) val.push(["P/E", fmtN(f.pe), null]);
+    if (f.ps != null) val.push(["P/S", fmtN(f.ps, 2), null]);
+    if (f.pb != null) val.push(["P/B", fmtN(f.pb, 2), null]);
+    if (f.dy != null) val.push(["ปันผล", (Number(f.dy) * 100).toFixed(2) + "%", null]);
+    if (f.mcap != null) val.push(["Mcap", fmtCap(f.mcap), null]);
+    if (f.gm != null) gro.push(["กำไรขั้นต้น", fmtPct(f.gm), f.gm >= 0 ? "up" : "dn"]);
+    if (f.nm != null) gro.push(["กำไรสุทธิ", fmtPct(f.nm), f.nm >= 0 ? "up" : "dn"]);
+    if (f.revG != null) gro.push(["รายได้ YoY", fmtPct(f.revG), f.revG >= 0 ? "up" : "dn"]);
+    if (f.epsG != null) gro.push(["กำไร YoY", fmtPct(f.epsG), f.epsG >= 0 ? "up" : "dn"]);
+    return { val, gro };
   }
 
-  function quarterBars(f) {
+  function fundChips(f) {
+    return fundGroups(f).val.concat(fundGroups(f).gro).map((x) => [x[0], x[1]]);
+  }
+
+  function quarterBars(f, cur) {
     const q = (f && f.q) || [];
     if (!q.length) return "";
     const mx = Math.max(...q.map((x) => Math.abs(x.ni || 0)), 1);
-    const rows = q.map((x) => {
-      const h = Math.max(3, Math.round((Math.abs(x.ni || 0) / mx) * 46));
+    const bars = q.map((x) => {
+      const h = Math.max(4, Math.round((Math.abs(x.ni || 0) / mx) * 54));
       const up = (x.ni || 0) >= 0;
-      return `<div class="fb-q"><div class="fb-b" style="height:${h}px;background:${up ? "var(--up)" : "var(--down)"}" title="${esc(x.d)} · กำไร ${fmtBig(x.ni)}"></div><span>${esc((x.d || "").slice(2, 7))}</span></div>`;
+      const lab = (cur || "") + fmtBig(x.ni || 0);
+      const dt = String(x.d || ""); const yy = Number(dt.slice(2, 4)), mm = Number(dt.slice(5, 7));
+      const ql = mm ? ("Q" + Math.ceil(mm / 3) + "/" + (yy + 43)) : dt.slice(2, 7);
+      return `<div class="fb-q"><span class="fb-qv">${esc(lab)}</span><div class="fb-b" style="height:${h}px;background:${up ? "var(--up)" : "var(--down)"};opacity:.9" title="${esc(dt)} · กำไร ${lab}"></div><span class="fb-qd">${esc(ql)}</span></div>`;
     }).join("");
-    return `<div class="fb-chart"><div class="fb-lbl">กำไรสุทธิรายไตรมาส (${q.length} ไตรมาสล่าสุด)</div><div class="fb-bars">${rows}</div><div class="fb-rev">รายได้ล่าสุด ${fmtBig(q[q.length - 1].rev)}</div></div>`;
+    return `<div class="fb-qbox"><div class="fb-qlbl">กำไรสุทธิรายไตรมาส <i>(${q.length} ไตรมาสล่าสุด · ${cur === "$" ? "USD" : "ล้านบาท"})</i></div><div class="fb-bars">${bars}</div></div>`;
   }
 
   async function FundRender(tk, mk, elId) {
+    ensureCss();
     const el = document.getElementById(elId || "modalFund");
     if (!el) return;
     el.innerHTML = "";
     const f = await loadFund(tk, mk);
     if (!f || !Object.keys(f).length) return;
     if (activeTicker !== tk) return;
-    const chips = fundChips(f);
+    const g = fundGroups(f);
+    const cur = mk === "america" ? "$" : "฿";
+    const cell = (x) => `<div class="fb-cell"><span>${esc(x[0])}</span><b class="${x[2] ? "fb-" + x[2] : ""}">${esc(x[0] === "Mcap" ? cur + x[1] : x[1])}</b></div>`;
+    const block = (title, arr) => (arr.length ? `<div class="fb-grp"><div class="fb-gt">${esc(title)}</div><div class="fb-grid">${arr.map(cell).join("")}</div></div>` : "");
     el.innerHTML =
-      `<div class="fb-wrap"><div class="fb-hd">📊 พื้นฐาน <span class="fb-src">Yahoo Finance · ${esc(f.t || "")}</span></div>` +
-      `<div class="fb-chips">${chips.map(([k, v]) => `<span class="fb-chip"><i>${esc(k)}</i><b>${esc(v)}</b></span>`).join("")}</div>` +
-      quarterBars(f) + `</div>`;
-  }
-
-
-  /* ---------- โลโก้หุ้น (TradingView S3 รองรับ CORS · ไม่มี = วงกลมตัวอักษรย่อ) ---------- */
-  const LOGO_CACHE = {};
-  function avatarData(tk) {
-    try { if (g.avatarUrl) return g.avatarUrl(tk); } catch (e) {}
-    const s = String(tk || "?").replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCase() || "?";
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#3a3044"/><text x="16" y="21" font-size="13" font-weight="700" text-anchor="middle" fill="#fff" font-family="Arial">${s}</text></svg>`;
-    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-  }
-  async function stockLogo(tk, mk) {
-    const key = (mk === "america" ? "us" : "th") + ":" + tk;
-    if (LOGO_CACHE[key]) return LOGO_CACHE[key];
-    let url = "";
-    try { url = (g.tvLogoUrl ? g.tvLogoUrl(tk, mk) : "") || ""; } catch (e) {}
-    const img = await loadImg(url || avatarData(tk));
-    const ok = img && img.naturalWidth > 0 ? img : await loadImg(avatarData(tk));
-    LOGO_CACHE[key] = ok;
-    return ok;
-  }
-
-  /* ---------- การ์ดแชร์แบบรายการ (Buy วันนี้ / งบวันนี้ / Pivot ฯลฯ) ---------- */
-  async function drawList(opts) {
-    const th = (document.documentElement.getAttribute("data-theme") === "light") ? THEMES.light : THEMES.dark;
-    const W = 1080, H = 1350;
-    const c = document.createElement("canvas");
-    c.width = W; c.height = H;
-    const x = c.getContext("2d");
-    const rows = (opts.rows || []).slice(0, opts.max || 11);
-    const logo = await loadImg("/brand/thus-symbol-white.png");
-    const thumbs = await Promise.all(rows.map((r) => stockLogo(r.ticker || r.tk, opts.mk)));
-
-    const grd = x.createLinearGradient(0, 0, W, H);
-    grd.addColorStop(0, th.bg); grd.addColorStop(1, th.bg2);
-    x.fillStyle = grd; x.fillRect(0, 0, W, H);
-    x.strokeStyle = th.line; x.lineWidth = 3; rr(x, 28, 28, W - 56, H - 56, 36); x.stroke();
-
-    if (logo) { try { x.drawImage(logo, 70, 66, 54, 54); } catch (e) {} }
-    x.fillStyle = th.text; x.font = font(900, 34); x.fillText("THUS", 140, 108);
-    x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
-    x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 100);
-    x.textAlign = "left";
-
-    x.fillStyle = th.text; x.font = font(900, 60); x.fillText((opts.title || "").slice(0, 30), 70, 232);
-    if (opts.sub) { x.fillStyle = th.muted; x.font = font(500, 24); x.fillText(String(opts.sub).slice(0, 70), 70, 274); }
-
-    let y = 322;
-    const rowH = Math.min(88, Math.floor((1090 - y) / Math.max(rows.length, 1)));
-    rows.forEach((r, i) => {
-      const tk = r.ticker || r.tk || "";
-      x.fillStyle = th.panel; rr(x, 70, y, W - 140, rowH - 10, 16); x.fill();
-      x.strokeStyle = th.line; x.lineWidth = 1.5; x.stroke();
-      const t = thumbs[i];
-      if (t) { x.save(); rr(x, 86, y + (rowH - 10) / 2 - 24, 48, 48, 24); x.clip(); x.drawImage(t, 86, y + (rowH - 10) / 2 - 24, 48, 48); x.restore(); }
-      x.fillStyle = th.text; x.font = font(800, 30); x.fillText(tk, 150, y + rowH / 2 + 8);
-      const sub = [String(r.industry || r.sector || r.group || "").slice(0, 22), String(r.lead || "").toLowerCase() === "leading" ? "★ นำตลาด" : ""].filter(Boolean).join(" · ");
-      if (sub) { x.fillStyle = th.muted; x.font = font(500, 19); x.fillText(sub, 150, y + rowH / 2 + 30); }
-      // ขวา: ราคา + %เปลี่ยน + RS
-      const px = r.price != null ? Number(r.price).toFixed(2) : "—";
-      x.textAlign = "right";
-      x.fillStyle = th.text; x.font = font(800, 30); x.fillText(px, W - 190, y + rowH / 2 + 4);
-      const ch = r.change != null ? Number(r.change) : null;
-      if (ch != null) { x.fillStyle = ch >= 0 ? th.up : th.down; x.font = font(700, 22); x.fillText((ch >= 0 ? "+" : "") + ch.toFixed(2) + "%", W - 190, y + rowH / 2 + 30); }
-      const rs = r.rs != null ? r.rs : (r.rs3 != null ? r.rs3 : null);
-      x.fillStyle = th.gold; x.font = font(800, 26); x.fillText(rs != null ? "RS " + rs : "", W - 88, y + rowH / 2 + 10);
-      x.textAlign = "left";
-      y += rowH;
-    });
-    if (!rows.length) { x.fillStyle = th.muted; x.font = font(600, 30); x.fillText("ยังไม่มีรายการ", 90, 420); }
-
-    x.fillStyle = th.muted; x.font = font(500, 24);
-    x.textAlign = "right";
-    x.fillText(opts.note || "ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 82);
-    x.textAlign = "left";
-    return c;
+      `<div class="fb-wrap"><div class="fb-hd"><span>📊 พื้นฐาน</span><i>Yahoo Finance · ${esc(f.t || "")}</i></div>` +
+      `<div class="fb-body">${block("มูลค่า", g.val)}${block("คุณภาพ / เติบโต", g.gro)}${quarterBars(f, cur)}</div></div>`;
   }
 
   /* ---------- การ์ดแชร์ ---------- */
@@ -306,20 +240,25 @@
   }
 
   const css = () => `
-  .fb-wrap{margin-top:8px;border:1px solid var(--line);background:var(--panel2);border-radius:10px;padding:8px 10px}
-  .fb-hd{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px}
-  .fb-src{font-weight:400;color:var(--faint)}
-  .fb-chips{display:flex;flex-wrap:wrap;gap:6px}
-  .fb-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:3px 8px;font-size:11px}
-  .fb-chip i{font-style:normal;color:var(--muted)}
-  .fb-chip b{color:var(--text);font-variant-numeric:tabular-nums}
-  .fb-chart{margin-top:8px;border-top:1px solid var(--line);padding-top:7px}
-  .fb-lbl{font-size:10.5px;color:var(--muted);margin-bottom:5px}
-  .fb-bars{display:flex;align-items:flex-end;gap:10px;height:56px}
-  .fb-q{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;min-width:34px}
-  .fb-b{width:22px;border-radius:4px 4px 0 0}
-  .fb-q span{font-size:9.5px;color:var(--faint);white-space:nowrap}
-  .fb-rev{font-size:10px;color:var(--faint);margin-top:4px}
+  .fb-wrap{margin-top:8px;border:1px solid var(--line);background:var(--panel2);border-radius:12px;overflow:hidden}
+  .fb-hd{display:flex;align-items:center;gap:6px;padding:8px 11px;border-bottom:1px solid var(--line);font-size:11.5px;font-weight:600;color:var(--text)}
+  .fb-hd i{font-style:normal;font-weight:400;color:var(--faint);margin-left:auto;font-size:10.5px}
+  .fb-body{padding:9px 11px 10px;display:grid;gap:9px}
+  .fb-grp{display:grid;gap:5px}
+  .fb-gt{font-size:11px;color:var(--body);letter-spacing:.2px}
+  .fb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:6px}
+  .fb-cell{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:6px 8px;display:flex;flex-direction:column;gap:2px;min-width:0}
+  .fb-cell span{font-size:10.5px;color:var(--body);opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fb-cell b{font-size:14px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-.2px}
+  .fb-cell b.fb-up{color:var(--up)}.fb-cell b.fb-dn{color:var(--down)}
+  .fb-qbox{border-top:1px solid var(--line);padding-top:8px}
+  .fb-qlbl{font-size:10.5px;color:var(--muted);margin-bottom:6px}
+  .fb-qlbl i{font-style:normal;color:var(--faint)}
+  .fb-bars{display:flex;align-items:flex-end;justify-content:space-around;gap:8px;height:86px;padding-bottom:0}
+  .fb-q{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;flex:1;min-width:0}
+  .fb-qv{font-size:10.5px;color:var(--body);font-variant-numeric:tabular-nums}
+  .fb-b{width:min(100%,30px);border-radius:4px 4px 0 0}
+  .fb-qd{font-size:10.5px;color:var(--muted);white-space:nowrap}
   .sh-modal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:14px}
   .sh-modal.on{display:flex}
   .sh-box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;max-width:min(92vw,520px);max-height:92vh;overflow:auto}
