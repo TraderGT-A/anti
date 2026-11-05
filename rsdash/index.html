@@ -2250,6 +2250,13 @@ function pvTable(mk,title,list,cls){
     +'<button class="pv-btn" onclick="pvOpenList(\''+jq(title)+'\',\''+jq(mk)+'\',\''+jq(list.map(x=>x.s.ticker).join(','))+'\')">ดูการ์ดกราฟ</button></div>'
     +'<div class="pv-scroll"><table class="pv-tbl"><thead><tr><th>หุ้น</th><th class="r">RS</th><th class="r">ราคา</th><th class="r pv-hide-sm">3M</th><th class="r pv-hide-sm">ถึงจุดสูง</th><th class="r">pivot</th><th class="r">ถึง pivot</th><th class="pv-hide-sm">รายละเอียด</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 }
+function pvSetScope(mk,tks){
+  try{
+    const rows=((PV.cache[mk==='america'?'us':'th']||{}).rows)||[];
+    const map={}; rows.forEach(function(r){ if(!tks||tks.indexOf(r.tk)>=0) map[r.tk]=r; });
+    window.PV_SCOPE={mk:mk, map:map};
+  }catch(e){}
+}
 function pvOpen(tk,name,mk){ pvSetScope(mk,[tk]); try{ window.PIVOT_CTX=(window.PV_SCOPE.map||{})[tk]||null; }catch(e){} try{ openModal(tk,name,mk); }catch(e){} }
 function pvOpenList(title,mk,csv){
   const arr=(typeof stockDB!=='undefined'&&stockDB[mk])||[], map=new Map(arr.map(s=>[s.ticker,s]));
@@ -3414,7 +3421,7 @@ function ldApply(){
     cg.innerHTML = ldView==='card' ? (show.map((p,i)=>{
       const ec=ernBy(p.ticker,ldMarket,true);
       return '<div class="ldc" onclick="openModal(\''+jq(p.ticker)+'\',\''+jq(p.name)+'\',\''+ldMarket+'\')">'+
-        '<div class="ldc-top"><span class="ldc-l"><span class="ldc-n">#'+(i+1)+'</span>'+sgChip(tk,m)+'<span class="bs-slot"></span></span><span class="rsr'+(p.rs<70?' lo':'')+'">'+p.rs+'</span></div>'+
+        '<div class="ldc-top"><span class="ldc-l"><span class="ldc-n">#'+(i+1)+'</span>'+sgChip(p.ticker,ldMarket)+'<span class="bs-slot"></span></span><span class="rsr'+(p.rs<70?' lo':'')+'">'+p.rs+'</span></div>'+
         '<div class="tkcell"><span class="tkrow">'+tkL(p.ticker,ldMarket,22)+'<b class="ldc-tk">'+p.ticker+'</b>'+ldTags(p.ticker)+'</span>'+(ec?'<span class="ern-wrap">'+ec+'</span>':'')+'</div>'+
         '<div class="ldc-big">'+pc(Number.isFinite(Number(p.p1m))?p.p1m:p.mtd)+'<small>1 เดือน</small></div>'+
         '<div id="tchart_'+ldMarket+'_'+String(p.ticker).replace(/[^a-z0-9]/gi,'_')+'" class="chart ldc-chart" data-tk="'+p.ticker+'" data-m="'+ldMarket+'"></div>'+
