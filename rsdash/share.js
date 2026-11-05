@@ -73,6 +73,82 @@
       quarterBars(f) + `</div>`;
   }
 
+
+  /* ---------- โลโก้หุ้น (TradingView S3 รองรับ CORS · ไม่มี = วงกลมตัวอักษรย่อ) ---------- */
+  const LOGO_CACHE = {};
+  function avatarData(tk) {
+    try { if (g.avatarUrl) return g.avatarUrl(tk); } catch (e) {}
+    const s = String(tk || "?").replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCase() || "?";
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#3a3044"/><text x="16" y="21" font-size="13" font-weight="700" text-anchor="middle" fill="#fff" font-family="Arial">${s}</text></svg>`;
+    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }
+  async function stockLogo(tk, mk) {
+    const key = (mk === "america" ? "us" : "th") + ":" + tk;
+    if (LOGO_CACHE[key]) return LOGO_CACHE[key];
+    let url = "";
+    try { url = (g.tvLogoUrl ? g.tvLogoUrl(tk, mk) : "") || ""; } catch (e) {}
+    const img = await loadImg(url || avatarData(tk));
+    const ok = img && img.naturalWidth > 0 ? img : await loadImg(avatarData(tk));
+    LOGO_CACHE[key] = ok;
+    return ok;
+  }
+
+  /* ---------- การ์ดแชร์แบบรายการ (Buy วันนี้ / งบวันนี้ / Pivot ฯลฯ) ---------- */
+  async function drawList(opts) {
+    const th = (document.documentElement.getAttribute("data-theme") === "light") ? THEMES.light : THEMES.dark;
+    const W = 1080, H = 1350;
+    const c = document.createElement("canvas");
+    c.width = W; c.height = H;
+    const x = c.getContext("2d");
+    const rows = (opts.rows || []).slice(0, opts.max || 11);
+    const logo = await loadImg("/brand/thus-symbol-white.png");
+    const thumbs = await Promise.all(rows.map((r) => stockLogo(r.ticker || r.tk, opts.mk)));
+
+    const grd = x.createLinearGradient(0, 0, W, H);
+    grd.addColorStop(0, th.bg); grd.addColorStop(1, th.bg2);
+    x.fillStyle = grd; x.fillRect(0, 0, W, H);
+    x.strokeStyle = th.line; x.lineWidth = 3; rr(x, 28, 28, W - 56, H - 56, 36); x.stroke();
+
+    if (logo) { try { x.drawImage(logo, 70, 66, 54, 54); } catch (e) {} }
+    x.fillStyle = th.text; x.font = font(900, 34); x.fillText("THUS", 140, 108);
+    x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
+    x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 100);
+    x.textAlign = "left";
+
+    x.fillStyle = th.text; x.font = font(900, 60); x.fillText((opts.title || "").slice(0, 30), 70, 232);
+    if (opts.sub) { x.fillStyle = th.muted; x.font = font(500, 24); x.fillText(String(opts.sub).slice(0, 70), 70, 274); }
+
+    let y = 322;
+    const rowH = Math.min(88, Math.floor((1090 - y) / Math.max(rows.length, 1)));
+    rows.forEach((r, i) => {
+      const tk = r.ticker || r.tk || "";
+      x.fillStyle = th.panel; rr(x, 70, y, W - 140, rowH - 10, 16); x.fill();
+      x.strokeStyle = th.line; x.lineWidth = 1.5; x.stroke();
+      const t = thumbs[i];
+      if (t) { x.save(); rr(x, 86, y + (rowH - 10) / 2 - 24, 48, 48, 24); x.clip(); x.drawImage(t, 86, y + (rowH - 10) / 2 - 24, 48, 48); x.restore(); }
+      x.fillStyle = th.text; x.font = font(800, 30); x.fillText(tk, 150, y + rowH / 2 + 8);
+      const sub = [String(r.industry || r.sector || r.group || "").slice(0, 22), String(r.lead || "").toLowerCase() === "leading" ? "★ นำตลาด" : ""].filter(Boolean).join(" · ");
+      if (sub) { x.fillStyle = th.muted; x.font = font(500, 19); x.fillText(sub, 150, y + rowH / 2 + 30); }
+      // ขวา: ราคา + %เปลี่ยน + RS
+      const px = r.price != null ? Number(r.price).toFixed(2) : "—";
+      x.textAlign = "right";
+      x.fillStyle = th.text; x.font = font(800, 30); x.fillText(px, W - 190, y + rowH / 2 + 4);
+      const ch = r.change != null ? Number(r.change) : null;
+      if (ch != null) { x.fillStyle = ch >= 0 ? th.up : th.down; x.font = font(700, 22); x.fillText((ch >= 0 ? "+" : "") + ch.toFixed(2) + "%", W - 190, y + rowH / 2 + 30); }
+      const rs = r.rs != null ? r.rs : (r.rs3 != null ? r.rs3 : null);
+      x.fillStyle = th.gold; x.font = font(800, 26); x.fillText(rs != null ? "RS " + rs : "", W - 88, y + rowH / 2 + 10);
+      x.textAlign = "left";
+      y += rowH;
+    });
+    if (!rows.length) { x.fillStyle = th.muted; x.font = font(600, 30); x.fillText("ยังไม่มีรายการ", 90, 420); }
+
+    x.fillStyle = th.muted; x.font = font(500, 24);
+    x.textAlign = "right";
+    x.fillText(opts.note || "ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 82);
+    x.textAlign = "left";
+    return c;
+  }
+
   /* ---------- การ์ดแชร์ ---------- */
   const THEMES = {
     dark: { bg: "#0B0910", bg2: "#15101B", panel: "#15101B", line: "#2A2233", text: "#F1EDF5", body: "#D9D2E0", muted: "#A597AD", gold: "#D4B67A", up: "#5CC6C8", down: "#F59A8C" },
@@ -122,7 +198,7 @@
     c.width = W; c.height = H;
     const x = c.getContext("2d");
     const row = (await rowOf(tk, mk)) || {};
-    const [f, bars, logo] = await Promise.all([loadFund(tk, mk), barsOf(tk, mk), loadImg("/brand/thus-symbol-" + (th === THEMES.dark ? "white" : "white") + ".png")]);
+    const [f, bars, logo, tlogo] = await Promise.all([loadFund(tk, mk), barsOf(tk, mk), loadImg("/brand/thus-symbol-white.png"), stockLogo(tk, mk)]);
 
     // พื้นหลัง
     const grd = x.createLinearGradient(0, 0, W, H);
@@ -132,22 +208,32 @@
 
     // หัวเว็บ
     if (logo) { try { x.drawImage(logo, 70, 66, 54, 54); } catch (e) {} }
-    x.fillStyle = th.text; x.font = font(800, 30); x.textBaseline = "alphabetic";
-    x.fillText("THUS HOUSE OF TRADERS", 140, 100);
-    x.fillStyle = th.gold; x.font = font(700, 22);
-    x.fillText("RS DASHBOARD", 140, 130);
+    x.fillStyle = th.text; x.font = font(900, 34); x.textBaseline = "alphabetic";
+    x.fillText("THUS", 140, 108);
     x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
     x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 100);
     x.textAlign = "left";
 
-    // ชื่อหุ้น
-    x.fillStyle = th.text; x.font = font(900, 96);
-    x.fillText(tk, 70, 260);
+    // โลโก้หุ้น + ชื่อย่อ
+    let nameX = 70;
+    if (tlogo) {
+      x.save();
+      rr(x, 70, 168, 96, 96, 48); x.clip(); x.drawImage(tlogo, 70, 168, 96, 96); x.restore();
+      nameX = 190;
+    }
+    x.fillStyle = th.text; x.font = font(900, 84);
+    x.fillText(tk, nameX, 250);
     const tw = x.measureText(tk).width;
-    x.fillStyle = th.muted; x.font = font(700, 26);
-    x.fillText(mk === "america" ? "US" : "TH", 70 + tw + 24, 220);
-    x.fillStyle = th.body; x.font = font(500, 30);
-    x.fillText((nm || "").slice(0, 44), 70, 312);
+    x.fillStyle = th.muted; x.font = font(700, 24);
+    x.fillText(mk === "america" ? "US" : "TH", nameX + tw + 20, 214);
+    x.fillStyle = th.body; x.font = font(500, 28);
+    x.fillText((nm || "").slice(0, 40), nameX, 296);
+    // กลุ่มหุ้น + สถานะนำตลาด
+    let tx = nameX;
+    const grp = (row.industry || row.sector || row.group || "").slice(0, 26);
+    if (grp) { x.fillStyle = th.muted; x.font = font(600, 22); x.fillText(grp, tx, 336); tx += x.measureText(grp).width + 16; }
+    const isLead = String(row.lead || "").toLowerCase() === "leading";
+    if (isLead) { x.fillStyle = th.gold; x.font = font(800, 22); x.fillText("★ นำตลาด", tx, 336); }
 
     // ราคา
     const lastBar = bars.length ? bars[bars.length - 1] : null;
@@ -213,7 +299,6 @@
 
     // ท้าย
     x.fillStyle = th.muted; x.font = font(500, 24);
-    x.fillText("rsdashclean.vercel.app", 70, H - 82);
     x.textAlign = "right";
     x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 82);
     x.textAlign = "left";
@@ -255,6 +340,26 @@
   }
 
   const ShareCard = {
+    async openList(opts) {
+      ensureCss();
+      let box = document.getElementById("shModal");
+      if (!box) return;
+      box.classList.add("on");
+      const img = document.getElementById("shImg");
+      const c = await drawList(opts);
+      const url = c.toDataURL("image/png");
+      img.src = url;
+      const fname = `rsdash_${(opts.title || "list").replace(/[^\w\u0E00-\u0E7F]+/g, "_")}_${new Date().toISOString().slice(0, 10)}.png`;
+      document.getElementById("shDl").onclick = () => { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); };
+      document.getElementById("shShare").onclick = async () => {
+        try {
+          const blob = await (await fetch(url)).blob();
+          const file = new File([blob], fname, { type: "image/png" });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: opts.title || "RS Dashboard" });
+          else { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); }
+        } catch (e) { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); }
+      };
+    },
     async open(tk, nm, mk) {
       ensureCss();
       let box = document.getElementById("shModal");

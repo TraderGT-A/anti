@@ -2252,7 +2252,8 @@ function pvTable(mk,title,list,cls){
       +'<td class="pv-hide-sm"><span class="det">'+det+'</span></td></tr>';
   }).join('');
   return '<div class="pv-sec"><span class="dot'+(cls==='b'?' b':'')+'"></span>'+title+' <b>'+list.length+'</b><span class="sp"></span>'
-    +'<button class="pv-btn" onclick="pvOpenList(\''+jq(title)+'\',\''+jq(mk)+'\',\''+jq(list.map(x=>x.s.ticker).join(','))+'\')">ดูการ์ดกราฟ</button></div>'
+    +'<button class="pv-btn" onclick="pvOpenList(\''+jq(title)+'\',\''+jq(mk)+'\',\''+jq(list.map(x=>x.s.ticker).join(','))+'\')">ดูการ์ดกราฟ</button>'
+    +'<button class="pv-btn" onclick="sharePivotGroup(\''+jq(title)+'\',\''+jq(mk)+'\',\''+jq(list.map(x=>x.s.ticker).join(','))+'\')">แชร์</button></div>'
     +'<div class="pv-scroll"><table class="pv-tbl"><thead><tr><th>หุ้น</th><th class="r">RS</th><th class="r">ราคา</th><th class="r pv-hide-sm">3M</th><th class="r pv-hide-sm">ถึงจุดสูง</th><th class="r">pivot</th><th class="r">ถึง pivot</th><th class="pv-hide-sm">รายละเอียด</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 }
 function pvSetScope(mk,tks){
@@ -3056,7 +3057,7 @@ function tdOpenList(k){ const L=TD.lists&&TD.lists[k]; if(L&&L.length) openStock
 function tdMini(x,m,i){ const s=x.s, ch=Number(s.change), up=ch>=0, ec=ernChips(s,m,true), rs=(x.rsv!=null?x.rsv:s.rs), rsh=Number.isFinite(Number(rs))?'<span class="rsr'+(rs<70?' lo':'')+'" title="RS">'+rs+'</span>':'';
   return '<div class="td-mr" onclick="openModal(\''+jq(s.ticker)+'\',\''+jq(s.name)+'\',\''+m+'\')"><span class="l">'+(i!=null?'<i class="rk">'+(i+1)+'</i>':'')+rsh+tkL(s.ticker,m,16)+'<b>'+s.ticker+'</b>'+tkT(s.ticker,m)+(x.stale?'<span class="pill" style="font-size:9px" title="'+(x.staleWhy||'').replace(/"/g,'')+'">ค้าง</span>':'')+(ec?'<span class="ern-wrap">'+ec+'</span>':'')+'</span><span class="g">'+bsGrpHtml(x.gi)+'</span>'+(x.tag?'<span class="tg">'+x.tag+'</span>':'')+(Number.isFinite(ch)?'<span class="v '+(up?'pos':'neg')+'">'+(up?'+':'')+ch.toFixed(2)+'%</span>':'')+'</div>'; }
 function tdBox(title,cls,n,list,m,empty,r0,key){
-  return '<div class="td-bx">'+(title?'<div class="td-bxh '+cls+'"><span>'+title+(n!=null?' <small>'+n+'</small>':'')+'</span>'+(key&&n?'<button class="tf-chip td-bxb" onclick="event.stopPropagation();tdOpenList(\''+key+'\')">การ์ดกราฟ '+n+'</button>'+wlBtn('td_'+key,'td-bxb'):'')+'</div>':'')+(list.length?list.map((x,i)=>tdMini(x,m,r0==null?null:r0+i)).join(''):'<div class="mu" style="padding:10px 12px">'+empty+'</div>')+'</div>'; }
+  return '<div class="td-bx">'+(title?'<div class="td-bxh '+cls+'"><span>'+title+(n!=null?' <small>'+n+'</small>':'')+'</span>'+(key&&n?'<button class="tf-chip td-bxb" onclick="event.stopPropagation();tdOpenList(\''+key+'\')">การ์ดกราฟ '+n+'</button>'+wlBtn('td_'+key,'td-bxb')+'<button class="tf-chip td-bxb" onclick="event.stopPropagation();shareToday(\''+key+'\')">แชร์</button>':'')+'</div>':'')+(list.length?list.map((x,i)=>tdMini(x,m,r0==null?null:r0+i)).join(''):'<div class="mu" style="padding:10px 12px">'+empty+'</div>')+'</div>'; }
 /* ปฏิทินงบ (เฉพาะหุ้น Buy/Wait): กริดรายเดือนเหมือนหน้าภาพรวม */
 function tdEarnShift(d){ if(d===0){ TD.cy=null; TD.cm=null; } else { TD.cm+=d; if(TD.cm<0){ TD.cm=11; TD.cy--; } else if(TD.cm>11){ TD.cm=0; TD.cy++; } } tdRender(); }
 function tdOpenDay(k){ const L=(TD.ev[k]||[]).map(x=>x.s); if(!L.length) return; const x=new Date(k*1000); openStockList('งบ '+ERN_DOW[x.getUTCDay()]+' '+x.getUTCDate()+' '+ERN_MON[x.getUTCMonth()],'หุ้น Buy / Wait ที่ประกาศงบ',L,currentMarket); }
@@ -3609,6 +3610,18 @@ function ensureNotes(m){   // คืน true เมื่อเพิ่งโ�
   notesLoading[m]=(async()=>{
     try{ const r=await fetch(API+'/api/notes?market='+m); const j=await r.json(); notesData[m]=new Map(((j&&j.data)||[]).map(x=>[x.ticker,x])); }
     catch(e){ notesData[m]=new Map(); }
+    // ตลาดไทย: ใช้ข่าวจาก Obsidian KB (Stocks_TH/*.md) ทับหัวข่าวเดิม — บอส 6 พ.ย. 2569
+    if(m==='thailand'){
+      try{
+        const kr=await fetch('/news_th.json'); if(kr.ok){
+          const kb=await kr.json();
+          Object.keys(kb||{}).forEach(function(tk){
+            const v=kb[tk]; const cur=notesData[m].get(tk)||{ticker:tk};
+            notesData[m].set(tk, Object.assign({}, cur, {headlines:(v.headlines||[]), news_7d:(v.headlines||[]).length, updated_at:v.updated_at, summary_at:v.updated_at, src:'kb'}));
+          });
+        }
+      }catch(e){}
+    }
     delete notesLoading[m]; return true;
   })();
   return notesLoading[m];
@@ -5573,6 +5586,22 @@ async function aboutTranslate(){
 function toggleModalMore(){
   const m=document.getElementById('chartModal'); const on=m.classList.toggle('show-more');
   const a=document.getElementById('modalMoreArrow'); if(a) a.textContent=on?'▴':'▾';
+}
+/* ===== แชร์การ์ดรายการ (Buy วันนี้ / Pivot) ===== */
+function shareToday(key){
+  try{
+    const m=currentMarket, r=BSS.res&&BSS.res[m]; if(!r) return;
+    const list=(key==='buy'?r.Buy:(key==='wait'?r.Wait:null))||[];
+    const src=(stockDB[m]||[]);
+    const rows=list.map(x=>{ const t=x.s&&x.s.ticker?x.s.ticker:x.ticker; const row=src.find(z=>z.ticker===t)||x.s||x; return {ticker:t,name:row.name,price:row.price,change:row.change,rs:row.rs!=null?row.rs:row.rs3,industry:row.industry||row.sector,lead:row.lead}; });
+    ShareCard.openList({title:(key==='buy'?'Buy วันนี้':'Wait วันนี้'), sub:(m==='america'?'US':'TH')+' · RS>'+BS_RS+' · '+rows.length+' ตัว', rows:rows, mk:m, max:11});
+  }catch(e){}
+}
+function sharePivotGroup(title, mk, csv){
+  try{
+    const rows=(csv||'').split(',').filter(Boolean).map(t=>{ const r=(stockDB[mk]||[]).find(z=>z.ticker===t)||{}; return {ticker:t,name:r.name,price:r.price,change:r.change,rs:r.rs,industry:r.industry||r.sector,lead:r.lead}; });
+    ShareCard.openList({title:title, sub:(mk==='america'?'US':'TH')+' · '+rows.length+' ตัว', rows:rows, mk:mk, max:11});
+  }catch(e){}
 }
 function openModal(tk,nm,mkt){
   activeTicker=tk;
