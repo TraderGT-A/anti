@@ -2075,12 +2075,12 @@ window.PV_SCOPE=null;    // {mk, map:{TK:rec}} — ใช้กับกรา�
 function pvApplyMarks(ser, data, tk){
   try{
     const sc=window.PV_SCOPE; const r=sc&&sc.map&&sc.map[tk]; if(!r||!ser||!data||!ser.createPriceLine) return;
-    try{ if(!ser.__pvLine){ ser.__pvLine=ser.createPriceLine({price:r.pivot, color:'#b08d3a', lineWidth:1, lineStyle:2, axisLabelVisible:true, title:'pivot'}); } else { try{ ser.__pvLine.applyOptions({price:r.pivot}); }catch(e){} } }catch(e){}
+    try{ if(!ser.__pvLine){ ser.__pvLine=ser.createPriceLine({price:r.pivot, color:'#b08d3a', lineWidth:1, lineStyle:0, axisLabelVisible:false, title:''}); } else { try{ ser.__pvLine.applyOptions({price:r.pivot}); }catch(e){} } }catch(e){}
     const has=t=>data.some(x=>String(x.time).slice(0,10)===t);
     const add=[];
     if(r.vduDate && has(r.vduDate)) add.push({time:r.vduDate, position:'belowBar', color:'#4d7a94', shape:'circle', text:'VDU'});
     // marker เบรกวางที่ “ใต้แท่ง/ใกล้ Low” ตามที่บอสสั่ง ไม่ใช่บน High
-    if(r.brkDate && has(r.brkDate)) add.push({time:r.brkDate, position:'belowBar', color:(r.brkVol&&r.brkVol>=1.5?'#4f9f75':'#c96a6a'), shape:'arrowUp', text:'break '+r.brkVol.toFixed(2)+'x'});
+    if(r.brkDate && has(r.brkDate)) add.push({time:r.brkDate, position:'belowBar', color:(r.brkVol&&r.brkVol>=1.5?'#4f9f75':'#c96a6a'), shape:'circle', text:r.brkVol.toFixed(2)+'x'});
     if(r.lows) r.lows.forEach(function(L,i){ if(has(L[0])) add.push({time:L[0], position:'belowBar', color:'#5d7d90', shape:'circle', text:'−'+r.dep[i]+'%'}); });
     if(!add.length) return;
     const k=BSM_REG.findIndex(e=>e.ser===ser);
@@ -2182,7 +2182,8 @@ function pvTable(mk,title,list,cls){
     const hiTxt=up==null?'<span class="mu">–</span>':'<b class="'+(up<=5?'pos':(up>=25?'neg':'mu'))+'">'+(up<=0.05?'ที่จุดสูง':'+'+up.toFixed(1)+'%')+'</b>';
     const det = r.kind==='VDU'
       ? (r.st==='BREAK' ? 'dry '+r.dry.toFixed(2)+'x · vol '+r.brkVol.toFixed(2)+'x · '+r.brkDate
-                        : 'dry '+r.dry.toFixed(2)+'x · อีก '+Math.abs(r.toGo).toFixed(1)+'%')
+         : (r.st==='รอ Vol' ? 'dry '+r.dry.toFixed(2)+'x · vol '+r.brkVol.toFixed(2)+'x (ยังไม่ถึง 1.8x)'
+                        : 'dry '+r.dry.toFixed(2)+'x · อีก '+Math.abs(r.toGo).toFixed(1)+'%'))
       : (r.st==='BREAK' ? 'ย่อ '+r.dep.join('/')+'% · vol '+r.brkVol.toFixed(2)+'x · '+r.brkDate
                         : 'ย่อ '+r.dep.join('/')+'% · อีก '+Math.abs(r.toGo).toFixed(1)+'%');
     return '<tr onclick="pvOpen(\''+jq(s.ticker)+'\',\''+jq(s.name||'')+'\',\''+mk+'\')">'
