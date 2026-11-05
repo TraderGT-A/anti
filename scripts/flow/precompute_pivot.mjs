@@ -98,6 +98,8 @@ function findVDU(b) {
     const dry = b[i][5] / av;
     if (brk && brk.bv >= 1.8 && n - 1 - brk.j <= 10 && c[n - 1] >= pivot && c[n - 1] <= pivot * 1.10) return { kind: "VDU", st: "BREAK", pivot: r2(pivot), close: r2(c[n - 1]), dry: r2(dry), vduDate: b[i][0], brkDate: b[brk.j][0], brkVol: r2(brk.bv), days: brk.j - i, toGo: r2((pivot / c[n - 1] - 1) * 100) };
     if (!brk && n - 1 - i <= 15 && c[n - 1] < pivot && pivot / c[n - 1] - 1 <= 0.10) return { kind: "VDU", st: "รอเบรก", pivot: r2(pivot), close: r2(c[n - 1]), dry: r2(dry), vduDate: b[i][0], brkDate: null, brkVol: null, days: n - 1 - i, toGo: r2((pivot / c[n - 1] - 1) * 100) };
+    // เบรกแล้วแต่ปริมาณยังไม่ถึง 1.8x → เก็บไว้เป็น "รอ Vol" (กันหุ้นหายจากลิสต์ทั้งที่เบรกแล้ว)
+    if (brk && brk.bv < 1.8 && n - 1 - brk.j <= 10 && c[n - 1] >= pivot && c[n - 1] <= pivot * 1.10) return { kind: "VDU", st: "รอ Vol", pivot: r2(pivot), close: r2(c[n - 1]), dry: r2(dry), vduDate: b[i][0], brkDate: b[brk.j][0], brkVol: r2(brk.bv), days: brk.j - i, toGo: r2((pivot / c[n - 1] - 1) * 100) };
   }
   return null;
 }
@@ -148,7 +150,8 @@ async function run(mk) {
       let bars = null;
       for (let k = 0; k < 2 && !bars; k++) {
         try {
-          bars = mk === "us" ? await yBars(sym, tz) : ((await tvBars(tv, tz)) || (await yBars(sym, tz)));
+          // ไทย: ใช้ Yahoo (.BK) ก่อนเพราะมีปริมาณครบทุกแท่ง (TV บางครั้งแท่งล่าสุดปริมาณยังไม่นิ่ง → หุ้นหายจากลิสต์)
+          bars = mk === "us" ? await yBars(sym, tz) : ((await yBars(sym, tz)) || (await tvBars(tv, tz)));
         } catch (e) { bars = null; }
         if (!bars) await sleep(600);
       }
