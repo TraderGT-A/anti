@@ -64,7 +64,7 @@ export default async function handler(req, res) {
   if (force) {
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   } else {
-    res.setHeader("Cache-Control", "no-store, max-age=0");   // ไม่ให้ CDN/เบราว์เซอร์ค้างชุดข้อมูลเก่า (อันดับ/RS เพี้ยนข้ามรอบ — บอส 4 พ.ย.)
+    res.setHeader("Cache-Control", "public, s-maxage=90, stale-while-revalidate=600");   // แคชสั้นที่ edge (90 วิ) — deploy ใหม่ล้าง cache เอง; ลดโหลดซ้ำตอนเปิดหลายหน้า
   }
 
   // universe 'all' → หุ้นสามัญล้วนทั้งตลาด (Top20 จริง ไม่อิงเกณฑ์ RS/สภาพคล่อง)

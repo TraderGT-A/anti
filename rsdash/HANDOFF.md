@@ -80,6 +80,13 @@
 
 ## ล็อก (ใหม่อยู่บน)
 
+### 6 พ.ย. 03:20 — Hermes (การ์ดแชร์ + พื้นฐาน + ประสิทธิภาพ)
+- `share.js` ใหม่: `ShareCard.open()` วาดการ์ด 1080×1350 ด้วย canvas (โลโก้/ชื่อ/ราคา/RS/52W/3M/Mcap/กราฟ 1 ปี/พื้นฐาน/ลายน้ำ) มีปุ่ม "ดาวน์โหลด PNG" และ "แชร์" (Web Share API), ปุ่มแชร์อยู่ในหัวป็อปอัปหุ้น
+- `FundRender()`: พื้นฐานใต้คำอธิบายบริษัท (P/E · P/S · P/B · กำไรขั้นต้น · กำไรสุทธิ · ปันผล · Mcap · รายได้ YoY) + กราฟแท่งกำไร 4 ไตรมาส — ข้อมูลจาก `rsdash/fund/<th|us>/<shard>.json` (สคริปต์ `scripts/fund/precompute_fund.mjs`, th 826 / us 2,356 ตัว)
+- คำอธิบายบริษัท: แสดงเต็มไม่ต้องกด "อ่านต่อ" และอ่านคำแปลจาก `/desc_th/` ก่อน (แปลล่วงหน้าด้วย `scripts/news/translate_desc_agy.py` ผ่าน agy)
+- ประสิทธิภาพ: `rshist_*` เต็ม 5.25/13.62MB → `rshist_*_lite.json` 0.73/2.17MB (60 แท่งล่าสุดพอสำหรับ streak) และ `api/_lib/rshist_*_data.js` เหลือ 0.15/0.55MB (เดิมเป็น bundle หลาย MB → cold start เร็วขึ้น)
+- `vercel.json` เพิ่ม headers แคช static (`/fund /desc /desc_th` 1 วัน, `/brand` 1 ปี immutable, `*.js` 7 วัน) · `/api/scan` เปลี่ยนจาก no-store → `s-maxage=90, swr=600` (deploy ใหม่ล้าง cache เอง)
+- ตรวจแล้ว: การ์ด 1080×1350 ทั้ง dark/light, พื้นฐาน 8 ชิป + 4 แท่ง, ไม่มี console error
 ### 6 พ.ย. 02:05 — Hermes (คืน pvSetScope + แก้การ์ดผู้นำรายเดือนไม่ขึ้นกราฟ)
 - Pivot: กดชื่อ/ดูการ์ดกราฟไม่ทำงาน → console `pvSetScope is not defined` เพราะฟังก์ชันหายตอนย้อนไฟล์จาก HEAD~1 → ใส่กลับ (`window.PV_SCOPE={mk,map}`)
 - ผู้นำรายเดือน (มุมมองการ์ด): console `tk is not defined` → ใน `ldApply()` การ์ดเรียก `sgChip(tk,m)` ด้วยตัวแปรที่ไม่มีในสโคป → เปลี่ยนเป็น `sgChip(p.ticker,ldMarket)`

@@ -5,16 +5,12 @@
   'use strict';
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const shardOf = (tk) => { const c = String(tk || '').charAt(0).toUpperCase(); return c >= 'A' && c <= 'Z' ? c : '0'; };
-  const LIMIT = 320;
-
+  // แสดงคำอธิบายเต็มเสมอ (บอส 6 พ.ย. 2026 — ไม่ต้องกด "อ่านต่อ")
   function aboutHtml(text, th) {
     if (!text) return '';
     const t = String(text);
-    const head = '<div class="text-[11px] text-slate-400 font-semibold mb-0.5">🏢 เกี่ยวกับบริษัท <span class="font-normal text-slate-500">' + (th ? '(Yahoo Finance · แปลไทยอัตโนมัติ)</span> <button type="button" class="text-sky-400 font-normal" onclick="aboutToggle()">ดูต้นฉบับ EN</button>' : '(Yahoo Finance)</span>') + '</div>';
-    if (t.length <= LIMIT) return `<div class="text-[12px] leading-relaxed p-2 bg-[#0b1018] rounded-lg border border-[#1e2634]">${head}${esc(t)}</div>`;
-    let cut = t.lastIndexOf('. ', LIMIT); if (cut < 120) cut = LIMIT;
-    return `<div class="text-[12px] leading-relaxed p-2 bg-[#0b1018] rounded-lg border border-[#1e2634]">${head}${esc(t.slice(0, cut + 1))}` +
-      `<details class="inline"><summary class="cursor-pointer text-sky-400 inline">อ่านต่อ</summary>${esc(t.slice(cut + 1))}</details></div>`;
+    const head = '<div class="text-[11px] text-slate-400 font-semibold mb-0.5">🏢 เกี่ยวกับบริษัท <span class="font-normal text-slate-500">' + (th ? '(Yahoo Finance · แปลไทย)' : '(Yahoo Finance)') + '</span>' + (th ? ' <button type="button" class="text-sky-400 font-normal" onclick="aboutToggle()">ต้นฉบับ EN</button>' : '') + '</div>';
+    return `<div class="text-[12px] leading-relaxed p-2 rounded-lg border" style="background:var(--panel2);border-color:var(--line)">${head}${esc(t)}</div>`;
   }
 
   g.About = { shardOf, aboutHtml };
