@@ -28,8 +28,16 @@ export default async function handler(req, res) {
   const tk = String(req.query.tk || "").toUpperCase();
   if (!/^[A-Z0-9.\-&]{1,12}$/.test(tk)) return res.status(400).json({ error: "bad ticker" });
   const shard = /^[A-Z]/.test(tk) ? tk[0] : "0";
+  const host = req.headers["x-forwarded-host"] || req.headers.host;
+  // 1) ใช้ไฟล์แปลที่เตรียมไว้ล่วงหน้า (desc_th/…) ก่อน — Google Translate จาก IP ของ Vercel โดน 429 บ่อย
   try {
-    const host = req.headers["x-forwarded-host"] || req.headers.host;
+    const pre = await fetch(`https://${host}/desc_th/${mk}/${shard}.json`, { signal: AbortSignal.timeout(5000) });
+    if (pre.ok) {
+      const th0 = (await pre.json())[tk];
+      if (th0) { res.setHeader("Cache-Control", "public, s-maxage=2592000, stale-while-revalidate=86400"); return res.status(200).json({ tk, th: String(th0), src: "static" }); }
+    }
+  } catch (e) {}
+  try {
     const src = await fetch(`https://${host}/desc/${mk}/${shard}.json`, { signal: AbortSignal.timeout(5000) });
     if (!src.ok) throw new Error("desc " + src.status);
     const en = (await src.json())[tk];
