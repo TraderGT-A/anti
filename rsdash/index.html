@@ -372,6 +372,7 @@ html .dot-legend { display:flex; flex-wrap:wrap; gap:4px 16px; font-size:11px; c
 html .dot-legend span { display:inline-flex; align-items:center; gap:6px; }
 html .dot-legend i { display:inline-block; width:7px; height:7px; border-radius:50%; }
 html .dot-legend .lg-news { font-size:11px; line-height:1; } html .dot-legend .lg-ssf { background:var(--up); } html .dot-legend .lg-ern { background:var(--gold); }
+html .edot.gray{background:#5b6875 !important;box-shadow:none !important;animation:none !important}
 html .dot-ssf { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--up); flex:none; margin-left:3px; vertical-align:middle; }
 /* ป้ายงบทุกชนิด: ขอบบางโปร่งแสง + พื้นจางมาก (สีตามสถานะ) */
 html .ern { padding:2px 9px; margin:2px 6px 2px 0; font-size:11px; font-weight:500; border:1px solid color-mix(in srgb, var(--muted) 30%, transparent); background:color-mix(in srgb, var(--muted) 7%, transparent) !important; color:var(--muted); border-radius:999px; }
@@ -1445,6 +1446,8 @@ html .gs-empty{padding:8px 10px;color:#5d6b7d;font-size:11.5px}
 #pivotPanel table.pv-tbl td .det{color:#6f8093;font-size:10.5px;line-height:1.35}
 #pivotPanel .pv-empty{font-size:11.5px;color:#5d6b7d;padding:8px 0}
 #pivotPanel .pv-only-sm{display:none}
+#pivotPanel .pv-nm{display:block;font-size:10px;color:#6f8093;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pivotPanel .pv-pre{font-size:9.5px;padding:0 5px;border-radius:4px;background:#2b2416;color:#c9a24a;border:1px solid #4a3d1c}
 #pivotPanel .rs90{color:#4fbf87}#pivotPanel .rs80{color:#a8d3a2}#pivotPanel .rslo{color:#7c8b9c}
 #pivotPanel .pos{color:#4fbf87}#pivotPanel .neg{color:#d9737a}#pivotPanel .mu{color:#6f8093}
 @media (max-width:640px){
@@ -1863,24 +1866,8 @@ function ernGrow(label, y, q){
   const ttl = label+'ไตรมาสล่าสุดเทียบ'+(qoq?'ไตรมาสก่อน':'ไตรมาสเดียวกันของปีก่อน')+' · '+(v>0?'+':'')+v+'%';
   return '<span class="ern '+cls+'" title="'+ttl+'">'+label+' '+(v>0?'▲':(v<0?'▼':'•'))+' '+t+'% <small style="opacity:.75;font-weight:500">'+(qoq?'QoQ':'YoY')+'</small></span>';
 }
-function ernChips(s, mk, compact){
-  const i=ernInfo(s, mk); if(!i) return '';
-  if(compact && (i.st==='out'||i.st==='far'||i.st==='old'||i.st==='filed')) return '';   // โหมดย่อ (Top20/ผู้นำ): เตือนเฉพาะ "งบกำลังจะออก" — งบที่ออกแล้วดูในป็อปอัปของหุ้น
-  if(i.st==='soon') return '<span class="ern soon'+(i.d===i.tn?' today':'')+'" title="วันประกาศงบ (ข้อมูล TradingView อาจคลาดเคลื่อน 1 วัน)">งบ '+ernLbl(i.d,i.tn)+'</span>';
-  if(i.st==='filed'){
-    const f=(mk==='thailand'&&SETF&&s&&s.ticker)?SETF[s.ticker]:null, ny=(f&&typeof f.niY==='number')?f.niY:null;
-    if(ny!=null){
-      const cls=ny>0?'up':(ny<0?'dn':''), a=Math.abs(ny), t=a>=1000?'>999':String(Math.round(a));
-      const ttl='ยื่นงบต่อ SET แล้ว (ยืนยันจากข่าว SET) · กำไร '+(ny>0?'+':'')+ny+'% YoY · รายได้รอ TradingView';
-      return '<span class="ern filed" title="'+ttl+'">ยื่นงบแล้ว '+ernLbl(i.d,i.tn)+'</span><span class="ern '+cls+'" title="'+ttl+'">กำไร '+(ny>0?'▲':'▼')+t+'% <small style="opacity:.75;font-weight:500">YoY</small></span>';
-    }
-    return '<span class="ern filed" title="ยื่นงบต่อ SET แล้ว (ยืนยันจากข่าว SET) · ตัวเลขกำไร/รายได้รอ TradingView อัปเดต">ยื่นงบแล้ว '+ernLbl(i.d,i.tn)+' · รอตัวเลข</span>';
-  }
-  if(i.st==='far') return '<span class="ern" title="วันประกาศงบครั้งถัดไป (ข้อมูล TradingView อาจคลาดเคลื่อน 1 วัน)">งบถัดไป '+ernShort(i.d,i.tn)+'</span>';
-  if(i.st==='old') return '<span class="ern" title="ประกาศงบล่าสุดเมื่อ '+ernShort(i.d,i.tn)+'">งบล่าสุด '+ernShort(i.d,i.tn)+'</span>'+ernGrow('กำไร',s.niY,s.niQ)+ernGrow('รายได้',s.rvY,s.rvQ)+ernSurp(s,mk);
-  if(i.st==='pend') return '<span class="ern pend" title="ถึงกำหนดแล้ว รอ TradingView อัปเดตตัวเลข">งบครบกำหนด '+ernLbl(i.d,i.tn)+' · รอตัวเลข</span>';
-  return '<span class="ern" title="ประกาศงบแล้ว">งบออกแล้ว '+ernLbl(i.d,i.tn)+'</span>'+ernGrow('กำไร',s.niY,s.niQ)+ernGrow('รายได้',s.rvY,s.rvQ)+ernSurp(s,mk);
-}
+function ernChips(s, mk, compact){ try{ return ernDot(s && s.ticker, mk); }catch(e){ return ''; } }   // มินิมอล: ป้ายงบเหลือจุดเดียว (รายละเอียดในป็อปอัป)
+
 /* เทียบประมาณการนักวิเคราะห์ (EPS ไตรมาสล่าสุด): "เกินคาด ▲x%" / "ต่ำกว่าคาด ▼x%" · รายละเอียด (จริง/คาด/รายได้) ในคำอธิบายตอนชี้ · ข้อมูล /api/flow?kind=surp (TradingView) โหลดครั้งเดียวต่อตลาด */
 const SURP={};
 function surpLoad(mk){
@@ -1937,6 +1924,7 @@ function sgChip(tk, m){
 function ernDot(tk, m){
   try{ const s=_rowOf(tk,m); if(!s) return ''; const i=ernInfo(s, m||currentMarket); if(!i) return '';
     if(i.st==='soon'||i.st==='today') return '<i class="edot" title="มีงบในสัปดาห์นี้ ('+ernLbl(i.d,i.tn)+')"></i>';
+    if(i.st==='filed'||i.st==='out') return '<i class="edot gray" title="ประกาศงบแล้ว ('+ernLbl(i.d,i.tn)+')"></i>';
   }catch(e){}
   return '';
 }
@@ -2096,7 +2084,8 @@ function pvApplyMarks(ser, data, tk){
     }
     const add=[];
     // ── จุด VDU ย้อนหลัง (ไม่มีข้อความ) ──
-    if(r.vdus) r.vdus.forEach(function(d){ if(has(d)) add.push({time:d, position:'belowBar', color:'#4d7a94', shape:'circle'}); });
+    const dots=(r.vdus||[]).slice(); if(r.vduDate && dots.indexOf(r.vduDate)<0) dots.push(r.vduDate);
+    dots.forEach(function(d){ if(has(d)) add.push({time:d, position:'belowBar', color:'#4d7a94', shape:'circle'}); });
     // ── จุดเบรก + ตัวเลขปริมาณ ──
     if(r.brkDate && has(r.brkDate)) add.push({time:r.brkDate, position:'belowBar', color:(r.brkVol&&r.brkVol>=1.5?'#4f9f75':'#c96a6a'), shape:'circle', text:r.brkVol.toFixed(2)+'x'});
     // ── จุดย่อของ VCP (มี %) ──
@@ -2197,42 +2186,50 @@ function pvRows(mk,kind,st){
   const map=new Map(arr.map(s=>[s.ticker,s]));
   const d=PV.cache[mk==='america'?'us':'th']||{rows:[]};
   const pick=s=>s?( (typeof RS_BASE!=='undefined'&&RS_BASE==='6m')?s.rs6:(RS_BASE==='1y'?s.rs1:s.rs3) )??s.rs:null;
-  return (d.rows||[]).filter(r=>r.kind===kind && (st==='BREAK'? r.st==='BREAK' : r.st!=='BREAK'))
-    .map(r=>{ const s=map.get(r.tk)||null; return {r, s, rs:pick(s)}; })
-    .filter(x=>x.s && Number(x.rs)>60)
-    .sort((a,b)=>(b.rs||0)-(a.rs||0));
+  const out=[];
+  (d.rows||[]).forEach(r=>{
+    if(r.kind!==kind) return;
+    const s=map.get(r.tk)||null; if(!s) return;
+    const rs=pick(s); if(!(Number(rs)>60)) return;
+    const px=Number(s.price), pv=Number(r.pivot);
+    const live = px>0 && pv>0 && px > pv*1.001;          // เบรกราคาสด
+    const eff = r.st==='BREAK' ? 'BREAK' : (live ? 'BREAK' : (r.st==='รอ Vol' ? 'รอ Vol' : 'รอเบรก'));
+    const pre = (eff==='BREAK' && r.st!=='BREAK');       // ยังไม่คอนเฟิร์มด้วยแท่งปิด
+    const refPx = (eff==='BREAK' && pre) ? px : Number(r.close);
+    const toPivot = (pv>0 && refPx>0) ? (pv/refPx-1)*100 : null;
+    out.push({r,s,rs,eff,pre,toPivot,live,px});
+  });
+  const wantBreak = st==='BREAK';
+  return out.filter(x=> wantBreak ? x.eff==='BREAK' : x.eff!=='BREAK')
+            .sort((a,b)=> wantBreak ? (b.rs-a.rs) : ((a.toPivot??999)-(b.toPivot??999)));
 }
 function pvTable(mk,title,list,cls){
   if(!list.length) return '';
-  const rows=list.slice(0,100).map(({r,s,rs})=>{
+  const rows=list.slice(0,100).map(({r,s,rs,eff,pre,toPivot,px})=>{
     const hi=Number(s.hi52), p=Number(s.price);
     const up=(hi>0&&p>0)?(hi/p-1)*100:null;
     const hiTxt=up==null?'<span class="mu">–</span>':'<b class="'+(up<=5?'pos':(up>=25?'neg':'mu'))+'">'+(up<=0.05?'ที่จุดสูง':'+'+up.toFixed(1)+'%')+'</b>';
+    const brkRed = eff==='BREAK';
+    const toTxt = brkRed
+      ? (pre?'<span class="pv-pre">Pre</span>':'<span class="mu">เบรกแล้ว</span>')
+      : '<b class="'+(Math.abs(toPivot)<=3?'pos':'mu')+'">'+(toPivot==null?'–':'+'+Math.abs(toPivot).toFixed(1)+'%')+'</b>';
     const det = r.kind==='VDU'
-      ? (r.st==='BREAK' ? 'dry '+r.dry.toFixed(2)+'x · vol '+r.brkVol.toFixed(2)+'x · '+r.brkDate
-         : (r.st==='รอ Vol' ? 'dry '+r.dry.toFixed(2)+'x · vol '+r.brkVol.toFixed(2)+'x (ยังไม่ถึง 1.8x)'
-                        : 'dry '+r.dry.toFixed(2)+'x · อีก '+Math.abs(r.toGo).toFixed(1)+'%'))
-      : (r.st==='BREAK' ? 'ย่อ '+r.dep.join('/')+'% · vol '+r.brkVol.toFixed(2)+'x · '+r.brkDate
-                        : 'ย่อ '+r.dep.join('/')+'% · อีก '+Math.abs(r.toGo).toFixed(1)+'%');
+      ? 'dry '+r.dry.toFixed(2)+'x'+(r.brkVol!=null?' · vol '+r.brkVol.toFixed(2)+'x':'')
+      : 'ย่อ '+r.dep.join('/')+'%'+(r.brkVol!=null?' · vol '+r.brkVol.toFixed(2)+'x':'');
     return '<tr onclick="pvOpen(\''+jq(s.ticker)+'\',\''+jq(s.name||'')+'\',\''+mk+'\')">'
-      +'<td><span class="tk">'+s.ticker+'</span><span class="det pv-only-sm">'+det+'</span></td>'
+      +'<td><div class="tkcell"><span class="tkrow">'+tkL(s.ticker,mk,16)+'<b>'+s.ticker+'</b>'+tkT(s.ticker,mk)+'</span>'
+      +'<span class="pv-nm">'+(s.name||'')+'</span></div></td>'
       +'<td class="r"><b class="'+(rs>=90?'rs90':(rs>=80?'rs80':'rslo'))+'">'+(rs==null?'–':rs)+'</b></td>'
       +'<td class="r">'+fNum(s.price)+'</td>'
       +'<td class="r pv-hide-sm">'+clPc(s.p3m)+'</td>'
       +'<td class="r pv-hide-sm">'+hiTxt+'</td>'
       +'<td class="r">'+fNum(r.pivot)+'</td>'
+      +'<td class="r">'+toTxt+'</td>'
       +'<td class="pv-hide-sm"><span class="det">'+det+'</span></td></tr>';
   }).join('');
   return '<div class="pv-sec"><span class="dot'+(cls==='b'?' b':'')+'"></span>'+title+' <b>'+list.length+'</b><span class="sp"></span>'
     +'<button class="pv-btn" onclick="pvOpenList(\''+jq(title)+'\',\''+jq(mk)+'\',\''+jq(list.map(x=>x.s.ticker).join(','))+'\')">ดูการ์ดกราฟ</button></div>'
-    +'<div class="pv-scroll"><table class="pv-tbl"><thead><tr><th>หุ้น</th><th class="r">RS</th><th class="r">ราคา</th><th class="r pv-hide-sm">3M</th><th class="r pv-hide-sm">ถึงจุดสูง</th><th class="r">pivot</th><th class="pv-hide-sm">รายละเอียด</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
-}
-function pvSetScope(mk,tks){
-  try{
-    const rows=((PV.cache[mk==='america'?'us':'th']||{}).rows)||[];
-    const map={}; rows.forEach(r=>{ if(!tks||tks.indexOf(r.tk)>=0) map[r.tk]=r; });
-    window.PV_SCOPE={mk:mk, map:map};
-  }catch(e){}
+    +'<div class="pv-scroll"><table class="pv-tbl"><thead><tr><th>หุ้น</th><th class="r">RS</th><th class="r">ราคา</th><th class="r pv-hide-sm">3M</th><th class="r pv-hide-sm">ถึงจุดสูง</th><th class="r">pivot</th><th class="r">ถึง pivot</th><th class="pv-hide-sm">รายละเอียด</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 }
 function pvOpen(tk,name,mk){ pvSetScope(mk,[tk]); try{ window.PIVOT_CTX=(window.PV_SCOPE.map||{})[tk]||null; }catch(e){} try{ openModal(tk,name,mk); }catch(e){} }
 function pvOpenList(title,mk,csv){
