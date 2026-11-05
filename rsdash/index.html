@@ -989,6 +989,21 @@ html #loadBar .tm{margin-left:auto;font-variant-numeric:tabular-nums;opacity:.7}
 @keyframes ldspin{to{transform:rotate(360deg)}}
 html body.lding #pageWrap{padding-top:26px}
 </style>
+<style>
+html .gs-wrap{position:relative;display:flex;align-items:center;gap:6px;height:30px;padding:0 9px;border-radius:9px;border:1px solid var(--line2);background:#0b1017;min-width:190px}
+html .gs-wrap .gs-ic{color:#64748b;flex:none}
+html .gs-inp{width:100%;background:transparent;border:0;outline:0;color:var(--text);font-size:12px;height:26px}
+html .gs-inp::placeholder{color:#5d6b7d}
+html .gs-res{position:absolute;left:0;right:0;top:34px;background:#0d131b;border:1px solid var(--line2);border-radius:10px;box-shadow:0 12px 28px rgba(0,0,0,.45);display:none;z-index:60;max-height:330px;overflow-y:auto}
+html .gs-res.on{display:block}
+html .gs-row{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;font-size:12px;color:var(--text)}
+html .gs-row:hover,html .gs-row.sel{background:#141d27}
+html .gs-row .t{font-weight:600;min-width:54px}
+html .gs-row .n{color:#8393a5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html .gs-row .r{margin-left:auto;color:#5d6b7d;font-variant-numeric:tabular-nums;font-size:11px}
+html .gs-empty{padding:8px 10px;color:#5d6b7d;font-size:11.5px}
+@media (max-width:640px){ html .gs-wrap{min-width:0;width:100%;order:9} }
+</style>
 <body class="py-3 sm:py-4 md:py-6">
 <div class="max-w-7xl mx-auto w-full px-2 sm:px-4 md:px-6">
 <div id="topbar">
@@ -998,6 +1013,11 @@ html body.lding #pageWrap{padding-top:26px}
     <h1 class="text-lg md:text-xl font-bold flex items-center gap-2">
       RS Dashboard <span class="text-slate-400 font-semibold" style="display:none">· <span id="stockCount">…</span></span> <span id="mkChip" class="mk-chip" title="ตลาดที่กำลังดู — ทุกแผงในหน้านี้แสดงข้อมูลของตลาดนี้เท่านั้น">TH</span> <span class="tip text-[10px] text-slate-500" style="display:none">ⓘ<span class="tipbox">ตัวบนสุดของชื่อ = ผ่านเกณฑ์ขั้นต่ำลงตาราง (value/ราคา/mcap/volume) · ทั้งกระดาน = หุ้นผ่านเกณฑ์คำนวณ RS (ตัด junk)</span></span>
     </h1>
+    <div class="gs-wrap" id="gsWrap">
+      <svg class="gs-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
+      <input id="gsInp" class="gs-inp" type="text" placeholder="ค้นหาหุ้น" autocomplete="off" spellcheck="false" aria-label="ค้นหาหุ้นทั้งเว็บ">
+      <div id="gsRes" class="gs-res"></div>
+    </div>
     <div class="flex items-center gap-3">
           <!-- ปุ่มปรับขนาดตัวหนังสือ (zoom เว็บ) -->
           <div class="zoom-seg flex gap-1 bg-[#0a0f16] p-1 rounded-lg border border-[#243044]" title="ปรับขนาดตัวหนังสือทั่วเว็บ">
@@ -1391,12 +1411,14 @@ html body.lding #pageWrap{padding-top:26px}
 
   <div id="stkLegend" class="dot-legend"><span><i class="lg-news"></i>ข่าว: มีข่าวใน 7 วัน (กดจุดอ่านสรุป)</span><span><i class="lg-ssf"></i>SSF: มีสัญญาซื้อขายล่วงหน้ารายตัวที่ TFEX</span><span><i class="lg-dr"></i>DR: หุ้นเมกาที่ซื้อในไทยได้ผ่าน DR</span><span><i class="lg-ern"></i>งบ: ใกล้ประกาศ / ประกาศแล้ว (ป้ายข้างชื่อ)</span></div>
   <div id="pivotPanel" style="display:none">
-  <div class="pv-hd" id="pvHd" role="button"><span class="pv-cv" id="pvCv">▸</span><span class="pv-tt">Pivot Break</span><span class="pv-info" id="pvInfo"></span></div>
+  <div class="pv-hd" id="pvHd" role="button"><h2 class="text-sm font-bold flex items-center gap-2" style="margin:0"><span class="h-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l5-6 4 3 4-7 5 4"/><path d="M3 21h18"/><circle cx="16" cy="7" r="2.2"/></svg></span>Pivot Break — เบรกยอดฐาน <span class="mk-chip mk-tag"></span></h2><span class="pv-info" id="pvInfo"></span><span class="pv-cv" id="pvCv">▸</span></div>
   <div id="pvList" class="pv-list" style="display:none"></div>
 </div>
 <style>
 #pivotPanel{margin:12px 0 6px;background:#0b1017;border:1px solid #1b2431;border-radius:12px;padding:0;overflow:hidden}
-#pivotPanel .pv-hd{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid #151d28;cursor:pointer;user-select:none;background:#0d131b}
+#pivotPanel .pv-hd{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #151d28;cursor:pointer;user-select:none;background:#0d131b;flex-wrap:wrap}
+#pivotPanel .pv-hd h2{color:#cbd5e1;font-size:13px}
+#pivotPanel .pv-cv{margin-left:2px}
 #pivotPanel .pv-cv{font-size:10px;color:#61707f;width:9px}
 #pivotPanel.open .pv-cv{color:#8b9bab}
 #pivotPanel .pv-tt{font-size:12.5px;font-weight:600;color:#c8d3de;letter-spacing:.2px}
@@ -2066,6 +2088,58 @@ function pvApplyMarks(ser, data, tk){
     else ser.setMarkers(add);
   }catch(e){}
 }
+
+/* ── ค้นหาหุ้นทุกหน้า (global search ในหัวเว็บ) ── */
+const GS = { items:[], sel:-1 };
+function gsPool(){
+  const mk=(typeof currentMarket!=='undefined'&&currentMarket)||'thailand';
+  const arr=(typeof stockDB!=='undefined'&&stockDB[mk])||[];
+  return {mk, arr};
+}
+function gsHide(){ const r=document.getElementById('gsRes'); if(r){ r.classList.remove('on'); r.innerHTML=''; } GS.items=[]; GS.sel=-1; }
+function gsGo(tk, name, mk){
+  gsHide();
+  const inp=document.getElementById('gsInp'); if(inp){ inp.value=''; inp.blur(); }
+  try{ openModal(tk, name||'', mk); }catch(e){}
+}
+function gsRender(q){
+  const box=document.getElementById('gsRes'); if(!box) return;
+  const {mk, arr}=gsPool();
+  const s=String(q||'').trim().toLowerCase();
+  if(!s){ gsHide(); return; }
+  const hit=arr.filter(x=>x && ((x.ticker||'').toLowerCase().startsWith(s) || (x.name||'').toLowerCase().includes(s))).slice(0,12);
+  GS.items=hit; GS.sel=hit.length?0:-1;
+  if(!hit.length){ box.innerHTML='<div class="gs-empty">ไม่พบหุ้นในตลาดนี้</div>'; box.classList.add('on'); return; }
+  box.innerHTML=hit.map(function(x,i){
+    const rs=(x.rs3!=null?x.rs3:(x.rs!=null?x.rs:''));
+    return '<div class="gs-row'+(i===0?' sel':'')+'" data-i="'+i+'" data-tk="'+x.ticker.replace(/"/g,'')+'" data-mk="'+mk+'">'
+      +'<span class="t">'+x.ticker+'</span><span class="n">'+(x.name||'')+'</span><span class="r">'+(rs!==''?'RS '+rs:'')+'</span></div>';
+  }).join('');
+  box.classList.add('on');
+  box.querySelectorAll('.gs-row').forEach(function(el){
+    el.onclick=function(){ const x=hit[+el.dataset.i]; gsGo(x.ticker, x.name, mk); };
+  });
+}
+function gsMove(d){
+  const box=document.getElementById('gsRes'); if(!box||!GS.items.length) return;
+  GS.sel=(GS.sel+d+GS.items.length)%GS.items.length;
+  box.querySelectorAll('.gs-row').forEach(function(el,i){ el.classList.toggle('sel', i===GS.sel); });
+  const cur=box.querySelectorAll('.gs-row')[GS.sel]; if(cur&&cur.scrollIntoView) cur.scrollIntoView({block:'nearest'});
+}
+document.addEventListener('input', function(e){
+  if(e.target && e.target.id==='gsInp') gsRender(e.target.value);
+});
+document.addEventListener('keydown', function(e){
+  const inp=document.getElementById('gsInp'); if(!inp || document.activeElement!==inp) return;
+  if(e.key==='ArrowDown'){ e.preventDefault(); gsMove(1); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); gsMove(-1); }
+  else if(e.key==='Enter'){ if(GS.items.length){ const x=GS.items[Math.max(0,GS.sel)]; gsGo(x.ticker,x.name,(typeof currentMarket!=='undefined'?currentMarket:'thailand')); } }
+  else if(e.key==='Escape'){ gsHide(); inp.blur(); }
+});
+document.addEventListener('click', function(e){
+  const w=document.getElementById('gsWrap'); if(w && !w.contains(e.target)) gsHide();
+});
+
 function pvToggle(force){
   const p=document.getElementById('pivotPanel'), l=document.getElementById('pvList'), c=document.getElementById('pvCv');
   if(!p||!l) return;
@@ -5400,13 +5474,32 @@ async function loadAbout(tk, mk){
     if(!aboutShards[key]) aboutShards[key]=fetch('/desc/'+key+'.json').then(r=>r.ok?r.json():{}).catch(()=>({}));
     const map=await aboutShards[key];
     if(activeTicker!==tk) return;
-    const en=map[tk]; el.innerHTML=About.aboutHtml(en);
-    if(!en) return;
-    // แปลไทย (ฟรี ไม่ใช้ LLM · /api/th แคช 30 วัน) — แปลไม่ได้ก็คงอังกฤษเดิม
-    const r=await fetch(API+'/api/flow?kind=tr&mk='+(mk==='america'?'us':'th')+'&tk='+encodeURIComponent(tk)).then(x=>x.ok?x.json():null).catch(()=>null);
-    if(!r||!r.th||activeTicker!==tk) return;
-    aboutTxt={en,th:r.th,showTh:true}; el.innerHTML=About.aboutHtml(r.th,true);
+    const en=map[tk]; if(!en) { el.innerHTML=''; return; }
+    // ไม่แปลอัตโนมัติแล้ว (บอส 5 พ.ย. 69) — แสดงอังกฤษ + ปุ่ม "แปล" ให้กดเอง ประหยัดการเรียก/กัน 429
+    const cached=(function(){ try{ return sessionStorage.getItem('abt_'+mk+'_'+tk)||''; }catch(e){ return ''; } })();
+    if(cached){ aboutTxt={en,th:cached,showTh:true}; el.innerHTML=About.aboutHtml(cached,true); return; }
+    aboutTxt={en,th:null,showTh:false,mk:mk,tk:tk};
+    el.innerHTML=About.aboutHtml(en)+'<div style="margin-top:6px"><button type="button" class="tf-chip" onclick="aboutTranslate()">แปล</button></div>';
   }catch(e){}
+}
+async function aboutTranslate(){
+  const el=document.getElementById('modalAbout'); if(!el) return;
+  const btn=el.querySelector('button'); if(btn){ btn.disabled=true; btn.textContent='กำลังแปล…'; }
+  const tk=(aboutTxt&&aboutTxt.tk)||activeTicker;
+  const mk=(aboutTxt&&aboutTxt.mk)||activeMarket;
+  try{
+    const r=await fetch(API+'/api/flow?kind=tr&mk='+(mk==='america'?'us':'th')+'&tk='+encodeURIComponent(tk)).then(x=>x.ok?x.json():null).catch(()=>null);
+    if(!r||!r.th){
+      if(btn){ btn.disabled=false; btn.textContent='แปลไม่สำเร็จ · ลองใหม่'; }
+      return;
+    }
+    try{ sessionStorage.setItem('abt_'+mk+'_'+tk, r.th); }catch(e){}
+    if(activeTicker!==tk) return;
+    aboutTxt=Object.assign({},aboutTxt,{th:r.th,showTh:true,tk:tk,mk:mk});
+    el.innerHTML=About.aboutHtml(r.th,true)+'<div style="margin-top:6px"><button type="button" class="tf-chip" onclick="aboutToggle()">ต้นฉบับ</button></div>';
+  }catch(e){
+    if(btn){ btn.disabled=false; btn.textContent='แปลไม่สำเร็จ · ลองใหม่'; }
+  }
 }
 function toggleModalMore(){
   const m=document.getElementById('chartModal'); const on=m.classList.toggle('show-more');
