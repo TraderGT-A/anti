@@ -129,7 +129,7 @@ function findVCP(b) {
   else st = bv >= 1.5 && c[n - 1] >= pivot && c[n - 1] <= pivot * 1.10 ? "BREAK" : (bv >= 1.5 ? null : "รอ Vol");
   if (!st) return null;
   const keep = st !== "รอเบรก";
-  return { kind: "VCP", st, pivot: r2(pivot), close: r2(c[n - 1]), dry: null, dep: dep.map(r2), brkDate: keep && bidx !== null ? w[bidx][0] : null, brkVol: keep && bv !== null ? r2(bv) : null, toGo: r2((pivot / c[n - 1] - 1) * 100), base: n - t[0][0][0] };
+  return { kind: "VCP", st, pivot: r2(pivot), close: r2(c[n - 1]), dry: null, dep: dep.map(r2), brkDate: keep && bidx !== null ? w[bidx][0] : null, brkVol: keep && bv !== null ? r2(bv) : null, toGo: r2((pivot / c[n - 1] - 1) * 100), base: n - t[0][0][0], lows: t.map(([h, l]) => [w[l[0]][0], r2(l[1])]), highs: t.map(([h]) => [w[h[0]][0], r2(h[1])]) };
 }
 
 async function run(mk) {

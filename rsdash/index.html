@@ -1391,8 +1391,8 @@ html body.lding #pageWrap{padding-top:26px}
 
   <div id="stkLegend" class="dot-legend"><span><i class="lg-news"></i>ข่าว: มีข่าวใน 7 วัน (กดจุดอ่านสรุป)</span><span><i class="lg-ssf"></i>SSF: มีสัญญาซื้อขายล่วงหน้ารายตัวที่ TFEX</span><span><i class="lg-dr"></i>DR: หุ้นเมกาที่ซื้อในไทยได้ผ่าน DR</span><span><i class="lg-ern"></i>งบ: ใกล้ประกาศ / ประกาศแล้ว (ป้ายข้างชื่อ)</span></div>
   <div id="pivotPanel" style="display:none">
-  <div class="pv-hd" id="pvHd" role="button"><span class="pv-cv" id="pvCv">▸</span><span class="pv-tt">Pivot Break</span><span class="pv-tabs"><b data-pv="VDU" class="on">VDU</b><b data-pv="VCP">VCP</b></span><span class="pv-info" id="pvInfo"></span></div>
-  <div id="pvList" class="pv-list" style="display:none"></div>
+  <div class="pv-hd" id="pvHd" role="button"><span class="pv-cv" id="pvCv">▾</span><span class="pv-tt">Pivot Break</span><span class="pv-info" id="pvInfo"></span></div>
+  <div id="pvList" class="pv-list"></div>
 </div>
 <style>
 #pivotPanel{margin:10px 0 4px;background:#0d1219;border:1px solid #1e2634;border-radius:10px;padding:8px 10px}
@@ -1414,6 +1414,9 @@ html body.lding #pageWrap{padding-top:26px}
 #pivotPanel .pv-row .s.w{background:#2e2716;color:#c9a24a}
 #pivotPanel .pv-row .n{color:#7d8899;font-variant-numeric:tabular-nums}
 #pivotPanel .pv-empty{font-size:11.5px;color:#5d6b7d;padding:4px 0}
+#pivotPanel .pv-sec{flex:0 0 100%;font-size:10.5px;letter-spacing:.4px;color:#556374;margin:8px 0 0;text-transform:uppercase}
+#pivotPanel .pv-sec:first-child{margin-top:0}
+#pivotPanel .pv-sec b{color:#7f8ea0;font-weight:600}
 </style>
 <div id="cardsView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-3"></div>
 
@@ -2026,7 +2029,25 @@ let currentMarket = 'thailand';
 let curPage = 'overview';
 
 /* ── Pivot Break (VDU / VCP) — แยกจาก Buy/Wait โดยสิ้นเชิง ── */
-const PV = { tab:'VDU', cache:{}, busy:false };
+const PV = { cache:{}, busy:false };
+window.PIVOT_CTX=null;   // แถว Pivot Break ที่เพิ่งกด → ใช้ลากเส้น pivot/marker บนกราฟป๊อปอัป
+function pvApplyModal(ser, data){
+  try{
+    const r=window.PIVOT_CTX; if(!r||!ser||!data) return;
+    const tk=(typeof activeTicker!=='undefined')?activeTicker:''; if(tk && r.tk!==tk) return;
+    if(!ser.createPriceLine) return;
+    try{ ser.createPriceLine({price:r.pivot, color:'#b08d3a', lineWidth:1, lineStyle:2, axisLabelVisible:true, title:'pivot'}); }catch(e){}
+    const has=t=>data.some(x=>String(x.time).slice(0,10)===t);
+    const add=[];
+    if(r.vduDate && has(r.vduDate)) add.push({time:r.vduDate, position:'belowBar', color:'#4d7a94', shape:'circle', text:'VDU'});
+    if(r.brkDate && has(r.brkDate)) add.push({time:r.brkDate, position:'aboveBar', color:(r.brkVol&&r.brkVol>=1.5?'#4f9f75':'#c96a6a'), shape:'arrowUp', text:'break '+r.brkVol.toFixed(2)+'x'});
+    if(r.lows) r.lows.forEach(function(L,i){ if(has(L[0])) add.push({time:L[0], position:'belowBar', color:'#5d7d90', shape:'circle', text:'−'+r.dep[i]+'%'}); });
+    if(!add.length) return;
+    const k=BSM_REG.findIndex(e=>e.ser===ser);
+    if(k>=0){ const seen=new Set(BSM_REG[k].all.map(m=>m.time+'|'+m.text)); add.forEach(m=>{ if(!seen.has(m.time+'|'+m.text)) BSM_REG[k].all.push(m); }); ser.setMarkers(bsFilt(BSM_REG[k].all)); }
+    else ser.setMarkers(add);
+  }catch(e){}
+}
 function pvToggle(force){
   const p=document.getElementById('pivotPanel'), l=document.getElementById('pvList'), c=document.getElementById('pvCv');
   if(!p||!l) return;
@@ -2035,6 +2056,9 @@ function pvToggle(force){
   p.classList.toggle('open', open);
   if(c) c.textContent = open ? '▾' : '▸';
 }
+function pvMount(){ try{ const sp=document.getElementById('scannerPanel'), pp=document.getElementById('pivotPanel');
+  if(sp&&pp&&pp.parentElement!==sp){ sp.appendChild(pp); pp.style.marginTop='10px'; } }catch(e){} }
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', pvMount); else pvMount();
 function pvShow(on){
   const el=document.getElementById('pivotPanel'); if(!el) return;
   el.style.display = on ? '' : 'none';
@@ -2056,17 +2080,29 @@ function pvDraw(){
   const key=mk==='america'?'us':'th', box=document.getElementById('pvList'), info=document.getElementById('pvInfo');
   if(!box) return;
   const d=PV.cache[key]||{rows:[]};
-  const rows=(d.rows||[]).filter(r=>r.kind===PV.tab);
-  const all=(d.rows||[]), nV=all.filter(r=>r.kind==='VDU').length, nC=all.filter(r=>r.kind==='VCP').length;
-  if(info) info.textContent='VDU '+nV+' · VCP '+nC+' · ณ '+(d.asOf||'-');
-  if(!rows.length){ box.innerHTML='<div class="pv-empty">ยังไม่มีตัวที่เข้าเกณฑ์ '+PV.tab+'</div>'; return; }
-  box.innerHTML=rows.map(function(r){
+  const all=d.rows||[];
+  const nB=k=>({v:all.filter(r=>r.kind===k&&r.st==='BREAK').length, w:all.filter(r=>r.kind===k&&r.st!=='BREAK').length});
+  const bv=nB('VDU'), bc=nB('VCP');
+  if(info) info.textContent='VDU '+bv.v+'+'+bv.w+' · VCP '+bc.v+'+'+bc.w+' · ณ '+(d.asOf||'-');
+  const row=r=>{
     const st=r.st==='BREAK'?'<span class="s b">break</span>':(r.st==='รอ Vol'?'<span class="s w">รอ vol</span>':'<span class="s w">รอเบรก</span>');
     const d1=r.dry!=null?('· dry '+r.dry.toFixed(2)+'x'):(r.dep?('· '+r.dep.join('/')+'%'):'');
     const d2=r.brkVol!=null?('· vol '+r.brkVol.toFixed(2)+'x'):('· อีก '+Math.abs(r.toGo||0).toFixed(1)+'%');
     return '<span class="pv-row" data-tk="'+r.tk+'" title="pivot '+r.pivot+'"><span class="t">'+r.tk+'</span>'+st+'<span class="n">'+d1+' '+d2+'</span></span>';
-  }).join('');
-  box.querySelectorAll('.pv-row').forEach(function(el){ el.onclick=function(){ try{ openModalByTk(el.dataset.tk); }catch(e){} }; });
+  };
+  const sec=(label,arr)=>arr.length?('<div class="pv-sec">'+label+' <b>'+arr.length+'</b></div>'+arr.map(row).join('')):'';
+  const html = sec('VDU · เบรกแล้ว',all.filter(r=>r.kind==='VDU'&&r.st==='BREAK'))
+             + sec('VDU · รอเบรก',all.filter(r=>r.kind==='VDU'&&r.st!=='BREAK'))
+             + sec('VCP · เบรกแล้ว',all.filter(r=>r.kind==='VCP'&&r.st==='BREAK'))
+             + sec('VCP · รอเบรก',all.filter(r=>r.kind==='VCP'&&r.st!=='BREAK'));
+  box.innerHTML = html || '<div class="pv-empty">ยังไม่มีตัวที่เข้าเกณฑ์</div>';
+  box.querySelectorAll('.pv-row').forEach(function(el){
+    el.onclick=function(){
+      const rec=all.find(r=>r.tk===el.dataset.tk)||null;
+      try{ window.PIVOT_CTX=rec; }catch(e){}
+      try{ openModalByTk(el.dataset.tk); }catch(e){}
+    };
+  });
 }
 document.addEventListener('click', function(e){
   const hd=e.target && e.target.closest ? e.target.closest('#pvHd') : null;
@@ -2085,7 +2121,7 @@ function setPage(pg){
   const st = ['searchBar','progressPanel','stkLegend','cardsView','tableView'];
   ov.forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display = (pg==='overview') ? '' : 'none'; });
   st.forEach(id=>{ const e=document.getElementById(id); if(e) e.style.display = (pg==='stocks') ? '' : 'none'; });
-  try{ pvShow(pg==='stocks'); }catch(e){}
+  try{ pvShow(pg==='scanner'); }catch(e){}
   const t20=document.getElementById('top20Panel'); if(t20) t20.style.display = (pg==='top20') ? '' : 'none';
   const rp=document.getElementById('reportPanel'); if(rp) rp.style.display = (pg==='report') ? '' : 'none';
   const htp=document.getElementById('howtoPanel'); if(htp) htp.style.display = (pg==='howto') ? '' : 'none';
@@ -5415,7 +5451,7 @@ async function fetchModal(iv){
       el.innerHTML='';
       const ch=LightweightCharts.createChart(el,{width:w,height:420,autoSize:true,layout:{background:{color:thusC().bg},textColor:thusC().text},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:false},timeScale:{borderVisible:false}});
       const cSer=ch.addCandlestickSeries({upColor:thusC().up,downColor:thusC().down,borderVisible:false,wickUpColor:thusC().up,wickDownColor:thusC().down}); cSer.setData(data);
-      if(iv==='1y'||iv==='1d') bsApplyMarks(cSer,data,activeTicker,activeMarket);
+      if(iv==='1y'||iv==='1d'){ Promise.resolve(bsApplyMarks(cSer,data,activeTicker,activeMarket)).then(function(){ try{ pvApplyModal(cSer,data); }catch(e){} }); } else { try{ pvApplyModal(cSer,data); }catch(e){} }
       const hasVol=data.some(d=>d.volume>0); let vSer=null;
       if(hasVol){
         vSer=ch.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol',priceLineVisible:false}); vSer.setData(data.map(d=>({time:d.time,value:d.volume,color:d.pre?'rgba(124,156,255,.45)':(d.close>=d.open?thusC().vup:thusC().vdown)})));
