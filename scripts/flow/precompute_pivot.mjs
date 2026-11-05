@@ -85,7 +85,9 @@ function findVDU(b) {
     if (c[i] < sma(c, 50, i)) continue;
     const near = Math.min(Math.abs(c[i] / sma(c, 10, i) - 1), Math.abs(c[i] / sma(c, 20, i) - 1));
     if (near > 0.02) continue;
-    const pivot = Math.max(...b.slice(Math.max(0, i - 30), i).map((x) => x[2]));
+    const seg = b.slice(Math.max(0, i - 30), i);
+    const pivot = Math.max(...seg.map((x) => x[2]));
+    const pivotDate = seg[seg.findIndex((x) => x[2] === pivot)] ? seg[seg.findIndex((x) => x[2] === pivot)][0] : b[i][0];
     if (c[i] > pivot) continue;
     let brk = null;
     for (let j = i + 1; j < Math.min(n, i + 11); j++) {
@@ -96,12 +98,30 @@ function findVDU(b) {
       }
     }
     const dry = b[i][5] / av;
-    if (brk && brk.bv >= 1.8 && n - 1 - brk.j <= 10 && c[n - 1] >= pivot && c[n - 1] <= pivot * 1.10) return { kind: "VDU", st: "BREAK", pivot: r2(pivot), close: r2(c[n - 1]), dry: r2(dry), vduDate: b[i][0], brkDate: b[brk.j][0], brkVol: r2(brk.bv), days: brk.j - i, toGo: r2((pivot / c[n - 1] - 1) * 100) };
-    if (!brk && n - 1 - i <= 15 && c[n - 1] < pivot && pivot / c[n - 1] - 1 <= 0.10) return { kind: "VDU", st: "รอเบรก", pivot: r2(pivot), close: r2(c[n - 1]), dry: r2(dry), vduDate: b[i][0], brkDate: null, brkVol: null, days: n - 1 - i, toGo: r2((pivot / c[n - 1] - 1) * 100) };
+    if (brk && brk.bv >= 1.8 && n - 1 - brk.j <= 10 && c[n - 1] >= pivot && c[n - 1] <= pivot * 1.10) return { kind: "VDU", st: "BREAK", pivot: r2(pivot), close: r2(c[n - 1]), dry: r2(dry), vduDate: b[i][0], pivotDate, brkDate: b[brk.j][0], brkVol: r2(brk.bv), days: brk.j - i, toGo: r2((pivot / c[n - 1] - 1) * 100) };
+    if (!brk && n - 1 - i <= 15 && c[n - 1] < pivot && pivot / c[n - 1] - 1 <= 0.10) return { kind: "VDU", st: "รอเบรก", pivot: r2(pivot), close: r2(c[n - 1]), dry: r2(dry), vduDate: b[i][0], pivotDate, brkDate: null, brkVol: null, days: n - 1 - i, toGo: r2((pivot / c[n - 1] - 1) * 100) };
     // เบรกแล้วแต่ปริมาณยังไม่ถึง 1.8x → เก็บไว้เป็น "รอ Vol" (กันหุ้นหายจากลิสต์ทั้งที่เบรกแล้ว)
-    if (brk && brk.bv < 1.8 && n - 1 - brk.j <= 10 && c[n - 1] >= pivot && c[n - 1] <= pivot * 1.10) return { kind: "VDU", st: "รอ Vol", pivot: r2(pivot), close: r2(c[n - 1]), dry: r2(dry), vduDate: b[i][0], brkDate: b[brk.j][0], brkVol: r2(brk.bv), days: brk.j - i, toGo: r2((pivot / c[n - 1] - 1) * 100) };
+    if (brk && brk.bv < 1.8 && n - 1 - brk.j <= 10 && c[n - 1] >= pivot && c[n - 1] <= pivot * 1.10) return { kind: "VDU", st: "รอ Vol", pivot: r2(pivot), close: r2(c[n - 1]), dry: r2(dry), vduDate: b[i][0], pivotDate, brkDate: b[brk.j][0], brkVol: r2(brk.bv), days: brk.j - i, toGo: r2((pivot / c[n - 1] - 1) * 100) };
   }
   return null;
+}
+
+// ประวัติแท่ง VDU ที่ "เบรก pivot ได้" (สำหรับวาดจุดย้อนหลังบนกราฟ) — ไม่เอาแท่งแห้งที่ไม่เคยเบรก
+function vduHistory(b, look = 150) {
+  const n = b.length, c = b.map((x) => x[4]), hh = b.map((x) => x[2]), out = [];
+  for (let i = Math.max(60, n - look); i < n - 11; i++) {
+    const av = avgVol(b, i); if (!av || b[i][5] > 0.65 * av) continue;
+    if (c[i] < sma(c, 50, i)) continue;
+    const near = Math.min(Math.abs(c[i] / sma(c, 10, i) - 1), Math.abs(c[i] / sma(c, 20, i) - 1));
+    if (near > 0.02) continue;
+    const pivot = Math.max(...hh.slice(Math.max(0, i - 30), i));
+    if (c[i] > pivot) continue;
+    // ต้องมีแท่งถัดไป (ไม่เกิน 10 แท่ง) ที่ปิดเหนือ pivot
+    let broke = false;
+    for (let j = i + 1; j < Math.min(n, i + 11); j++) { if (c[j] > pivot * 1.001) { broke = true; break; } }
+    if (broke) out.push(b[i][0]);
+  }
+  return out.slice(-8);
 }
 
 // ── VCP ──────────────────────────────────────────────────────────
@@ -120,7 +140,7 @@ function findVCP(b) {
   const segVol = (a, z) => { let s = 0; for (let k = a; k <= z; k++) s += w[k][5]; return s / Math.max(1, z - a + 1); };
   const v1 = segVol(t[0][0][0], t[0][1][0]), v3 = segVol(t[2][0][0], t[2][1][0]);
   if (!(v3 < v1 * 0.9)) return null;
-  const pivot = t[2][0][1], n = w.length;
+  const pivot = t[2][0][1], pivotDate = w[t[2][0][0]][0], n = w.length;
   let bidx = null, bv = null;
   for (let j = Math.max(0, n - 25); j < n; j++) {
     if (c[j] > pivot * 1.001) { bidx = j; bv = w[j][5] / avgVol(w, j); break; }
@@ -131,7 +151,7 @@ function findVCP(b) {
   else st = bv >= 1.5 && c[n - 1] >= pivot && c[n - 1] <= pivot * 1.10 ? "BREAK" : (bv >= 1.5 ? null : "รอ Vol");
   if (!st) return null;
   const keep = st !== "รอเบรก";
-  return { kind: "VCP", st, pivot: r2(pivot), close: r2(c[n - 1]), dry: null, dep: dep.map(r2), brkDate: keep && bidx !== null ? w[bidx][0] : null, brkVol: keep && bv !== null ? r2(bv) : null, toGo: r2((pivot / c[n - 1] - 1) * 100), base: n - t[0][0][0], lows: t.map(([h, l]) => [w[l[0]][0], r2(l[1])]), highs: t.map(([h]) => [w[h[0]][0], r2(h[1])]) };
+  return { kind: "VCP", st, pivot: r2(pivot), pivotDate, close: r2(c[n - 1]), dry: null, dep: dep.map(r2), brkDate: keep && bidx !== null ? w[bidx][0] : null, brkVol: keep && bv !== null ? r2(bv) : null, toGo: r2((pivot / c[n - 1] - 1) * 100), base: n - t[0][0][0], lows: t.map(([h, l]) => [w[l[0]][0], r2(l[1])]), highs: t.map(([h]) => [w[h[0]][0], r2(h[1])]) };
 }
 
 async function run(mk) {
@@ -162,9 +182,10 @@ async function run(mk) {
       const cl = bars.map((x) => x[4]);
       const m150 = sma(cl, 150, bars.length - 1), m200 = sma(cl, 200, bars.length - 1), m50 = sma(cl, 50, bars.length - 1);
       if (!(cl[cl.length - 1] > m150 && m50 > m200)) continue;
+      const vdus = vduHistory(bars);
       for (const fn of [findVDU, findVCP]) {
         const hit = fn(bars);
-        if (hit) rows.push({ tk, ...hit });
+        if (hit) rows.push({ tk, ...hit, vdus });
       }
     }
   }

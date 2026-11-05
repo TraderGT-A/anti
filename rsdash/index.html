@@ -1415,6 +1415,7 @@ html .gs-empty{padding:8px 10px;color:#5d6b7d;font-size:11.5px}
   <div id="pvList" class="pv-list" style="display:none"></div>
 </div>
 <style>
+#searchBar #searchInput{display:none !important}
 #pivotPanel{margin:12px 0 6px;background:#0b1017;border:1px solid #1b2431;border-radius:12px;padding:0;overflow:hidden}
 #pivotPanel .pv-hd{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #151d28;cursor:pointer;user-select:none;background:#0d131b;flex-wrap:wrap}
 #pivotPanel .pv-hd h2{color:#cbd5e1;font-size:13px}
@@ -2074,22 +2075,40 @@ window.PIVOT_CTX=null;   // แถวล่าสุดที่กด
 window.PV_SCOPE=null;    // {mk, map:{TK:rec}} — ใช้กับกราฟทุกใบที่เปิดจากหมวด VDU/VCP
 function pvApplyMarks(ser, data, tk){
   try{
-    const sc=window.PV_SCOPE; const r=sc&&sc.map&&sc.map[tk]; if(!r||!ser||!data||!ser.createPriceLine) return;
-    try{ if(!ser.__pvLine){ ser.__pvLine=ser.createPriceLine({price:r.pivot, color:'#b08d3a', lineWidth:1, lineStyle:0, axisLabelVisible:false, title:''}); } else { try{ ser.__pvLine.applyOptions({price:r.pivot}); }catch(e){} } }catch(e){}
-    const has=t=>data.some(x=>String(x.time).slice(0,10)===t);
+    const sc=window.PV_SCOPE; const r=sc&&sc.map&&sc.map[tk]; if(!r||!ser||!data) return;
+    const has=t=>!!t && data.some(x=>String(x.time).slice(0,10)===t);
+    // ── เส้น pivot: ลากจากแท่งที่เกิดยอด ถึงแท่งที่เบรก (ยังไม่เบรก = ถึงแท่งล่าสุด) ──
+    const ch=ser.__chart;
+    if(ch && r.pivotDate && has(r.pivotDate)){
+      const endT = (r.brkDate && has(r.brkDate)) ? r.brkDate : String(data[data.length-1].time).slice(0,10);
+      const key=(r.pivotDate+'|'+endT+'|'+r.pivot);
+      if(ser.__pvKey!==key){
+        try{ if(ser.__pvLine && ch.removeSeries) ch.removeSeries(ser.__pvLine); }catch(e){}
+        let ls=null;
+        try{ ls=ch.addLineSeries({color:'#b08d3a',lineWidth:1,lineStyle:0,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false}); }catch(e){}
+        if(ls){
+          const a=String(r.pivotDate).slice(0,10), b2=String(endT).slice(0,10);
+          const pts = (a<=b2) ? [{time:a,value:r.pivot},{time:b2,value:r.pivot}] : [{time:b2,value:r.pivot},{time:a,value:r.pivot}];
+          try{ ls.setData(pts); }catch(e){}
+          ser.__pvLine=ls; ser.__pvKey=key;
+        }
+      }
+    }
     const add=[];
-    if(r.vduDate && has(r.vduDate)) add.push({time:r.vduDate, position:'belowBar', color:'#4d7a94', shape:'circle', text:'VDU'});
-    // marker เบรกวางที่ “ใต้แท่ง/ใกล้ Low” ตามที่บอสสั่ง ไม่ใช่บน High
+    // ── จุด VDU ย้อนหลัง (ไม่มีข้อความ) ──
+    if(r.vdus) r.vdus.forEach(function(d){ if(has(d)) add.push({time:d, position:'belowBar', color:'#4d7a94', shape:'circle'}); });
+    // ── จุดเบรก + ตัวเลขปริมาณ ──
     if(r.brkDate && has(r.brkDate)) add.push({time:r.brkDate, position:'belowBar', color:(r.brkVol&&r.brkVol>=1.5?'#4f9f75':'#c96a6a'), shape:'circle', text:r.brkVol.toFixed(2)+'x'});
+    // ── จุดย่อของ VCP (มี %) ──
     if(r.lows) r.lows.forEach(function(L,i){ if(has(L[0])) add.push({time:L[0], position:'belowBar', color:'#5d7d90', shape:'circle', text:'−'+r.dep[i]+'%'}); });
     if(!add.length) return;
     const k=BSM_REG.findIndex(e=>e.ser===ser);
-    if(k>=0){ const seen=new Set(BSM_REG[k].all.map(m=>m.time+'|'+m.text)); add.forEach(m=>{ if(!seen.has(m.time+'|'+m.text)) BSM_REG[k].all.push(m); }); ser.setMarkers(bsFilt(BSM_REG[k].all)); }
+    if(k>=0){ const seen=new Set(BSM_REG[k].all.map(m=>m.time+'|'+(m.text||''))); add.forEach(m=>{ const kk=m.time+'|'+(m.text||''); if(!seen.has(kk)){ BSM_REG[k].all.push(m); seen.add(kk);} }); ser.setMarkers(bsFilt(BSM_REG[k].all)); }
     else ser.setMarkers(add);
   }catch(e){}
 }
 
-/* ── ค้นหาหุ้นทุกหน้า (global search ในหัวเว็บ) ── */
+/* ── ค้นหาหุ้นทุกหน้า (ช่องเดียวในหัวเว็บ · หน้า "หุ้น" ใช้ช่องนี้กรองลิสต์ด้วย) ── */
 const GS = { items:[], sel:-1 };
 function gsPool(){
   const mk=(typeof currentMarket!=='undefined'&&currentMarket)||'thailand';
@@ -2102,17 +2121,27 @@ function gsGo(tk, name, mk){
   const inp=document.getElementById('gsInp'); if(inp){ inp.value=''; inp.blur(); }
   try{ openModal(tk, name||'', mk); }catch(e){}
 }
+function gsSyncList(q){
+  try{
+    if(typeof curPage!=='undefined' && curPage!=='stocks') return;
+    const si=document.getElementById('searchInput'); if(!si) return;
+    if(si.value===q) return;
+    si.value=q||'';
+    si.dispatchEvent(new Event('input',{bubbles:true}));
+  }catch(e){}
+}
 function gsRender(q){
   const box=document.getElementById('gsRes'); if(!box) return;
   const {mk, arr}=gsPool();
   const s=String(q||'').trim().toLowerCase();
+  gsSyncList(q);
   if(!s){ gsHide(); return; }
   const hit=arr.filter(x=>x && ((x.ticker||'').toLowerCase().startsWith(s) || (x.name||'').toLowerCase().includes(s))).slice(0,12);
   GS.items=hit; GS.sel=hit.length?0:-1;
   if(!hit.length){ box.innerHTML='<div class="gs-empty">ไม่พบหุ้นในตลาดนี้</div>'; box.classList.add('on'); return; }
   box.innerHTML=hit.map(function(x,i){
     const rs=(x.rs3!=null?x.rs3:(x.rs!=null?x.rs:''));
-    return '<div class="gs-row'+(i===0?' sel':'')+'" data-i="'+i+'" data-tk="'+x.ticker.replace(/"/g,'')+'" data-mk="'+mk+'">'
+    return '<div class="gs-row'+(i===0?' sel':'')+'" data-i="'+i+'">'
       +'<span class="t">'+x.ticker+'</span><span class="n">'+(x.name||'')+'</span><span class="r">'+(rs!==''?'RS '+rs:'')+'</span></div>';
   }).join('');
   box.classList.add('on');
@@ -2124,7 +2153,6 @@ function gsMove(d){
   const box=document.getElementById('gsRes'); if(!box||!GS.items.length) return;
   GS.sel=(GS.sel+d+GS.items.length)%GS.items.length;
   box.querySelectorAll('.gs-row').forEach(function(el,i){ el.classList.toggle('sel', i===GS.sel); });
-  const cur=box.querySelectorAll('.gs-row')[GS.sel]; if(cur&&cur.scrollIntoView) cur.scrollIntoView({block:'nearest'});
 }
 document.addEventListener('input', function(e){
   if(e.target && e.target.id==='gsInp') gsRender(e.target.value);
@@ -5429,7 +5457,7 @@ function drawChartW(el, raw, w){
   // ความสูงอัตโนมัติตามความกว้าง (ไม่ fix 240) — กว้างมากก็สูงสุด 240, แคบ (3 คอลัมน์) จะสั้นตาม
   const hgt = Math.max(150, Math.min(240, Math.round(w * 0.62)));
   const chart=LightweightCharts.createChart(el,{width:w,height:hgt,layout:{background:{color:'transparent'},textColor:thusC().text},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:false},timeScale:{borderVisible:false}});
-  const cSer=chart.addCandlestickSeries({upColor:thusC().up,downColor:thusC().down,borderVisible:false,wickUpColor:thusC().up,wickDownColor:thusC().down}); cSer.setData(data);
+  const cSer=chart.addCandlestickSeries({upColor:thusC().up,downColor:thusC().down,borderVisible:false,wickUpColor:thusC().up,wickDownColor:thusC().down}); cSer.setData(data); cSer.__chart=chart;
   try{ Promise.resolve(bsApplyMarks(cSer,data,el.dataset&&el.dataset.tk,el.dataset&&el.dataset.m||currentMarket)).then(function(){ try{ pvApplyMarks(cSer,data,el.dataset&&el.dataset.tk); }catch(e){} }); }catch(e){}
   const hasVol=data.some(d=>d.volume>0); let vSer=null;
   if(hasVol){
@@ -5596,7 +5624,7 @@ async function fetchModal(iv){
       const w=el.clientWidth||el.parentElement.clientWidth||700;
       el.innerHTML='';
       const ch=LightweightCharts.createChart(el,{width:w,height:420,autoSize:true,layout:{background:{color:thusC().bg},textColor:thusC().text},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:false},timeScale:{borderVisible:false}});
-      const cSer=ch.addCandlestickSeries({upColor:thusC().up,downColor:thusC().down,borderVisible:false,wickUpColor:thusC().up,wickDownColor:thusC().down}); cSer.setData(data);
+      const cSer=ch.addCandlestickSeries({upColor:thusC().up,downColor:thusC().down,borderVisible:false,wickUpColor:thusC().up,wickDownColor:thusC().down}); cSer.setData(data); cSer.__chart=ch;
       if(iv==='1y'||iv==='1d'){ Promise.resolve(bsApplyMarks(cSer,data,activeTicker,activeMarket)).then(function(){ try{ pvApplyMarks(cSer,data,activeTicker); }catch(e){} }); } else { try{ pvApplyMarks(cSer,data,activeTicker); }catch(e){} }
       const hasVol=data.some(d=>d.volume>0); let vSer=null;
       if(hasVol){
