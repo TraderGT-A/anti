@@ -155,6 +155,10 @@ async function run(mk) {
       if (!bars) { errs.push(tk); continue; }
       bars = bars.filter((x) => x[0] <= closed && x[4] > 0);
       if (bars.length < 120) { errs.push(tk); continue; }
+      // เกณฑ์ผ่าน Wait: แนวโน้มยังขึ้น (ปิด>MA150 และ MA50>MA200) — RS>60 กรองที่ฝั่งเว็บตามฐานที่เลือก
+      const cl = bars.map((x) => x[4]);
+      const m150 = sma(cl, 150, bars.length - 1), m200 = sma(cl, 200, bars.length - 1), m50 = sma(cl, 50, bars.length - 1);
+      if (!(cl[cl.length - 1] > m150 && m50 > m200)) continue;
       for (const fn of [findVDU, findVCP]) {
         const hit = fn(bars);
         if (hit) rows.push({ tk, ...hit });

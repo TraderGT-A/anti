@@ -2075,34 +2075,61 @@ function pvLoad(){
     .then(r=>r.json()).then(j=>{ PV.cache[key]=j; PV.busy=false; try{loadOff();}catch(e){} pvDraw(); })
     .catch(e=>{ PV.busy=false; try{loadOff();}catch(e2){} const l=document.getElementById('pvList'); if(l) l.innerHTML='<div class="pv-empty">โหลดไม่ได้</div>'; });
 }
+function pvRows(mk,kind,st){
+  const arr=(typeof stockDB!=='undefined'&&stockDB[mk])||[];
+  const map=new Map(arr.map(s=>[s.ticker,s]));
+  const d=PV.cache[mk==='america'?'us':'th']||{rows:[]};
+  const pick=s=>s?( (typeof RS_BASE!=='undefined'&&RS_BASE==='6m')?s.rs6:(RS_BASE==='1y'?s.rs1:s.rs3) )??s.rs:null;
+  return (d.rows||[]).filter(r=>r.kind===kind && (st==='BREAK'? r.st==='BREAK' : r.st!=='BREAK'))
+    .map(r=>{ const s=map.get(r.tk)||null; return {r, s, rs:pick(s)}; })
+    .filter(x=>x.s && Number(x.rs)>60)
+    .sort((a,b)=>(b.rs||0)-(a.rs||0));
+}
+function pvTable(mk,title,list){
+  if(!list.length) return '';
+  const rows=list.slice(0,100).map(({r,s,rs})=>{
+    const hi=Number(s.hi52), p=Number(s.price);
+    const up=(hi>0&&p>0)? (hi/p-1)*100 : null;
+    const hiTxt=up==null?'<span class="mu">–</span>':'<b class="'+(up<=5?'pos':(up>=25?'neg':'mu'))+' nw">'+(up<=0.05?'ที่จุดสูง':'+'+up.toFixed(1)+'%')+'</b>';
+    const det = r.kind==='VDU'
+      ? (r.st==='BREAK' ? 'dry '+r.dry.toFixed(2)+'x · vol '+r.brkVol.toFixed(2)+'x · เบรก '+r.brkDate
+                        : 'dry '+r.dry.toFixed(2)+'x · อีก '+Math.abs(r.toGo).toFixed(1)+'% ถึง pivot')
+      : (r.st==='BREAK' ? 'ย่อ '+r.dep.join('/')+'% · vol '+r.brkVol.toFixed(2)+'x · เบรก '+r.brkDate
+                        : 'ย่อ '+r.dep.join('/')+'% · อีก '+Math.abs(r.toGo).toFixed(1)+'% ถึง pivot');
+    return '<tr onclick="pvOpen(\''+jq(s.ticker)+'\',\''+jq(s.name||'')+'\',\''+mk+'\')">'
+      +'<td><div class="tkcell"><span class="tkrow">'+tkL(s.ticker,mk,16)+'<b>'+s.ticker+'</b>'+tkT(s.ticker,mk)+'</span></div></td>'
+      +'<td class="r"><span class="rsr'+(rs<70?' lo':'')+'">'+(rs==null?'–':rs)+'</span></td>'
+      +'<td class="r">'+fNum(s.price)+'</td><td class="r">'+clPc(s.p3m)+'</td>'
+      +'<td class="r">'+hiTxt+'</td><td class="r">'+fNum(r.pivot)+'</td>'
+      +'<td class="bs-th"><span class="mu">'+det+'</span></td></tr>';
+  }).join('');
+  const title2=title+' · '+list.length;
+  return '<div class="pv-sec">'+title2+'</div>'
+    +'<div class="bs-tools" style="margin:6px 0 4px"><button class="tf-chip bs-open" onclick="pvOpenList(\''+jq(title)+'\',\''+jq(mk)+'\',\''+jq(list.map(x=>x.s.ticker).join(','))+'\')">ดูการ์ดกราฟ '+list.length+' ตัว</button></div>'
+    +'<div class="overflow-x-auto"><table class="bs-tbl"><thead><tr><th>หุ้น</th><th class="r">RS</th><th class="r">ราคา</th><th class="r">3M</th><th class="r">ถึงจุดสูง 52w</th><th class="r">pivot</th><th class="bs-th">รายละเอียด</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+function pvOpen(tk,name,mk){ try{ window.PIVOT_CTX=(PV.cache[mk==='america'?'us':'th'].rows||[]).find(r=>r.tk===tk)||null; }catch(e){} try{ openModal(tk,name,mk); }catch(e){} }
+function pvOpenList(title,mk,csv){
+  const arr=(typeof stockDB!=='undefined'&&stockDB[mk])||[], map=new Map(arr.map(s=>[s.ticker,s]));
+  const list=csv.split(',').map(t=>map.get(t)).filter(Boolean);
+  try{ openStockList('Pivot Break · '+title,'VDU / VCP · ผ่านเกณฑ์ RS>60 และขาขึ้น',list,mk); }catch(e){}
+}
 function pvDraw(){
   const mk=(typeof currentMarket!=='undefined'&&currentMarket)||'thailand';
-  const key=mk==='america'?'us':'th', box=document.getElementById('pvList'), info=document.getElementById('pvInfo');
+  const box=document.getElementById('pvList'), info=document.getElementById('pvInfo');
   if(!box) return;
-  const d=PV.cache[key]||{rows:[]};
-  const all=d.rows||[];
-  const nB=k=>({v:all.filter(r=>r.kind===k&&r.st==='BREAK').length, w:all.filter(r=>r.kind===k&&r.st!=='BREAK').length});
-  const bv=nB('VDU'), bc=nB('VCP');
-  if(info) info.textContent='VDU '+bv.v+'+'+bv.w+' · VCP '+bc.v+'+'+bc.w+' · ณ '+(d.asOf||'-');
-  const row=r=>{
-    const st=r.st==='BREAK'?'<span class="s b">break</span>':(r.st==='รอ Vol'?'<span class="s w">รอ vol</span>':'<span class="s w">รอเบรก</span>');
-    const d1=r.dry!=null?('· dry '+r.dry.toFixed(2)+'x'):(r.dep?('· '+r.dep.join('/')+'%'):'');
-    const d2=r.brkVol!=null?('· vol '+r.brkVol.toFixed(2)+'x'):('· อีก '+Math.abs(r.toGo||0).toFixed(1)+'%');
-    return '<span class="pv-row" data-tk="'+r.tk+'" title="pivot '+r.pivot+'"><span class="t">'+r.tk+'</span>'+st+'<span class="n">'+d1+' '+d2+'</span></span>';
-  };
-  const sec=(label,arr)=>arr.length?('<div class="pv-sec">'+label+' <b>'+arr.length+'</b></div>'+arr.map(row).join('')):'';
-  const html = sec('VDU · เบรกแล้ว',all.filter(r=>r.kind==='VDU'&&r.st==='BREAK'))
-             + sec('VDU · รอเบรก',all.filter(r=>r.kind==='VDU'&&r.st!=='BREAK'))
-             + sec('VCP · เบรกแล้ว',all.filter(r=>r.kind==='VCP'&&r.st==='BREAK'))
-             + sec('VCP · รอเบรก',all.filter(r=>r.kind==='VCP'&&r.st!=='BREAK'));
-  box.innerHTML = html || '<div class="pv-empty">ยังไม่มีตัวที่เข้าเกณฑ์</div>';
-  box.querySelectorAll('.pv-row').forEach(function(el){
-    el.onclick=function(){
-      const rec=all.find(r=>r.tk===el.dataset.tk)||null;
-      try{ window.PIVOT_CTX=rec; }catch(e){}
-      try{ openModalByTk(el.dataset.tk); }catch(e){}
-    };
-  });
+  // ข้อมูล scan อาจยังโหลดไม่เสร็จตอนเปิดหน้า → ลองวาดใหม่เมื่อมีข้อมูล (สูงสุด ~15 วิ)
+  const dbn=((typeof stockDB!=='undefined'&&stockDB[mk])||[]).length;
+  if(dbn<50){ PV._wait=(PV._wait||0)+1; if(PV._wait<=12){ setTimeout(pvDraw, 1200); return; } }
+  else PV._wait=0;
+  const d=PV.cache[mk==='america'?'us':'th']||{rows:[]};
+  const g=[['VDU · เบรกแล้ว',pvRows(mk,'VDU','BREAK')],['VDU · รอเบรก',pvRows(mk,'VDU','WAIT')],
+           ['VCP · เบรกแล้ว',pvRows(mk,'VCP','BREAK')],['VCP · รอเบรก',pvRows(mk,'VCP','WAIT')]];
+  const _b=(typeof RS_BASE!=='undefined')?RS_BASE:'3m';
+  const base=(_b==='6m'?'6M':(_b==='1y'?'1Y':'3M'));
+  if(info) info.textContent='RS '+base+' > 60 · ขาขึ้น · ณ '+(d.asOf||'-');
+  const html=g.map(([t,l])=>pvTable(mk,t,l)).join('');
+  box.innerHTML=html || '<div class="pv-empty">ยังไม่มีตัวที่ผ่านเกณฑ์ (RS>60 และขาขึ้น)</div>';
 }
 document.addEventListener('click', function(e){
   const hd=e.target && e.target.closest ? e.target.closest('#pvHd') : null;
