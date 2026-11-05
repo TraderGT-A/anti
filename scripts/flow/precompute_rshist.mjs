@@ -119,12 +119,25 @@ export async function computeMarket(mk) {
     for (let k = 0; k < N; k++) {
       const c = C[k]; if (c[t] == null || !(c[t] > 0)) continue;
       for (const [bk, n] of TFS) {
-        // ── นิยามใหม่ (บอส 6 พ.ย. 26): RS ของแต่ละ TF = เปอร์เซ็นไทล์ของผลตอบแทนช่วงนั้นตรง ๆ (แบบที่ 1) ──
-        const i = t - n;
-        if (i < 0) continue;
-        const pv = c[i];
-        if (pv == null || !(pv > 0)) continue;
-        buckets[bk].push([k, (c[t] / pv - 1) * 100]);
+        // ── นิยาม (บอส 6 พ.ย. 26): 3M/6M = เปอร์เซ็นไทล์ผลตอบแทนตรง ๆ (แบบที่ 1) · 1Y = สูตรเดิมถ่วง 0.3/0.3/0.2/0.2 ──
+        if (bk === "rs1") {
+          const offs = offsOf(n);
+          let sum = 0, ok = true;
+          for (let q = 0; q < 4; q++) {
+            const i = t - offs[q];
+            if (i < 0) { ok = false; break; }
+            const pv = c[i];
+            if (pv == null || !(pv > 0)) { ok = false; break; }
+            sum += W4[q] * (c[t] / pv - 1) * 100;
+          }
+          if (ok) buckets[bk].push([k, sum]);
+        } else {
+          const i = t - n;
+          if (i < 0) continue;
+          const pv = c[i];
+          if (pv == null || !(pv > 0)) continue;
+          buckets[bk].push([k, (c[t] / pv - 1) * 100]);
+        }
       }
     }
     for (const bk of ["rs3", "rs6", "rs1"]) {
@@ -137,8 +150,8 @@ export async function computeMarket(mk) {
   }
   for (const t of tk) { for (let j = 0; j < outDates.length; j++) { rs[t][j] = rsB.rs1[t][j] || rs[t][j]; } }
   // ตรวจเทียบกับ RS ปัจจุบันจากระบบ (ต่างได้เล็กน้อยเพราะนิยามช่วงเวลา)
-  const cur = new Map(got.filter((s) => shown.has(s.ticker)).map((s) => [s.ticker, Number(s.rs1 != null ? s.rs1 : s.rs)])); let n = 0, abs = 0, within5 = 0, same70 = 0;
-  for (const t of tk) { if (!shown.has(t)) continue; const a = rs[t][outDates.length - 1], b = cur.get(t); if (a > 0 && b > 0) { n++; abs += Math.abs(a - b); if (Math.abs(a - b) <= 5) within5++; if ((a > 70) === (b > 70)) same70++; } }
+  const cur = new Map(got.filter((s) => shown.has(s.ticker)).map((s) => [s.ticker, Number(s.rs3 != null ? s.rs3 : s.rs)])); let n = 0, abs = 0, within5 = 0, same70 = 0;
+  for (const t of tk) { if (!shown.has(t)) continue; const a = rsB.rs3[t][outDates.length - 1], b = cur.get(t); if (a > 0 && b > 0) { n++; abs += Math.abs(a - b); if (Math.abs(a - b) <= 5) within5++; if ((a > 70) === (b > 70)) same70++; } }
   log(mk, "ตรวจเทียบ RS ล่าสุดกับระบบ: หุ้น", n, "· ต่างเฉลี่ย", (abs / n).toFixed(2), "· ต่าง≤5:", (100 * within5 / n).toFixed(0) + "%", "· ตัดสิน RS>70 ตรงกัน:", (100 * same70 / n).toFixed(0) + "%");
   if (!(n > 0) || abs / n > 14) throw new Error(mk + ": RS ที่คำนวณต่างจากระบบมากผิดปกติ — ไม่เขียนไฟล์");
   // สัญญาณ Buy/Wait/Sell ณ แท่งที่ปิดล่าสุด — กฎเดียวกับ bsEval ใน index.html: [รหัส 0=Sell(บิต 2,4) 1=Wait(บิต 1,8,16,32) 2=Buy, flags, RS]
