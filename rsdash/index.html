@@ -1391,32 +1391,50 @@ html body.lding #pageWrap{padding-top:26px}
 
   <div id="stkLegend" class="dot-legend"><span><i class="lg-news"></i>ข่าว: มีข่าวใน 7 วัน (กดจุดอ่านสรุป)</span><span><i class="lg-ssf"></i>SSF: มีสัญญาซื้อขายล่วงหน้ารายตัวที่ TFEX</span><span><i class="lg-dr"></i>DR: หุ้นเมกาที่ซื้อในไทยได้ผ่าน DR</span><span><i class="lg-ern"></i>งบ: ใกล้ประกาศ / ประกาศแล้ว (ป้ายข้างชื่อ)</span></div>
   <div id="pivotPanel" style="display:none">
-  <div class="pv-hd" id="pvHd" role="button"><span class="pv-cv" id="pvCv">▾</span><span class="pv-tt">Pivot Break</span><span class="pv-info" id="pvInfo"></span></div>
-  <div id="pvList" class="pv-list"></div>
+  <div class="pv-hd" id="pvHd" role="button"><span class="pv-cv" id="pvCv">▸</span><span class="pv-tt">Pivot Break</span><span class="pv-info" id="pvInfo"></span></div>
+  <div id="pvList" class="pv-list" style="display:none"></div>
 </div>
 <style>
-#pivotPanel{margin:10px 0 4px;background:#0d1219;border:1px solid #1e2634;border-radius:10px;padding:8px 10px}
-#pivotPanel .pv-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-#pivotPanel .pv-tt{font-size:12.5px;color:#94a3b8}
-#pivotPanel .pv-tabs{display:inline-flex;gap:2px;background:#141b26;border:1px solid #1e2634;border-radius:6px;padding:2px}
-#pivotPanel .pv-tabs b{font-size:11px;font-weight:500;color:#7d8899;padding:2px 9px;border-radius:4px;cursor:pointer;line-height:16px}
-#pivotPanel .pv-tabs b.on{background:#1d2733;color:#cbd5e1}
-#pivotPanel .pv-info{font-size:11px;color:#5d6b7d;margin-left:auto}
-#pivotPanel .pv-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-#pivotPanel .pv-cv{font-size:10px;color:#5d6b7d;width:10px;display:inline-block}
-#pivotPanel .pv-hd{cursor:pointer;user-select:none}
-#pivotPanel.open .pv-cv{color:#94a3b8}
-#pivotPanel .pv-row{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;border-radius:6px;background:#121a24;border:1px solid #1e2634;font-size:11.5px;color:#cbd5e1;cursor:pointer;white-space:nowrap}
-#pivotPanel .pv-row:hover{border-color:#2a3846;background:#16202c}
-#pivotPanel .pv-row .t{font-weight:600;color:#e2e8f0}
-#pivotPanel .pv-row .s{font-size:10.5px;padding:0 5px;border-radius:4px}
-#pivotPanel .pv-row .s.b{background:#14301f;color:#5fbf8f}
-#pivotPanel .pv-row .s.w{background:#2e2716;color:#c9a24a}
-#pivotPanel .pv-row .n{color:#7d8899;font-variant-numeric:tabular-nums}
-#pivotPanel .pv-empty{font-size:11.5px;color:#5d6b7d;padding:4px 0}
-#pivotPanel .pv-sec{flex:0 0 100%;font-size:10.5px;letter-spacing:.4px;color:#556374;margin:8px 0 0;text-transform:uppercase}
-#pivotPanel .pv-sec:first-child{margin-top:0}
-#pivotPanel .pv-sec b{color:#7f8ea0;font-weight:600}
+#pivotPanel{margin:12px 0 6px;background:#0b1017;border:1px solid #1b2431;border-radius:12px;padding:0;overflow:hidden}
+#pivotPanel .pv-hd{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid #151d28;cursor:pointer;user-select:none;background:#0d131b}
+#pivotPanel .pv-cv{font-size:10px;color:#61707f;width:9px}
+#pivotPanel.open .pv-cv{color:#8b9bab}
+#pivotPanel .pv-tt{font-size:12.5px;font-weight:600;color:#c8d3de;letter-spacing:.2px}
+#pivotPanel .pv-info{font-size:11px;color:#5d6b7d;margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pivotPanel .pv-list{padding:4px 12px 12px;display:block}
+#pivotPanel .pv-sec{display:flex;align-items:center;gap:6px;font-size:11px;color:#8b9bab;margin:10px 0 6px;padding-left:2px}
+#pivotPanel .pv-sec .dot{width:5px;height:5px;border-radius:50%;background:#3d5670;flex:none}
+#pivotPanel .pv-sec .dot.b{background:#4f9f75}
+#pivotPanel .pv-sec b{color:#a9b8c7;font-weight:600;font-variant-numeric:tabular-nums}
+#pivotPanel .pv-sec .sp{flex:1}
+#pivotPanel .pv-btn{font-size:10.5px;color:#7d8fa2;background:#111a24;border:1px solid #1e2a38;border-radius:6px;padding:2px 8px;height:22px;line-height:16px;cursor:pointer;white-space:nowrap}
+#pivotPanel .pv-btn:hover{color:#c3d0dd;border-color:#2b3b4c;background:#15202b}
+#pivotPanel .pv-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid #151d28;border-radius:8px}
+#pivotPanel table.pv-tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+#pivotPanel table.pv-tbl thead th{position:sticky;top:0;background:#0e151d;color:#67788a;font-weight:500;font-size:10.5px;text-align:left;padding:5px 8px;border-bottom:1px solid #17202b;white-space:nowrap;z-index:1}
+#pivotPanel table.pv-tbl thead th.r{text-align:right}
+#pivotPanel table.pv-tbl tbody td{padding:6px 8px;border-bottom:1px solid #101821;color:#c2ccd8;vertical-align:middle}
+#pivotPanel table.pv-tbl tbody tr:last-child td{border-bottom:0}
+#pivotPanel table.pv-tbl tbody tr:nth-child(even){background:#0c131a}
+#pivotPanel table.pv-tbl tbody tr:hover{background:#111c26}
+#pivotPanel table.pv-tbl td.r{text-align:right;font-variant-numeric:tabular-nums}
+#pivotPanel table.pv-tbl td .tk{font-weight:600;color:#e3ebf3}
+#pivotPanel table.pv-tbl td .det{color:#6f8093;font-size:10.5px;line-height:1.35}
+#pivotPanel .pv-empty{font-size:11.5px;color:#5d6b7d;padding:8px 0}
+#pivotPanel .pv-only-sm{display:none}
+#pivotPanel .rs90{color:#4fbf87}#pivotPanel .rs80{color:#a8d3a2}#pivotPanel .rslo{color:#7c8b9c}
+#pivotPanel .pos{color:#4fbf87}#pivotPanel .neg{color:#d9737a}#pivotPanel .mu{color:#6f8093}
+@media (max-width:640px){
+  #pivotPanel{padding:0;margin:10px 0 4px}
+  #pivotPanel .pv-hd{padding:8px 10px}
+  #pivotPanel .pv-list{padding:2px 8px 10px}
+  #pivotPanel table.pv-tbl{font-size:11px}
+  #pivotPanel table.pv-tbl thead th,#pivotPanel table.pv-tbl tbody td{padding:5px 6px}
+  #pivotPanel .pv-hide-sm{display:none}
+  #pivotPanel .pv-only-sm{display:block;margin-top:2px;font-size:10px;color:#6f8093;white-space:normal}
+  #pivotPanel .pv-btn{height:26px;line-height:20px;font-size:11px;padding:2px 10px}
+  #pivotPanel .pv-sec{margin:8px 0 5px}
+}
 </style>
 <div id="cardsView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-3"></div>
 
@@ -2030,17 +2048,17 @@ let curPage = 'overview';
 
 /* ── Pivot Break (VDU / VCP) — แยกจาก Buy/Wait โดยสิ้นเชิง ── */
 const PV = { cache:{}, busy:false };
-window.PIVOT_CTX=null;   // แถว Pivot Break ที่เพิ่งกด → ใช้ลากเส้น pivot/marker บนกราฟป๊อปอัป
-function pvApplyModal(ser, data){
+window.PIVOT_CTX=null;   // แถวล่าสุดที่กด
+window.PV_SCOPE=null;    // {mk, map:{TK:rec}} — ใช้กับกราฟทุกใบที่เปิดจากหมวด VDU/VCP
+function pvApplyMarks(ser, data, tk){
   try{
-    const r=window.PIVOT_CTX; if(!r||!ser||!data) return;
-    const tk=(typeof activeTicker!=='undefined')?activeTicker:''; if(tk && r.tk!==tk) return;
-    if(!ser.createPriceLine) return;
-    try{ ser.createPriceLine({price:r.pivot, color:'#b08d3a', lineWidth:1, lineStyle:2, axisLabelVisible:true, title:'pivot'}); }catch(e){}
+    const sc=window.PV_SCOPE; const r=sc&&sc.map&&sc.map[tk]; if(!r||!ser||!data||!ser.createPriceLine) return;
+    try{ if(!ser.__pvLine){ ser.__pvLine=ser.createPriceLine({price:r.pivot, color:'#b08d3a', lineWidth:1, lineStyle:2, axisLabelVisible:true, title:'pivot'}); } else { try{ ser.__pvLine.applyOptions({price:r.pivot}); }catch(e){} } }catch(e){}
     const has=t=>data.some(x=>String(x.time).slice(0,10)===t);
     const add=[];
     if(r.vduDate && has(r.vduDate)) add.push({time:r.vduDate, position:'belowBar', color:'#4d7a94', shape:'circle', text:'VDU'});
-    if(r.brkDate && has(r.brkDate)) add.push({time:r.brkDate, position:'aboveBar', color:(r.brkVol&&r.brkVol>=1.5?'#4f9f75':'#c96a6a'), shape:'arrowUp', text:'break '+r.brkVol.toFixed(2)+'x'});
+    // marker เบรกวางที่ “ใต้แท่ง/ใกล้ Low” ตามที่บอสสั่ง ไม่ใช่บน High
+    if(r.brkDate && has(r.brkDate)) add.push({time:r.brkDate, position:'belowBar', color:(r.brkVol&&r.brkVol>=1.5?'#4f9f75':'#c96a6a'), shape:'arrowUp', text:'break '+r.brkVol.toFixed(2)+'x'});
     if(r.lows) r.lows.forEach(function(L,i){ if(has(L[0])) add.push({time:L[0], position:'belowBar', color:'#5d7d90', shape:'circle', text:'−'+r.dep[i]+'%'}); });
     if(!add.length) return;
     const k=BSM_REG.findIndex(e=>e.ser===ser);
@@ -2052,13 +2070,10 @@ function pvToggle(force){
   const p=document.getElementById('pivotPanel'), l=document.getElementById('pvList'), c=document.getElementById('pvCv');
   if(!p||!l) return;
   const open = force!=null ? force : (l.style.display==='none');
-  l.style.display = open ? 'flex' : 'none';
+  l.style.display = open ? 'block' : 'none';
   p.classList.toggle('open', open);
   if(c) c.textContent = open ? '▾' : '▸';
 }
-function pvMount(){ try{ const sp=document.getElementById('scannerPanel'), pp=document.getElementById('pivotPanel');
-  if(sp&&pp&&pp.parentElement!==sp){ sp.appendChild(pp); pp.style.marginTop='10px'; } }catch(e){} }
-if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', pvMount); else pvMount();
 function pvShow(on){
   const el=document.getElementById('pivotPanel'); if(!el) return;
   el.style.display = on ? '' : 'none';
@@ -2085,33 +2100,42 @@ function pvRows(mk,kind,st){
     .filter(x=>x.s && Number(x.rs)>60)
     .sort((a,b)=>(b.rs||0)-(a.rs||0));
 }
-function pvTable(mk,title,list){
+function pvTable(mk,title,list,cls){
   if(!list.length) return '';
   const rows=list.slice(0,100).map(({r,s,rs})=>{
     const hi=Number(s.hi52), p=Number(s.price);
-    const up=(hi>0&&p>0)? (hi/p-1)*100 : null;
-    const hiTxt=up==null?'<span class="mu">–</span>':'<b class="'+(up<=5?'pos':(up>=25?'neg':'mu'))+' nw">'+(up<=0.05?'ที่จุดสูง':'+'+up.toFixed(1)+'%')+'</b>';
+    const up=(hi>0&&p>0)?(hi/p-1)*100:null;
+    const hiTxt=up==null?'<span class="mu">–</span>':'<b class="'+(up<=5?'pos':(up>=25?'neg':'mu'))+'">'+(up<=0.05?'ที่จุดสูง':'+'+up.toFixed(1)+'%')+'</b>';
     const det = r.kind==='VDU'
-      ? (r.st==='BREAK' ? 'dry '+r.dry.toFixed(2)+'x · vol '+r.brkVol.toFixed(2)+'x · เบรก '+r.brkDate
-                        : 'dry '+r.dry.toFixed(2)+'x · อีก '+Math.abs(r.toGo).toFixed(1)+'% ถึง pivot')
-      : (r.st==='BREAK' ? 'ย่อ '+r.dep.join('/')+'% · vol '+r.brkVol.toFixed(2)+'x · เบรก '+r.brkDate
-                        : 'ย่อ '+r.dep.join('/')+'% · อีก '+Math.abs(r.toGo).toFixed(1)+'% ถึง pivot');
+      ? (r.st==='BREAK' ? 'dry '+r.dry.toFixed(2)+'x · vol '+r.brkVol.toFixed(2)+'x · '+r.brkDate
+                        : 'dry '+r.dry.toFixed(2)+'x · อีก '+Math.abs(r.toGo).toFixed(1)+'%')
+      : (r.st==='BREAK' ? 'ย่อ '+r.dep.join('/')+'% · vol '+r.brkVol.toFixed(2)+'x · '+r.brkDate
+                        : 'ย่อ '+r.dep.join('/')+'% · อีก '+Math.abs(r.toGo).toFixed(1)+'%');
     return '<tr onclick="pvOpen(\''+jq(s.ticker)+'\',\''+jq(s.name||'')+'\',\''+mk+'\')">'
-      +'<td><div class="tkcell"><span class="tkrow">'+tkL(s.ticker,mk,16)+'<b>'+s.ticker+'</b>'+tkT(s.ticker,mk)+'</span></div></td>'
-      +'<td class="r"><span class="rsr'+(rs<70?' lo':'')+'">'+(rs==null?'–':rs)+'</span></td>'
-      +'<td class="r">'+fNum(s.price)+'</td><td class="r">'+clPc(s.p3m)+'</td>'
-      +'<td class="r">'+hiTxt+'</td><td class="r">'+fNum(r.pivot)+'</td>'
-      +'<td class="bs-th"><span class="mu">'+det+'</span></td></tr>';
+      +'<td><span class="tk">'+s.ticker+'</span><span class="det pv-only-sm">'+det+'</span></td>'
+      +'<td class="r"><b class="'+(rs>=90?'rs90':(rs>=80?'rs80':'rslo'))+'">'+(rs==null?'–':rs)+'</b></td>'
+      +'<td class="r">'+fNum(s.price)+'</td>'
+      +'<td class="r pv-hide-sm">'+clPc(s.p3m)+'</td>'
+      +'<td class="r pv-hide-sm">'+hiTxt+'</td>'
+      +'<td class="r">'+fNum(r.pivot)+'</td>'
+      +'<td class="pv-hide-sm"><span class="det">'+det+'</span></td></tr>';
   }).join('');
-  const title2=title+' · '+list.length;
-  return '<div class="pv-sec">'+title2+'</div>'
-    +'<div class="bs-tools" style="margin:6px 0 4px"><button class="tf-chip bs-open" onclick="pvOpenList(\''+jq(title)+'\',\''+jq(mk)+'\',\''+jq(list.map(x=>x.s.ticker).join(','))+'\')">ดูการ์ดกราฟ '+list.length+' ตัว</button></div>'
-    +'<div class="overflow-x-auto"><table class="bs-tbl"><thead><tr><th>หุ้น</th><th class="r">RS</th><th class="r">ราคา</th><th class="r">3M</th><th class="r">ถึงจุดสูง 52w</th><th class="r">pivot</th><th class="bs-th">รายละเอียด</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  return '<div class="pv-sec"><span class="dot'+(cls==='b'?' b':'')+'"></span>'+title+' <b>'+list.length+'</b><span class="sp"></span>'
+    +'<button class="pv-btn" onclick="pvOpenList(\''+jq(title)+'\',\''+jq(mk)+'\',\''+jq(list.map(x=>x.s.ticker).join(','))+'\')">ดูการ์ดกราฟ</button></div>'
+    +'<div class="pv-scroll"><table class="pv-tbl"><thead><tr><th>หุ้น</th><th class="r">RS</th><th class="r">ราคา</th><th class="r pv-hide-sm">3M</th><th class="r pv-hide-sm">ถึงจุดสูง</th><th class="r">pivot</th><th class="pv-hide-sm">รายละเอียด</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 }
-function pvOpen(tk,name,mk){ try{ window.PIVOT_CTX=(PV.cache[mk==='america'?'us':'th'].rows||[]).find(r=>r.tk===tk)||null; }catch(e){} try{ openModal(tk,name,mk); }catch(e){} }
+function pvSetScope(mk,tks){
+  try{
+    const rows=((PV.cache[mk==='america'?'us':'th']||{}).rows)||[];
+    const map={}; rows.forEach(r=>{ if(!tks||tks.indexOf(r.tk)>=0) map[r.tk]=r; });
+    window.PV_SCOPE={mk:mk, map:map};
+  }catch(e){}
+}
+function pvOpen(tk,name,mk){ pvSetScope(mk,[tk]); try{ window.PIVOT_CTX=(window.PV_SCOPE.map||{})[tk]||null; }catch(e){} try{ openModal(tk,name,mk); }catch(e){} }
 function pvOpenList(title,mk,csv){
   const arr=(typeof stockDB!=='undefined'&&stockDB[mk])||[], map=new Map(arr.map(s=>[s.ticker,s]));
   const list=csv.split(',').map(t=>map.get(t)).filter(Boolean);
+  pvSetScope(mk, csv.split(','));
   try{ openStockList('Pivot Break · '+title,'VDU / VCP · ผ่านเกณฑ์ RS>60 และขาขึ้น',list,mk); }catch(e){}
 }
 function pvDraw(){
@@ -2123,12 +2147,12 @@ function pvDraw(){
   if(dbn<50){ PV._wait=(PV._wait||0)+1; if(PV._wait<=12){ setTimeout(pvDraw, 1200); return; } }
   else PV._wait=0;
   const d=PV.cache[mk==='america'?'us':'th']||{rows:[]};
-  const g=[['VDU · เบรกแล้ว',pvRows(mk,'VDU','BREAK')],['VDU · รอเบรก',pvRows(mk,'VDU','WAIT')],
-           ['VCP · เบรกแล้ว',pvRows(mk,'VCP','BREAK')],['VCP · รอเบรก',pvRows(mk,'VCP','WAIT')]];
+  const g=[['VDU · เบรกแล้ว',pvRows(mk,'VDU','BREAK'),'b'],['VDU · รอเบรก',pvRows(mk,'VDU','WAIT'),'w'],
+           ['VCP · เบรกแล้ว',pvRows(mk,'VCP','BREAK'),'b'],['VCP · รอเบรก',pvRows(mk,'VCP','WAIT'),'w']];
   const _b=(typeof RS_BASE!=='undefined')?RS_BASE:'3m';
   const base=(_b==='6m'?'6M':(_b==='1y'?'1Y':'3M'));
   if(info) info.textContent='RS '+base+' > 60 · ขาขึ้น · ณ '+(d.asOf||'-');
-  const html=g.map(([t,l])=>pvTable(mk,t,l)).join('');
+  const html=g.map(([t,l,c])=>pvTable(mk,t,l,c)).join('');
   box.innerHTML=html || '<div class="pv-empty">ยังไม่มีตัวที่ผ่านเกณฑ์ (RS>60 และขาขึ้น)</div>';
 }
 document.addEventListener('click', function(e){
@@ -4719,7 +4743,8 @@ async function bsApplyMarks(ser,data,tk,m){
     if(!rsfn){ const rsNow=Number(s&&s.rs); if(Number.isFinite(rsNow)) rsfn = ()=>rsNow; }
     const all=bsMarks(bsClosed(data,m),rsfn,true,ctx);
     const k=BSM_REG.findIndex(e=>e.ser===ser); if(k>=0) BSM_REG.splice(k,1); BSM_REG.push({ser,all}); if(BSM_REG.length>400) BSM_REG.shift();
-    ser.setMarkers(bsFilt(all)); }catch(e){}
+    ser.setMarkers(bsFilt(all));
+    try{ if(typeof pvApplyMarks==='function') pvApplyMarks(ser,data,tk); }catch(e){} }catch(e){}
 }
 // สัญญาณ Buy/Wait/Sell เปลี่ยนเมื่อแท่ง Day "ปิดแล้ว" เท่านั้น — ตัดแท่งของวันนี้ที่ตลาดยังไม่ปิด (ก่อนเวลาปิด+30 นาที: ไทย 17:00 น. เวลาไทย · สหรัฐ 16:30 น. เวลานิวยอร์ก) ออกก่อนคำนวณ
 function bsCutDate(m){
@@ -5330,7 +5355,7 @@ function drawChartW(el, raw, w){
   const hgt = Math.max(150, Math.min(240, Math.round(w * 0.62)));
   const chart=LightweightCharts.createChart(el,{width:w,height:hgt,layout:{background:{color:'transparent'},textColor:thusC().text},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:false},timeScale:{borderVisible:false}});
   const cSer=chart.addCandlestickSeries({upColor:thusC().up,downColor:thusC().down,borderVisible:false,wickUpColor:thusC().up,wickDownColor:thusC().down}); cSer.setData(data);
-  bsApplyMarks(cSer,data,el.dataset&&el.dataset.tk,el.dataset&&el.dataset.m||currentMarket);
+  try{ Promise.resolve(bsApplyMarks(cSer,data,el.dataset&&el.dataset.tk,el.dataset&&el.dataset.m||currentMarket)).then(function(){ try{ pvApplyMarks(cSer,data,el.dataset&&el.dataset.tk); }catch(e){} }); }catch(e){}
   const hasVol=data.some(d=>d.volume>0); let vSer=null;
   if(hasVol){
     vSer=chart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol',priceLineVisible:false}); vSer.setData(data.map(d=>({time:d.time,value:d.volume,color:d.pre?'rgba(124,156,255,.45)':(d.close>=d.open?thusC().vup:thusC().vdown)})));
@@ -5478,7 +5503,7 @@ async function fetchModal(iv){
       el.innerHTML='';
       const ch=LightweightCharts.createChart(el,{width:w,height:420,autoSize:true,layout:{background:{color:thusC().bg},textColor:thusC().text},grid:{vertLines:{visible:false},horzLines:{visible:false}},rightPriceScale:{borderVisible:false},timeScale:{borderVisible:false}});
       const cSer=ch.addCandlestickSeries({upColor:thusC().up,downColor:thusC().down,borderVisible:false,wickUpColor:thusC().up,wickDownColor:thusC().down}); cSer.setData(data);
-      if(iv==='1y'||iv==='1d'){ Promise.resolve(bsApplyMarks(cSer,data,activeTicker,activeMarket)).then(function(){ try{ pvApplyModal(cSer,data); }catch(e){} }); } else { try{ pvApplyModal(cSer,data); }catch(e){} }
+      if(iv==='1y'||iv==='1d'){ Promise.resolve(bsApplyMarks(cSer,data,activeTicker,activeMarket)).then(function(){ try{ pvApplyMarks(cSer,data,activeTicker); }catch(e){} }); } else { try{ pvApplyMarks(cSer,data,activeTicker); }catch(e){} }
       const hasVol=data.some(d=>d.volume>0); let vSer=null;
       if(hasVol){
         vSer=ch.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol',priceLineVisible:false}); vSer.setData(data.map(d=>({time:d.time,value:d.volume,color:d.pre?'rgba(124,156,255,.45)':(d.close>=d.open?thusC().vup:thusC().vdown)})));
