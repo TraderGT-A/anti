@@ -3858,7 +3858,7 @@ function maLegendHTML(){
   return '<div class="ma-leg" title="แท่งเทียน = เปิด-สูง-ต่ำ-ปิด · แท่งล่าง = ปริมาณซื้อขาย · เส้นประ = ราคาปิดล่าสุด · กดชื่อ SMA เพื่อเปิด/ปิดเส้น (จำไว้ ใช้กับทุกกราฟ)">'
     + MA_LIST.map(n=>'<span data-ma="'+n+'" class="'+(MA_ON[n]?'':'off')+'" onclick="toggleMA('+n+')" title="กดเพื่อเปิด/ปิดเส้น SMA'+n+' (ใช้กับทุกกราฟ)"><i style="background:'+maColor(n)+'"></i>SMA'+n+'</span>').join('')
     + (currentMarket==='america'&&preWindow()?'<span class="pre-leg" title="แท่งสีฟ้า = Pre-market ของวันนี้ (04:00–09:30 น. เวลานิวยอร์ก ดีเลย์ ~15 นาที) หายไปเมื่อตลาดเปิด"><i></i>Pre-market</span>':'')
-    + '<span data-bsred="1" class="'+(BS_REDON?'':'off')+'" onclick="toggleBsRed()" title="กดเพื่อเปิด/ปิดลูกศรลงแดง (ใช้กับทุกกราฟ)"><i style="background:#ff453a"></i>▼ แดง</span>'
+    + '<span data-bsred="1" class="'+(BS_REDON?'':'off')+'" onclick="toggleBsRed()" role="button"><i style="background:#ff453a"></i>▼</span>'
   + '</div>';
 }
 function fNum(n){ const v=Number(n); return Number.isFinite(v)?v.toFixed(2):'-'; }
@@ -4524,6 +4524,17 @@ function toggleBsRed(){
   BS_REDON=BS_REDON?0:1; try{ localStorage.setItem('rsd_bsred',String(BS_REDON)); }catch(e){}
   for(let i=BSM_REG.length-1;i>=0;i--){ try{ BSM_REG[i].ser.setMarkers(bsFilt(BSM_REG[i].all)); }catch(e){ BSM_REG.splice(i,1); } }
   document.querySelectorAll('.ma-leg [data-bsred]').forEach(sp=>sp.classList.toggle('off',!BS_REDON));
+  // ถ้ากราฟยังไม่ถูกลงทะเบียน (เช่น เพิ่งเปิด/วาดใหม่) ให้ใส่ marker ใหม่ทันที
+  try{
+    if(!BSM_REG.length){
+      document.querySelectorAll('[data-tk]').forEach(el=>{
+        const c=el.__chart; if(!c||!c.series) return;
+        const ser=c.series('candlestick')||c.series('bar'); if(!ser) return;
+        const data=(c.__bars)||null; if(!data) return;
+        bsApplyMarks(ser,data,el.dataset.tk,el.dataset.m||currentMarket);
+      });
+    }
+  }catch(e){}
 }
 async function bsApplyMarks(ser,data,tk,m){
   if(!ser||!tk) return;
