@@ -226,11 +226,21 @@ export async function scanMarket(market = "thailand") {
   const marketLive = market === "thailand"
     ? _inSession("Asia/Bangkok", 9.5, 17.0)
     : _inSession("America/New_York", 4.0, 16.0);
+  // average_volume_10d_calc ของ TradingView มีแท่งวันนี้รวมอยู่ด้วย (ระหว่างเทรดเป็นแท่งไม่เต็ม)
+  // → ถ้าใช้ตรง ๆ เกณฑ์สภาพคล่องจะแกว่ง เช้าติด/บ่ายหลุด (บอส 6 พ.ย. 2569)
+  // ตัดแท่งวันนี้ออกก่อน: avg_prev9 = (avg10*10 - volume_today) / 9
+  const avgVolExToday = (s) => {
+    const a = s.avgVol || 0, v = s.volume || 0;
+    if (a <= 0) return 0;
+    const ex = (a * 10 - v) / 9;
+    return ex > 0 ? ex : a;   // กันค่าติดลบกรณีแท่งวันนี้โตผิดปกติ
+  };
   const okLiq = (s, minV, minVal) => {
+    const ex = avgVolExToday(s);
     if (marketLive)
-      return (s.avgVol || 0) >= minV && (s.avgVol || 0) * (s.price || 0) >= minVal;
+      return ex >= minV && ex * (s.price || 0) >= minVal;
     return ((s.volume || 0) >= minV && (s.val || 0) >= minVal) ||
-           ((s.avgVol || 0) >= minV && (s.avgVol || 0) * (s.price || 0) >= minVal);
+           (ex >= minV && ex * (s.price || 0) >= minVal);
   };
 
   let clean = raw.filter(s => s.price >= M.min_price && s.mcap >= M.min_mcap && okLiq(s, M.min_vol, M.min_value));
