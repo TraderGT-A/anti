@@ -1046,6 +1046,7 @@ html .ht-cap { padding-top:14px; }
 
 /* ป้าย OHLC มุมซ้ายบนกราฟ */
 .ohlc-tip{position:absolute;left:6px;top:6px;z-index:5;display:none;padding:2px 6px;border-radius:6px;background:rgba(10,14,20,.86);border:1px solid var(--line2);color:var(--body);font-size:10.5px;line-height:1.5;font-variant-numeric:tabular-nums;pointer-events:none;white-space:nowrap}
+.ohlc-tip .ohlc-lbl{font-style:normal;color:var(--faint);margin-left:4px;font-size:9.5px}
 .ohlc-tip b{color:var(--muted);font-weight:600;margin-right:4px}
 html[data-theme="light"] .ohlc-tip{background:rgba(255,255,255,.92)}
 </style>
@@ -5693,7 +5694,7 @@ function drawWhenSized(el, data){
 }
 
 // drawChart รับ width เจาะจง (ไม่ autoSize — กัน width=0 บนมือถือ)
-function attachOhlcTip(el, chart, data){
+function attachOhlcTip(el, chart, data, chgLbl){
   try{
     el.style.position='relative';
     let tip=el.querySelector('.ohlc-tip');
@@ -5707,7 +5708,7 @@ function attachOhlcTip(el, chart, data){
       const d=data[i], prev=i>0?data[i-1]:null;
       const ch=(prev&&prev.close)?((d.close/prev.close)-1)*100:null;
       tip.innerHTML='<b>'+String(param.time)+'</b> O '+fmt(d.open)+' H '+fmt(d.high)+' L '+fmt(d.low)+' C '+fmt(d.close)
-        +(ch==null?'':' <span class="'+(ch>=0?'pos':'neg')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>');
+        +(ch==null?'':' <span class="'+(ch>=0?'pos':'neg')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>'+(chgLbl?'<i class="ohlc-lbl">'+chgLbl+'</i>':''));
       tip.style.display='block';
     });
     el.addEventListener('mouseleave',function(){ tip.style.display='none'; });
@@ -5727,7 +5728,7 @@ function drawChartW(el, raw, w){
     vSer=chart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol',priceLineVisible:false}); vSer.setData(data.map(d=>({time:d.time,value:d.volume,color:d.pre?'rgba(124,156,255,.45)':(d.close>=d.open?thusC().vup:thusC().vdown)})));
     chart.priceScale('vol').applyOptions({scaleMargins:{top:.82,bottom:0}});
   }
-  attachOhlcTip(el, chart, data);
+  attachOhlcTip(el, chart, data, '');
   maApply(chart,data,el);
   try{ if(el.dataset&&el.dataset.tk){ const _m=el.dataset.m||currentMarket; liveReg(el,el.dataset.tk,_m,cSer,vSer); syncPx(el.dataset.tk,_m,data); } }catch(e){}
   const last=data[data.length-1];
@@ -5932,7 +5933,7 @@ async function fetchModal(iv){
         ch.priceScale('vol').applyOptions({scaleMargins:{top:.8,bottom:0}});
       }
       if(iv==='1y'||iv==='1d'){ try{ liveReg(el,activeTicker,activeMarket,cSer,vSer); syncPx(activeTicker,activeMarket,data); }catch(e){} }
-      attachOhlcTip(el, ch, data);
+      attachOhlcTip(el, ch, data, iv==='1mo'?'MTD':(iv==='1wk'?'WTD':''));
       maApply(ch,data,el); ((iv==='1y'||iv==='1d')?thusRange(ch,data.length,126):ch.timeScale().fitContent()); ch.timeScale().applyOptions({ rightOffset: 12 });
     });
   }catch(e){ el.innerHTML='<div class="text-center text-rose-400 text-sm">โหลดไม่สำเร็จ</div>'; }
