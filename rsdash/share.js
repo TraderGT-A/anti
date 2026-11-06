@@ -263,13 +263,13 @@
     x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 100);
     x.textAlign = "left";
 
+    const byChg = opts.sizeBy === "chg";
     x.fillStyle = th.text; x.font = font(900, 52); x.fillText((opts.title || "Heatmap").slice(0, 26), 70, 200);
     const subTxt2 = (opts.sub || "") + (byChg ? " · ขนาดบล็อก = % เปลี่ยนแปลง" : " · ขนาดบล็อก = มูลค่าตลาด");
     x.fillStyle = th.muted; x.font = font(500, 22); x.fillText(subTxt2.slice(0, 70), 70, 238);
 
     // พื้นที่ treemap
     const X0 = 70, Y0 = 274, XW = W - 140, XH = 940;
-    const byChg = opts.sizeBy === "chg";
     const tItems = (opts.items || [])
       .filter((it) => (byChg ? Math.abs(Number(it.chg) || 0) > 0.01 : (it.mcap || 0) > 0))
       .map((it) => Object.assign({}, it, { v: byChg ? Math.max(0.05, Math.abs(Number(it.chg) || 0)) : it.mcap }))
@@ -277,7 +277,7 @@
       .slice(0, byChg ? 60 : 100000);   // โหมด %เปลี่ยน: เอา 60 ตัวที่ขยับแรงสุด (อ่านง่าย + ไม่หนัก)
     const rects = squarify(tItems, X0, Y0, XW, XH);
     // โลโก้บริษัทในบล็อกที่ใหญ่พอ (เสิร์ฟผ่านโดเมนเรา → ไม่ทำให้ canvas เสีย)
-    const big = rects.filter((r) => (r.w - 2) > 96 && (r.h - 2) > 78).slice(0, 34);
+    const big = rects.filter((r) => (r.w - 2) > 110 && (r.h - 2) > 92).slice(0, 30);
     const logos = {};
     await Promise.all(big.map(async (r) => {
       const tk = (r.it && r.it.ticker) || "";
@@ -323,7 +323,7 @@
     // legend
     const ly = Y0 + XH + 34;
     x.fillStyle = th.muted; x.font = font(600, 22);
-    x.fillText("สี = % เปลี่ยนวันนี้ · ขนาด = มูลค่าตลาด", 70, ly);
+    x.fillText(byChg ? "สี = % เปลี่ยนวันนี้ · ขนาด = ขนาดการเปลี่ยน (%)" : "สี = % เปลี่ยนวันนี้ · ขนาด = มูลค่าตลาด", 70, ly);
     ["-3%", "0", "+3%"].forEach((t, i) => {
       const bx = W - 70 - 240 + i * 80;
       x.fillStyle = i === 0 ? "rgb(192,57,43)" : (i === 1 ? (th === THEMES.dark ? "rgb(26,22,32)" : "rgb(232,229,220)") : "rgb(24,158,106)");
