@@ -590,7 +590,7 @@
 
 
   // กล่องสไตล์กระจกนูน (glassmorphism): ไล่แสงบน-ล่าง + ขอบไฮไลต์ + เงาใน
-  const GLASS = { a: 0.055, b: 0.018, hi: 0.14, sh: 0.55 };
+  const GLASS = { a: 0.028, b: 0.009, hi: 0.07, sh: 0.42 };
   function glassPanel(x, th, bx, by, bw, bh, r) {
     const rr2 = r || 20;
     x.save();
@@ -727,31 +727,76 @@
   function drawTrendBlock(x, th, q, box) {
     const pts = (q || []).filter((z) => z && z.d && (z.rev != null || z.ni != null));
     if (pts.length < 2) return;
-    const padL = 34, padR = 34, padT = 34, padB = 42;
+    const padL = 18, padR = 18, padT = 46, padB = 34;
     const px = box.x + padL, py = box.y + padT, pw = box.w - padL - padR, ph = box.h - padT - padB;
     const revs = pts.map((z) => Number(z.rev) || 0), nis = pts.map((z) => Number(z.ni) || 0);
-    const rMax = Math.max(...revs, 1), rMin = Math.min(0, ...revs);
-    const nMax = Math.max(...nis, 1), nMin = Math.min(0, ...nis);
-    const X = (i) => px + (i / (pts.length - 1)) * pw;
-    const Yr = (v) => py + ph - ((v - rMin) / ((rMax - rMin) || 1)) * ph;
-    const Yn = (v) => py + ph - ((v - nMin) / ((nMax - nMin) || 1)) * ph;
-    const line = (vals, Yf, col, dash) => {
-      x.strokeStyle = col; x.lineWidth = 2.6; x.setLineDash(dash || []);
-      x.beginPath();
-      vals.forEach((v, i) => { const yy = Yf(v); if (i === 0) x.moveTo(X(i), yy); else x.lineTo(X(i), yy); });
-      x.stroke(); x.setLineDash([]);
-      vals.forEach((v, i) => { x.beginPath(); x.arc(X(i), Yf(v), 3.2, 0, Math.PI * 2); x.fillStyle = col; x.fill(); });
+    const mxRev = Math.max(...revs.map(Math.abs), 1), mxNi = Math.max(...nis.map(Math.abs), 1);
+    const base = py + ph * 0.88;                       // เส้นฐาน (ศูนย์)
+    const slot = pw / pts.length;
+
+    const fmtS = (v) => {
+      const av = Math.abs(v), sg = v < 0 ? "-" : "";
+      if (av >= 1e12) return sg + (av / 1e12).toFixed(2) + "T";
+      if (av >= 1e9) return sg + (av / 1e9).toFixed(2) + "B";
+      if (av >= 1e7) return sg + (av / 1e6).toFixed(0) + "M";
+      if (av >= 1e4) return sg + (av / 1e3).toFixed(0) + "K";
+      return sg + Math.round(av);
     };
-    line(revs, Yr, "#E2BE6E");
-    line(nis, Yn, th.up, [5, 4]);
-    // ป้ายไตรมาส + ตัวเลขท้ายเส้น
-    x.font = font(600, 15); x.fillStyle = th.muted; x.textAlign = "center";
-    pts.forEach((z, i) => x.fillText(qLabel(z.d), X(i), box.y + box.h - 12));
+    const hOf = (v, mx, hMax) => Math.max(1.5, (Math.abs(v) / mx) * hMax);
+    const hMax = ph * 0.58;        // รายได้
+    const hMaxNi = ph * 0.24;      // กำไร (สเกลของตัวเอง ให้เห็นความเปลี่ยนแปลงและไม่ทับป้ายรายได้)
+
+    // แท่งรายได้ (ทอง) + กำไร (เขียวน้ำทะเล) ต่อไตรมาส
+    const tops = { rev: [], ni: [] };
+    pts.forEach((z, i) => {
+      const cx = px + slot * (i + 0.5);
+      const bw = Math.min(34, slot * 0.30), bgap = Math.max(3, slot * 0.06);
+      const rv = Number(z.rev) || 0, ni = Number(z.ni) || 0;
+      const rH = hOf(rv, mxRev, hMax), nH = hOf(ni, mxNi, hMaxNi);
+
+      x.fillStyle = "#E2BE6E";
+      if (rv >= 0) { rr(x, cx - bw - bgap / 2, base - rH, bw, rH, 4); x.fill(); tops.rev.push([cx - bw / 2 - bgap / 4, base - rH]); }
+      else { rr(x, cx - bw - bgap / 2, base, bw, rH, 4); x.fill(); tops.rev.push([cx - bw / 2 - bgap / 4, base + rH]); }
+
+      x.fillStyle = th.up;
+      if (ni >= 0) { rr(x, cx + bgap / 2, base - nH, bw, nH, 4); x.fill(); tops.ni.push([cx + bw / 2 + bgap / 4, base - nH]); }
+      else { rr(x, cx + bgap / 2, base, bw, nH, 4); x.fill(); tops.ni.push([cx + bw / 2 + bgap / 4, base + nH]); }
+
+      // ตัวเลขบนหัวแท่ง (เฉพาะเมื่อที่มีที่พอ)
+      x.font = font(700, 11); x.textAlign = "center";
+      if (slot > 62) {
+        if (rH > 14) { x.fillStyle = "#E2BE6E"; x.fillText(fmtS(rv), cx - bw / 2 - bgap / 4, (rv >= 0 ? base - rH - 7 : base + rH + 13)); }
+        if (nH > 14) { x.fillStyle = th.up; x.fillText(fmtS(ni), cx + bw / 2 + bgap / 4, (ni >= 0 ? base - nH - 7 : base + nH + 13)); }
+      }
+      x.textAlign = "left";
+    });
+
+    // เส้นแนวโน้มลากจากหัวแท่ง
+    const poly = (arr, col, dash) => {
+      if (arr.length < 2) return;
+      x.strokeStyle = col; x.lineWidth = 2.4; x.setLineDash(dash || []);
+      x.beginPath(); arr.forEach((p, i) => (i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1]))); x.stroke();
+      x.setLineDash([]);
+      arr.forEach((p) => { x.beginPath(); x.arc(p[0], p[1], 3.4, 0, Math.PI * 2); x.fillStyle = col; x.fill(); });
+    };
+    poly(tops.rev, "#F0D79B");
+    poly(tops.ni, th.up, [4, 4]);
+
+    // เส้นฐาน + ป้ายไตรมาส
+    x.strokeStyle = "rgba(255,255,255,0.10)"; x.lineWidth = 1;
+    x.beginPath(); x.moveTo(px, base); x.lineTo(px + pw, base); x.stroke();
+    x.font = font(600, 13); x.fillStyle = th.muted; x.textAlign = "center";
+    pts.forEach((z, i) => x.fillText(qLabel(z.d), px + slot * (i + 0.5), box.y + box.h - 10));
     x.textAlign = "left";
-    x.font = font(700, 13);
-    x.fillStyle = "#E2BE6E"; x.fillText("รายได้", px, box.y + 12);
-    const wR = x.measureText("รายได้").width;
-    x.fillStyle = th.up; x.fillText("กำไร", px + wR + 14, box.y + 12);
+
+    // คำอธิบายสี
+    x.font = labelFont(600, 12);
+    let lx = px;
+    [[("#E2BE6E"), "รายได้"], [(th.up), "กำไร"]].forEach((p2, k) => {
+      x.fillStyle = p2[0]; rr(x, lx, box.y + 10, 9, 9, 2); x.fill();
+      x.fillStyle = th.muted; x.fillText(p2[1], lx + 14, box.y + 18);
+      lx += 14 + x.measureText(p2[1]).width + 16;
+    });
   }
 
   async function loadCardData(tk, mk, withLogo) {
@@ -990,19 +1035,27 @@
     st.forEach((sv, i) => {
       const bx = 52 + (i % 2) * 236, by = 268 + Math.floor(i / 2) * 76;
       glassPanel(x, th, bx, by, 220, 62, 14);
-      x.fillStyle = th.muted; x.font = labelFont(600, 13); x.fillText(sv[0], bx + 14, by + 23);
+      x.textAlign = "center";
+      x.fillStyle = th.muted; x.font = labelFont(600, 13);
+      let lbW = sv[0];
+      while (x.measureText(lbW).width > 190 && lbW.length > 4) lbW = lbW.slice(0, -1);
+      x.fillText(lbW, bx + 110, by + 23);
       const neg = /^-/.test(String(sv[1]));
       x.fillStyle = i === 1 || i === 2 ? (neg ? th.down : th.up) : th.text;
-      x.font = font(700, 24); x.fillText(sv[1], bx + 14, by + 50);
+      x.font = font(700, 24); x.fillText(sv[1], bx + 110, by + 50);
+      x.textAlign = "left";
     });
 
     const chips = f ? fundChips(f).filter((kv) => !/mcap|มูลค่าตลาด/i.test(String(kv[0]))).slice(0, 4) : [];
+    const vW = 456 / Math.max(chips.length, 1);          // ให้ขอบขวาชนกับกล่องสถิติพอดี
     chips.forEach((kv, i) => {
-      const bx = 52 + (i % 4) * 118, by = 448;
+      const bx = 52 + vW * i + vW / 2, by = 448;
+      x.textAlign = "center";
       x.fillStyle = th.muted; x.font = labelFont(500, 12);
       x.fillText(String(kv[0]).slice(0, 12), bx, by);
       x.fillStyle = th.text; x.font = font(700, 21);
       x.fillText(String(kv[1]).slice(0, 8), bx, by + 28);
+      x.textAlign = "left";
     });
 
     const box = { x: 520, y: 100, w: W - 570, h: H - 190 };
