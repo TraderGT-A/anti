@@ -145,7 +145,7 @@
 
   /* ---------- การ์ดแชร์แบบรายการ (Buy วันนี้ / Pivot / Pivot group) ---------- */
   async function drawList(opts) {
-    const th = (document.documentElement.getAttribute("data-theme") === "light") ? THEMES.light : THEMES.dark;
+    const th = THEMES.dark;
     const W = 1080, H = 1350;
     const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
@@ -303,7 +303,7 @@
     return `rgb(${c[0]},${c[1]},${c[2]})`;
   }
   async function drawHeat(opts) {
-    const th = (document.documentElement.getAttribute("data-theme") === "light") ? THEMES.light : THEMES.dark;
+    const th = THEMES.dark;
     const W = 1080, H = 1350;
     const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
@@ -419,174 +419,189 @@
     }
     await Promise.all(Array.from({ length: Math.min(5, need.length) }, worker));
   }
+  // เลย์เอาต์การ์ดกลุ่มตามจำนวนหุ้น (แถว × คอลัมน์)
+  const GRID_LAYOUT = { 1: [1], 2: [1, 1], 3: [1, 1, 1], 4: [2, 2], 5: [1, 2, 2], 6: [3, 3], 7: [1, 3, 3], 8: [4, 4], 9: [3, 3, 3] };
+
   async function drawGrid(opts) {
-    const th = (document.documentElement.getAttribute("data-theme") === "light") ? THEMES.light : THEMES.dark;
+    const th = THEMES.dark;                       // การ์ดใช้พื้นดำ #0D0A11 เสมอ
     const W = 1080, H = 1350;
     const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
     const g2 = x.createLinearGradient(0, 0, W, H);
     g2.addColorStop(0, th.bg); g2.addColorStop(1, th.bg2);
     x.fillStyle = g2; x.fillRect(0, 0, W, H);
-    x.strokeStyle = th.line; x.lineWidth = 3; rr(x, 28, 28, W - 56, H - 56, 36); x.stroke();
 
     const logo = await loadImg("/brand/thus-symbol-white.png");
-    if (logo) { try { x.drawImage(logo, 70, 66, 54, 54); } catch (e) {} }
-    x.fillStyle = th.text; x.font = font(900, 34); x.fillText("THUS", 140, 108);
-    x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
-    x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 100);
+    if (logo) { try { x.drawImage(logo, 70, 62, 44, 44); } catch (e) {} }
+    x.fillStyle = th.text; x.font = font(700, 30); x.fillText("THUS", 126, 96);
+    x.fillStyle = th.muted; x.font = font(400, 19); x.textAlign = "right";
+    x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 92);
     x.textAlign = "left";
 
-    x.fillStyle = th.text; x.font = font(900, 46); x.fillText(String(opts.title || "").slice(0, 26), 70, 196);
-    const subTxt = (opts.sub || "") + (opts.pageTotal > 1 ? " · หน้า " + opts.page + "/" + opts.pageTotal : "");
-    if (subTxt) { x.fillStyle = th.muted; x.font = font(500, 21); x.fillText(subTxt.slice(0, 74), 70, 230); }
+    x.fillStyle = th.text; x.font = font(700, 44); x.fillText(String(opts.title || "").slice(0, 26), 70, 190);
+    const subTxt = String(opts.sub || "").toUpperCase();
+    if (subTxt) {
+      x.fillStyle = th.gold; x.font = labelFont(600, 15);
+      try { x.letterSpacing = "1.4px"; } catch (e) {}
+      x.fillText(subTxt.slice(0, 60), 70, 222);
+      try { x.letterSpacing = "0px"; } catch (e) {}
+    }
+    if (opts.pageTotal > 1) {
+      x.fillStyle = th.muted; x.font = labelFont(600, 15); x.textAlign = "right";
+      x.fillText("หน้า " + (opts.page || 1) + "/" + opts.pageTotal, W - 70, 222);
+      x.textAlign = "left";
+    }
 
     const items = (opts.items || []).slice(0, 9);
-    const cols = 3, rows = Math.ceil(items.length / cols) || 1;
-    const X0 = 60, GW = W - 120, GH = 1000;
-    const gap = 14, cwid = GW / cols;
-    const chei = rows === 1 ? 830 : (rows === 2 ? 470 : 318);
-    const blockH = rows * chei;
-    const Y0 = 262 + Math.max(0, (1000 - blockH) / 2);   // จัดกึ่งกลางแนวตั้ง ไม่ให้เหลือช่องว่างล่างเยอะ
+    const plan = GRID_LAYOUT[items.length] || [3, 3, 3];
+    const maxCols = Math.max.apply(null, plan);
+    const X0 = 60, GW = W - 120, YTOP = 262, YBOT = 1236;
+    const gap = 14;
+    const rh = (YBOT - YTOP) / plan.length;
 
-    const MA20 = "#e8b04b", MA50 = "#5b9df9";
-
-    // จัดแถวให้เต็มทุกแถว และจัดกึ่งกลางเมื่อแถวสุดท้ายมีไม่ครบ (กันการ์ดแหว่ง)
-    const fullCols = (n) => (n >= 3 ? 3 : (n === 2 ? 2 : 1));
-    const perRow = [];
-    let left = items.length;
-    while (left > 0) {
-      let take = Math.min(3, left);
-      // ถ้าเหลือ 4 → แบ่ง 2+2 ; เหลือ 5 → 3+2 ; เหลือ 1 ในแถวสุดท้ายให้อยู่กลาง
-      if (left === 4) take = 2;
-      if (left === 5) take = 3;
-      perRow.push(take);
-      left -= take;
-    }
     let idx = 0;
-    for (let r = 0; r < perRow.length; r++) {
-      const nRow = perRow[r];
-      const rowW = nRow * cwid;
-      const rowX = X0 + (GW - rowW) / 2;      // กึ่งกลางแนวนอน
-      for (let c = 0; c < nRow; c++, idx++) {
-      const it = items[idx];
-      const cx = rowX + c * cwid + gap / 2;
-      const cy = Y0 + r * chei + gap / 2;
-      const cw2 = cwid - gap, ch2 = chei - gap;
-      glassPanel(x, th, cx, cy, cw2, ch2, 16);
+    for (let r = 0; r < plan.length; r++) {
+      const nRow = plan[r];
+      const cwid = GW / nRow;                    // แถวที่มีcolน้อยกว่า = การ์ดกว้างขึ้น
+      for (let ci = 0; ci < nRow && idx < items.length; ci++, idx++) {
+        const it = items[idx];
+        const cx = X0 + ci * cwid + gap / 2;
+        const cy = YTOP + r * rh + gap / 2;
+        const cw2 = cwid - gap, ch2 = rh - gap;
+        glassPanel(x, th, cx, cy, cw2, ch2, 20);
+        const sc = Math.max(0.85, Math.min(1.55, Math.min(cw2 / 316, ch2 / 318)));
 
-      // โลโก้บริษัท + ชื่อย่อ + RS
-      let tx = cx + 14;
-      try {
-        const lg = await stockLogo(it.ticker, opts.mk || "thailand");
-        if (lg && lg.naturalWidth > 0) {
-          x.save(); x.beginPath(); x.arc(cx + 14 + 16, cy + 30, 16, 0, Math.PI * 2); x.clip();
-          x.drawImage(lg, cx + 14, cy + 14, 32, 32); x.restore();
-          x.strokeStyle = th.line; x.lineWidth = 1; x.beginPath(); x.arc(cx + 14 + 16, cy + 30, 16, 0, Math.PI * 2); x.stroke();
-          tx = cx + 58;
-        }
-      } catch (e) {}
-      x.fillStyle = th.text; x.font = font(800, 24); x.fillText(String(it.ticker).slice(0, 10), tx, cy + 38);
-      if (it.rs != null) { x.fillStyle = th.gold; x.font = font(800, 18); x.textAlign = "right"; x.fillText("RS " + it.rs, cx + cw2 - 14, cy + 36); x.textAlign = "left"; }
-      const chg = Number(it.change);
-      x.fillStyle = th.body; x.font = font(700, 19);
-      x.fillText(it.price != null ? Number(it.price).toFixed(2) : "—", tx, cy + 64);
-      if (Number.isFinite(chg)) {
-        x.fillStyle = chg >= 0 ? th.up : th.down; x.font = font(700, 16);
-        x.fillText((chg >= 0 ? "+" : "") + chg.toFixed(2) + "%", tx + 62, cy + 64);
-      }
-      x.font = font(600, 12); x.textAlign = "right";
-      x.fillStyle = "#e8b04b";
-      x.fillText("MA20", cx + cw2 - 14 - 40, cy + 64);
-      x.fillStyle = "#5b9df9"; x.fillText("MA50", cx + cw2 - 14, cy + 64);
-      x.textAlign = "left";
-
-      // กราฟ: แท่งเทียน + MA20/MA50
-      const bars = it.bars || [];
-      const px = cx + 10, py = cy + 76, pw = cw2 - 44, ph = ch2 - 100;   // เว้นขวาให้กราฟวิ่งต่อ
-      if (bars.length > 10) {
-        const n0 = Math.min(bars.length, 150), off = bars.length - n0;
-        let lo = Infinity, hi2 = -Infinity;
-        for (let k = off; k < bars.length; k++) {
-          const b = bars[k];
-          const l = b.low != null ? b.low : b.l, hh = b.high != null ? b.high : b.h;
-          if (l < lo) lo = l; if (hh > hi2) hi2 = hh;
-        }
-        const Y = (v) => py + ph - ((v - lo) / (hi2 - lo || 1)) * ph;
-        const cw3 = pw / n0;
-        x.save(); x.beginPath(); x.rect(px, py, pw, ph); x.clip();   // กันแท่ง/เส้นล้นขอบการ์ด
-        for (let j = 0; j < n0; j++) {
-          const b = bars[off + j];
-          const o = b.open != null ? b.open : b.o, cl = b.close != null ? b.close : b.c;
-          const hh = b.high != null ? b.high : b.h, l = b.low != null ? b.low : b.l;
-          if (o == null || cl == null) continue;
-          const bx = px + j * cw3 + cw3 / 2;
-          const col = cl >= o ? th.up : th.down;
-          x.strokeStyle = col; x.fillStyle = col; x.lineWidth = Math.max(1, cw3 * 0.12);
-          x.beginPath(); x.moveTo(bx, Y(hh)); x.lineTo(bx, Y(l)); x.stroke();
-          const bt = Math.min(Y(o), Y(cl)), bh = Math.max(1.2, Math.abs(Y(o) - Y(cl)));
-          x.fillRect(bx - Math.max(1, cw3 * 0.3), bt, Math.max(1.4, cw3 * 0.6), bh);
-        }
-        [[20, MA20], [50, MA50]].forEach(function (pair) {
-          const n = pair[0], col = pair[1];
-          x.strokeStyle = col; x.lineWidth = 1.6; x.beginPath();
-          let started = false;
-          for (let j = 0; j < n0; j++) {
-            const v = smaAt(bars, off + j, n);
-            if (v == null) continue;
-            const bx = px + j * cw3 + cw3 / 2;
-            if (!started) { x.moveTo(bx, Y(v)); started = true; } else x.lineTo(bx, Y(v));
+        // โลโก้ + ชื่อย่อ + ราคา
+        let tx = cx + 18 * sc;
+        const logoS = 34 * sc;
+        try {
+          const lg = await stockLogo(it.ticker, opts.mk || "thailand");
+          x.save(); x.beginPath(); x.arc(cx + 18 * sc + logoS / 2, cy + 20 * sc + logoS / 2, logoS / 2 + 2, 0, Math.PI * 2);
+          x.fillStyle = "rgba(255,255,255,0.07)"; x.fill(); x.restore();
+          if (lg && lg.naturalWidth > 0) {
+            x.save(); x.beginPath(); x.arc(cx + 18 * sc + logoS / 2, cy + 20 * sc + logoS / 2, logoS / 2, 0, Math.PI * 2); x.clip();
+            x.drawImage(lg, cx + 18 * sc, cy + 20 * sc, logoS, logoS); x.restore();
+            x.strokeStyle = "rgba(255,255,255,0.13)"; x.lineWidth = 1;
+            x.beginPath(); x.arc(cx + 18 * sc + logoS / 2, cy + 20 * sc + logoS / 2, logoS / 2 + 1, 0, Math.PI * 2); x.stroke();
+            tx = cx + 18 * sc + logoS + 12 * sc;
           }
-          if (started) x.stroke();
-        });
-        x.restore();
-      }
+        } catch (e) {}
+        x.fillStyle = th.text; x.font = font(700, 23 * sc);
+        x.fillText(String(it.ticker || "").slice(0, 10), tx, cy + 34 * sc);
+
+        const chg = Number(it.change);
+        x.fillStyle = th.body; x.font = font(600, 19 * sc);
+        const priceTxt = it.price != null ? Number(it.price).toFixed(2) : "—";
+        x.fillText(priceTxt, tx, cy + 60 * sc);
+        const pw0 = x.measureText(priceTxt).width;
+        if (Number.isFinite(chg)) {
+          x.fillStyle = chg >= 0 ? th.up : th.down; x.font = font(600, 16 * sc);
+          x.fillText((chg >= 0 ? "+" : "") + chg.toFixed(1) + "%", tx + pw0 + 10 * sc, cy + 60 * sc);
+        }
+
+        // วงแหวน RS (ทอง) มุมขวาบน
+        if (it.rs != null) {
+          const rs = Math.max(0, Math.min(99, Number(it.rs)));
+          const rad = 21 * sc, cxr = cx + cw2 - 18 * sc - rad, cyr = cy + 20 * sc + rad;
+          x.lineWidth = 4 * sc; x.lineCap = "round";
+          x.strokeStyle = "rgba(255,255,255,0.10)";
+          x.beginPath(); x.arc(cxr, cyr, rad, 0, Math.PI * 2); x.stroke();
+          x.strokeStyle = th.gold;
+          x.beginPath(); x.arc(cxr, cyr, rad, -Math.PI / 2, -Math.PI / 2 + (rs / 99) * Math.PI * 2); x.stroke();
+          x.fillStyle = th.text; x.font = font(700, 17 * sc); x.textAlign = "center";
+          x.fillText(String(Math.round(rs)), cxr, cyr + 6 * sc);
+          x.textAlign = "left";
+        }
+
+        // กราฟแท่งเทียน + MA20 ทอง / MA50 ม่วง
+        const bars = it.bars || [];
+        const px = cx + 12 * sc, py = cy + 78 * sc;
+        const pw = cw2 - 26 * sc, ph = ch2 - 92 * sc;
+        if (bars.length > 10 && ph > 20) {
+          const n0 = Math.min(bars.length, 150), off = bars.length - n0;
+          let lo = Infinity, hi2 = -Infinity;
+          for (let k = off; k < bars.length; k++) {
+            const b = bars[k];
+            const l = b.low != null ? b.low : b.l, hh = b.high != null ? b.high : b.h;
+            if (l < lo) lo = l; if (hh > hi2) hi2 = hh;
+          }
+          const Y = (v) => py + ph - ((v - lo) / (hi2 - lo || 1)) * ph;
+          const cw3 = pw / n0;
+          x.save(); x.beginPath(); x.rect(px, py, pw, ph); x.clip();
+          for (let j = 0; j < n0; j++) {
+            const b = bars[off + j];
+            const o = b.open != null ? b.open : b.o, cl = b.close != null ? b.close : b.c;
+            const hh = b.high != null ? b.high : b.h, l = b.low != null ? b.low : b.l;
+            if (o == null || cl == null) continue;
+            const bx = px + j * cw3 + cw3 / 2;
+            const col = cl >= o ? th.up : th.down;
+            x.strokeStyle = col; x.fillStyle = col; x.lineWidth = Math.max(1, cw3 * 0.12);
+            x.beginPath(); x.moveTo(bx, Y(hh)); x.lineTo(bx, Y(l)); x.stroke();
+            const bt = Math.min(Y(o), Y(cl)), bh = Math.max(1.2, Math.abs(Y(o) - Y(cl)));
+            x.fillRect(bx - Math.max(1, cw3 * 0.3), bt, Math.max(1.4, cw3 * 0.6), bh);
+          }
+          [[20, th.ma20], [50, th.ma50]].forEach(function (pair) {
+            const n = pair[0], col = pair[1];
+            x.strokeStyle = col; x.lineWidth = 1.7; x.beginPath();
+            let started = false;
+            for (let j = 0; j < n0; j++) {
+              const v = smaAt(bars, off + j, n);
+              if (v == null) continue;
+              const bx = px + j * cw3 + cw3 / 2;
+              if (!started) { x.moveTo(bx, Y(v)); started = true; } else x.lineTo(bx, Y(v));
+            }
+            if (started) x.stroke();
+          });
+          x.restore();
+        }
       }
     }
 
-    x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
-    x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 78);
+    // คำอธิบายเส้น (ครั้งเดียวท้ายการ์ด) + คำเตือน
+    x.save();
+    x.font = labelFont(600, 15);
+    let lx = 70;
+    [[th.ma20, "MA20"], [th.ma50, "MA50"]].forEach(function (p2) {
+      x.strokeStyle = p2[0]; x.lineWidth = 3; x.beginPath(); x.moveTo(lx, H - 66); x.lineTo(lx + 26, H - 66); x.stroke();
+      x.fillStyle = th.body; x.fillText(p2[1], lx + 34, H - 61);
+      lx += 34 + x.measureText(p2[1]).width + 26;
+    });
+    x.fillStyle = th.body; x.font = font(400, 17); x.textAlign = "right";
+    x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 60);
     x.textAlign = "left";
+    x.restore();
     return c;
   }
 
   /* ---------- การ์ดแชร์ ---------- */
   const THEMES = {
-    dark: { bg: "#0B0910", bg2: "#15101B", panel: "#15101B", hi: "#251B31", line: "#3B2F49", lineHi: "#4C3D60", text: "#F1EDF5", body: "#D9D2E0", muted: "#A597AD", gold: "#D4B67A", up: "#5CC6C8", down: "#F59A8C" },
+    dark: { bg: "#0D0A11", bg2: "#120E18", panel: "#120E18", hi: "#1B1624", line: "#241E30", lineHi: "#332B42", text: "#F3EFF8", body: "#B8B1C2", muted: "#8F879A", gold: "#E2BE6E", gold2: "#F0D79B", up: "#4FD1B5", down: "#F08A7E", ma20: "#E2BE6E", ma50: "#9B7BE0" },
     light: { bg: "#EFEEE9", bg2: "#FAF9F6", panel: "#FAF9F6", hi: "#FFFFFF", line: "#D3CBBE", lineHi: "#B9AE9C", text: "#1F1A24", body: "#3B3342", muted: "#5E5468", gold: "#7A5C24", up: "#0B6E70", down: "#A63B27" },
   };
-  const FONT = '600 %spx Inter, "IBM Plex Sans Thai", "Noto Sans Thai", "Leelawadee UI", sans-serif';
+  const FONT = '600 %spx Prompt, Inter, "Noto Sans Thai", "Leelawadee UI", sans-serif';
   const font = (w, s) => FONT.replace("600", w).replace("%s", s);
+  const LABELFONT = '600 %spx Montserrat, Prompt, sans-serif';
+  const labelFont = (w, s) => LABELFONT.replace("600", w).replace("%s", s);
 
 
 
   // กล่องสไตล์กระจกนูน (glassmorphism): ไล่แสงบน-ล่าง + ขอบไฮไลต์ + เงาใน
   function glassPanel(x, th, bx, by, bw, bh, r) {
-    const dark = th === THEMES.dark;
+    const rr2 = r || 20;
     x.save();
-    // พื้นโปร่งแสง
-    const g = x.createLinearGradient(bx, by, bx + bw, by + bh);
-    if (dark) { g.addColorStop(0, "rgba(255,255,255,0.085)"); g.addColorStop(0.55, "rgba(255,255,255,0.045)"); g.addColorStop(1, "rgba(255,255,255,0.02)"); }
-    else { g.addColorStop(0, "rgba(255,255,255,0.92)"); g.addColorStop(1, "rgba(255,255,255,0.62)"); }
+    const g = x.createLinearGradient(bx, by, bx, by + bh);
+    g.addColorStop(0, "rgba(255,255,255,0.055)");
+    g.addColorStop(1, "rgba(255,255,255,0.018)");
     x.save();
-    x.shadowColor = dark ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0.10)";
-    x.shadowBlur = 12; x.shadowOffsetY = 3;
-    x.fillStyle = g; rr(x, bx, by, bw, bh, r); x.fill();
+    x.shadowColor = "rgba(0,0,0,0.55)"; x.shadowBlur = 18; x.shadowOffsetY = 6;
+    x.fillStyle = g; rr(x, bx, by, bw, bh, rr2); x.fill();
     x.restore();
-    // ขอบบาง
-    x.strokeStyle = dark ? "rgba(255,255,255,0.16)" : "rgba(0,0,0,0.10)";
-    x.lineWidth = 1.2; x.stroke();
-    // ไฮไลต์ด้านบน (นูนขึ้น)
+    // ขอบบนสว่างบาง ๆ (ให้ความรู้สึกนูนขึ้น)
     x.beginPath();
-    x.moveTo(bx + r * 1.15, by + 1);
-    x.lineTo(bx + bw - r * 1.15, by + 1);
-    x.strokeStyle = dark ? "rgba(255,255,255,0.42)" : "rgba(255,255,255,1)";
-    x.lineWidth = 2; x.stroke();
-    // เงาในด้านล่าง
-    x.beginPath();
-    x.moveTo(bx + r * 0.7, by + bh - 1);
-    x.lineTo(bx + bw - r * 0.7, by + bh - 1);
-    x.strokeStyle = dark ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.06)";
-    x.lineWidth = 1.4; x.stroke();
+    x.moveTo(bx + rr2 * 1.1, by + 1);
+    x.lineTo(bx + bw - rr2 * 1.1, by + 1);
+    x.strokeStyle = "rgba(255,255,255,0.14)";
+    x.lineWidth = 1; x.stroke();
     x.restore();
   }
 
@@ -595,6 +610,13 @@
     try {
       if (!document.fonts) return;
       await Promise.all([
+        document.fonts.load('400 20px Prompt'),
+        document.fonts.load('500 20px Prompt'),
+        document.fonts.load('600 20px Prompt'),
+        document.fonts.load('700 20px Prompt'),
+        document.fonts.load('500 20px Montserrat'),
+        document.fonts.load('600 20px Montserrat'),
+        document.fonts.load('700 20px Montserrat'),
         document.fonts.load('400 20px Inter'),
         document.fonts.load('600 20px Inter'),
         document.fonts.load('700 20px Inter'),
@@ -660,7 +682,7 @@
     barsS.forEach((b) => { const l = b.l ?? b.low, h = b.h ?? b.high; if (l != null && l < lo) lo = l; if (h != null && h > up2) up2 = h; });
     const Y = (v) => py + ph - ((v - lo) / (up2 - lo || 1)) * ph;
     const n0 = barsS.length, cw0 = pw / n0;
-    const MA20C = "#e8b04b", MA50C = "#5b9df9";
+    const MA20C = "#E2BE6E", MA50C = "#9B7BE0";
     x.save(); x.beginPath(); x.rect(px - 2, py - 6, pw + 4, ph + 12); x.clip();
     barsS.forEach((b, i) => {
       const o = b.o ?? b.open, hh = b.h ?? b.high, ll = b.l ?? b.low, cl = b.c ?? b.close;
@@ -715,14 +737,14 @@
       x.stroke(); x.setLineDash([]);
       vals.forEach((v, i) => { x.beginPath(); x.arc(X(i), Yf(v), 3.2, 0, Math.PI * 2); x.fillStyle = col; x.fill(); });
     };
-    line(revs, Yr, "#e8b04b");
+    line(revs, Yr, "#E2BE6E");
     line(nis, Yn, th.up, [5, 4]);
     // ป้ายไตรมาส + ตัวเลขท้ายเส้น
     x.font = font(600, 15); x.fillStyle = th.muted; x.textAlign = "center";
     pts.forEach((z, i) => x.fillText(qLabel(z.d), X(i), box.y + box.h - 12));
     x.textAlign = "left";
     x.font = font(700, 13);
-    x.fillStyle = "#e8b04b"; x.fillText("รายได้", px, box.y + 12);
+    x.fillStyle = "#E2BE6E"; x.fillText("รายได้", px, box.y + 12);
     const wR = x.measureText("รายได้").width;
     x.fillStyle = th.up; x.fillText("กำไร", px + wR + 14, box.y + 12);
   }
@@ -741,7 +763,7 @@
   }
 
   async function draw(tk, nm, mk, withLogo) {
-    const th = (document.documentElement.getAttribute("data-theme") === "light") ? THEMES.light : THEMES.dark;
+    const th = THEMES.dark;
     const W = 1080, H = 1350;
     const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
@@ -914,7 +936,7 @@
 
   // ── การ์ดสัดส่วน Facebook (1200×630) ──
   async function drawWide(tk, nm, mk, withLogo) {
-    const th = (document.documentElement.getAttribute("data-theme") === "light") ? THEMES.light : THEMES.dark;
+    const th = THEMES.dark;
     const W = 1200, H = 630;
     const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
