@@ -615,6 +615,45 @@
     } catch (e) { return undefined; }
   }
 
+  const pctS = (v) => (v == null || isNaN(v)) ? "—" : (v >= 0 ? "+" : "") + Number(v).toFixed(1) + "%";
+  const closeOf = (b) => (b == null ? null : (b.close != null ? b.close : b.c));
+
+  // สถิติสำหรับดัชนี (ไม่มีพื้นฐานแบบบริษัท)
+  function indexStats(bars) {
+    const out = { chips: [] };
+    if (!bars || bars.length < 20) return out;
+    const last = bars[bars.length - 1], prev = bars[bars.length - 2];
+    const c0 = closeOf(last);
+    const w = bars.slice(-252);
+    const hi = Math.max.apply(null, w.map((b) => (b.high != null ? b.high : b.h)));
+    const lo = Math.min.apply(null, w.map((b) => (b.low != null ? b.low : b.l)));
+    const i63 = Math.max(0, bars.length - 64);
+    const y1 = (c0 / closeOf(bars[0]) - 1) * 100;
+    const m3 = (c0 / closeOf(bars[i63]) - 1) * 100;
+    const day = prev ? (c0 / closeOf(prev) - 1) * 100 : null;
+    // YTD: แท่งแรกของปีปัจจุบัน
+    const y = String(last.time || "").slice(0, 4);
+    const firstY = bars.find((b) => String(b.time || "").slice(0, 4) === y);
+    const ytd = firstY ? (c0 / closeOf(firstY) - 1) * 100 : null;
+    // ผันผวน 60 วัน (annualized)
+    const rets = [];
+    for (let i = Math.max(1, bars.length - 60); i < bars.length; i++) {
+      const a = closeOf(bars[i - 1]), b2 = closeOf(bars[i]);
+      if (a && b2) rets.push(b2 / a - 1);
+    }
+    const mean = rets.reduce((t, v) => t + v, 0) / (rets.length || 1);
+    const sd = Math.sqrt(rets.reduce((t, v) => t + (v - mean) * (v - mean), 0) / (rets.length || 1));
+    const vol = sd * Math.sqrt(252) * 100;
+    // Drawdown 1 ปี
+    let peak = -Infinity, mdd = 0;
+    w.forEach((b) => { const c = closeOf(b); if (c > peak) peak = c; if (peak > 0) mdd = Math.min(mdd, (c / peak - 1) * 100); });
+
+    out.head = [["วันนี้", pctS(day)], ["จาก 52W สูง", pctS((c0 / hi - 1) * 100)], ["3 เดือน", pctS(m3)], ["1 ปี", pctS(y1)]];
+    out.chips = [["YTD", pctS(ytd)], ["52W สูง", Number(hi).toFixed(2)], ["52W ต่ำ", Number(lo).toFixed(2)],
+                 ["ผันผวน 60 วัน", vol ? vol.toFixed(1) + "%" : "—"], ["Drawdown 1 ปี", pctS(mdd)], ["แท่ง", String(bars.length)]];
+    return out;
+  }
+
   // เลือกขนาดฟอนต์ใหญ่สุดที่ยังพอดีความกว้าง (ตัวเลขอ่านชัดขึ้น)
   function fitSize(x, txt, maxW, start, min, weight, fam) {
     let sz = start;
@@ -683,11 +722,22 @@
     return new Promise((res) => { const i = new Image(); i.crossOrigin = "anonymous"; i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
   }
 
-  async function barsOf(tk, mk) {
+  async function barsOf(tk, mk, rng) {
+    const isIdx = String(tk).charAt(0) === "^";
+    // ดัชนีไทย Yahoo คืนแท่งเดียว → ใช้ TradingView ผ่าน /api/idxchart
+    const url = (isIdx && mk === "thailand")
+      ? `/api/idxchart?symbol=${encodeURIComponent(tk)}&interval=1d&range=${rng || "3y"}`
+      : `/api/chart?market=${mk}&symbol=${encodeURIComponent(tk)}&interval=1d&range=${rng || "1y"}`;
     try {
-      const r = await fetch(`/api/chart?market=${mk}&symbol=${encodeURIComponent(tk)}&interval=1d&range=1y`);
+      const r = await fetch(url);
       const j = await r.json();
-      return (j && j.data) || [];
+      let out = (j && j.data) || [];
+      if (out.length < 5 && isIdx) {
+        const r2 = await fetch(`/api/idxchart?symbol=${encodeURIComponent(tk)}&interval=1d&range=3y`);
+        const j2 = await r2.json();
+        out = (j2 && j2.data) || out;
+      }
+      return out;
     } catch (e) { return []; }
   }
 
@@ -909,7 +959,9 @@
       const v0 = c0.c != null ? c0.c : c0.close, v1 = c1.c != null ? c1.c : c1.close;
       if (v0 && v1) p3 = (v0 / v1 - 1) * 100;
     }
-    const stats = [
+    const isIndex = String(tk).charAt(0) === "^";
+    const ix = isIndex ? indexStats(bars) : null;
+    const stats = isIndex ? (ix.head || []) : [
       ["RS", String(rs ?? "—")],
       ["จาก 52W สูง", toHi == null ? "—" : toHi.toFixed(1) + "%"],
       ["3 เดือน", p3 != null ? (p3 >= 0 ? "+" : "") + Number(p3).toFixed(1) + "%" : "—"],
@@ -920,7 +972,7 @@
       const bx = 70 + i * (bw + 14), by = 320, bh = 92;
       const cx = bx + bw / 2;
       glassPanel(x, th, bx, by, bw, bh, 14);
-      if (i === 0) {
+      if (i === 0 && String(sv[0]) === "RS") {
         // RS = วงแหวนกลางกล่อง
         const rr0 = 34, cyc = by + bh / 2 - 2;
         const val = Math.max(0, Math.min(99, Number(sv[1]) || 0));
@@ -959,10 +1011,10 @@
     const lastQ = qs.length ? qLabel(qs[qs.length - 1].d) : "";
     x.fillStyle = th.muted; x.font = font(600, 16);
     try { x.letterSpacing = "0.8px"; } catch (e) {}
-    x.fillText(("พื้นฐาน" + (lastQ ? " · ล่าสุด " + lastQ : "")).toUpperCase(), 70, 1008);
+    x.fillText((isIndex ? "สถิติดัชนี" : ("พื้นฐาน" + (lastQ ? " · ล่าสุด " + lastQ : ""))).toUpperCase(), 70, 1008);
     try { x.letterSpacing = "0px"; } catch (e) {}
     const rawChips = f ? fundChips(f) : [];
-    const chips = rawChips
+    const chips = isIndex ? (ix.chips || []) : rawChips
       .filter((kv) => !/mcap|มูลค่าตลาด/i.test(String(kv[0])))
       .map((kv) => {
         const lb = String(kv[0]);
@@ -976,9 +1028,10 @@
     const leftX = 70, rightX = 70 + colW + halfGap;
     const chipsH = 70, chipsGap = 12;
     chips.forEach((kv, i) => {
-      const cx = leftX + (i % 2) * (colW / 2 + 4);
-      const cy = 1028 + Math.floor(i / 2) * (chipsH + chipsGap);
-      const cw3 = colW / 2 - 8;
+      const fullW = (W - 140 - 2 * 12) / 3;
+      const cx = isIndex ? (70 + (i % 3) * (fullW + 12)) : (leftX + (i % 2) * (colW / 2 + 4));
+      const cy = 1028 + Math.floor(i / (isIndex ? 3 : 2)) * (chipsH + chipsGap);
+      const cw3 = isIndex ? fullW : (colW / 2 - 8);
       glassPanel(x, th, cx, cy, cw3, chipsH, 10);
 
       x.textAlign = "center";
@@ -989,8 +1042,8 @@
       x.fillText(lb, cx + cw3 / 2, cy + 25);
       try { x.letterSpacing = "0px"; } catch (e) {}
       x.fillStyle = th.text;
-      fitSize(x, String(kv[1]), cw3 - 14, 40, 22, 700);
-      x.fillText(kv[1], cx + cw3 / 2, cy + 56);
+      fitSize(x, String(kv[1]), cw3 - 16, 33, 20, 700);
+      x.fillText(kv[1], cx + cw3 / 2, cy + 55);
       x.textAlign = "left";
     });
 
@@ -1087,7 +1140,7 @@
       x.fillText(lbW, bx + 110, by + 23);
       const neg = /^-/.test(String(sv[1]));
       x.fillStyle = i === 1 || i === 2 ? (neg ? th.down : th.up) : th.text;
-      fitSize(x, String(sv[1]), 200, 40, 22, 700);
+      fitSize(x, String(sv[1]), 200, 34, 22, 700);
       x.fillText(sv[1], bx + 110, by + 52);
       x.textAlign = "left";
     });
