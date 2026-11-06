@@ -1014,9 +1014,9 @@ html .ht-cap { padding-top:14px; }
 
 /* Pivot table: คอลัมน์คงที่ + เรียงได้ + จุดสถานะ */
 #pivotPanel table.pv-tbl{table-layout:fixed;width:100%}
-#pivotPanel .pv-tbl col.w-tk{width:30%}#pivotPanel .pv-tbl col.w-rs{width:46px}#pivotPanel .pv-tbl col.w-px{width:66px}
+#pivotPanel .pv-tbl col.w-tk{width:auto}#pivotPanel .pv-tbl col.w-rs{width:46px}#pivotPanel .pv-tbl col.w-px{width:66px}
 #pivotPanel .pv-tbl col.w-3m{width:58px}#pivotPanel .pv-tbl col.w-hi{width:72px}#pivotPanel .pv-tbl col.w-pv{width:66px}
-#pivotPanel .pv-tbl col.w-brk{width:56px}#pivotPanel .pv-tbl col.w-st{width:46px}#pivotPanel .pv-tbl col.w-to{width:74px}#pivotPanel .pv-tbl col.w-det{width:auto}
+#pivotPanel .pv-tbl col.w-brk{width:56px}#pivotPanel .pv-tbl col.w-st{width:46px}#pivotPanel .pv-tbl col.w-to{width:74px}
 #pivotPanel table.pv-tbl th.sortable{cursor:pointer;user-select:none;white-space:nowrap}
 #pivotPanel table.pv-tbl th.sortable:hover{color:var(--text)}
 #pivotPanel table.pv-tbl th .sv{font-style:normal;margin-left:3px;font-size:9px;color:var(--gold)}
@@ -1032,15 +1032,12 @@ html .ht-cap { padding-top:14px; }
 #pivotPanel .pv-tbl td.c-st,#pivotPanel .pv-tbl th.c-st{text-align:center}
 #pivotPanel .pv-note .pv-dot{margin-right:4px}
 @media (max-width:640px){
-  #pivotPanel .pv-tbl col.w-tk{width:44%}
+  #pivotPanel .pv-tbl col.w-tk{width:auto}
   #pivotPanel .pv-tbl col.w-rs{width:38px}#pivotPanel .pv-tbl col.w-px{width:58px}#pivotPanel .pv-tbl col.w-pv{width:58px}
   #pivotPanel .pv-tbl col.w-st{width:34px}#pivotPanel .pv-tbl col.w-to{width:62px}
 }
 
 /* ซ่อนคำอธิบายละเอียดในตาราง Pivot — เหลือเฉพาะคำอธิบายจุดสี (บอส 6 พ.ย. 2569) */
-#pivotPanel .pv-tbl .c-det,
-#pivotPanel .pv-tbl th.c-det,
-#pivotPanel .pv-tbl td.c-det,
 #pivotPanel .pv-scroll .det{display:none !important}
 #pivotPanel .pv-note{gap:3px 12px;font-size:10px}
 
@@ -1049,6 +1046,14 @@ html .ht-cap { padding-top:14px; }
 .ohlc-tip .ohlc-lbl{font-style:normal;color:var(--faint);margin-left:4px;font-size:9.5px}
 .ohlc-tip b{color:var(--muted);font-weight:600;margin-right:4px}
 html[data-theme="light"] .ohlc-tip{background:rgba(255,255,255,.92)}
+
+@media (max-width:640px){
+  /* มือถือ: ให้ตารางพอดีความกว้าง ไม่ต้องเลื่อนแนวนอน */
+  #pivotPanel table.pv-tbl{table-layout:auto;width:100%;font-size:10.5px}
+  #pivotPanel .pv-tbl col{width:auto !important}
+  #pivotPanel table.pv-tbl thead th,#pivotPanel table.pv-tbl tbody td{padding:5px 4px}
+  #pivotPanel .pv-tbl td.c-tk{max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
 </style>
 </head>
 <div id="loadBar" aria-live="polite"><i class="sp"></i><span class="tx">กำลังโหลด…</span><span class="tm"></span></div>
@@ -2383,13 +2388,13 @@ function pvTable(mk,title,list,cls){
       +'<td class="r c-brk pv-hide-sm">'+brkTxt+'</td>'
       +'<td class="c-st">'+stTxt+'</td>'
       +'<td class="r c-to">'+toTxt+'</td>'
-      +'<td class="c-det pv-hide-sm"><span class="det">'+det+'</span></td></tr>';
+      +'</tr>';
   }).join('');
   return '<div class="pv-sec"><span class="dot'+(cls==='b'?' b':'')+'"></span>'+title+' <b>'+list.length+'</b><span class="sp"></span>'
     +'<button class="pv-btn" onclick="pvOpenList(\''+jq(title)+'\',\''+jq(mk)+'\',\''+jq(list.map(x=>x.s.ticker).join(','))+'\')">ดูการ์ดกราฟ</button>'
     +'<button class="pv-btn" onclick="sharePivotGroup(\''+jq(title)+'\',\''+jq(mk)+'\',\''+jq(list.map(x=>x.s.ticker).join(','))+'\')">แชร์</button></div>'
-    +'<div class="pv-scroll"><table class="pv-tbl"><colgroup><col class="w-tk"><col class="w-rs"><col class="w-px"><col class="w-3m"><col class="w-hi"><col class="w-pv"><col class="w-brk"><col class="w-st"><col class="w-to"><col class="w-det"></colgroup>'
-    +'<thead><tr>'+pvTh('tk','หุ้น','c-tk')+pvTh('rs','RS','r c-rs')+pvTh('px','ราคา','r c-px')+pvTh('p3m','3M','r c-3m pv-hide-sm')+pvTh('hi','ถึง 52W','r c-hi pv-hide-sm')+pvTh('pivot','Pivot','r c-pv')+pvTh('brk','เบรก','r c-brk pv-hide-sm')+pvTh('','สถานะ','c-st')+pvTh('to','ถึง pivot','r c-to')+'<th class="c-det pv-hide-sm">รายละเอียด</th></tr></thead>'
+    +'<div class="pv-scroll"><table class="pv-tbl"><colgroup><col class="w-tk"><col class="w-rs"><col class="w-px"><col class="w-3m"><col class="w-hi"><col class="w-pv"><col class="w-brk"><col class="w-st"><col class="w-to"></colgroup>'
+    +'<thead><tr>'+pvTh('tk','หุ้น','c-tk')+pvTh('rs','RS','r c-rs')+pvTh('px','ราคา','r c-px')+pvTh('p3m','3M','r c-3m pv-hide-sm')+pvTh('hi','ถึง 52W','r c-hi pv-hide-sm')+pvTh('pivot','Pivot','r c-pv')+pvTh('brk','เบรก','r c-brk pv-hide-sm')+pvTh('','สถานะ','c-st')+pvTh('to','ถึง pivot','r c-to')+'</tr></thead>'
     +'<tbody>'+rows+'</tbody></table></div>';
 }
 function pvSetScope(mk,tks){
