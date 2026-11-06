@@ -447,9 +447,9 @@
 
       // กราฟ: แท่งเทียน + MA20/MA50
       const bars = it.bars || [];
-      const px = cx + 10, py = cy + 76, pw = cw2 - 20, ph = ch2 - 100;
+      const px = cx + 10, py = cy + 76, pw = cw2 - 44, ph = ch2 - 100;   // เว้นขวาให้กราฟวิ่งต่อ
       if (bars.length > 10) {
-        const n0 = Math.min(bars.length, 60), off = bars.length - n0;
+        const n0 = Math.min(bars.length, 150), off = bars.length - n0;
         let lo = Infinity, hi2 = -Infinity;
         for (let k = off; k < bars.length; k++) {
           const b = bars[k];
@@ -496,8 +496,8 @@
 
   /* ---------- การ์ดแชร์ ---------- */
   const THEMES = {
-    dark: { bg: "#0B0910", bg2: "#15101B", panel: "#15101B", line: "#2A2233", text: "#F1EDF5", body: "#D9D2E0", muted: "#A597AD", gold: "#D4B67A", up: "#5CC6C8", down: "#F59A8C" },
-    light: { bg: "#EFEEE9", bg2: "#FAF9F6", panel: "#FAF9F6", line: "#DED9D0", text: "#1F1A24", body: "#3B3342", muted: "#5E5468", gold: "#7A5C24", up: "#0B6E70", down: "#A63B27" },
+    dark: { bg: "#0B0910", bg2: "#15101B", panel: "#15101B", hi: "#251B31", line: "#3B2F49", lineHi: "#4C3D60", text: "#F1EDF5", body: "#D9D2E0", muted: "#A597AD", gold: "#D4B67A", up: "#5CC6C8", down: "#F59A8C" },
+    light: { bg: "#EFEEE9", bg2: "#FAF9F6", panel: "#FAF9F6", hi: "#FFFFFF", line: "#D3CBBE", lineHi: "#B9AE9C", text: "#1F1A24", body: "#3B3342", muted: "#5E5468", gold: "#7A5C24", up: "#0B6E70", down: "#A63B27" },
   };
   const FONT = '600 %spx Inter, "IBM Plex Sans Thai", "Leelawadee UI", "Noto Sans Thai", sans-serif';
   const font = (w, s) => FONT.replace("600", w).replace("%s", s);
@@ -618,9 +618,9 @@
     pts.forEach((z, i) => x.fillText(qLabel(z.d), X(i), box.y + box.h - 12));
     x.textAlign = "left";
     x.font = font(700, 13);
-    x.fillStyle = "#e8b04b"; x.fillText("รายได้", px, box.y + 16);
+    x.fillStyle = "#e8b04b"; x.fillText("รายได้", px, box.y + 12);
     const wR = x.measureText("รายได้").width;
-    x.fillStyle = th.up; x.fillText("กำไร", px + wR + 14, box.y + 16);
+    x.fillStyle = th.up; x.fillText("กำไร", px + wR + 14, box.y + 12);
   }
 
   async function loadCardData(tk, mk, withLogo) {
@@ -661,11 +661,11 @@
       x.save(); rr(x, 70, 150, 88, 88, 44); x.clip(); x.drawImage(tlogo, 70, 150, 88, 88); x.restore();
       nameX = 178;
     }
-    x.fillStyle = th.text; x.font = font(900, 76);
-    x.fillText(tk, nameX, 222);
+    x.fillStyle = th.text; x.font = font(800, 52);
+    x.fillText(tk, nameX, 208);
     const tw = x.measureText(tk).width;
-    x.fillStyle = th.muted; x.font = font(700, 22);
-    x.fillText(mk === "america" ? "US" : "TH", nameX + tw + 16, 186);
+    x.fillStyle = th.muted; x.font = font(700, 19);
+    x.fillText(mk === "america" ? "US" : "TH", nameX + tw + 14, 186);
     x.fillStyle = th.body; x.font = font(500, 25);
     x.fillText((nm || "").slice(0, 34), nameX, 258);
     let tx = nameX;
@@ -678,11 +678,11 @@
     const prevBar = bars.length > 1 ? bars[bars.length - 2] : null;
     const chg = row.change != null ? row.change : (px != null && prevBar ? ((px / (prevBar.c ?? prevBar.close) - 1) * 100) : null);
     x.textAlign = "right";
-    x.fillStyle = th.text; x.font = font(900, 72);
-    x.fillText(px != null ? Number(px).toFixed(2) : "—", W - 70, 214);
+    x.fillStyle = th.text; x.font = font(700, 48);
+    x.fillText(px != null ? Number(px).toFixed(2) : "—", W - 70, 206);
     if (chg != null) {
-      x.fillStyle = chg >= 0 ? th.up : th.down; x.font = font(800, 34);
-      x.fillText((chg >= 0 ? "▲ +" : "▼ ") + Number(chg).toFixed(2) + "%", W - 70, 258);
+      x.fillStyle = chg >= 0 ? th.up : th.down; x.font = font(700, 28);
+      x.fillText((chg >= 0 ? "▲ +" : "▼ ") + Number(chg).toFixed(2) + "%", W - 70, 250);
     }
     x.textAlign = "left";
 
@@ -699,8 +699,8 @@
     const bw = (W - 140 - 3 * 14) / 4;
     stats.forEach((sv, i) => {
       const bx = 70 + i * (bw + 14);
-      x.fillStyle = th.panel; rr(x, bx, 320, bw, 88, 14); x.fill();
-      x.strokeStyle = th.line; x.lineWidth = 1; x.stroke();
+      x.fillStyle = th.hi || th.panel; rr(x, bx, 320, bw, 88, 14); x.fill();
+      x.strokeStyle = th.lineHi || th.line; x.lineWidth = 1.4; x.stroke();
       x.fillStyle = th.muted; x.font = font(600, 15);
       try { x.letterSpacing = "0.6px"; } catch (e) {}
       x.fillText(String(sv[0]).toUpperCase(), bx + 16, 350);
@@ -709,7 +709,7 @@
     });
 
     // ── กราฟราคา (ใหญ่ขึ้น + เผื่อที่ด้านขวาให้กราฟวิ่งต่อ) ──
-    const box = { x: 70, y: 434, w: W - 140, h: 512 };
+    const box = { x: 70, y: 426, w: W - 140, h: 560 };
     x.fillStyle = th.panel; rr(x, box.x, box.y, box.w, box.h, 18); x.fill();
     x.strokeStyle = th.line; x.lineWidth = 1; x.stroke();
     const rng = drawChartBlock(x, th, bars, box, { n: 150 });
@@ -721,7 +721,7 @@
     const lastQ = qs.length ? qLabel(qs[qs.length - 1].d) : "";
     x.fillStyle = th.muted; x.font = font(600, 16);
     try { x.letterSpacing = "0.8px"; } catch (e) {}
-    x.fillText(("พื้นฐาน" + (lastQ ? " · ล่าสุด " + lastQ : "")).toUpperCase(), 70, 982);
+    x.fillText(("พื้นฐาน" + (lastQ ? " · ล่าสุด " + lastQ : "")).toUpperCase(), 70, 1002);
     try { x.letterSpacing = "0px"; } catch (e) {}
     const rawChips = f ? fundChips(f) : [];
     const chips = rawChips
@@ -729,34 +729,41 @@
       .map((kv) => {
         const lb = String(kv[0]);
         const isTTM = /P\/E|P\/S|P\/B|ปันผล/i.test(lb);
-        const suf = isTTM ? " · TTM" : (lastQ ? " · " + lastQ : "");
-        return [lb + suf, kv[1]];
+        return [lb + (isTTM ? " · TTM" : (lastQ ? " · " + lastQ : "")), kv[1]];
       })
       .slice(0, 6);
-    const cw2 = (W - 140 - 2 * 14) / 3;
+
+    const halfGap = 14;
+    const colW = (W - 140 - halfGap) / 2;
+    const leftX = 70, rightX = 70 + colW + halfGap;
+    const chipsH = 70, chipsGap = 12;
     chips.forEach((kv, i) => {
-      const cx = 70 + (i % 3) * (cw2 + 14), cy = 1002 + Math.floor(i / 3) * 74;
-      x.fillStyle = th.panel; rr(x, cx, cy, cw2, 60, 12); x.fill();
-      x.strokeStyle = th.line; x.lineWidth = 1; x.stroke();
-      x.fillStyle = th.muted; x.font = font(600, 14);
-      try { x.letterSpacing = "0.4px"; } catch (e) {}
-      x.fillText(String(kv[0]).toUpperCase(), cx + 14, cy + 23);
+      const cx = leftX + (i % 2) * (colW / 2);
+      const cy = 1016 + Math.floor(i / 2) * (chipsH + chipsGap);
+      const cw3 = colW / 2 - 6;
+      x.fillStyle = th.hi || th.panel; rr(x, cx, cy, cw3, chipsH, 10); x.fill();
+      x.strokeStyle = th.lineHi || th.line; x.lineWidth = 1.4; x.stroke();
+      x.fillStyle = th.muted; x.font = font(600, 12.5);
+      try { x.letterSpacing = "0.3px"; } catch (e) {}
+      let lb = String(kv[0]).toUpperCase();
+      while (x.measureText(lb).width > cw3 - 22 && lb.length > 4) lb = lb.slice(0, -1);
+      x.fillText(lb, cx + 12, cy + 24);
       try { x.letterSpacing = "0px"; } catch (e) {}
-      x.fillStyle = th.text; x.font = font(700, 23); x.fillText(kv[1], cx + 14, cy + 49);
+      x.fillStyle = th.text; x.font = font(700, 25);
+      x.fillText(kv[1], cx + 12, cy + 52);
     });
 
-    // ── แนวโน้มรายได้/กำไร รายไตรมาส (กราฟเส้น) ──
+    // ── แนวโน้มรายได้/กำไร (ครึ่งขวา สูงขึ้น) ──
     if (qs.length >= 2) {
-      const tb = { x: 70, y: 1148, w: W - 140, h: 120 };
-      x.fillStyle = th.panel; rr(x, tb.x, tb.y, tb.w, tb.h, 16); x.fill();
-      x.strokeStyle = th.line; x.lineWidth = 1; x.stroke();
-      // YoY / QoQ ของไตรมาสล่าสุด
+      const tb = { x: rightX, y: 1016, w: colW, h: 3 * chipsH + 2 * chipsGap };
+      x.fillStyle = th.hi || th.panel; rr(x, tb.x, tb.y, tb.w, tb.h, 14); x.fill();
+      x.strokeStyle = th.lineHi || th.line; x.lineWidth = 1.4; x.stroke();
       let note = "";
       if (qs.length >= 2) {
         const a = qs[qs.length - 1], b = qs[qs.length - 2];
         if (a.rev && b.rev) {
           const qoq = (a.rev / b.rev - 1) * 100;
-          note = "รายได้ QoQ " + (qoq >= 0 ? "+" : "") + qoq.toFixed(1) + "%";
+          note = "QoQ " + (qoq >= 0 ? "+" : "") + qoq.toFixed(1) + "%";
         }
       }
       if (qs.length >= 5) {
@@ -766,10 +773,12 @@
           note += (note ? " · " : "") + "YoY " + (yoy >= 0 ? "+" : "") + yoy.toFixed(1) + "%";
         }
       }
-      x.fillStyle = th.muted; x.font = font(600, 17); x.textAlign = "right";
-      x.fillText(note, tb.x + tb.w - 20, tb.y + 16);
-      x.textAlign = "left";
-      drawTrendBlock(x, th, qs.slice(-5), tb);
+      x.fillStyle = th.muted; x.font = font(600, 12);
+      try { x.letterSpacing = "0.5px"; } catch (e) {}
+      x.fillText("แนวโน้มงบ", tb.x + 14, tb.y + 19);
+      try { x.letterSpacing = "0px"; } catch (e) {}
+      if (note) { x.textAlign = "right"; x.fillStyle = th.gold; x.font = font(600, 12); x.fillText(note, tb.x + tb.w - 14, tb.y + 20); x.textAlign = "left"; }
+      drawTrendBlock(x, th, qs.slice(-5), { x: tb.x, y: tb.y + 34, w: tb.w, h: tb.h - 40 });
     }
 
     x.fillStyle = th.muted; x.font = font(500, 17); x.textAlign = "right";
@@ -821,7 +830,7 @@
     st.forEach((sv, i) => {
       const bx = 52 + (i % 2) * 232, by = 366 + Math.floor(i / 2) * 74;
       x.fillStyle = th.panel; rr(x, bx, by, 216, 64, 14); x.fill();
-      x.strokeStyle = th.line; x.lineWidth = 1.2; x.stroke();
+      x.strokeStyle = th.lineHi || th.line; x.lineWidth = 1.4; x.stroke();
       x.fillStyle = th.muted; x.font = font(600, 15); x.fillText(sv[0], bx + 14, by + 24);
       x.fillStyle = th.text; x.font = font(800, 24); x.fillText(sv[1], bx + 14, by + 52);
     });
@@ -905,6 +914,7 @@
 
   const ShareCard = {
     async openGrid(opts) {
+      const oldFmt = document.getElementById("shFmt"); if (oldFmt) oldFmt.remove();
       const box = ensureShareBox();
       box.classList.add("on");
       const img = document.getElementById("shImg");
@@ -967,6 +977,7 @@
       await render(1);
     },
     async openHeat(opts) {
+      const oldFmt2 = document.getElementById("shFmt"); if (oldFmt2) oldFmt2.remove();
       const box = ensureShareBox();
       box.classList.add("on");
       const img = document.getElementById("shImg");
