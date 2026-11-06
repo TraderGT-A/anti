@@ -1036,6 +1036,13 @@ html .ht-cap { padding-top:14px; }
   #pivotPanel .pv-tbl col.w-rs{width:38px}#pivotPanel .pv-tbl col.w-px{width:58px}#pivotPanel .pv-tbl col.w-pv{width:58px}
   #pivotPanel .pv-tbl col.w-st{width:34px}#pivotPanel .pv-tbl col.w-to{width:62px}
 }
+
+/* ซ่อนคำอธิบายละเอียดในตาราง Pivot — เหลือเฉพาะคำอธิบายจุดสี (บอส 6 พ.ย. 2569) */
+#pivotPanel .pv-tbl .c-det,
+#pivotPanel .pv-tbl th.c-det,
+#pivotPanel .pv-tbl td.c-det,
+#pivotPanel .pv-scroll .det{display:none !important}
+#pivotPanel .pv-note{gap:3px 12px;font-size:10px}
 </style>
 </head>
 <div id="loadBar" aria-live="polite"><i class="sp"></i><span class="tx">กำลังโหลด…</span><span class="tm"></span></div>
@@ -2380,6 +2387,13 @@ function pvTable(mk,title,list,cls){
     +'<thead><tr>'+pvTh('tk','หุ้น','c-tk')+pvTh('rs','RS','r c-rs')+pvTh('px','ราคา','r c-px')+pvTh('p3m','3M','r c-3m pv-hide-sm')+pvTh('hi','ถึง 52W','r c-hi pv-hide-sm')+pvTh('pivot','Pivot','r c-pv')+pvTh('brk','เบรก','r c-brk pv-hide-sm')+pvTh('','สถานะ','c-st')+pvTh('to','ถึง pivot','r c-to')+'<th class="c-det pv-hide-sm">รายละเอียด</th></tr></thead>'
     +'<tbody>'+rows+'</tbody></table></div>';
 }
+function pvSetScope(mk,tks){
+  try{
+    const rows=((PV.cache[mk==='america'?'us':'th']||{}).rows)||[];
+    const map={}; rows.forEach(function(r){ if(!tks||tks.indexOf(r.tk)>=0) map[r.tk]=r; });
+    window.PV_SCOPE={mk:mk, map:map};
+  }catch(e){}
+}
 function pvOpenList(title,mk,csv){
   const arr=(typeof stockDB!=='undefined'&&stockDB[mk])||[], map=new Map(arr.map(s=>[s.ticker,s]));
   const list=csv.split(',').map(t=>map.get(t)).filter(Boolean);
@@ -2405,7 +2419,6 @@ function pvDraw(){
     +'<span><span class="pv-dot ok low"></span>เบรกแล้วแต่ปริมาณวันเบรกต่ำ</span>'
     +'<span><span class="pv-dot pre"></span>Pre = ราคาสดเหนือ pivot ยังไม่ยืนยัน</span>'
     +'<span><span class="pv-dot wait"></span>รอเบรก = ปิดยังไม่เหนือ pivot</span>'
-    +'<span class="pv-sorthint">กดหัวคอลัมน์เพื่อเรียง</span>'
     +'</div>';
   const html=g.map(([t,l,c])=>pvTable(mk,t,l,c)).join('');
   box.innerHTML=(html?note+html:html) || '<div class="pv-empty">ยังไม่มีตัวที่ผ่านเกณฑ์ (RS>60 และขาขึ้น)</div>';
@@ -5853,7 +5866,7 @@ async function fetchModal(iv){
   const el=document.getElementById('modalChart'); el.innerHTML='<div class="flex items-center justify-center h-full text-sky-400 animate-pulse text-sm">กำลังโหลด...</div>';
   try{
     const _idxTh = activeMarket==='thailand' && String(activeTicker).charAt(0)==='^';   // ดัชนีไทย: Yahoo มีแท่งเดียว → ดึงจาก TradingView (/api/idxchart)
-    const r=await fetch(API+(_idxTh?'/api/idxchart?symbol=':'/api/chart?market='+activeMarket+'&symbol=')+encodeURIComponent(activeTicker)+'&interval='+((iv==='1y'||iv==='1mo')?'1d':iv)+'&range='+({['30m']:'1mo',['1mo']:'1mo',['1wk']:'2y',['1y']:'3y'}[iv]||'3y'));
+    const r=await fetch(API+(_idxTh?'/api/idxchart?symbol=':'/api/chart?market='+activeMarket+'&symbol=')+encodeURIComponent(activeTicker)+'&interval='+(iv==='1y'?'1d':iv)+'&range='+({['30m']:'1mo',['1mo']:'5y',['1wk']:'2y',['1y']:'3y'}[iv]||'3y'));
     const j=await r.json(); if(j.firstTradeDate) chartFirstDate[activeTicker]=j.firstTradeDate;
     const _mi=document.getElementById('modalIpo'); if(_mi) _mi.textContent=ipoAge(chartFirstDate[activeTicker]);
     let data=(j.data||[]).sort((a,b)=>typeof a.time==='number'?(a.time-b.time):String(a.time).localeCompare(String(b.time)));
