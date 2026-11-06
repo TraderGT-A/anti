@@ -2368,9 +2368,8 @@ function pvTable(mk,title,list,cls){
       ? 'dry '+r.dry.toFixed(2)+'x'+(r.brkVol!=null?' · vol '+r.brkVol.toFixed(2)+'x':'')
       : 'ย่อ '+r.dep.join('/')+'%'+(r.brkVol!=null?' · vol '+r.brkVol.toFixed(2)+'x':'');
     return '<tr onclick="pvOpen(\''+jq(s.ticker)+'\',\''+jq(s.name||'')+'\',\''+mk+'\')">'
-      +'<td class="c-tk"><div class="tkcell"><span class="tkrow">'+tkL(s.ticker,mk,16)+'<b>'+s.ticker+'</b>'+tkT(s.ticker,mk)+'</span>'
-      +'<span class="pv-nm">'+(s.name||'')+'</span></div></td>'
-      +'<td class="r c-rs"><b class="'+(rs>=90?'rs90':(rs>=80?'rs80':'rslo'))+'">'+(rs==null?'–':rs)+'</b></td>'
+      +'<td class="c-tk"><div class="tkcell"><span class="tkrow">'+tkL(s.ticker,mk,16)+'<b>'+s.ticker+'</b>'+tkT(s.ticker,mk)+'</span></div></td>'
+      +'<td class="r c-rs">'+(rs==null?'<span class="mu">–</span>':'<span class="rsr'+(Number(rs)<70?' lo':'')+'">'+rs+'</span>')+'</td>'
       +'<td class="r c-px">'+fNum(s.price)+'</td>'
       +'<td class="r c-3m pv-hide-sm">'+clPc(s.p3m)+'</td>'
       +'<td class="r c-hi pv-hide-sm">'+hiTxt+'</td>'
@@ -2394,6 +2393,7 @@ function pvSetScope(mk,tks){
     window.PV_SCOPE={mk:mk, map:map};
   }catch(e){}
 }
+function pvOpen(tk,name,mk){ pvSetScope(mk,[tk]); try{ window.PIVOT_CTX=(window.PV_SCOPE.map||{})[tk]||null; }catch(e){} try{ openModal(tk,name,mk); }catch(e){} }
 function pvOpenList(title,mk,csv){
   const arr=(typeof stockDB!=='undefined'&&stockDB[mk])||[], map=new Map(arr.map(s=>[s.ticker,s]));
   const list=csv.split(',').map(t=>map.get(t)).filter(Boolean);
