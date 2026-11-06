@@ -98,10 +98,10 @@ function findVDU(b) {
       }
     }
     const dry = b[i][5] / av;
-    if (brk && brk.bv >= 1.8 && n - 1 - brk.j <= 10 && c[n - 1] >= pivot && c[n - 1] <= pivot * 1.10) return { kind: "VDU", st: "BREAK", pivot: r2(pivot), close: r2(c[n - 1]), dry: r2(dry), vduDate: b[i][0], pivotDate, brkDate: b[brk.j][0], brkVol: r2(brk.bv), days: brk.j - i, toGo: r2((pivot / c[n - 1] - 1) * 100) };
+    // เบรก = แท่งปิดยืนเหนือ pivot (ปริมาณเป็นข้อมูลประกอบ ไม่ใช่เงื่อนไขตัดสิน) — บอส 6 พ.ย. 2569
+    if (brk && n - 1 - brk.j <= 10 && c[n - 1] >= pivot && c[n - 1] <= pivot * 1.10) return { kind: "VDU", st: "BREAK", vok: brk.bv >= 1.8, pivot: r2(pivot), close: r2(c[n - 1]), dry: r2(dry), vduDate: b[i][0], pivotDate, brkDate: b[brk.j][0], brkVol: r2(brk.bv), days: brk.j - i, toGo: r2((pivot / c[n - 1] - 1) * 100) };
     if (!brk && n - 1 - i <= 15 && c[n - 1] < pivot && pivot / c[n - 1] - 1 <= 0.10) return { kind: "VDU", st: "รอเบรก", pivot: r2(pivot), close: r2(c[n - 1]), dry: r2(dry), vduDate: b[i][0], pivotDate, brkDate: null, brkVol: null, days: n - 1 - i, toGo: r2((pivot / c[n - 1] - 1) * 100) };
-    // เบรกแล้วแต่ปริมาณยังไม่ถึง 1.8x → เก็บไว้เป็น "รอ Vol" (กันหุ้นหายจากลิสต์ทั้งที่เบรกแล้ว)
-    if (brk && brk.bv < 1.8 && n - 1 - brk.j <= 10 && c[n - 1] >= pivot && c[n - 1] <= pivot * 1.10) return { kind: "VDU", st: "รอ Vol", pivot: r2(pivot), close: r2(c[n - 1]), dry: r2(dry), vduDate: b[i][0], pivotDate, brkDate: b[brk.j][0], brkVol: r2(brk.bv), days: brk.j - i, toGo: r2((pivot / c[n - 1] - 1) * 100) };
+
   }
   return null;
 }
@@ -148,10 +148,11 @@ function findVCP(b) {
   let st;
   if (bidx === null) st = c[n - 1] < pivot && pivot / c[n - 1] - 1 <= 0.10 ? "รอเบรก" : null;
   else if (n - 1 - bidx > 10) st = c[n - 1] < pivot && pivot / c[n - 1] - 1 <= 0.10 ? "รอเบรก" : null;
-  else st = bv >= 1.5 && c[n - 1] >= pivot && c[n - 1] <= pivot * 1.10 ? "BREAK" : (bv >= 1.5 ? null : "รอ Vol");
+  // เบรก = ปิดยืนเหนือ pivot (ปริมาณเป็นข้อมูลประกอบ) — บอส 6 พ.ย. 2569
+  else st = (c[n - 1] >= pivot && c[n - 1] <= pivot * 1.10) ? "BREAK" : null;
   if (!st) return null;
   const keep = st !== "รอเบรก";
-  return { kind: "VCP", st, pivot: r2(pivot), pivotDate, close: r2(c[n - 1]), dry: null, dep: dep.map(r2), brkDate: keep && bidx !== null ? w[bidx][0] : null, brkVol: keep && bv !== null ? r2(bv) : null, toGo: r2((pivot / c[n - 1] - 1) * 100), base: n - t[0][0][0], lows: t.map(([h, l]) => [w[l[0]][0], r2(l[1])]), highs: t.map(([h]) => [w[h[0]][0], r2(h[1])]) };
+  return { kind: "VCP", st, vok: bv != null ? bv >= 1.5 : null, pivot: r2(pivot), pivotDate, close: r2(c[n - 1]), dry: null, dep: dep.map(r2), brkDate: keep && bidx !== null ? w[bidx][0] : null, brkVol: keep && bv !== null ? r2(bv) : null, toGo: r2((pivot / c[n - 1] - 1) * 100), base: n - t[0][0][0], lows: t.map(([h, l]) => [w[l[0]][0], r2(l[1])]), highs: t.map(([h]) => [w[h[0]][0], r2(h[1])]) };
 }
 
 async function run(mk) {

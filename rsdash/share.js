@@ -106,18 +106,36 @@
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#3a3044"/><text x="16" y="21" font-size="13" font-weight="700" text-anchor="middle" fill="#fff" font-family="Arial">${s2}</text></svg>`;
     return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
   }
+  const ALLROWS = {};
+  function allRowsOf(mk) {
+    if (!ALLROWS[mk]) {
+      ALLROWS[mk] = fetch("/api/scan?market=" + mk + "&universe=all")
+        .then((r) => r.json()).then((j) => (j && j.data) || []).catch(() => []);
+    }
+    return ALLROWS[mk];
+  }
   function logoIdOf(tk, mk) {
     try { if (typeof LOGO_ID !== "undefined") { const id = LOGO_ID[mk + ":" + tk]; if (id) return id; } } catch (e) {}
     try {
       const arr = (typeof stockDB !== "undefined" && stockDB[mk]) ? stockDB[mk] : [];
       const r = arr.find((x) => x.ticker === tk);
+      if (r && r.logoId) return r.logoId;
+    } catch (e) {}
+    return "";
+  }
+  async function logoIdAsync(tk, mk) {
+    const id = logoIdOf(tk, mk);
+    if (id) return id;
+    try {
+      const rows = await allRowsOf(mk);
+      const r = rows.find((x) => x.ticker === tk);
       return (r && r.logoId) || "";
     } catch (e) { return ""; }
   }
   async function stockLogo(tk, mk) {
     const key = (mk === "america" ? "us" : "th") + ":" + tk;
     if (LOGO_CACHE[key]) return LOGO_CACHE[key];
-    const id = logoIdOf(tk, mk);
+    const id = await logoIdAsync(tk, mk);
     const url = id ? ("/api/flow?kind=logo&id=" + encodeURIComponent(id)) : "";
     const img = await loadImg(url || avatarData(tk));
     const ok = img && img.naturalWidth > 0 ? img : await loadImg(avatarData(tk));
@@ -251,6 +269,14 @@
       .map((it) => Object.assign({}, it, { v: it.mcap }))
       .sort((a, b) => b.v - a.v);
     const rects = squarify(tItems, X0, Y0, XW, XH);
+    // โลโก้บริษัทในบล็อกที่ใหญ่พอ (เสิร์ฟผ่านโดเมนเรา → ไม่ทำให้ canvas เสีย)
+    const big = rects.filter((r) => (r.w - 2) > 96 && (r.h - 2) > 78).slice(0, 34);
+    const logos = {};
+    await Promise.all(big.map(async (r) => {
+      const tk = (r.it && r.it.ticker) || "";
+      if (!tk) return;
+      try { logos[tk] = await stockLogo(tk, opts.mk || "thailand"); } catch (e) {}
+    }));
     rects.forEach((r) => {
       const src = r.it || {};
       const chg = Number(src.chg || 0);
@@ -259,14 +285,27 @@
       x.fillStyle = heatColor(chg, th === THEMES.light ? THEMES.light : THEMES.dark);
       x.fillRect(rx, ry, rw, rh);
       if (rw > 52 && rh > 34) {
+        const lg = logos[src.ticker];
+        const hasLg = !!lg;
+        const lgS = hasLg ? Math.max(20, Math.min(40, Math.min(rw, rh) * 0.34)) : 0;
         const fs = Math.max(13, Math.min(30, Math.floor(Math.min(rw / 3.4, rh / 2.6))));
+        x.textAlign = "center";
+        if (hasLg) {
+          // โลโก้วงกลมมุมซ้ายบน
+          try {
+            x.save();
+            x.beginPath(); x.arc(rx + 8 + lgS / 2, ry + 8 + lgS / 2, lgS / 2, 0, Math.PI * 2); x.clip();
+            x.drawImage(lg, rx + 8, ry + 8, lgS, lgS); x.restore();
+            x.beginPath(); x.arc(rx + 8 + lgS / 2, ry + 8 + lgS / 2, lgS / 2, 0, Math.PI * 2);
+            x.strokeStyle = "rgba(255,255,255,.35)"; x.lineWidth = 1.5; x.stroke();
+          } catch (e) {}
+        }
         x.fillStyle = "#fff";
         x.font = font(800, fs);
-        x.textAlign = "center";
         x.fillText(String(src.ticker || "").slice(0, 8), rx + rw / 2, ry + rh / 2 + fs * 0.12);
         if (rh > 58) {
           x.font = font(700, Math.max(11, fs * 0.62));
-          x.globalAlpha = 0.9;
+          x.globalAlpha = 0.92;
           x.fillText((chg >= 0 ? "+" : "") + chg.toFixed(2) + "%", rx + rw / 2, ry + rh / 2 + fs * 0.95);
           x.globalAlpha = 1;
         }
