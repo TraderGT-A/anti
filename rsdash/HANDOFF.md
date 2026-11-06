@@ -29,6 +29,34 @@
 | `api/scan.js`, `api/_lib/scan.js` (RS, ΔRANK), `update_a1a2.py`, `scripts/news/*`, cron 17:40 deploy | Hermes | Claude ไม่แตะ ยกเว้นบอสสั่ง |
 | Port Champ | — | ไม่แตะ |
 
+## ผังงานข้อมูลทั้งหมด (อัปเดต 6 พ.ย. 2569 — สำหรับตรวจงาน)
+
+**1) ราคา/RS/สแกน (`api/scan.js` + `api/_lib/scan.js`)**
+- แหล่ง: TradingView scanner (ไทย + สหรัฐ), RS = เปอร์เซ็นไทล์ของ 0.3·1M + 0.3·3M + 0.2·6M + 0.2·1Y เทียบทั้งตลาด
+- ตรวจ: `curl -s "https://rsdashclean.vercel.app/api/scan?market=thailand&force=1"` ดู `count`
+
+**2) RS ย้อนหลัง + สัญญาณ Buy/Wait/Sell**
+- `scripts/flow/precompute_rshist.mjs` → `rshist_th/us.json` → `make_rshist_lite.py` → `rshist_*_lite.json` (60 แท่งล่าสุด) → หน้าเว็บอ่านตัว lite
+- ตรวจ: `sigAsOf` ต้องเป็นวันซื้อขายล่าสุดของตลาดนั้น
+- กับดัก: รันหลังเที่ยงคืน TradingView อาจคืนแท่งล่าสุดหาย 1 วัน → `scripts/flow/run_rshist.py` มีการ์ดกันถอยหลัง (คืนไฟล์เดิม) และควรรันก่อน 24:00
+
+**3) Pivot Break VDU/VCP**
+- `scripts/flow/precompute_pivot.mjs` → `pivot_th/us.json`; cron ไทย 17:10 จ-ศ, สหรัฐ 04:20 อังคาร-เสาร์ ผ่าน `pivot_after_close.sh` (ต่อด้วย `precompute_signals.py` แล้ว deploy)
+
+**4) งบไทยจาก SET**
+- `scripts/news/set_fetch.py` (Chrome headless + CDP เลี่ยง Incapsula) → `set_earn.json` → `set_summarize.py` (agy สรุปไทย) → `set_filed_th.json` (วันยื่นจริงให้ปฏิทินงบ)
+- cron 10/13/16/18 น. จ-ศ (`set_earn_alert.sh`) เงียบถ้าไม่มีของใหม่
+
+**5) การเงินรายไตรมาส** — `scripts/fund/precompute_fund.mjs` → `rsdash/fund/<th|us>/*.json` (เติมไตรมาสที่ขาดด้วย Yahoo timeseries)
+
+**6) อื่น ๆ** — `desc_th` แปลไทย 22:30 · `news_th.json` จาก Obsidian · breadth 17:45(ไทย)/06:45(สหรัฐ) · `vol_th`+`corr_th` 17:40
+
+**7) การ์ดแชร์** — เดี่ยว 4:5 + ปุ่มสลับ Facebook (`drawWide`), กลุ่ม `openGrid` (9/หน้า แบ่งหน้าอัตโนมัติ), Heatmap `openHeat` (`sizeBy:'mcap'|'chg'`)
+- ตรวจก่อน deploy: `python scripts/dev/preview_server.py` เปิด `http://127.0.0.1:8880/index.html` (proxy `/api` ไปเว็บจริง)
+
+**8) ดีพลอย** — `scripts/rsdash_deploy.py`; Vercel Hobby จำกัด **100 deployment/วัน** → รวมงานแก้แล้วดีพลอยครั้งเดียว; ชนเพดานให้ commit+push แล้วรอ `rsdash_morning.sh` รอบเช้า (07:10)
+
+
 ## ห้ามทำ (ทั้งสองฝั่ง)
 - ห้าม deploy จากสำเนา/staging เก่า · `index.html` ต้องไม่หดจากเดิมอย่างมีนัยสำคัญ (ตอนนี้ ~470KB) · ชุด deploy ต้องมี `api/heatmap.js`, `api/flow.js`, `api/idxchart.js` และ `api/_lib/flow_*.js`
 - **Vercel Hobby จำกัดฟังก์ชัน 12 ตัว: ตอนนี้ `api/*.js` = 12 พอดี ห้ามเพิ่มไฟล์ใหม่ใน `api/`** (เพิ่ม `kind` ใน `api/flow.js` แทน; ตรรกะวางใน `api/_lib/`)
@@ -79,6 +107,28 @@
 7. Webull TH API: key/token อยู่ใน `%LOCALAPPDATA%\hermes\secrets\` (ต่ออายุทุก ~15 วัน) — ใช้เช็ก ETF เท่านั้น ไม่ซื้อขาย
 
 ## ล็อก (ใหม่อยู่บน)
+
+### 6 พ.ย. 2569 ~23:59 — Hermes (การ์ดแชร์ชุดใหม่ · งบ SET/MD&A · ปฏิทินงบวันจริง · งานเช้า deploy)
+
+**โจทย์จากบอส:** การ์ดแชร์ต้องดู minimal/ทันสมัย, การ์ดเดี่ยว 4:5 กับสัดส่วน Facebook แยกจากกัน, การ์ดกลุ่มต้องมีแท่งกราฟเยอะพอเห็นแนวโน้ม, Heatmap แชร์ได้ทั้งแบบขนาดตามมูลค่าตลาดและตาม %เปลี่ยน, ปฏิทินงบต้องใช้วันที่ยื่นจริง (TradingView ดีเลย์), งบไทยต้องดึง MD&A จาก SET แล้วสรุปไทย, และให้ระบบซ่อมงาน cron ที่ล้มเองได้
+
+**สิ่งที่แก้ (ไฟล์หลัก):**
+- `share.js` — เขียน `draw()` (4:5) ใหม่: ราคาอยู่ข้างชื่อ, กราฟใหญ่ขึ้น + เผื่อขอบขวา, พื้นฐานครึ่งซ้าย (2×3) + กราฟเส้นแนวโน้มรายได้/กำไรครึ่งขวา, กล่องสไตล์กระจกนูน (`glassPanel`), RS เป็นวงแหวน, ฟอนต์ Inter + IBM Plex Sans Thai (`ensureFonts`), ป้าย TTM/ไตรมาส; เพิ่ม `drawWide()` 1200×630 และปุ่มสลับสัดส่วน (`#shFmt`) เฉพาะการ์ดเดี่ยว; `drawGrid()` แท่ง 150 + จัดกึ่งกลางแถวที่ไม่เต็ม (3/4/5 ตัว) และไม่โชว์ปุ่มสัดส่วน; `drawHeat()` เพิ่ม `sizeBy:'chg'` (เอา 60 ตัวที่ขยับแรงสุด) + legend ตามโหมด
+- `index.html` — ปุ่ม `แชร์ตาม %` (`hmShare('chg')`), `hmShare()` เป็น async (รอ/ดึงข้อมูล heatmap ก่อนแชร์), โหลดฟอนต์เว็บ, `setEarnRender()` กล่องงบพับ/กาง + เรียกใน `openModal`
+- `scripts/news/set_fetch.py` — ดึงข่าวงบ SET ผ่าน Chrome headless (CDP) เลี่ยง Incapsula, ดาวน์โหลด PDF MD&A (`weblink.set.or.th` + referer) แล้วสกัดข้อความ, เขียน `rsdash/set_earn.json` + `rsdash/set_filed_th.json`
+- `scripts/news/set_summarize.py` — สรุป MD&A เป็นไทยด้วย agy (JSON: yoy/qoq/note/nums) เขียนทีละตัวกันหลุด
+- `scripts/news/set_update.sh` + `hermes/scripts/set_earn_alert.sh` — รอบอัตโนมัติทุก 3 ชม. (10/13/16/18 น. จ-ศ) เงียบถ้าไม่มีงบใหม่, มีใหม่ = deploy + แจ้งชื่อหุ้นพร้อมสรุป
+- `scripts/flow/precompute_signals.py` — คำนวณ Buy/Wait/Sell ใหม่หลังปิด (`signals_th/us.json`) + ต่อใน `pivot_after_close.sh`
+- `scripts/report/close_digest.py` — สรุปปิดตลาด (ดัชนี, breadth, เบรกใหม่, งบใหม่, หุ้นขึ้น/ลงแรง, สัญญาณ)
+- `scripts/dev/preview_server.py` — เซิร์ฟเวอร์ทดสอบในเครื่อง (proxy `/api/*` ไปเว็บจริง) ไว้ตรวจการ์ดก่อน deploy
+- `scripts/flow/run_rshist.py` — รัน rshist ผ่าน Python (stdin=DEVNULL) + การ์ดกัน "วันถอยหลัง"
+
+**ผลตรวจในเครื่อง (preview 8880):** การ์ด 4:5 / FB / กลุ่ม 3 ตัว / Heatmap มูลค่า / Heatmap % เปลี่ยน สร้างได้ครบ; ปฏิทินงบวัน 5 พ.ย. มี KCE SMT AKR TAE SCGD NER GPSC OR; `signals_th` = Buy 3 · Wait 114 · Sell 85
+
+**ยังไม่ deploy (ชนโควตา Vercel 100 ครั้ง/วัน):** commit `f358ec8` (และชุดก่อนหน้า) push แล้ว · ตั้ง cron one-shot `88c1a646f65c` = `rsdash_morning.sh` 07:10 วันที่ 7 พ.ย. เพื่อ lite → set_filed → deploy → ตรวจปลายทาง
+
+**ยังค้าง:** สรุป MD&A ทำแล้ว ~98/225 ตัว (ที่เหลือกำลังทำ); 30 ตัวไม่มี PDF (กองทุน/ทรัสต์) จะไม่มีบทสรุป; rshist ที่รันหลังเที่ยงคืนมีโอกาสได้แท่งเก่ากว่า (ใส่การ์ดกันถอยหลังแล้ว แต่ควรเรียกก่อนเที่ยงคืน)
+
 
 ### 6 พ.ย. 03:20 — Hermes (การ์ดแชร์ + พื้นฐาน + ประสิทธิภาพ)
 - `share.js` ใหม่: `ShareCard.open()` วาดการ์ด 1080×1350 ด้วย canvas (โลโก้/ชื่อ/ราคา/RS/52W/3M/Mcap/กราฟ 1 ปี/พื้นฐาน/ลายน้ำ) มีปุ่ม "ดาวน์โหลด PNG" และ "แชร์" (Web Share API), ปุ่มแชร์อยู่ในหัวป็อปอัปหุ้น
