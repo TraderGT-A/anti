@@ -696,19 +696,22 @@
       ["3 เดือน", row.p3m != null ? (row.p3m >= 0 ? "+" : "") + Number(row.p3m).toFixed(1) + "%" : "—"],
       ["Mcap", f && f.mcap ? fmtCap(f.mcap) : (row.mcap ? fmtCap(row.mcap) : "—")],
     ];
-    const bw = (W - 140 - 3 * 16) / 4;
+    const bw = (W - 140 - 3 * 14) / 4;
     stats.forEach((sv, i) => {
-      const bx = 70 + i * (bw + 16);
-      x.fillStyle = th.panel; rr(x, bx, 318, bw, 96, 18); x.fill();
-      x.strokeStyle = th.line; x.lineWidth = 1.5; x.stroke();
-      x.fillStyle = th.muted; x.font = font(600, 20); x.fillText(sv[0], bx + 18, 352);
-      x.fillStyle = th.text; x.font = font(800, 34); x.fillText(sv[1], bx + 18, 396);
+      const bx = 70 + i * (bw + 14);
+      x.fillStyle = th.panel; rr(x, bx, 320, bw, 88, 14); x.fill();
+      x.strokeStyle = th.line; x.lineWidth = 1; x.stroke();
+      x.fillStyle = th.muted; x.font = font(600, 15);
+      try { x.letterSpacing = "0.6px"; } catch (e) {}
+      x.fillText(String(sv[0]).toUpperCase(), bx + 16, 350);
+      try { x.letterSpacing = "0px"; } catch (e) {}
+      x.fillStyle = th.text; x.font = font(700, 30); x.fillText(sv[1], bx + 16, 392);
     });
 
     // ── กราฟราคา (ใหญ่ขึ้น + เผื่อที่ด้านขวาให้กราฟวิ่งต่อ) ──
     const box = { x: 70, y: 434, w: W - 140, h: 512 };
-    x.fillStyle = th.panel; rr(x, box.x, box.y, box.w, box.h, 24); x.fill();
-    x.strokeStyle = th.line; x.lineWidth = 2; x.stroke();
+    x.fillStyle = th.panel; rr(x, box.x, box.y, box.w, box.h, 18); x.fill();
+    x.strokeStyle = th.line; x.lineWidth = 1; x.stroke();
     const rng = drawChartBlock(x, th, bars, box, { n: 150 });
     if (rng.lo == null) { x.fillStyle = th.muted; x.font = font(600, 26); x.fillText("ไม่มีข้อมูลกราฟ", box.x + 30, box.y + box.h / 2); }
     else if (hi) { x.fillStyle = th.muted; x.font = font(600, 19); x.fillText("52W " + Number(hi).toFixed(2), box.x + 24, box.y + 26); }
@@ -716,8 +719,10 @@
     // ── พื้นฐาน (บอกช่วงเวลา TTM / ไตรมาส) ──
     const qs = (f && f.q) ? f.q.filter((z) => z && z.d) : [];
     const lastQ = qs.length ? qLabel(qs[qs.length - 1].d) : "";
-    x.fillStyle = th.muted; x.font = font(700, 22);
-    x.fillText("พื้นฐาน" + (lastQ ? " · ล่าสุด " + lastQ : ""), 70, 984);
+    x.fillStyle = th.muted; x.font = font(600, 16);
+    try { x.letterSpacing = "0.8px"; } catch (e) {}
+    x.fillText(("พื้นฐาน" + (lastQ ? " · ล่าสุด " + lastQ : "")).toUpperCase(), 70, 982);
+    try { x.letterSpacing = "0px"; } catch (e) {}
     const rawChips = f ? fundChips(f) : [];
     const chips = rawChips
       .filter((kv) => !/mcap|มูลค่าตลาด/i.test(String(kv[0])))
@@ -731,17 +736,20 @@
     const cw2 = (W - 140 - 2 * 14) / 3;
     chips.forEach((kv, i) => {
       const cx = 70 + (i % 3) * (cw2 + 14), cy = 1002 + Math.floor(i / 3) * 74;
-      x.fillStyle = th.panel; rr(x, cx, cy, cw2, 64, 16); x.fill();
-      x.strokeStyle = th.line; x.lineWidth = 1.5; x.stroke();
-      x.fillStyle = th.muted; x.font = font(600, 18); x.fillText(kv[0], cx + 16, cy + 26);
-      x.fillStyle = th.text; x.font = font(800, 27); x.fillText(kv[1], cx + 16, cy + 54);
+      x.fillStyle = th.panel; rr(x, cx, cy, cw2, 60, 12); x.fill();
+      x.strokeStyle = th.line; x.lineWidth = 1; x.stroke();
+      x.fillStyle = th.muted; x.font = font(600, 14);
+      try { x.letterSpacing = "0.4px"; } catch (e) {}
+      x.fillText(String(kv[0]).toUpperCase(), cx + 14, cy + 23);
+      try { x.letterSpacing = "0px"; } catch (e) {}
+      x.fillStyle = th.text; x.font = font(700, 23); x.fillText(kv[1], cx + 14, cy + 49);
     });
 
     // ── แนวโน้มรายได้/กำไร รายไตรมาส (กราฟเส้น) ──
     if (qs.length >= 2) {
       const tb = { x: 70, y: 1148, w: W - 140, h: 120 };
-      x.fillStyle = th.panel; rr(x, tb.x, tb.y, tb.w, tb.h, 20); x.fill();
-      x.strokeStyle = th.line; x.lineWidth = 1.5; x.stroke();
+      x.fillStyle = th.panel; rr(x, tb.x, tb.y, tb.w, tb.h, 16); x.fill();
+      x.strokeStyle = th.line; x.lineWidth = 1; x.stroke();
       // YoY / QoQ ของไตรมาสล่าสุด
       let note = "";
       if (qs.length >= 2) {
@@ -764,8 +772,8 @@
       drawTrendBlock(x, th, qs.slice(-5), tb);
     }
 
-    x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
-    x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 36);
+    x.fillStyle = th.muted; x.font = font(500, 17); x.textAlign = "right";
+    x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 40);
     x.textAlign = "left";
     return c;
   }
