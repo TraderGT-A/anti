@@ -1054,6 +1054,12 @@ html[data-theme="light"] .ohlc-tip{background:rgba(255,255,255,.92)}
   #pivotPanel table.pv-tbl thead th,#pivotPanel table.pv-tbl tbody td{padding:5px 4px}
   #pivotPanel .pv-tbl td.c-tk{max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
+
+/* Minimal: ซ่อนคำอธิบายยาว เหลือเฉพาะจุดสี 4 อย่าง (บอส 6 พ.ย. 2569) */
+.bsleg, .cal-leg, .bs-note { display:none !important; }
+.dot-legend{font-size:10px !important;gap:4px 10px !important;line-height:1.45 !important;opacity:.85}
+.dot-legend span{gap:4px !important}
+.dot-legend i{width:6px !important;height:6px !important}
 </style>
 </head>
 <div id="loadBar" aria-live="polite"><i class="sp"></i><span class="tx">กำลังโหลด…</span><span class="tm"></span></div>
@@ -3445,10 +3451,9 @@ function renderScanner(){
   const advice = {green:'เข้าได้ตามแผน — ใช้ขนาดไม้ปกติ', yellow:'ลดขนาดไม้ลง เลือกเฉพาะตัวที่แกร่งสุด', red:'ระวัง — ลดโพซิชัน/รอตลาดกลับตัว คะแนนด้านล่างถูกลดแล้ว', unknown:'รอข้อมูลดัชนี'}[gi.state];
   const bf = summaryData && summaryData.breadth_full;
   document.getElementById('scGate').innerHTML =
-    `<div class="rounded-lg border ${gcol} px-3 py-2 text-xs"><b class="text-sm">${icon} ${gi.label}</b>`
-    + (gi.reason?` · <span class="opacity-80">${gi.reason}</span>`:'')
-    + (bf?` · หุ้นเหนือ SMA50 <b>${bf.pctAboveMA50}%</b> · เหนือ SMA200 <b>${bf.pctAboveMA200}%</b>`:'')
-    + `<div class="opacity-80 mt-0.5">${advice}${gi.mult<1?` (คะแนน ×${gi.mult})`:''}</div></div>`;
+    `<div class="rounded-lg border ${gcol} px-3 py-1.5 text-xs flex flex-wrap items-center gap-x-2"><b class="text-sm">${icon} ${gi.label}</b>`
+    + (bf?`<span class="opacity-60">· เหนือ SMA50 <b>${bf.pctAboveMA50}%</b> · SMA200 <b>${bf.pctAboveMA200}%</b></span>`:'')
+    + `</div>`;
   const SQm = SQ[currentMarket] || (SQ[currentMarket] = {});
   (stockData||[]).forEach(s=>{ const c=SQm[s.ticker]; s.sq = (c && Date.now()-c.ts < 6*3600e3) ? c.v : undefined; });
   const all = (stockData||[]).map(s=>({ s, r: TrendLib.setup(s, P, gi) }));
