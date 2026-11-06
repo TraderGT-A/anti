@@ -950,6 +950,8 @@ html .cal-leg i{display:inline-block;width:14px;height:8px;border-radius:999px;b
 
 .cal-tools{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;margin:8px 0 2px} .cal-tools .grp{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center} .cal-tools .lbl{font-size:11px;color:var(--muted);margin-right:2px}
 html .tkcell .ern-wrap, html .tkrow .ern-wrap, html .td-mr .ern-wrap, html .ldc .ern-wrap, html .cl-id .ern-wrap, html .bs-tbl .ern-wrap{display:none !important}
+.dr-open{background:transparent;border:0;color:#fda4af;font-weight:700;font-size:11px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px}
+.dr-open:hover{color:#fecdd3}
 </style>
 <style id="poCss">
 html #poBox .po-r{display:grid;grid-template-columns:64px 64px 1fr;gap:2px 8px;align-items:baseline;padding:3px 0;border-top:1px solid var(--line);cursor:pointer;font-size:12.5px}
@@ -1700,12 +1702,18 @@ function drLabel(tk, mk){   // (DR) ตัวกะทัดรัดติด�
   const L=drList(tk); if(!L||!L.length) return '';
   return `<i class="dot-dr" title="ซื้อในไทยได้ผ่าน DR ${L.length} ตัว"></i>`;
 }
+function openDRChart(dr){
+  try{
+    // DR ซื้อขายบน SET — ใช้กราฟชุดเดียวกับหุ้นไทย (Yahoo: <DR>.BK)
+    openModal(dr, 'DR · อ้างอิงหุ้นเมกา', 'thailand');
+  }catch(e){ alert('เปิดกราฟไม่สำเร็จ: '+(e&&e.message?e.message:'')); }
+}
 function drTableHTML(tk){   // ตารางเต็ม (ใน modal) เรียงตาม Vol มาก→น้อย
   const L=drList(tk); if(!L||!L.length) return '';
   const rows=L.map(x=>{
     const v=Number(x.val), y=Number(x.ytd);
     return `<tr class="border-b border-[#16202e]">
-      <td class="p-1.5 font-semibold text-rose-300">${x.t}</td>
+      <td class="p-1.5 font-semibold"><button type="button" class="dr-open" onclick="openDRChart('${x.t}')" title="เปิดกราฟ DR ตัวนี้">${x.t}</button></td>
       <td class="p-1.5 text-slate-300">${x.i}</td>
       <td class="p-1.5 text-right">${Number(x.vol||0).toLocaleString()}</td>
       <td class="p-1.5 text-right text-slate-400">${Number.isFinite(v)?v.toFixed(1)+'M':'-'}</td>
