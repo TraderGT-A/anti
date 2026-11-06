@@ -55,7 +55,7 @@ async function yBars(sym, tz, timeout = 15000) {
   return out.length > 120 ? out : null;
 }
 function lastClosedDate(mk, now = new Date()) {
-  const tzn = mk === "us" ? "America/New_York" : "Asia/Bangkok", closeBuf = mk === "us" ? 16 * 60 + 30 : 17 * 60;
+  const tzn = mk === "us" ? "America/New_York" : "Asia/Bangkok", closeBuf = mk === "us" ? 16 * 60 + 15 : 16 * 60 + 45   // US ปิด 16:00 ET (+15 น.) · TH ปิด 16:30 ICT + ATC ~16:40 (+15 น.);
   const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: tzn, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(now).map((x) => [x.type, x.value]));
   const today = `${p.year}-${p.month}-${p.day}`, mins = +p.hour * 60 + +p.minute;
   if (mins >= closeBuf) return today;

@@ -2217,7 +2217,8 @@ function pvRows(mk,kind,st){
     const rs=pick(s); if(!(Number(rs)>60)) return;
     const px=Number(s.price), pv=Number(r.pivot);
     const live = px>0 && pv>0 && px > pv*1.001;          // เบรกราคาสด
-    const eff = r.st==='BREAK' ? 'BREAK' : (live ? 'BREAK' : (r.st==='รอ Vol' ? 'รอ Vol' : 'รอเบรก'));
+    // เบรกจริง = แท่งปิดยืนเหนือ pivot แล้วเท่านั้น · ราคาสดเหนือ pivot = Pre (เฉพาะตัวที่ยังไม่เคยเบรก/ยังไม่ผ่าน volume)
+    const eff = r.st==='BREAK' ? 'BREAK' : (r.st==='รอ Vol' ? 'รอ Vol' : (live ? 'BREAK' : 'รอเบรก'));
     const pre = (eff==='BREAK' && r.st!=='BREAK');       // ยังไม่คอนเฟิร์มด้วยแท่งปิด
     const refPx = (eff==='BREAK' && pre) ? px : Number(r.close);
     const toPivot = (pv>0 && refPx>0) ? (pv/refPx-1)*100 : null;
