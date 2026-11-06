@@ -111,6 +111,24 @@ def main():
         except Exception:
             pass
 
+    # 7) สัญญาณ Buy / Wait / Sell (คำนวณใหม่หลังปิด)
+    sig = {}
+    try:
+        sig = json.load(open(os.path.join(ROOT, "rsdash", f"signals_{a.market}.json"), encoding="utf-8"))
+    except Exception:
+        sig = {}
+    sig_line = ""
+    if sig.get("counts"):
+        c = sig["counts"]
+        sig_line = f"สัญญาณ Buy {c.get('buy',0)} · Wait {c.get('wait',0)} · Sell {c.get('sell',0)}"
+        df = sig.get("diff") or {}
+        if df:
+            bi, bo = len(df.get("buyIn") or []), len(df.get("buyOut") or [])
+            if bi or bo:
+                sig_line += f" (Buy เข้าใหม่ {bi} ออก {bo})"
+                if df.get("buyIn"):
+                    sig_line += ": " + ", ".join(df["buyIn"][:6])
+
     # ── ประกอบข้อความ ──
     out = []
     out.append(f"📊 ปิดตลาด{tag} {(asof or datetime.now().strftime('%d/%m/%Y'))}")
@@ -129,6 +147,8 @@ def main():
         out.append("RS สูงขึ้นแรง: " + ", ".join(f"{r['ticker']} {fmt_pct(r['change'])}" for r in ups))
     if dns:
         out.append("RS สูงลงแรง: " + ", ".join(f"{r['ticker']} {fmt_pct(r['change'])}" for r in dns))
+    if sig_line:
+        out.append(sig_line)
     out.append("ระบบอัปเดตแล้ว: สแกนสัญญาณ · Pivot Break · breadth · ภาพรวมตลาด")
     print("\n".join(out)[:1900])
 
