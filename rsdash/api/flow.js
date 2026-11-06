@@ -14,6 +14,7 @@ import surp from "./_lib/flow_surp.js";
 import cal from "./_lib/flow_cal.js";
 import pre, { preopenSummary } from "./_lib/flow_pre.js";
 import pivot from "./_lib/flow_pivot.js";
+import logo from "./_lib/flow_logo.js";
 
 export default async function handler(req, res) {
   const k = String(req.query.kind || "");
@@ -23,6 +24,7 @@ export default async function handler(req, res) {
   if (k === "tr") return tr(req, res);
   if (k === "surp") return surp(req, res);   // ส่วนต่างงบเทียบประมาณการ (เกินคาด/ต่ำกว่าคาด)
   if (k === "pivot") return pivot(req, res);   // Pivot Break (VDU/VCP) — คนละเรื่องกับ Buy/Wait
+  if (k === "logo") return logo(req, res);     // proxy โลโก้หุ้น (same-origin → canvas ไม่ taint)
   if (k === "pre") return pre(req, res);   // Pre-market สหรัฐ (ดิบ รายหุ้น)
   if (k === "preopen") {                   // สรุปบรรยากาศก่อนเปิดตลาด (top/bottom/sector)
     res.setHeader("Access-Control-Allow-Origin", "*");
