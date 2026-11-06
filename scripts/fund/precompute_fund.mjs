@@ -12,6 +12,7 @@ const arg = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] :
 const MK = arg("--mk", "both");
 const CONC = Number(arg("--conc", 6));
 const LIMIT = Number(arg("--limit", 0));
+const ONLY = new Set(String(arg("--only", "")).split(",").map(x => x.trim().toUpperCase()).filter(Boolean));
 const FORCE = args.includes("--force");
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36";
 const MODULES = "summaryDetail,defaultKeyStatistics,financialData,incomeStatementHistoryQuarterly,price";
@@ -28,6 +29,36 @@ async function cookieCrumb() {
 const num = (v) => (v && typeof v === "object" ? (v.raw ?? null) : (typeof v === "number" ? v : null));
 const pct = (v) => { const n = num(v); return n == null ? null : n; };
 
+
+// ไตรมาสจาก timeseries (ครบกว่า incomeStatementHistoryQuarterly — ตัวหลังชอบขาดไตรมาส/ให้รายได้ 0)
+async function fetchQuartersTimeseries(sym, years = 2) {
+  const now = Math.floor(Date.now() / 1000);
+  const p1 = now - years * 365 * 86400;
+  const types = "quarterlyTotalRevenue,quarterlyNetIncome";
+  const url = `https://query2.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries/${encodeURIComponent(sym)}?symbol=${encodeURIComponent(sym)}&type=${types}&period1=${p1}&period2=${now}`;
+  try {
+    const r = await fetch(url, { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(20000) });
+    if (!r.ok) return [];
+    const j = await r.json();
+    const res = j?.timeseries?.result || [];
+    const rev = {}, ni = {};
+    for (const blk of res) {
+      const type = blk?.meta?.type?.[0] || Object.keys(blk).find((k) => k !== "meta");
+      for (const x of blk?.[type] || []) {
+        const d = (x?.asOfDate || "").slice(0, 10);
+        const v = x?.reportedValue?.raw;
+        if (!d || typeof v !== "number") continue;
+        if (type === "quarterlyTotalRevenue") rev[d] = v;
+        if (type === "quarterlyNetIncome") ni[d] = v;
+      }
+    }
+    const dates = [...new Set([...Object.keys(rev), ...Object.keys(ni)])].sort();
+    return dates.map((d) => ({ d, rev: rev[d] ?? null, ni: ni[d] ?? null }));
+  } catch (e) {
+    return [];
+  }
+}
+
 async function fetchOne(sym, auth) {
   const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(sym)}?modules=${MODULES}&crumb=${encodeURIComponent(auth.crumb)}`;
   const r = await fetch(url, { headers: { "User-Agent": UA, Cookie: auth.cookie }, signal: AbortSignal.timeout(20000) });
@@ -37,11 +68,18 @@ async function fetchOne(sym, auth) {
   if (!d) throw new Error("no result");
   const sd = d.summaryDetail || {}, ks = d.defaultKeyStatistics || {}, fd = d.financialData || {}, pr = d.price || {};
   const qh = d.incomeStatementHistoryQuarterly?.incomeStatementHistory || [];
-  const q = qh.slice(0, 4).map((x) => ({
+  let q = qh.slice(0, 4).map((x) => ({
     d: (x.endDate?.fmt || "").slice(0, 10),
     rev: num(x.totalRevenue),
     ni: num(x.netIncome),
   })).filter((x) => x.d).reverse();
+
+  // เติมช่องว่างด้วย timeseries ถ้าจำนวนไตรมาสไม่ครบ 4 หรือมีรายได้เป็น 0/ว่าง
+  const broken = q.length < 4 || q.some((x) => !x.rev || x.rev <= 0 || x.ni == null || x.ni === 0);
+  if (broken) {
+    const ts = await fetchQuartersTimeseries(sym);
+    if (ts.length >= q.length) q = ts.slice(-4);
+  }
   return {
     pe: num(sd.trailingPE), fpe: num(sd.forwardPE), ps: num(sd.priceToSalesTrailing12Months) ?? num(ks.priceToSalesTrailing12Months),
     pb: num(ks.priceToBook), gm: pct(fd.grossMargins), nm: pct(fd.profitMargins), om: pct(fd.operatingMargins),
@@ -69,7 +107,8 @@ async function runMarket(mk, auth) {
     const src = load(path.join(ROOT, "rsdash", "desc", mk, fn));
     const outp = path.join(outdir, fn);
     const dst = load(outp);
-    const todo = Object.keys(src).filter((t) => FORCE || !dst[t] || !dst[t].t || dst[t].t < new Date(Date.now() - 3 * 864e5).toISOString().slice(0, 10));
+    let todo = Object.keys(src).filter((t) => FORCE || !dst[t] || !dst[t].t || dst[t].t < new Date(Date.now() - 3 * 864e5).toISOString().slice(0, 10));
+    if (ONLY.size) todo = Object.keys(src).filter((t) => ONLY.has(String(t).toUpperCase()));
     total += todo.length;
     if (!todo.length) continue;
     console.log(`[fund] ${mk}/${fn}: ${todo.length} ตัว`);
