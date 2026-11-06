@@ -180,6 +180,117 @@
     return c;
   }
 
+
+  /* ---------- Heatmap card: วาด treemap ลง canvas ---------- */
+  function squarify(items, x, y, w, h) {
+    const out = [];
+    const total = items.reduce((a, b) => a + b.v, 0) || 1;
+    let rest = items.slice(), rx = x, ry = y, rw = w, rh = h, rem = total;
+    while (rest.length) {
+      const horiz = rw >= rh;
+      const side = horiz ? rh : rw;
+      // ไล่หยิบจน aspect แย่ลง
+      let row = [], best = Infinity;
+      for (let i = 0; i < rest.length; i++) {
+        const cand = row.concat([rest[i]]);
+        const sum = cand.reduce((a, b) => a + b.v, 0);
+        const thick = (sum / rem) * (horiz ? rw : rh);
+        const worst = cand.reduce((m, it) => {
+          const len = ((it.v / sum) * side) || 1;
+          return Math.max(m, Math.max(thick / len, len / thick));
+        }, 0);
+        if (worst > best && row.length) break;
+        best = worst; row = cand;
+      }
+      const sum = row.reduce((a, b) => a + b.v, 0) || 1;
+      const thick = (sum / rem) * (horiz ? rw : rh);
+      let off = 0;
+      row.forEach((it) => {
+        const len = ((it.v / sum) * side);
+        if (horiz) out.push({ it, x: rx, y: ry + off, w: thick, h: len });
+        else out.push({ it, x: rx + off, y: ry, w: len, h: thick });
+        off += len;
+      });
+      if (horiz) { rx += thick; rw -= thick; } else { ry += thick; rh -= thick; }
+      rem -= sum; rest = rest.slice(row.length);
+    }
+    return out;
+  }
+  function heatColor(v, th) {
+    const t = Math.max(-1, Math.min(1, v / 3));
+    const mid = th === THEMES.dark ? [26, 22, 32] : [232, 229, 220];
+    const up = [24, 158, 106], dn = [192, 57, 43];
+    const end = t >= 0 ? up : dn, k = Math.abs(t);
+    const c = mid.map((m, i) => Math.round(m + (end[i] - m) * (0.18 + 0.82 * k)));
+    return `rgb(${c[0]},${c[1]},${c[2]})`;
+  }
+  async function drawHeat(opts) {
+    const th = (document.documentElement.getAttribute("data-theme") === "light") ? THEMES.light : THEMES.dark;
+    const W = 1080, H = 1350;
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d");
+    const g2 = x.createLinearGradient(0, 0, W, H);
+    g2.addColorStop(0, th.bg); g2.addColorStop(1, th.bg2);
+    x.fillStyle = g2; x.fillRect(0, 0, W, H);
+    x.strokeStyle = th.line; x.lineWidth = 3; rr(x, 28, 28, W - 56, H - 56, 36); x.stroke();
+
+    const logo = await loadImg("/brand/thus-symbol-white.png");
+    if (logo) { try { x.drawImage(logo, 70, 66, 54, 54); } catch (e) {} }
+    x.fillStyle = th.text; x.font = font(900, 34); x.fillText("THUS", 140, 108);
+    x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
+    x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 100);
+    x.textAlign = "left";
+
+    x.fillStyle = th.text; x.font = font(900, 52); x.fillText((opts.title || "Heatmap").slice(0, 26), 70, 200);
+    if (opts.sub) { x.fillStyle = th.muted; x.font = font(500, 22); x.fillText(String(opts.sub).slice(0, 62), 70, 238); }
+
+    // พื้นที่ treemap
+    const X0 = 70, Y0 = 274, XW = W - 140, XH = 940;
+    const tItems = (opts.items || [])
+      .filter((it) => (it.mcap || 0) > 0)
+      .map((it) => Object.assign({}, it, { v: it.mcap }))
+      .sort((a, b) => b.v - a.v);
+    const rects = squarify(tItems, X0, Y0, XW, XH);
+    rects.forEach((r) => {
+      const src = r.it || {};
+      const chg = Number(src.chg || 0);
+      const rx = r.x + 1, ry = r.y + 1, rw = Math.max(0, r.w - 2), rh = Math.max(0, r.h - 2);
+      if (rw < 3 || rh < 3) return;
+      x.fillStyle = heatColor(chg, th === THEMES.light ? THEMES.light : THEMES.dark);
+      x.fillRect(rx, ry, rw, rh);
+      if (rw > 52 && rh > 34) {
+        const fs = Math.max(13, Math.min(30, Math.floor(Math.min(rw / 3.4, rh / 2.6))));
+        x.fillStyle = "#fff";
+        x.font = font(800, fs);
+        x.textAlign = "center";
+        x.fillText(String(src.ticker || "").slice(0, 8), rx + rw / 2, ry + rh / 2 + fs * 0.12);
+        if (rh > 58) {
+          x.font = font(700, Math.max(11, fs * 0.62));
+          x.globalAlpha = 0.9;
+          x.fillText((chg >= 0 ? "+" : "") + chg.toFixed(2) + "%", rx + rw / 2, ry + rh / 2 + fs * 0.95);
+          x.globalAlpha = 1;
+        }
+        x.textAlign = "left";
+      }
+    });
+
+    // legend
+    const ly = Y0 + XH + 34;
+    x.fillStyle = th.muted; x.font = font(600, 22);
+    x.fillText("สี = % เปลี่ยนวันนี้ · ขนาด = มูลค่าตลาด", 70, ly);
+    ["-3%", "0", "+3%"].forEach((t, i) => {
+      const bx = W - 70 - 240 + i * 80;
+      x.fillStyle = i === 0 ? "rgb(192,57,43)" : (i === 1 ? (th === THEMES.dark ? "rgb(26,22,32)" : "rgb(232,229,220)") : "rgb(24,158,106)");
+      x.fillRect(bx, ly - 16, 26, 16);
+      x.fillStyle = th.muted; x.font = font(500, 18); x.fillText(t, bx + 32, ly);
+    });
+
+    x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
+    x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 78);
+    x.textAlign = "left";
+    return c;
+  }
+
   /* ---------- การ์ดแชร์ ---------- */
   const THEMES = {
     dark: { bg: "#0B0910", bg2: "#15101B", panel: "#15101B", line: "#2A2233", text: "#F1EDF5", body: "#D9D2E0", muted: "#A597AD", gold: "#D4B67A", up: "#5CC6C8", down: "#F59A8C" },
@@ -397,6 +508,25 @@
   }
 
   const ShareCard = {
+    async openHeat(opts) {
+      const box = ensureShareBox();
+      box.classList.add("on");
+      const img = document.getElementById("shImg");
+      let url = "";
+      try { url = (await drawHeat(opts)).toDataURL("image/png"); } catch (e) { url = ""; }
+      if (!url) { box.classList.remove("on"); alert("สร้างการ์ดไม่สำเร็จ ลองใหม่อีกครั้ง"); return; }
+      img.src = url;
+      const fname = `rsdash_heat_${new Date().toISOString().slice(0, 10)}.png`;
+      document.getElementById("shDl").onclick = () => { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); };
+      document.getElementById("shShare").onclick = async () => {
+        try {
+          const blob = await (await fetch(url)).blob();
+          const file = new File([blob], fname, { type: "image/png" });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: opts.title || "Heatmap" });
+          else { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); }
+        } catch (e) { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); }
+      };
+    },
     async openList(opts) {
       const box = ensureShareBox();
       box.classList.add("on");
