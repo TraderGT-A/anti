@@ -28,7 +28,7 @@ def sync():
 
 def deploy():
     vc = shutil.which("vercel.cmd") or shutil.which("vercel")
-    r = subprocess.run([vc, "--prod", "--yes", "--force"], cwd=ST, capture_output=True, text=True, timeout=1200)
+    r = subprocess.run([vc, "--prod", "--yes", "--force"], cwd=ST, capture_output=True, text=True, timeout=1200, stdin=subprocess.DEVNULL)
     if r.returncode != 0:
         print((r.stderr or r.stdout)[-1200:])
         raise SystemExit(f"deploy ล้มเหลว rc={r.returncode}")

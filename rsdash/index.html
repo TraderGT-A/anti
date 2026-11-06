@@ -1063,6 +1063,27 @@ html[data-theme="light"] .ohlc-tip{background:rgba(255,255,255,.92)}
 .dot-legend{font-size:10px !important;gap:4px 10px !important;line-height:1.45 !important;opacity:.85}
 .dot-legend span{gap:4px !important}
 .dot-legend i{width:6px !important;height:6px !important}
+
+/* กล่องงบล่าสุด (SET) */
+.se-box{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px 14px}
+.se-hd{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.se-t{font-weight:700;color:var(--text);font-size:13px;display:flex;align-items:center;gap:6px}
+.se-dot{width:6px;height:6px;border-radius:50%;background:#e8b04b;display:inline-block}
+.se-dt{color:var(--muted);font-size:11.5px}
+.se-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.se-chips span{font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);color:var(--body)}
+.se-tx>div{font-size:12.5px;line-height:1.6;color:var(--body);margin-bottom:4px}
+.se-tx b{color:var(--muted);font-weight:600;margin-right:4px}
+.se-lnk{display:inline-block;margin-top:6px;font-size:11.5px;color:#e8b04b;text-decoration:none}
+.se-lnk:hover{text-decoration:underline}
+
+/* ผลค้นหา "ในหน้านี้" */
+.gs-sec{padding:6px 12px 2px;font-size:10px;letter-spacing:.4px;color:var(--muted);border-top:1px solid var(--line);margin-top:2px}
+.gs-loc{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;font-size:12px;color:var(--body)}
+.gs-loc:hover{background:var(--panel2)}
+.gs-loc .t{font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gs-loc .n{color:var(--muted);font-size:11px;white-space:nowrap}
+.gs-flash{outline:2px solid #e8b04b !important;outline-offset:2px;border-radius:6px;transition:outline-color .3s}
 </style>
 </head>
 <div id="loadBar" aria-live="polite"><i class="sp"></i><span class="tx">กำลังโหลด…</span><span class="tm"></span></div>
@@ -1617,6 +1638,7 @@ html .gs-empty{padding:8px 10px;color:#5d6b7d;font-size:11.5px}
     <div id="modalTT" class="mt-2 mmore"></div>
     <div id="modalDR" class="mt-2 mmore"></div>
     <div id="modalAbout" class="mt-2 mmore"></div>
+    <div id="modalEarn" class="mt-2 mmore"></div>
     <div id="modalFund" class="mt-2 mmore"></div>
   </div>
 </div>
@@ -2239,13 +2261,96 @@ function gsSyncList(q){
     si.dispatchEvent(new Event('input',{bubbles:true}));
   }catch(e){}
 }
+
+/* ── ค้นหา "ในหน้านี้": บอกว่าหุ้นตัวนั้นอยู่กลุ่ม/ธีมไหนของหน้าที่เปิดอยู่ ── */
+function pageLocs(q){
+  const s=String(q||'').trim().toLowerCase(); if(!s) return [];
+  const out=[];
+  const panelOf=(ids)=>ids.map(id=>document.getElementById(id)).find(el=>el && el.offsetParent!==null);
+  const add=(label, sub, el)=>{ if(out.length<6) out.push({label:label, sub:sub||'', el:el}); };
+  const has=(txt)=>String(txt||'').toLowerCase().includes(s);
+
+  // 0) ตัวหุ้นเอง: อยู่กลุ่มอุตสาหกรรม/เซกเตอร์อะไร (จากฐานข้อมูล)
+  let selfInd='', selfSec='', selfTk='';
+  try{
+    const rows=(typeof stockData!=='undefined'&&stockData)?stockData:((typeof ALLROWS!=='undefined'&&ALLROWS)||[]);
+    const r=rows.find(function(x){ return String(x.ticker||'').toLowerCase()===s; });
+    if(r){ selfTk=r.ticker; selfInd=r.industry||r.sector||''; selfSec=r.sector||''; }
+  }catch(e){}
+  if(selfTk){
+    add('หุ้น '+selfTk, (selfInd||selfSec||'—'), null);
+  }
+  // 1) Flow — กลุ่มอุตสาหกรรมที่มีเงินเข้า/ออก (จับคู่กับกลุ่มของหุ้นตัวนี้ก่อน)
+  const fl=document.getElementById('flowPanel');
+  if(fl && fl.offsetParent!==null){
+    const rowsF=[...fl.querySelectorAll('.fl-row')];
+    const own=rowsF.find(function(r){ return selfInd && ((r.querySelector('.fl-nm')||{}).textContent||'').trim()===selfInd; });
+    if(own) add('Flow · '+selfInd, 'กลุ่มของหุ้นตัวนี้', own);
+    rowsF.forEach(function(r){
+      if(has(r.textContent)) add('Flow · '+((r.querySelector('.fl-nm')||{}).textContent||''), 'กลุ่มอุตสาหกรรม', r);
+    });
+  }
+  // 2) Pivot Break — หมวด VDU/VCP และสถานะ
+  const pv=document.getElementById('pivotPanel');
+  if(pv && pv.offsetParent!==null){
+    pv.querySelectorAll('#pvList tr').forEach(function(tr){
+      if(tr.querySelectorAll('td').length && has(tr.textContent)){
+        let sec='', prev=tr.closest('table');
+        const secs=[...pv.querySelectorAll('.pv-sec')];
+        for(const sx of secs){ if(sx.compareDocumentPosition(tr) & Node.DOCUMENT_POSITION_FOLLOWING) sec=sx.textContent.trim(); }
+        add('Pivot · '+(sec||'ตาราง'), 'หมวดสัญญาณ', tr);
+      }
+    });
+  }
+  // 3) Heatmap — หุ้นในชิ้นของ treemap (บอกเซกเตอร์จากฐานข้อมูล)
+  const hm=document.getElementById('heatmapPanel')||document.querySelector('[id^="hm"]');
+  document.querySelectorAll('.hm-t[data-tk]').forEach(function(c){
+    if(String(c.dataset.tk||'').toLowerCase()===s || has(c.getAttribute('title'))){
+      let sec='';
+      try{ const rows=(typeof ALLROWS!=='undefined'&&ALLROWS)?ALLROWS:(typeof stockDB!=='undefined'?stockDB[currentMarket]:null);
+        const r=(rows||[]).find(x=>x.ticker===c.dataset.tk); if(r) sec=r.sector||r.sic||''; }catch(e){}
+      add('Heatmap · '+(sec||'แผนที่ตลาด'), c.dataset.tk, c);
+    }
+  });
+  // 4) กลุ่มอื่น (การ์ด/การ์ดกราฟ/ธีม) — หา element ที่มี data-tk
+  document.querySelectorAll('[data-tk]').forEach(function(el){
+    if(out.length>=6) return;
+    if(el.classList.contains('chart')) return;
+    if(String(el.dataset.tk||'').toLowerCase()!==s) return;
+    if(el.closest('#pivotPanel')) return;
+    let box=el.closest('[class*="card"], .thm-card, li, tr, section')||el.parentElement;
+    let label='หน้านี้';
+    const hd=box?box.querySelector('h3,h4,.ttl,.th-nm'):null;
+    if(hd) label=hd.textContent.trim().slice(0,40);
+    add(label, el.dataset.tk, box||el);
+  });
+  return out;
+}
+function gsGoLoc(el){
+  try{
+    const box=document.getElementById('gsRes'); if(box){ box.classList.remove('on'); box.innerHTML=''; }
+    if(!el) return;
+    el.scrollIntoView({behavior:'smooth', block:'center'});
+    el.classList.add('gs-flash');
+    setTimeout(function(){ el.classList.remove('gs-flash'); }, 2200);
+  }catch(e){}
+}
 function gsRender(q){
   const box=document.getElementById('gsRes'); if(!box) return;
   const {mk, arr}=gsPool();
   const s=String(q||'').trim().toLowerCase();
   gsSyncList(q);
   if(!s){ gsHide(); return; }
-  const hit=arr.filter(x=>x && ((x.ticker||'').toLowerCase().startsWith(s) || (x.name||'').toLowerCase().includes(s))).slice(0,12);
+  // ค้นด้วย "symbol" ก่อนเสมอ (บอสจำชื่อบริษัทไม่ได้) — exact > ขึ้นต้นด้วย > มีในชื่อบริษัท
+  const hit=arr.filter(x=>x && ((x.ticker||'').toLowerCase().startsWith(s) || (x.name||'').toLowerCase().includes(s)))
+    .sort(function(a,b){
+      const at=(a.ticker||'').toLowerCase(), bt=(b.ticker||'').toLowerCase();
+      const rank=(t)=> t===s?0 : (t.startsWith(s)?1 : 2);
+      const ra=rank(at), rb=rank(bt);
+      if(ra!==rb) return ra-rb;
+      const rsA=(a.rs3!=null?a.rs3:(a.rs!=null?a.rs:-1)), rsB=(b.rs3!=null?b.rs3:(b.rs!=null?b.rs:-1));
+      return rsB-rsA;
+    }).slice(0,12);
   GS.items=hit; GS.sel=hit.length?0:-1;
   if(!hit.length){ box.innerHTML='<div class="gs-empty">ไม่พบหุ้นในตลาดนี้</div>'; box.classList.add('on'); return; }
   box.innerHTML=hit.map(function(x,i){
@@ -2253,9 +2358,18 @@ function gsRender(q){
     return '<div class="gs-row'+(i===0?' sel':'')+'" data-i="'+i+'">'
       +'<span class="t">'+x.ticker+'</span><span class="n">'+(x.name||'')+'</span><span class="r">'+(rs!==''?'RS '+rs:'')+'</span></div>';
   }).join('');
+  const locs=(typeof pageLocs==='function')?pageLocs(q):[];
+  if(locs.length){
+    box.insertAdjacentHTML('beforeend','<div class="gs-sec">ในหน้านี้</div>'+locs.map(function(l,i){
+      return '<div class="gs-loc" data-l="'+i+'"><span class="t">'+esc2(l.label)+'</span><span class="n">'+esc2(l.sub)+'</span></div>';
+    }).join(''));
+  }
   box.classList.add('on');
   box.querySelectorAll('.gs-row').forEach(function(el){
     el.onclick=function(){ const x=hit[+el.dataset.i]; gsGo(x.ticker, x.name, mk); };
+  });
+  box.querySelectorAll('.gs-loc').forEach(function(el){
+    el.onclick=function(){ gsGoLoc(locs[+el.dataset.l].el); };
   });
 }
 function gsMove(d){
@@ -5765,6 +5879,41 @@ function openModalByTk(tk, mkt){
 }
 // เกี่ยวกับบริษัท (desc/<us|th>/<shard>.json จาก scripts/news/fetch_profiles.mjs) — โหลดเฉพาะ shard ที่ต้องใช้ แคชไว้
 const aboutShards={}; const aboutThShards={}; let aboutTxt=null;
+
+/* ===== งบล่าสุดจาก SET (MD&A สรุปไทย) — ไฟล์ rsdash/set_earn.json ===== */
+let SET_EARN=null, SET_EARN_P=null;
+function setEarnLoad(){
+  if(!SET_EARN_P) SET_EARN_P=fetch('/set_earn.json',{cache:'no-store'}).then(r=>r.ok?r.json():{items:{}}).then(j=>{SET_EARN=j||{items:{}};return SET_EARN;}).catch(()=>({items:{}}));
+  return SET_EARN_P;
+}
+function fmtEarnDate(iso){
+  try{ const d=new Date(iso); return d.toLocaleDateString('th-TH',{day:'2-digit',month:'short'})+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }catch(e){ return ''; }
+}
+async function setEarnRender(tk, mk){
+  const el=document.getElementById('modalEarn'); if(!el) return;
+  if(mk!=='thailand'){ el.innerHTML=''; return; }
+  const d=await setEarnLoad();
+  const it=(d.items||{})[tk];
+  if(!it){ el.innerHTML=''; return; }
+  const s=it.sum||{};
+  const rows=[];
+  if(s.yoy) rows.push('<div><b>เทียบปีก่อน</b> '+esc2(s.yoy)+'</div>');
+  if(s.qoq) rows.push('<div><b>เทียบไตรมาสก่อน</b> '+esc2(s.qoq)+'</div>');
+  if(s.note) rows.push('<div><b>ประเด็นอื่น</b> '+esc2(s.note)+'</div>');
+  const n=s.nums||{};
+  const chips=[];
+  if(n.rev) chips.push('รายได้ '+esc2(n.rev)+' ล้าน');
+  if(n.profit) chips.push('กำไร '+esc2(n.profit)+' ล้าน');
+  if(n.yoy) chips.push('กำไร YoY '+esc2(n.yoy));
+  if(n.qoq) chips.push('QoQ '+esc2(n.qoq));
+  el.innerHTML='<div class="se-box"><div class="se-hd"><span class="se-t"><i class="se-dot"></i>งบล่าสุด · ไตรมาส '+(it.quarter||'—')+'</span>'
+    +'<span class="se-dt">'+fmtEarnDate(it.date)+'</span></div>'
+    +(chips.length?'<div class="se-chips">'+chips.map(c=>'<span>'+c+'</span>').join('')+'</div>':'')
+    +(rows.length?'<div class="se-tx">'+rows.join('')+'</div>':'<div class="se-tx" style="color:var(--muted)">ยังไม่มีบทสรุปสำหรับหุ้นตัวนี้</div>')
+    +(it.mdna_url?'<a class="se-lnk" href="'+it.mdna_url+'" target="_blank" rel="noopener">เปิด MD&A ฉบับเต็มที่ SET</a>':'')
+    +'</div>';
+}
+function esc2(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function aboutToggle(){ if(!aboutTxt) return; const el=document.getElementById('modalAbout'); if(!el) return; aboutTxt.showTh=!aboutTxt.showTh; el.innerHTML=aboutTxt.showTh?About.aboutHtml(aboutTxt.th,true):About.aboutHtml(aboutTxt.en).replace('(Yahoo Finance)</span>','(Yahoo Finance)</span> <button type="button" class="text-sky-400 font-normal" onclick="aboutToggle()">ดูแปลไทย</button>'); }
 async function loadAbout(tk, mk){
   const el=document.getElementById('modalAbout'); if(!el) return;
@@ -5845,6 +5994,7 @@ function openModal(tk,nm,mkt){
   activeMarket = mk;
   loadAbout(tk, mk);
   try{ if(window.FundRender) FundRender(tk, mk, 'modalFund'); }catch(e){}
+  try{ setEarnRender(tk, mk); }catch(e){}
   const found =
     (mk==='america'?(stockDB.america||[]):(stockDB.thailand||[])).find(x=>x.ticker===tk)
     || (stockData||[]).find(x=>x.ticker===tk);

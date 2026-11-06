@@ -204,7 +204,11 @@
     const out = [];
     const total = items.reduce((a, b) => a + b.v, 0) || 1;
     let rest = items.slice(), rx = x, ry = y, rw = w, rh = h, rem = total;
+    let guard = 0;
     while (rest.length) {
+      if (++guard > 500) break;                       // กันวนไม่จบ
+      const vsum = rest.reduce((a, b) => a + b.v, 0);
+      if (!(vsum > 0)) { rest = []; break; }          // ไม่มีขนาด = จบ
       const horiz = rw >= rh;
       const side = horiz ? rh : rw;
       // ไล่หยิบจน aspect แย่ลง
@@ -581,20 +585,20 @@
       x.fillStyle = th.text; x.font = font(800, 40); x.fillText(s[1], bx + 22, 618);
     });
 
-    // กราฟ 1 ปี (แสดง 130 แท่งล่าสุดให้แท่งอ่านง่าย)
-    if (Array.isArray(bars) && bars.length > 130) bars = bars.slice(-130);
+    // กราฟ 1 ปี (แสดง 130 แท่งล่าสุดให้แท่งอ่านง่าย) — bars เป็น const ห้ามเขียนทับ
+    const barsS = (Array.isArray(bars) && bars.length > 130) ? bars.slice(-130) : (bars || []);
     x.fillStyle = th.panel; rr(x, 70, 668, W - 140, 300, 24); x.fill();
     x.strokeStyle = th.line; x.lineWidth = 2; x.stroke();
-    if (bars.length > 5) {
-      const xs = bars.map((b) => b.t || b.time || b.date);
+    if (barsS.length > 5) {
+      const xs = barsS.map((b) => b.t || b.time || b.date);
       let lo = Infinity, up2 = -Infinity;
-      bars.forEach((b) => { const l = b.l ?? b.low, h = b.h ?? b.high; if (l != null && l < lo) lo = l; if (h != null && h > up2) up2 = h; });
+      barsS.forEach((b) => { const l = b.l ?? b.low, h = b.h ?? b.high; if (l != null && l < lo) lo = l; if (h != null && h > up2) up2 = h; });
       const padL = 100, padR = 100, py0 = 700, py1 = 930;
-      const X = (i) => padL + (i / (bars.length - 1)) * (W - padL - padR);
+      const X = (i) => padL + (i / (barsS.length - 1)) * (W - padL - padR);
       const Y = (v) => py1 - ((v - lo) / (up2 - lo || 1)) * (py1 - py0);
       // แท่งเทียนจริง (ไม่ใช่เส้น) — บอสสั่งให้การ์ดรายตัวเป็นกราฟสวย ๆ
-      const n0 = bars.length, cw0 = (W - padL - padR) / n0;
-      bars.forEach((b, i) => {
+      const n0 = barsS.length, cw0 = (W - padL - padR) / n0;
+      barsS.forEach((b, i) => {
         const o = b.o ?? b.open, hh = b.h ?? b.high, ll = b.l ?? b.low, cl = b.c ?? b.close;
         if (o == null || cl == null) return;
         const cx = padL + i * cw0 + cw0 / 2;
