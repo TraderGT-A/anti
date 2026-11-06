@@ -27,7 +27,7 @@ export default async function handler(req, res) {
         return { ticker: d[0], price: d[1], change: d[2], mcap: d[3], sector: d[4] || "อื่นๆ", ytd: d[5], name: d[6] };
       })
       .filter((x) => x.ticker && x.mcap > 0 && x.change != null);
-    res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
+    res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=120");
     res.status(200).json({ market: mk, index: cfg.label, count: data.length, data });
   } catch (e) {
     res.status(502).json({ error: String(e).slice(0, 120) });

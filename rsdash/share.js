@@ -382,11 +382,23 @@
     document.head.appendChild(s);
   }
 
+
+  function ensureShareBox() {
+    ensureCss();
+    let box = document.getElementById("shModal");
+    if (box) return box;
+    box = document.createElement("div");
+    box.id = "shModal"; box.className = "sh-modal";
+    box.innerHTML = `<div class="sh-box"><img id="shImg" class="sh-img" alt="share card" /><div class="sh-row"><button class="sh-btn primary" id="shDl">ดาวน์โหลด PNG</button><button class="sh-btn" id="shShare">แชร์</button><button class="sh-btn" id="shClose">ปิด</button></div><div class="sh-note">1080 × 1350 px · พร้อมลงโซเชียล</div></div>`;
+    document.body.appendChild(box);
+    box.addEventListener("click", (e) => { if (e.target === box) box.classList.remove("on"); });
+    document.getElementById("shClose").onclick = () => box.classList.remove("on");
+    return box;
+  }
+
   const ShareCard = {
     async openList(opts) {
-      ensureCss();
-      let box = document.getElementById("shModal");
-      if (!box) return;
+      const box = ensureShareBox();
       box.classList.add("on");
       const img = document.getElementById("shImg");
       let url = "";
@@ -406,16 +418,7 @@
       };
     },
     async open(tk, nm, mk) {
-      ensureCss();
-      let box = document.getElementById("shModal");
-      if (!box) {
-        box = document.createElement("div");
-        box.id = "shModal"; box.className = "sh-modal";
-        box.innerHTML = `<div class="sh-box"><img id="shImg" class="sh-img" alt="share card" /><div class="sh-row"><button class="sh-btn primary" id="shDl">ดาวน์โหลด PNG</button><button class="sh-btn" id="shShare">แชร์</button><button class="sh-btn" id="shClose">ปิด</button></div><div class="sh-note">1080 × 1350 px · พร้อมลงโซเชียล</div></div>`;
-        document.body.appendChild(box);
-        box.addEventListener("click", (e) => { if (e.target === box) box.classList.remove("on"); });
-        document.getElementById("shClose").onclick = () => box.classList.remove("on");
-      }
+      const box = ensureShareBox();
       box.classList.add("on");
       const img = document.getElementById("shImg");
       img.src = "";
