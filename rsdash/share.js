@@ -372,9 +372,10 @@
 
     const items = (opts.items || []).slice(0, 9);
     const cols = 3, rows = Math.ceil(items.length / cols) || 1;
-    const X0 = 60, Y0 = 258, GW = W - 120, GH = 1000;
-    const cwid = GW / cols, chei = GH / Math.max(rows, 1);
-    const gap = 12;
+    const X0 = 60, GW = W - 120, GH = 1000;
+    const gap = 14, cwid = GW / cols;
+    const chei = rows === 1 ? 830 : (rows === 2 ? 470 : 318);   // การ์ดใหญ่ขึ้นเมื่อมีแถวน้อย แต่ไม่ยืดเต็มหน้า
+    const Y0 = 262;
 
     items.forEach((it, i) => {
       const cx = X0 + (i % cols) * cwid + gap / 2;
