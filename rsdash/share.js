@@ -174,7 +174,7 @@
     }
 
     const y0 = 250, bottom = 1258;
-    const rowH = Math.min(190, Math.floor((bottom - y0) / Math.max(rows.length, 1)));
+    const rowH = Math.min(150, Math.floor((bottom - y0) / Math.max(rows.length, 1)));
     const boxH = rowH - 10;
     const blockH = rowH * rows.length;
     const startY = y0 + Math.max(0, (bottom - y0 - blockH) / 2);   // จัดกลุ่มแถวให้อยู่กลาง ไม่ลอยขึ้นบน
@@ -207,7 +207,17 @@
         while (nm.length > 4 && x.measureText(nm + "…").width > nmMax) nm = nm.slice(0, -1);
         nm += "…";
       }
-      x.fillText(nm, tx, y + boxH / 2 + 20);
+      x.fillText(nm, tx, y + boxH / 2 + 18);
+      let ind = String(r.industry || r.sector || r.group || "");
+      if (ind) {
+        x.fillStyle = th.muted; x.font = font(500, 13);
+        const indMax = (W - 250) - tx - 24;
+        if (x.measureText(ind).width > indMax) {
+          while (ind.length > 4 && x.measureText(ind + "…").width > indMax) ind = ind.slice(0, -1);
+          ind += "…";
+        }
+        x.fillText(ind, tx, y + boxH / 2 + 38);
+      }
 
       // ราคา + เปลี่ยน
       const px = r.price != null ? Number(r.price).toFixed(2) : "—";
@@ -229,6 +239,10 @@
         x.arc(cxr, cyr, rad, -Math.PI / 2, -Math.PI / 2 + (Math.max(0, Math.min(99, rs)) / 99) * Math.PI * 2); x.stroke();
         x.fillStyle = th.text; x.font = font(700, 18); x.textAlign = "center";
         x.fillText(String(Math.round(rs)), cxr, cyr + 6);
+        x.fillStyle = th.muted; x.font = font(600, 11);
+        try { x.letterSpacing = "1px"; } catch (e) {}
+        x.fillText("RS", cxr, cyr + rad + 16);
+        try { x.letterSpacing = "0px"; } catch (e) {}
       }
       x.textAlign = "left";
     });
