@@ -308,6 +308,28 @@ def main():
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False)
     print("NEW_TICKERS:", ",".join(new_tk), flush=True)
+
+    # เขียน set_filed_th.json ให้ปฏิทินงบใช้ "วันยื่นจริงจาก SET" (แทนวันที่ TradingView ที่ดีเลย์)
+    try:
+        filed = {}
+        for tk, it in items.items():
+            at = it.get("date") or ""
+            if not at:
+                continue
+            rec = {"at": at, "headline": it.get("headline") or ""}
+            s2 = it.get("sum") or {}
+            n2 = s2.get("nums") or {}
+            m2 = re.search(r"([-+]?\d+(?:\.\d+)?)", str(n2.get("yoy") or ""))
+            if m2:
+                rec["niY"] = float(m2.group(1))
+            if it.get("quarter"):
+                rec["quarter"] = it["quarter"]
+            filed[tk] = rec
+        json.dump({"generatedAt": payload["updated_at"], "source": "set_earn.json", "filed": filed},
+                  open(os.path.join(ROOT, "rsdash", "set_filed_th.json"), "w", encoding="utf-8"), ensure_ascii=False)
+        print("เขียน set_filed_th.json", len(filed), "ตัว", flush=True)
+    except Exception as e:
+        print("เขียน set_filed_th.json ไม่สำเร็จ:", e, flush=True)
     print("เขียน", OUT, "หุ้น", len(items))
 
 

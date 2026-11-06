@@ -416,8 +416,7 @@
       const cx = rowX + c * cwid + gap / 2;
       const cy = Y0 + r * chei + gap / 2;
       const cw2 = cwid - gap, ch2 = chei - gap;
-      x.fillStyle = th.panel; rr(x, cx, cy, cw2, ch2, 16); x.fill();
-      x.strokeStyle = th.line; x.lineWidth = 1.5; x.stroke();
+      glassPanel(x, th, cx, cy, cw2, ch2, 16);
 
       // โลโก้บริษัท + ชื่อย่อ + RS
       let tx = cx + 14;
@@ -499,8 +498,57 @@
     dark: { bg: "#0B0910", bg2: "#15101B", panel: "#15101B", hi: "#251B31", line: "#3B2F49", lineHi: "#4C3D60", text: "#F1EDF5", body: "#D9D2E0", muted: "#A597AD", gold: "#D4B67A", up: "#5CC6C8", down: "#F59A8C" },
     light: { bg: "#EFEEE9", bg2: "#FAF9F6", panel: "#FAF9F6", hi: "#FFFFFF", line: "#D3CBBE", lineHi: "#B9AE9C", text: "#1F1A24", body: "#3B3342", muted: "#5E5468", gold: "#7A5C24", up: "#0B6E70", down: "#A63B27" },
   };
-  const FONT = '600 %spx Inter, "IBM Plex Sans Thai", "Leelawadee UI", "Noto Sans Thai", sans-serif';
+  const FONT = '600 %spx Inter, "IBM Plex Sans Thai", "Noto Sans Thai", "Leelawadee UI", sans-serif';
   const font = (w, s) => FONT.replace("600", w).replace("%s", s);
+
+
+
+  // กล่องสไตล์กระจกนูน (glassmorphism): ไล่แสงบน-ล่าง + ขอบไฮไลต์ + เงาใน
+  function glassPanel(x, th, bx, by, bw, bh, r) {
+    const dark = th === THEMES.dark;
+    x.save();
+    // พื้นโปร่งแสง
+    const g = x.createLinearGradient(bx, by, bx + bw, by + bh);
+    if (dark) { g.addColorStop(0, "rgba(255,255,255,0.085)"); g.addColorStop(0.55, "rgba(255,255,255,0.045)"); g.addColorStop(1, "rgba(255,255,255,0.02)"); }
+    else { g.addColorStop(0, "rgba(255,255,255,0.92)"); g.addColorStop(1, "rgba(255,255,255,0.62)"); }
+    x.save();
+    x.shadowColor = dark ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0.10)";
+    x.shadowBlur = 12; x.shadowOffsetY = 3;
+    x.fillStyle = g; rr(x, bx, by, bw, bh, r); x.fill();
+    x.restore();
+    // ขอบบาง
+    x.strokeStyle = dark ? "rgba(255,255,255,0.16)" : "rgba(0,0,0,0.10)";
+    x.lineWidth = 1.2; x.stroke();
+    // ไฮไลต์ด้านบน (นูนขึ้น)
+    x.beginPath();
+    x.moveTo(bx + r * 0.7, by + 1);
+    x.lineTo(bx + bw - r * 0.7, by + 1);
+    x.strokeStyle = dark ? "rgba(255,255,255,0.42)" : "rgba(255,255,255,1)";
+    x.lineWidth = 2; x.stroke();
+    // เงาในด้านล่าง
+    x.beginPath();
+    x.moveTo(bx + r * 0.7, by + bh - 1);
+    x.lineTo(bx + bw - r * 0.7, by + bh - 1);
+    x.strokeStyle = dark ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.06)";
+    x.lineWidth = 1.4; x.stroke();
+    x.restore();
+  }
+
+  // โหลดฟอนต์เว็บให้พร้อมก่อนวาดลง canvas (ไม่งั้นได้ฟอนต์ระบบแทน)
+  async function ensureFonts() {
+    try {
+      if (!document.fonts) return;
+      await Promise.all([
+        document.fonts.load('400 20px Inter'),
+        document.fonts.load('600 20px Inter'),
+        document.fonts.load('700 20px Inter'),
+        document.fonts.load('800 20px Inter'),
+        document.fonts.load('700 20px "IBM Plex Sans Thai"'),
+        document.fonts.load('600 20px "IBM Plex Sans Thai"'),
+      ]);
+      await document.fonts.ready;
+    } catch (e) {}
+  }
 
   function rr(ctx, x, y, w, h, r) {
     ctx.beginPath();
@@ -698,20 +746,39 @@
     ];
     const bw = (W - 140 - 3 * 14) / 4;
     stats.forEach((sv, i) => {
-      const bx = 70 + i * (bw + 14);
-      x.fillStyle = th.hi || th.panel; rr(x, bx, 320, bw, 88, 14); x.fill();
-      x.strokeStyle = th.lineHi || th.line; x.lineWidth = 1.4; x.stroke();
-      x.fillStyle = th.muted; x.font = font(600, 15);
-      try { x.letterSpacing = "0.6px"; } catch (e) {}
-      x.fillText(String(sv[0]).toUpperCase(), bx + 16, 350);
+      const bx = 70 + i * (bw + 14), by = 320, bh = 92;
+      const cx = bx + bw / 2;
+      glassPanel(x, th, bx, by, bw, bh, 14);
+      if (i === 0) {
+        // RS = วงแหวนกลางกล่อง
+        const rr0 = 27, cyc = by + bh / 2 - 4;
+        const val = Math.max(0, Math.min(99, Number(sv[1]) || 0));
+        x.lineWidth = 5; x.lineCap = "round";
+        x.strokeStyle = th.line; x.beginPath(); x.arc(cx, cyc, rr0, 0, Math.PI * 2); x.stroke();
+        x.strokeStyle = th.gold; x.beginPath();
+        x.arc(cx, cyc, rr0, -Math.PI / 2, -Math.PI / 2 + (val / 99) * Math.PI * 2); x.stroke();
+        x.fillStyle = th.text; x.font = font(700, 24); x.textAlign = "center";
+        x.fillText(String(Math.round(val)), cx, cyc + 9);
+        x.fillStyle = th.muted; x.font = font(600, 11);
+        try { x.letterSpacing = "1px"; } catch (e) {}
+        x.fillText("RS", cx, by + bh - 8);
+        try { x.letterSpacing = "0px"; } catch (e) {}
+        x.textAlign = "left";
+        return;
+      }
+      x.textAlign = "center";
+      x.fillStyle = th.body; x.font = font(600, 13);
+      try { x.letterSpacing = "0.7px"; } catch (e) {}
+      x.fillText(String(sv[0]).toUpperCase(), cx, by + 30);
       try { x.letterSpacing = "0px"; } catch (e) {}
-      x.fillStyle = th.text; x.font = font(700, 30); x.fillText(sv[1], bx + 16, 392);
+      x.fillStyle = th.text; x.font = font(700, 30);
+      x.fillText(sv[1], cx, by + 66);
+      x.textAlign = "left";
     });
 
     // ── กราฟราคา (ใหญ่ขึ้น + เผื่อที่ด้านขวาให้กราฟวิ่งต่อ) ──
     const box = { x: 70, y: 426, w: W - 140, h: 560 };
-    x.fillStyle = th.panel; rr(x, box.x, box.y, box.w, box.h, 18); x.fill();
-    x.strokeStyle = th.line; x.lineWidth = 1; x.stroke();
+    glassPanel(x, th, box.x, box.y, box.w, box.h, 18);
     const rng = drawChartBlock(x, th, bars, box, { n: 150 });
     if (rng.lo == null) { x.fillStyle = th.muted; x.font = font(600, 26); x.fillText("ไม่มีข้อมูลกราฟ", box.x + 30, box.y + box.h / 2); }
     else if (hi) { x.fillStyle = th.muted; x.font = font(600, 19); x.fillText("52W " + Number(hi).toFixed(2), box.x + 24, box.y + 26); }
@@ -721,7 +788,7 @@
     const lastQ = qs.length ? qLabel(qs[qs.length - 1].d) : "";
     x.fillStyle = th.muted; x.font = font(600, 16);
     try { x.letterSpacing = "0.8px"; } catch (e) {}
-    x.fillText(("พื้นฐาน" + (lastQ ? " · ล่าสุด " + lastQ : "")).toUpperCase(), 70, 1002);
+    x.fillText(("พื้นฐาน" + (lastQ ? " · ล่าสุด " + lastQ : "")).toUpperCase(), 70, 1012);
     try { x.letterSpacing = "0px"; } catch (e) {}
     const rawChips = f ? fundChips(f) : [];
     const chips = rawChips
@@ -738,26 +805,28 @@
     const leftX = 70, rightX = 70 + colW + halfGap;
     const chipsH = 70, chipsGap = 12;
     chips.forEach((kv, i) => {
-      const cx = leftX + (i % 2) * (colW / 2);
+      const cx = leftX + (i % 2) * (colW / 2 + 4);
       const cy = 1016 + Math.floor(i / 2) * (chipsH + chipsGap);
-      const cw3 = colW / 2 - 6;
-      x.fillStyle = th.hi || th.panel; rr(x, cx, cy, cw3, chipsH, 10); x.fill();
-      x.strokeStyle = th.lineHi || th.line; x.lineWidth = 1.4; x.stroke();
-      x.fillStyle = th.muted; x.font = font(600, 12.5);
+      const cw3 = colW / 2 - 8;
+      glassPanel(x, th, cx, cy, cw3, chipsH, 10);
+
+      x.textAlign = "center";
+      x.fillStyle = th.body; x.font = font(600, 13);
       try { x.letterSpacing = "0.3px"; } catch (e) {}
       let lb = String(kv[0]).toUpperCase();
-      while (x.measureText(lb).width > cw3 - 22 && lb.length > 4) lb = lb.slice(0, -1);
-      x.fillText(lb, cx + 12, cy + 24);
+      while (x.measureText(lb).width > cw3 - 20 && lb.length > 4) lb = lb.slice(0, -1);
+      x.fillText(lb, cx + cw3 / 2, cy + 25);
       try { x.letterSpacing = "0px"; } catch (e) {}
       x.fillStyle = th.text; x.font = font(700, 25);
-      x.fillText(kv[1], cx + 12, cy + 52);
+      x.fillText(kv[1], cx + cw3 / 2, cy + 54);
+      x.textAlign = "left";
     });
 
     // ── แนวโน้มรายได้/กำไร (ครึ่งขวา สูงขึ้น) ──
     if (qs.length >= 2) {
       const tb = { x: rightX, y: 1016, w: colW, h: 3 * chipsH + 2 * chipsGap };
-      x.fillStyle = th.hi || th.panel; rr(x, tb.x, tb.y, tb.w, tb.h, 14); x.fill();
-      x.strokeStyle = th.lineHi || th.line; x.lineWidth = 1.4; x.stroke();
+      glassPanel(x, th, tb.x, tb.y, tb.w, tb.h, 14);
+
       let note = "";
       if (qs.length >= 2) {
         const a = qs[qs.length - 1], b = qs[qs.length - 2];
@@ -914,6 +983,7 @@
 
   const ShareCard = {
     async openGrid(opts) {
+      await ensureFonts();
       const oldFmt = document.getElementById("shFmt"); if (oldFmt) oldFmt.remove();
       const box = ensureShareBox();
       box.classList.add("on");
@@ -977,6 +1047,7 @@
       await render(1);
     },
     async openHeat(opts) {
+      await ensureFonts();
       const oldFmt2 = document.getElementById("shFmt"); if (oldFmt2) oldFmt2.remove();
       const box = ensureShareBox();
       box.classList.add("on");
@@ -1017,6 +1088,7 @@
       };
     },
     async open(tk, nm, mk, fmt) {
+      await ensureFonts();
       const box = ensureShareBox();
       box.classList.add("on");
       const img = document.getElementById("shImg");
