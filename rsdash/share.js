@@ -264,14 +264,17 @@
     x.textAlign = "left";
 
     x.fillStyle = th.text; x.font = font(900, 52); x.fillText((opts.title || "Heatmap").slice(0, 26), 70, 200);
-    if (opts.sub) { x.fillStyle = th.muted; x.font = font(500, 22); x.fillText(String(opts.sub).slice(0, 62), 70, 238); }
+    const subTxt2 = (opts.sub || "") + (byChg ? " · ขนาดบล็อก = % เปลี่ยนแปลง" : " · ขนาดบล็อก = มูลค่าตลาด");
+    x.fillStyle = th.muted; x.font = font(500, 22); x.fillText(subTxt2.slice(0, 70), 70, 238);
 
     // พื้นที่ treemap
     const X0 = 70, Y0 = 274, XW = W - 140, XH = 940;
+    const byChg = opts.sizeBy === "chg";
     const tItems = (opts.items || [])
-      .filter((it) => (it.mcap || 0) > 0)
-      .map((it) => Object.assign({}, it, { v: it.mcap }))
-      .sort((a, b) => b.v - a.v);
+      .filter((it) => (byChg ? Math.abs(Number(it.chg) || 0) > 0.01 : (it.mcap || 0) > 0))
+      .map((it) => Object.assign({}, it, { v: byChg ? Math.max(0.05, Math.abs(Number(it.chg) || 0)) : it.mcap }))
+      .sort((a, b) => b.v - a.v)
+      .slice(0, byChg ? 60 : 100000);   // โหมด %เปลี่ยน: เอา 60 ตัวที่ขยับแรงสุด (อ่านง่าย + ไม่หนัก)
     const rects = squarify(tItems, X0, Y0, XW, XH);
     // โลโก้บริษัทในบล็อกที่ใหญ่พอ (เสิร์ฟผ่านโดเมนเรา → ไม่ทำให้ canvas เสีย)
     const big = rects.filter((r) => (r.w - 2) > 96 && (r.h - 2) > 78).slice(0, 34);
@@ -386,14 +389,32 @@
     const X0 = 60, GW = W - 120, GH = 1000;
     const gap = 14, cwid = GW / cols;
     const chei = rows === 1 ? 830 : (rows === 2 ? 470 : 318);
-    const Y0 = 262;
+    const blockH = rows * chei;
+    const Y0 = 262 + Math.max(0, (1000 - blockH) / 2);   // จัดกึ่งกลางแนวตั้ง ไม่ให้เหลือช่องว่างล่างเยอะ
 
     const MA20 = "#e8b04b", MA50 = "#5b9df9";
 
-    for (let i = 0; i < items.length; i++) {
-      const it = items[i];
-      const cx = X0 + (i % cols) * cwid + gap / 2;
-      const cy = Y0 + Math.floor(i / cols) * chei + gap / 2;
+    // จัดแถวให้เต็มทุกแถว และจัดกึ่งกลางเมื่อแถวสุดท้ายมีไม่ครบ (กันการ์ดแหว่ง)
+    const fullCols = (n) => (n >= 3 ? 3 : (n === 2 ? 2 : 1));
+    const perRow = [];
+    let left = items.length;
+    while (left > 0) {
+      let take = Math.min(3, left);
+      // ถ้าเหลือ 4 → แบ่ง 2+2 ; เหลือ 5 → 3+2 ; เหลือ 1 ในแถวสุดท้ายให้อยู่กลาง
+      if (left === 4) take = 2;
+      if (left === 5) take = 3;
+      perRow.push(take);
+      left -= take;
+    }
+    let idx = 0;
+    for (let r = 0; r < perRow.length; r++) {
+      const nRow = perRow[r];
+      const rowW = nRow * cwid;
+      const rowX = X0 + (GW - rowW) / 2;      // กึ่งกลางแนวนอน
+      for (let c = 0; c < nRow; c++, idx++) {
+      const it = items[idx];
+      const cx = rowX + c * cwid + gap / 2;
+      const cy = Y0 + r * chei + gap / 2;
       const cw2 = cwid - gap, ch2 = chei - gap;
       x.fillStyle = th.panel; rr(x, cx, cy, cw2, ch2, 16); x.fill();
       x.strokeStyle = th.line; x.lineWidth = 1.5; x.stroke();
@@ -464,6 +485,7 @@
         });
         x.restore();
       }
+      }
     }
 
     x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
@@ -515,142 +537,301 @@
     return rows.find((x) => x.ticker === tk) || hit || null;
   }
 
+  // ป้ายไตรมาสจากวันที่ เช่น 2026-09-30 → Q3/69
+  function qLabel(dstr) {
+    const m = String(dstr || "").match(/^(\d{4})-(\d{2})/);
+    if (!m) return "";
+    const y = m[1], mo = +m[2];
+    const q = Math.ceil(mo / 3);
+    return "Q" + q + "/" + String(+y % 100 === 0 ? 100 : (+y + 543) % 100).padStart(2, "0");
+  }
+
+  // วาดแท่งเทียน + MA20/50 ในกรอบที่กำหนด (ใช้ทั้งการ์ด 4:5 และการ์ดกว้าง)
+  function drawChartBlock(x, th, bars, box, opt) {
+    const padL = box.pl ?? 96, padR = box.pr ?? 130, padT = box.pt ?? 34, padB = box.pb ?? 56;
+    const px = box.x + padL, py = box.y + padT, pw = box.w - padL - padR, ph = box.h - padT - padB;
+    const barsS = (Array.isArray(bars) && bars.length > (opt?.n || 130)) ? bars.slice(-(opt?.n || 130)) : (bars || []);
+    if (barsS.length < 5) return { lo: null, hi: null };
+    let lo = Infinity, up2 = -Infinity;
+    barsS.forEach((b) => { const l = b.l ?? b.low, h = b.h ?? b.high; if (l != null && l < lo) lo = l; if (h != null && h > up2) up2 = h; });
+    const Y = (v) => py + ph - ((v - lo) / (up2 - lo || 1)) * ph;
+    const n0 = barsS.length, cw0 = pw / n0;
+    const MA20C = "#e8b04b", MA50C = "#5b9df9";
+    x.save(); x.beginPath(); x.rect(px - 2, py - 6, pw + 4, ph + 12); x.clip();
+    barsS.forEach((b, i) => {
+      const o = b.o ?? b.open, hh = b.h ?? b.high, ll = b.l ?? b.low, cl = b.c ?? b.close;
+      if (o == null || cl == null) return;
+      const cx = px + i * cw0 + cw0 / 2;
+      const col = cl >= o ? th.up : th.down;
+      x.strokeStyle = col; x.fillStyle = col;
+      x.lineWidth = Math.max(1.3, cw0 * 0.12);
+      x.beginPath(); x.moveTo(cx, Y(hh)); x.lineTo(cx, Y(ll)); x.stroke();
+      const bodyTop = Math.min(Y(o), Y(cl)), bodyH = Math.max(1.6, Math.abs(Y(o) - Y(cl)));
+      x.fillRect(cx - Math.max(1.5, cw0 * 0.32), bodyTop, Math.max(2.2, cw0 * 0.64), bodyH);
+    });
+    [[20, MA20C], [50, MA50C]].forEach(function (pair) {
+      const n = pair[0], col = pair[1];
+      x.strokeStyle = col; x.lineWidth = 2.6; x.beginPath();
+      let started = false;
+      for (let i = 0; i < n0; i++) {
+        const v = smaAt(barsS, i, n);
+        if (v == null) continue;
+        const bx = px + i * cw0 + cw0 / 2;
+        if (!started) { x.moveTo(bx, Y(v)); started = true; } else x.lineTo(bx, Y(v));
+      }
+      if (started) x.stroke();
+    });
+    x.restore();
+    // ป้ายค่า 52 สัปดาห์ + ชื่อเส้น
+    x.textAlign = "right";
+    x.font = font(700, 18);
+    x.fillStyle = MA50C; x.fillText("MA50", box.x + box.w - 26, box.y + 26);
+    const w50 = x.measureText("MA50").width;
+    x.fillStyle = MA20C; x.fillText("MA20", box.x + box.w - 26 - w50 - 10, box.y + 26);
+    x.textAlign = "left";
+    return { lo, hi: up2 };
+  }
+
+  // กราฟเส้นแนวโน้มรายได้ / กำไรสุทธิ รายไตรมาส
+  function drawTrendBlock(x, th, q, box) {
+    const pts = (q || []).filter((z) => z && z.d && (z.rev != null || z.ni != null));
+    if (pts.length < 2) return;
+    const padL = 26, padR = 26, padT = 34, padB = 42;
+    const px = box.x + padL, py = box.y + padT, pw = box.w - padL - padR, ph = box.h - padT - padB;
+    const revs = pts.map((z) => Number(z.rev) || 0), nis = pts.map((z) => Number(z.ni) || 0);
+    const rMax = Math.max(...revs, 1), rMin = Math.min(0, ...revs);
+    const nMax = Math.max(...nis, 1), nMin = Math.min(0, ...nis);
+    const X = (i) => px + (i / (pts.length - 1)) * pw;
+    const Yr = (v) => py + ph - ((v - rMin) / ((rMax - rMin) || 1)) * ph;
+    const Yn = (v) => py + ph - ((v - nMin) / ((nMax - nMin) || 1)) * ph;
+    const line = (vals, Yf, col, dash) => {
+      x.strokeStyle = col; x.lineWidth = 2.6; x.setLineDash(dash || []);
+      x.beginPath();
+      vals.forEach((v, i) => { const yy = Yf(v); if (i === 0) x.moveTo(X(i), yy); else x.lineTo(X(i), yy); });
+      x.stroke(); x.setLineDash([]);
+      vals.forEach((v, i) => { x.beginPath(); x.arc(X(i), Yf(v), 3.2, 0, Math.PI * 2); x.fillStyle = col; x.fill(); });
+    };
+    line(revs, Yr, "#e8b04b");
+    line(nis, Yn, th.up, [5, 4]);
+    // ป้ายไตรมาส + ตัวเลขท้ายเส้น
+    x.font = font(600, 15); x.fillStyle = th.muted; x.textAlign = "center";
+    pts.forEach((z, i) => x.fillText(qLabel(z.d), X(i), box.y + box.h - 12));
+    x.textAlign = "left";
+    x.font = font(700, 13);
+    x.fillStyle = "#e8b04b"; x.fillText("รายได้", px, box.y + 16);
+    const wR = x.measureText("รายได้").width;
+    x.fillStyle = th.up; x.fillText("กำไร", px + wR + 14, box.y + 16);
+  }
+
+  async function loadCardData(tk, mk, withLogo) {
+    const [f, bars, logo, tlogo] = await Promise.all([
+      loadFund(tk, mk), barsOf(tk, mk), loadImg("/brand/thus-symbol-white.png"),
+      (withLogo === false ? loadImg(avatarData(tk)) : stockLogo(tk, mk)),
+    ]);
+    let row = {};
+    try {
+      const rows = (typeof stockData !== "undefined" && stockData) ? stockData : [];
+      row = rows.find((z) => z.ticker === tk) || {};
+    } catch (e) {}
+    return { f, bars, logo, tlogo, row };
+  }
+
   async function draw(tk, nm, mk, withLogo) {
     const th = (document.documentElement.getAttribute("data-theme") === "light") ? THEMES.light : THEMES.dark;
     const W = 1080, H = 1350;
-    const c = document.createElement("canvas");
-    c.width = W; c.height = H;
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
-    const row = (await rowOf(tk, mk)) || {};
-    const [f, bars, logo, tlogo] = await Promise.all([loadFund(tk, mk), barsOf(tk, mk), loadImg("/brand/thus-symbol-white.png"), (withLogo === false ? loadImg(avatarData(tk)) : stockLogo(tk, mk))]);
+    const { f, bars, logo, tlogo, row } = await loadCardData(tk, mk, withLogo);
 
-    // พื้นหลัง
     const grd = x.createLinearGradient(0, 0, W, H);
     grd.addColorStop(0, th.bg); grd.addColorStop(1, th.bg2);
     x.fillStyle = grd; x.fillRect(0, 0, W, H);
     x.strokeStyle = th.line; x.lineWidth = 3; rr(x, 28, 28, W - 56, H - 56, 36); x.stroke();
 
     // หัวเว็บ
-    if (logo) { try { x.drawImage(logo, 70, 66, 54, 54); } catch (e) {} }
-    x.fillStyle = th.text; x.font = font(900, 34); x.textBaseline = "alphabetic";
-    x.fillText("THUS", 140, 108);
-    x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
-    x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 100);
+    if (logo) { try { x.drawImage(logo, 70, 62, 48, 48); } catch (e) {} }
+    x.fillStyle = th.text; x.font = font(900, 32); x.fillText("THUS", 132, 100);
+    x.fillStyle = th.muted; x.font = font(500, 21); x.textAlign = "right";
+    x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 96);
     x.textAlign = "left";
 
-    // โลโก้หุ้น + ชื่อย่อ
+    // ── แถวชื่อหุ้น + ราคา (ราคาอยู่ข้างชื่อ ใช้พื้นที่ว่างให้คุ้ม) ──
     let nameX = 70;
     if (tlogo) {
-      x.save();
-      rr(x, 70, 168, 96, 96, 48); x.clip(); x.drawImage(tlogo, 70, 168, 96, 96); x.restore();
-      nameX = 190;
+      x.save(); rr(x, 70, 150, 88, 88, 44); x.clip(); x.drawImage(tlogo, 70, 150, 88, 88); x.restore();
+      nameX = 178;
     }
-    x.fillStyle = th.text; x.font = font(900, 84);
-    x.fillText(tk, nameX, 250);
+    x.fillStyle = th.text; x.font = font(900, 76);
+    x.fillText(tk, nameX, 222);
     const tw = x.measureText(tk).width;
-    x.fillStyle = th.muted; x.font = font(700, 24);
-    x.fillText(mk === "america" ? "US" : "TH", nameX + tw + 20, 214);
-    x.fillStyle = th.body; x.font = font(500, 28);
-    x.fillText((nm || "").slice(0, 40), nameX, 296);
-    // กลุ่มหุ้น + สถานะนำตลาด
+    x.fillStyle = th.muted; x.font = font(700, 22);
+    x.fillText(mk === "america" ? "US" : "TH", nameX + tw + 16, 186);
+    x.fillStyle = th.body; x.font = font(500, 25);
+    x.fillText((nm || "").slice(0, 34), nameX, 258);
     let tx = nameX;
-    const grp = (row.industry || row.sector || row.group || "").slice(0, 26);
-    if (grp) { x.fillStyle = th.muted; x.font = font(600, 22); x.fillText(grp, tx, 336); tx += x.measureText(grp).width + 16; }
-    const isLead = String(row.lead || "").toLowerCase() === "leading";
-    if (isLead) { x.fillStyle = th.gold; x.font = font(800, 22); x.fillText("★ นำตลาด", tx, 336); }
+    const grp = (row.industry || row.sector || "").slice(0, 26);
+    if (grp) { x.fillStyle = th.muted; x.font = font(600, 20); x.fillText(grp, tx, 292); tx += x.measureText(grp).width + 14; }
+    if (String(row.lead || "").toLowerCase() === "leading") { x.fillStyle = th.gold; x.font = font(800, 20); x.fillText("★ นำตลาด", tx, 292); }
 
-    // ราคา
     const lastBar = bars.length ? bars[bars.length - 1] : null;
     const px = row.price != null ? row.price : (lastBar ? (lastBar.c ?? lastBar.close) : null);
     const prevBar = bars.length > 1 ? bars[bars.length - 2] : null;
     const chg = row.change != null ? row.change : (px != null && prevBar ? ((px / (prevBar.c ?? prevBar.close) - 1) * 100) : null);
-    x.fillStyle = th.text; x.font = font(800, 84);
-    x.fillText(px != null ? Number(px).toFixed(2) : "—", 70, 430);
+    x.textAlign = "right";
+    x.fillStyle = th.text; x.font = font(900, 72);
+    x.fillText(px != null ? Number(px).toFixed(2) : "—", W - 70, 214);
     if (chg != null) {
-      x.fillStyle = chg >= 0 ? th.up : th.down; x.font = font(800, 40);
-      x.fillText((chg >= 0 ? "▲ +" : "▼ ") + Number(chg).toFixed(2) + "%", 84, 486);
+      x.fillStyle = chg >= 0 ? th.up : th.down; x.font = font(800, 34);
+      x.fillText((chg >= 0 ? "▲ +" : "▼ ") + Number(chg).toFixed(2) + "%", W - 70, 258);
     }
+    x.textAlign = "left";
 
-    // แถวสถิติ
-    const rs = row.rs != null ? row.rs : (row.rs3 != null ? row.rs3 : (row.rs6 != null ? row.rs6 : (row.rs1 != null ? row.rs1 : "—")));
+    // ── ชิปสถิติ 4 ช่อง ──
+    const rs = row.rs != null ? row.rs : (row.rs3 != null ? row.rs3 : (row.rs6 ?? row.rs1 ?? "—"));
     const hi = f && f.hi ? f.hi : null;
     const toHi = (hi && px) ? ((px / hi - 1) * 100) : null;
-    const stats = [["RS", String(rs)], ["จาก 52W สูง", toHi == null ? "—" : toHi.toFixed(1) + "%"], ["3 เดือน", row.p3m != null ? (row.p3m >= 0 ? "+" : "") + Number(row.p3m).toFixed(1) + "%" : "—"], ["Mcap", f && f.mcap ? fmtCap(f.mcap) : (row.mcap ? fmtCap(row.mcap) : "—")]];
-    const bw = (W - 140 - 3 * 18) / 4;
-    stats.forEach((s, i) => {
-      const bx = 70 + i * (bw + 18);
-      x.fillStyle = th.panel; rr(x, bx, 530, bw, 108, 20); x.fill();
-      x.strokeStyle = th.line; x.lineWidth = 2; x.stroke();
-      x.fillStyle = th.muted; x.font = font(600, 22); x.fillText(s[0], bx + 22, 572);
-      x.fillStyle = th.text; x.font = font(800, 40); x.fillText(s[1], bx + 22, 618);
+    const stats = [
+      ["RS", String(rs ?? "—")],
+      ["จาก 52W สูง", toHi == null ? "—" : toHi.toFixed(1) + "%"],
+      ["3 เดือน", row.p3m != null ? (row.p3m >= 0 ? "+" : "") + Number(row.p3m).toFixed(1) + "%" : "—"],
+      ["Mcap", f && f.mcap ? fmtCap(f.mcap) : (row.mcap ? fmtCap(row.mcap) : "—")],
+    ];
+    const bw = (W - 140 - 3 * 16) / 4;
+    stats.forEach((sv, i) => {
+      const bx = 70 + i * (bw + 16);
+      x.fillStyle = th.panel; rr(x, bx, 318, bw, 96, 18); x.fill();
+      x.strokeStyle = th.line; x.lineWidth = 1.5; x.stroke();
+      x.fillStyle = th.muted; x.font = font(600, 20); x.fillText(sv[0], bx + 18, 352);
+      x.fillStyle = th.text; x.font = font(800, 34); x.fillText(sv[1], bx + 18, 396);
     });
 
-    // กราฟ 1 ปี (แสดง 130 แท่งล่าสุดให้แท่งอ่านง่าย) — bars เป็น const ห้ามเขียนทับ
-    const barsS = (Array.isArray(bars) && bars.length > 130) ? bars.slice(-130) : (bars || []);
-    x.fillStyle = th.panel; rr(x, 70, 668, W - 140, 300, 24); x.fill();
+    // ── กราฟราคา (ใหญ่ขึ้น + เผื่อที่ด้านขวาให้กราฟวิ่งต่อ) ──
+    const box = { x: 70, y: 434, w: W - 140, h: 512 };
+    x.fillStyle = th.panel; rr(x, box.x, box.y, box.w, box.h, 24); x.fill();
     x.strokeStyle = th.line; x.lineWidth = 2; x.stroke();
-    if (barsS.length > 5) {
-      const xs = barsS.map((b) => b.t || b.time || b.date);
-      let lo = Infinity, up2 = -Infinity;
-      barsS.forEach((b) => { const l = b.l ?? b.low, h = b.h ?? b.high; if (l != null && l < lo) lo = l; if (h != null && h > up2) up2 = h; });
-      const padL = 100, padR = 100, py0 = 700, py1 = 930;
-      const X = (i) => padL + (i / (barsS.length - 1)) * (W - padL - padR);
-      const Y = (v) => py1 - ((v - lo) / (up2 - lo || 1)) * (py1 - py0);
-      // แท่งเทียนจริง (ไม่ใช่เส้น) — บอสสั่งให้การ์ดรายตัวเป็นกราฟสวย ๆ
-      const n0 = barsS.length, cw0 = (W - padL - padR) / n0;
-      barsS.forEach((b, i) => {
-        const o = b.o ?? b.open, hh = b.h ?? b.high, ll = b.l ?? b.low, cl = b.c ?? b.close;
-        if (o == null || cl == null) return;
-        const cx = padL + i * cw0 + cw0 / 2;
-        const col = cl >= o ? th.up : th.down;
-        x.strokeStyle = col; x.fillStyle = col;
-        x.lineWidth = Math.max(1.4, cw0 * 0.12);
-        x.beginPath(); x.moveTo(cx, Y(hh)); x.lineTo(cx, Y(ll)); x.stroke();
-        const bodyTop = Math.min(Y(o), Y(cl)), bodyH = Math.max(1.6, Math.abs(Y(o) - Y(cl)));
-        x.fillRect(cx - Math.max(1.6, cw0 * 0.32), bodyTop, Math.max(2.4, cw0 * 0.64), bodyH);
-      });
-      // เส้น MA20 (ทอง) และ MA50 (ฟ้า) บนกราฟการ์ดรายตัว
-      const MA20C = "#e8b04b", MA50C = "#5b9df9";
-      [[20, MA20C], [50, MA50C]].forEach(function (pair) {
-        const n = pair[0], col = pair[1];
-        x.strokeStyle = col; x.lineWidth = 3; x.beginPath();
-        let started = false;
-        for (let i = 0; i < n0; i++) {
-          const v = smaAt(barsS, i, n);
-          if (v == null) continue;
-          const bx = padL + i * cw0 + cw0 / 2;
-          if (!started) { x.moveTo(bx, Y(v)); started = true; } else x.lineTo(bx, Y(v));
+    const rng = drawChartBlock(x, th, bars, box, { n: 150 });
+    if (rng.lo == null) { x.fillStyle = th.muted; x.font = font(600, 26); x.fillText("ไม่มีข้อมูลกราฟ", box.x + 30, box.y + box.h / 2); }
+    else if (hi) { x.fillStyle = th.muted; x.font = font(600, 19); x.fillText("52W " + Number(hi).toFixed(2), box.x + 24, box.y + 26); }
+
+    // ── พื้นฐาน (บอกช่วงเวลา TTM / ไตรมาส) ──
+    const qs = (f && f.q) ? f.q.filter((z) => z && z.d) : [];
+    const lastQ = qs.length ? qLabel(qs[qs.length - 1].d) : "";
+    x.fillStyle = th.muted; x.font = font(700, 22);
+    x.fillText("พื้นฐาน" + (lastQ ? " · ล่าสุด " + lastQ : ""), 70, 984);
+    const rawChips = f ? fundChips(f) : [];
+    const chips = rawChips
+      .filter((kv) => !/mcap|มูลค่าตลาด/i.test(String(kv[0])))
+      .map((kv) => {
+        const lb = String(kv[0]);
+        const isTTM = /P\/E|P\/S|P\/B|ปันผล/i.test(lb);
+        const suf = isTTM ? " · TTM" : (lastQ ? " · " + lastQ : "");
+        return [lb + suf, kv[1]];
+      })
+      .slice(0, 6);
+    const cw2 = (W - 140 - 2 * 14) / 3;
+    chips.forEach((kv, i) => {
+      const cx = 70 + (i % 3) * (cw2 + 14), cy = 1002 + Math.floor(i / 3) * 74;
+      x.fillStyle = th.panel; rr(x, cx, cy, cw2, 64, 16); x.fill();
+      x.strokeStyle = th.line; x.lineWidth = 1.5; x.stroke();
+      x.fillStyle = th.muted; x.font = font(600, 18); x.fillText(kv[0], cx + 16, cy + 26);
+      x.fillStyle = th.text; x.font = font(800, 27); x.fillText(kv[1], cx + 16, cy + 54);
+    });
+
+    // ── แนวโน้มรายได้/กำไร รายไตรมาส (กราฟเส้น) ──
+    if (qs.length >= 2) {
+      const tb = { x: 70, y: 1148, w: W - 140, h: 120 };
+      x.fillStyle = th.panel; rr(x, tb.x, tb.y, tb.w, tb.h, 20); x.fill();
+      x.strokeStyle = th.line; x.lineWidth = 1.5; x.stroke();
+      // YoY / QoQ ของไตรมาสล่าสุด
+      let note = "";
+      if (qs.length >= 2) {
+        const a = qs[qs.length - 1], b = qs[qs.length - 2];
+        if (a.rev && b.rev) {
+          const qoq = (a.rev / b.rev - 1) * 100;
+          note = "รายได้ QoQ " + (qoq >= 0 ? "+" : "") + qoq.toFixed(1) + "%";
         }
-        if (started) x.stroke();
-      });
-      // คำอธิบายเส้น
-      x.font = font(700, 20); x.textAlign = "right";
-      x.fillStyle = MA50C; x.fillText("MA50", W - 96, 706);
-      x.fillStyle = MA20C; x.fillText("MA20", W - 176, 706);
-      x.textAlign = "left";
-      if (lo < Infinity) {
-        x.fillStyle = th.muted; x.font = font(600, 22);
-        x.fillText(hi ? "52W " + Number(hi).toFixed(2) : "", 84, 690);
       }
-    } else {
-      x.fillStyle = th.muted; x.font = font(600, 26); x.fillText("ไม่มีข้อมูลกราฟ", 96, 828);
+      if (qs.length >= 5) {
+        const a = qs[qs.length - 1], y0 = qs[qs.length - 5];
+        if (a.rev && y0.rev) {
+          const yoy = (a.rev / y0.rev - 1) * 100;
+          note += (note ? " · " : "") + "YoY " + (yoy >= 0 ? "+" : "") + yoy.toFixed(1) + "%";
+        }
+      }
+      x.fillStyle = th.muted; x.font = font(600, 17); x.textAlign = "right";
+      x.fillText(note, tb.x + tb.w - 20, tb.y + 16);
+      x.textAlign = "left";
+      drawTrendBlock(x, th, qs.slice(-5), tb);
     }
 
-    // พื้นฐาน
-    const chips = f ? fundChips(f).slice(0, 6) : [];
-    x.fillStyle = th.muted; x.font = font(700, 24); x.fillText("พื้นฐาน", 70, 1024);
-    chips.forEach((kv, i) => {
-      const cx = 70 + (i % 3) * ((W - 140) / 3), cy = 1046 + Math.floor(i / 3) * 92;
-      x.fillStyle = th.panel; rr(x, cx, cy, (W - 140) / 3 - 14, 78, 18); x.fill();
-      x.strokeStyle = th.line; x.lineWidth = 2; x.stroke();
-      x.fillStyle = th.muted; x.font = font(600, 21); x.fillText(kv[0], cx + 20, cy + 30);
-      x.fillStyle = th.text; x.font = font(800, 32); x.fillText(kv[1], cx + 20, cy + 64);
+    x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
+    x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 36);
+    x.textAlign = "left";
+    return c;
+  }
+
+  // ── การ์ดสัดส่วน Facebook (1200×630) ──
+  async function drawWide(tk, nm, mk, withLogo) {
+    const th = (document.documentElement.getAttribute("data-theme") === "light") ? THEMES.light : THEMES.dark;
+    const W = 1200, H = 630;
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d");
+    const { f, bars, logo, tlogo, row } = await loadCardData(tk, mk, withLogo);
+
+    const grd = x.createLinearGradient(0, 0, W, H);
+    grd.addColorStop(0, th.bg); grd.addColorStop(1, th.bg2);
+    x.fillStyle = grd; x.fillRect(0, 0, W, H);
+    x.strokeStyle = th.line; x.lineWidth = 3; rr(x, 20, 20, W - 40, H - 40, 28); x.stroke();
+
+    if (logo) { try { x.drawImage(logo, 52, 44, 40, 40); } catch (e) {} }
+    x.fillStyle = th.text; x.font = font(900, 26); x.fillText("THUS", 102, 76);
+    x.fillStyle = th.muted; x.font = font(500, 18); x.textAlign = "right";
+    x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 52, 72);
+    x.textAlign = "left";
+
+    let nameX = 52;
+    if (tlogo) { x.save(); rr(x, 52, 104, 66, 66, 33); x.clip(); x.drawImage(tlogo, 52, 104, 66, 66); x.restore(); nameX = 132; }
+    x.fillStyle = th.text; x.font = font(900, 58); x.fillText(tk, nameX, 160);
+    x.fillStyle = th.body; x.font = font(500, 21);
+    x.fillText((nm || "").slice(0, 30), nameX, 192);
+    if (row.industry || row.sector) { x.fillStyle = th.muted; x.font = font(600, 17); x.fillText(String(row.industry || row.sector).slice(0, 26), nameX, 218); }
+
+    const lastBar = bars.length ? bars[bars.length - 1] : null;
+    const px = row.price != null ? row.price : (lastBar ? (lastBar.c ?? lastBar.close) : null);
+    const prevBar = bars.length > 1 ? bars[bars.length - 2] : null;
+    const chg = row.change != null ? row.change : (px != null && prevBar ? ((px / (prevBar.c ?? prevBar.close) - 1) * 100) : null);
+    x.fillStyle = th.text; x.font = font(900, 62);
+    x.fillText(px != null ? Number(px).toFixed(2) : "—", 52, 300);
+    if (chg != null) { x.fillStyle = chg >= 0 ? th.up : th.down; x.font = font(800, 28); x.fillText((chg >= 0 ? "▲ +" : "▼ ") + Number(chg).toFixed(2) + "%", 52, 338); }
+
+    const rs = row.rs != null ? row.rs : (row.rs3 ?? row.rs6 ?? "—");
+    const hi = f && f.hi ? f.hi : null;
+    const toHi = (hi && px) ? ((px / hi - 1) * 100) : null;
+    const st = [["RS", String(rs ?? "—")], ["จาก 52W สูง", toHi == null ? "—" : toHi.toFixed(1) + "%"],
+                ["3 เดือน", row.p3m != null ? (row.p3m >= 0 ? "+" : "") + Number(row.p3m).toFixed(1) + "%" : "—"],
+                ["Mcap", f && f.mcap ? fmtCap(f.mcap) : "—"]];
+    st.forEach((sv, i) => {
+      const bx = 52 + (i % 2) * 232, by = 366 + Math.floor(i / 2) * 74;
+      x.fillStyle = th.panel; rr(x, bx, by, 216, 64, 14); x.fill();
+      x.strokeStyle = th.line; x.lineWidth = 1.2; x.stroke();
+      x.fillStyle = th.muted; x.font = font(600, 15); x.fillText(sv[0], bx + 14, by + 24);
+      x.fillStyle = th.text; x.font = font(800, 24); x.fillText(sv[1], bx + 14, by + 52);
     });
 
-    // ท้าย
-    x.fillStyle = th.muted; x.font = font(500, 24);
-    x.textAlign = "right";
-    x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 82);
+    const chips = f ? fundChips(f).filter((kv) => !/mcap|มูลค่าตลาด/i.test(String(kv[0]))).slice(0, 4) : [];
+    chips.forEach((kv, i) => {
+      const bx = 52 + (i % 2) * 232, by = 512 + Math.floor(i / 2) * 26;
+      x.fillStyle = th.muted; x.font = font(600, 14); x.fillText(kv[0], bx, by);
+      x.fillStyle = th.text; x.font = font(800, 19); x.fillText(kv[1], bx + x.measureText(kv[0]).width + 10, by);
+    });
+
+    const box = { x: 520, y: 100, w: W - 570, h: H - 190 };
+    x.fillStyle = th.panel; rr(x, box.x, box.y, box.w, box.h, 22); x.fill();
+    x.strokeStyle = th.line; x.lineWidth = 2; x.stroke();
+    drawChartBlock(x, th, bars, { ...box, pl: 40, pr: 90, pt: 44, pb: 40 }, { n: 120 });
+
+    x.fillStyle = th.muted; x.font = font(500, 16); x.textAlign = "right";
+    x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 52, H - 46);
     x.textAlign = "left";
     return c;
   }
@@ -816,37 +997,61 @@
         } catch (e) { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); }
       };
     },
-    async open(tk, nm, mk) {
+    async open(tk, nm, mk, fmt) {
       const box = ensureShareBox();
       box.classList.add("on");
       const img = document.getElementById("shImg");
       img.src = "";
-      let url = "";
-      try {
-        url = (await draw(tk, nm, mk, true)).toDataURL("image/png");
-      } catch (e) {
-        // โลโก้หุ้นบางตัวไม่มี CORS → canvas tainted: วาดใหม่โดยใช้ตัวอักษรย่อแทน
-        try { url = (await draw(tk, nm, mk, false)).toDataURL("image/png"); } catch (e2) { url = ""; }
-      }
-      if (!url) { box.classList.remove("on"); alert("สร้างการ์ดไม่สำเร็จ ลองใหม่อีกครั้ง"); return; }
-      img.src = url;
-      const fname = `rsdash_${tk}_${new Date().toISOString().slice(0, 10)}.png`;
-      document.getElementById("shDl").onclick = () => {
-        const a = document.createElement("a"); a.href = url; a.download = fname; a.click();
-      };
-      document.getElementById("shShare").onclick = async () => {
+      const render = async (m) => {
         try {
-          const blob = await (await fetch(url)).blob();
-          const file = new File([blob], fname, { type: "image/png" });
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({ files: [file], title: tk + " · RS Dashboard" });
-          } else {
-            const a = document.createElement("a"); a.href = url; a.download = fname; a.click();
-          }
+          return (await (m === "wide" ? drawWide(tk, nm, mk, true) : draw(tk, nm, mk, true))).toDataURL("image/png");
         } catch (e) {
-          const a = document.createElement("a"); a.href = url; a.download = fname; a.click();
+          try { return (await (m === "wide" ? drawWide(tk, nm, mk, false) : draw(tk, nm, mk, false))).toDataURL("image/png"); }
+          catch (e2) { return ""; }
         }
       };
+      const cur = { mode: (fmt === "wide") ? "wide" : "card", url: "" };
+      cur.url = await render(cur.mode);
+      if (!cur.url) { box.classList.remove("on"); alert("สร้างการ์ดไม่สำเร็จ ลองใหม่อีกครั้ง"); return; }
+      img.src = cur.url;
+      const fname = (m) => `rsdash_${tk}_${m === "wide" ? "fb" : "card"}_${new Date().toISOString().slice(0, 10)}.png`;
+
+      let fb = document.getElementById("shFmt");
+      if (!fb) {
+        fb = document.createElement("button");
+        fb.id = "shFmt"; fb.className = "sh-btn";
+        const row = document.querySelector(".sh-box .sh-row");
+        if (row) row.insertBefore(fb, row.firstChild);
+      }
+      const paintFmt = () => { fb.textContent = cur.mode === "wide" ? "สัดส่วน 4:5" : "สัดส่วน Facebook"; };
+      paintFmt();
+      fb.onclick = async () => {
+        fb.disabled = true;
+        const next = cur.mode === "wide" ? "card" : "wide";
+        const u2 = await render(next);
+        if (u2) { cur.url = u2; cur.mode = next; img.src = u2; paintFmt(); bind(); }
+        fb.disabled = false;
+      };
+
+      function bind() {
+        document.getElementById("shDl").onclick = () => {
+          const a = document.createElement("a"); a.href = cur.url; a.download = fname(cur.mode); a.click();
+        };
+        document.getElementById("shShare").onclick = async () => {
+          try {
+            const blob = await (await fetch(cur.url)).blob();
+            const file = new File([blob], fname(cur.mode), { type: "image/png" });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({ files: [file], title: tk + " · RS Dashboard" });
+            } else {
+              const a = document.createElement("a"); a.href = cur.url; a.download = fname(cur.mode); a.click();
+            }
+          } catch (e) {
+            const a = document.createElement("a"); a.href = cur.url; a.download = fname(cur.mode); a.click();
+          }
+        };
+      }
+      bind();
     },
   };
 
