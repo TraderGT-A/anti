@@ -330,6 +330,79 @@
     return c;
   }
 
+
+  /* ---------- การ์ดกราฟรวม: ตารางมินิชาร์ต ---------- */
+  function drawMiniCandles(x, bars, px, py, pw, ph, up, dn) {
+    if (!bars || bars.length < 5) return;
+    const b = bars.slice(-60);
+    let lo = Infinity, hi = -Infinity;
+    b.forEach((d) => { if (d.low < lo) lo = d.low; if (d.high > hi) hi = d.high; });
+    if (!(hi > lo)) return;
+    const n = b.length, cw = pw / n;
+    const Y = (v) => py + ph - ((v - lo) / (hi - lo)) * ph;
+    b.forEach((d, i) => {
+      const cx = px + i * cw + cw / 2;
+      const col = d.close >= d.open ? up : dn;
+      x.strokeStyle = col; x.fillStyle = col;
+      x.lineWidth = Math.max(1, cw * 0.12);
+      x.beginPath(); x.moveTo(cx, Y(d.high)); x.lineTo(cx, Y(d.low)); x.stroke();
+      const h = Math.max(1, Math.abs(Y(d.open) - Y(d.close)));
+      x.fillRect(cx - Math.max(1, cw * 0.3), Math.min(Y(d.open), Y(d.close)), Math.max(1.6, cw * 0.6), h);
+    });
+  }
+  async function drawGrid(opts) {
+    const th = (document.documentElement.getAttribute("data-theme") === "light") ? THEMES.light : THEMES.dark;
+    const W = 1080, H = 1350;
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d");
+    const g2 = x.createLinearGradient(0, 0, W, H);
+    g2.addColorStop(0, th.bg); g2.addColorStop(1, th.bg2);
+    x.fillStyle = g2; x.fillRect(0, 0, W, H);
+    x.strokeStyle = th.line; x.lineWidth = 3; rr(x, 28, 28, W - 56, H - 56, 36); x.stroke();
+
+    const logo = await loadImg("/brand/thus-symbol-white.png");
+    if (logo) { try { x.drawImage(logo, 70, 66, 54, 54); } catch (e) {} }
+    x.fillStyle = th.text; x.font = font(900, 34); x.fillText("THUS", 140, 108);
+    x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
+    x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 100);
+    x.textAlign = "left";
+
+    x.fillStyle = th.text; x.font = font(900, 46); x.fillText(String(opts.title || "").slice(0, 30), 70, 196);
+    if (opts.sub) { x.fillStyle = th.muted; x.font = font(500, 21); x.fillText(String(opts.sub).slice(0, 72), 70, 230); }
+
+    const items = (opts.items || []).slice(0, 9);
+    const cols = 3, rows = Math.ceil(items.length / cols) || 1;
+    const X0 = 60, Y0 = 258, GW = W - 120, GH = 1000;
+    const cwid = GW / cols, chei = GH / Math.max(rows, 1);
+    const gap = 12;
+
+    items.forEach((it, i) => {
+      const cx = X0 + (i % cols) * cwid + gap / 2;
+      const cy = Y0 + Math.floor(i / cols) * chei + gap / 2;
+      const cw2 = cwid - gap, ch2 = chei - gap;
+      x.fillStyle = th.panel; rr(x, cx, cy, cw2, ch2, 16); x.fill();
+      x.strokeStyle = th.line; x.lineWidth = 1.5; x.stroke();
+
+      // หัวการ์ด: ticker + RS
+      x.fillStyle = th.text; x.font = font(800, 26); x.fillText(String(it.ticker).slice(0, 10), cx + 14, cy + 32);
+      if (it.rs != null) { x.fillStyle = th.gold; x.font = font(800, 18); x.textAlign = "right"; x.fillText("RS " + it.rs, cx + cw2 - 14, cy + 30); x.textAlign = "left"; }
+      // ราคา + %
+      const chg = Number(it.change);
+      x.fillStyle = th.body; x.font = font(700, 20);
+      x.fillText(it.price != null ? Number(it.price).toFixed(2) : "—", cx + 14, cy + 58);
+      if (Number.isFinite(chg)) {
+        x.fillStyle = chg >= 0 ? th.up : th.down; x.font = font(700, 17);
+        x.fillText((chg >= 0 ? "+" : "") + chg.toFixed(2) + "%", cx + 84, cy + 58);
+      }
+      drawMiniCandles(x, it.bars, cx + 10, cy + 70, cw2 - 20, ch2 - 92, th.up, th.down);
+    });
+
+    x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
+    x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 78);
+    x.textAlign = "left";
+    return c;
+  }
+
   /* ---------- การ์ดแชร์ ---------- */
   const THEMES = {
     dark: { bg: "#0B0910", bg2: "#15101B", panel: "#15101B", line: "#2A2233", text: "#F1EDF5", body: "#D9D2E0", muted: "#A597AD", gold: "#D4B67A", up: "#5CC6C8", down: "#F59A8C" },
@@ -547,6 +620,25 @@
   }
 
   const ShareCard = {
+    async openGrid(opts) {
+      const box = ensureShareBox();
+      box.classList.add("on");
+      const img = document.getElementById("shImg");
+      let url = "";
+      try { url = (await drawGrid(opts)).toDataURL("image/png"); } catch (e) { url = ""; }
+      if (!url) { box.classList.remove("on"); alert("สร้างการ์ดไม่สำเร็จ ลองใหม่อีกครั้ง"); return; }
+      img.src = url;
+      const fname = `rsdash_cards_${new Date().toISOString().slice(0, 10)}.png`;
+      document.getElementById("shDl").onclick = () => { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); };
+      document.getElementById("shShare").onclick = async () => {
+        try {
+          const blob = await (await fetch(url)).blob();
+          const file = new File([blob], fname, { type: "image/png" });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: opts.title || "RS Dashboard" });
+          else { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); }
+        } catch (e) { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); }
+      };
+    },
     async openHeat(opts) {
       const box = ensureShareBox();
       box.classList.add("on");

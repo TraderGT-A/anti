@@ -1043,6 +1043,11 @@ html .ht-cap { padding-top:14px; }
 #pivotPanel .pv-tbl td.c-det,
 #pivotPanel .pv-scroll .det{display:none !important}
 #pivotPanel .pv-note{gap:3px 12px;font-size:10px}
+
+/* ป้าย OHLC มุมซ้ายบนกราฟ */
+.ohlc-tip{position:absolute;left:6px;top:6px;z-index:5;display:none;padding:2px 6px;border-radius:6px;background:rgba(10,14,20,.86);border:1px solid var(--line2);color:var(--body);font-size:10.5px;line-height:1.5;font-variant-numeric:tabular-nums;pointer-events:none;white-space:nowrap}
+.ohlc-tip b{color:var(--muted);font-weight:600;margin-right:4px}
+html[data-theme="light"] .ohlc-tip{background:rgba(255,255,255,.92)}
 </style>
 </head>
 <div id="loadBar" aria-live="polite"><i class="sp"></i><span class="tx">กำลังโหลด…</span><span class="tm"></span></div>
@@ -5170,6 +5175,24 @@ function openStockList(title, sub, rows, m){
 function setClView(v){ clView=v; try{ localStorage.setItem('rsd_clview',v); }catch(e){} clRender(); }
 function setClCols(n){ clCols=n; try{ localStorage.setItem('rsd_clcols',String(n)); }catch(e){} clRender(); }
 function clPc(v){ const n=Number(v); return Number.isFinite(n) ? '<b class="'+(n>=0?'pos':'neg')+' nw"><i class="ar">'+(n>=0?'▲':'▼')+'</i> '+Math.abs(n).toFixed(1)+'%</b>' : '–'; }
+async function shareCardGrid(){
+  try{
+    const rows=(clState&&clState.rows)||[]; const m=(clState&&clState.m)||currentMarket;
+    const pick=rows.slice(0,9);
+    if(!pick.length){ alert('ยังไม่มีหุ้นในรายการ'); return; }
+    try{ loadOn('เตรียมการ์ดแชร์…'); }catch(e){}
+    const items=await Promise.all(pick.map(async s=>{
+      let bars=[];
+      try{
+        const r=await fetch(API+'/api/chart?market='+m+'&symbol='+encodeURIComponent(s.ticker)+'&interval=1d&range=1y');
+        const j=await r.json(); bars=(j&&j.data)||[];
+      }catch(e){}
+      return {ticker:s.ticker, price:s.price, change:s.change, rs:s.rs, bars:bars};
+    }));
+    try{ loadOff(); }catch(e){}
+    ShareCard.openGrid({title:(clState.title||'การ์ดกราฟ'), sub:(clState.sub?clState.sub+' · ':'')+pick.length+' ตัว · '+(m==='america'?'US':'TH'), items:items});
+  }catch(e){ try{ loadOff(); }catch(_){} alert('สร้างการ์ดไม่สำเร็จ'); }
+}
 function clCard(s,i){
   const m=clState.m, tk=s.ticker, ec=ernChips(s,m);
   const rs=Number.isFinite(Number(s.rs)) ? '<span class="rsr'+(s.rs<70?' lo':'')+'">'+s.rs+'</span>' : '';
@@ -5193,6 +5216,7 @@ function clRender(){
   wlReg('modal',S.rows,S.m,'List');
   document.getElementById('groupModalTools').innerHTML=
     '<span class="grp"><span class="lbl">คัดลอก</span>'+wlBtn('modal')+'</span>'+
+    (clView==='chart'?'<span class="grp"><button class="tf-chip" onclick="shareCardGrid()" title="แชร์การ์ดกราฟรวมเป็นรูป">แชร์การ์ด</button></span>':'')+
     '<span class="grp"><span class="lbl">มุมมอง</span><button class="tf-chip'+(clView==='chart'?' active':'')+'" onclick="setClView(\'chart\')">กราฟ</button><button class="tf-chip'+(clView==='list'?' active':'')+'" onclick="setClView(\'list\')">รายการ</button></span>'+
     (clView==='chart' ? '<span class="grp"><span class="lbl">ต่อแถว</span>'+colBtns+'</span>' : '')+(clView==='chart'?maLegendHTML()+bsLegend():'')+DOT_LEGEND;
   const body=document.getElementById('groupModalBody');
@@ -5669,6 +5693,26 @@ function drawWhenSized(el, data){
 }
 
 // drawChart รับ width เจาะจง (ไม่ autoSize — กัน width=0 บนมือถือ)
+function attachOhlcTip(el, chart, data){
+  try{
+    el.style.position='relative';
+    let tip=el.querySelector('.ohlc-tip');
+    if(!tip){ tip=document.createElement('div'); tip.className='ohlc-tip'; el.appendChild(tip); }
+    const fmt=(v)=> (v==null||!Number.isFinite(+v)) ? '–' : (+v).toFixed(2);
+    const idxOf=new Map(data.map((d,i)=>[String(d.time),i]));
+    chart.subscribeCrosshairMove(function(param){
+      if(!param || !param.time || !param.point){ tip.style.display='none'; return; }
+      const i=idxOf.get(String(param.time));
+      if(i==null){ tip.style.display='none'; return; }
+      const d=data[i], prev=i>0?data[i-1]:null;
+      const ch=(prev&&prev.close)?((d.close/prev.close)-1)*100:null;
+      tip.innerHTML='<b>'+String(param.time)+'</b> O '+fmt(d.open)+' H '+fmt(d.high)+' L '+fmt(d.low)+' C '+fmt(d.close)
+        +(ch==null?'':' <span class="'+(ch>=0?'pos':'neg')+'">'+(ch>=0?'+':'')+ch.toFixed(2)+'%</span>');
+      tip.style.display='block';
+    });
+    el.addEventListener('mouseleave',function(){ tip.style.display='none'; });
+  }catch(e){}
+}
 function drawChartW(el, raw, w){
   if(!w) w = el.clientWidth || el.parentElement?.clientWidth || 320;
   el.innerHTML='';
@@ -5683,6 +5727,7 @@ function drawChartW(el, raw, w){
     vSer=chart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol',priceLineVisible:false}); vSer.setData(data.map(d=>({time:d.time,value:d.volume,color:d.pre?'rgba(124,156,255,.45)':(d.close>=d.open?thusC().vup:thusC().vdown)})));
     chart.priceScale('vol').applyOptions({scaleMargins:{top:.82,bottom:0}});
   }
+  attachOhlcTip(el, chart, data);
   maApply(chart,data,el);
   try{ if(el.dataset&&el.dataset.tk){ const _m=el.dataset.m||currentMarket; liveReg(el,el.dataset.tk,_m,cSer,vSer); syncPx(el.dataset.tk,_m,data); } }catch(e){}
   const last=data[data.length-1];
@@ -5887,6 +5932,7 @@ async function fetchModal(iv){
         ch.priceScale('vol').applyOptions({scaleMargins:{top:.8,bottom:0}});
       }
       if(iv==='1y'||iv==='1d'){ try{ liveReg(el,activeTicker,activeMarket,cSer,vSer); syncPx(activeTicker,activeMarket,data); }catch(e){} }
+      attachOhlcTip(el, ch, data);
       maApply(ch,data,el); ((iv==='1y'||iv==='1d')?thusRange(ch,data.length,126):ch.timeScale().fitContent()); ch.timeScale().applyOptions({ rightOffset: 12 });
     });
   }catch(e){ el.innerHTML='<div class="text-center text-rose-400 text-sm">โหลดไม่สำเร็จ</div>'; }

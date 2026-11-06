@@ -24,7 +24,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=${interval}&range=${rng}`;
+    const agg = interval === "1wk" || interval === "1mo";
+    const fetchIv = agg ? "1d" : interval;
+    const fetchRng = agg ? (interval === "1mo" ? (["5y", "10y", "max"].includes(rng) ? rng : "5y") : "2y") : rng;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=${fetchIv}&range=${fetchRng}`;
     const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" } });
     const data = await r.json();
     const result = data?.chart?.result?.[0];
@@ -46,12 +49,36 @@ export default async function handler(req, res) {
         });
       }
     }
+    // รวมแท่งเอง (สัปดาห์/เดือน) จากข้อมูลรายวัน — Yahoo จัดกลุ่มเดือนเพี้ยน แท่งเดือนปัจจุบันมีแค่วันเดียว
+    let series = candles;
+    if (agg) {
+      const keyOf = (dstr) => {
+        const dt = new Date(dstr + "T00:00:00Z");
+        if (interval === "1mo") return dstr.slice(0, 7);
+        const t = new Date(Date.UTC(dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate()));
+        const dow = (t.getUTCDay() + 6) % 7;               // จันทร์ = 0
+        t.setUTCDate(t.getUTCDate() - dow);
+        return t.toISOString().slice(0, 10);
+      };
+      const groups = new Map();
+      for (const b of candles) {
+        if (typeof b.time !== "string") continue;
+        const k = keyOf(b.time);
+        const g = groups.get(k);
+        if (!g) groups.set(k, { time: b.time, open: b.open, high: b.high, low: b.low, close: b.close, volume: b.volume || 0 });
+        else {
+          g.high = Math.max(g.high, b.high); g.low = Math.min(g.low, b.low);
+          g.close = b.close; g.volume += (b.volume || 0); g.time = b.time;
+        }
+      }
+      series = [...groups.values()];
+    }
     // firstTradeDate = วันแรกที่มีการซื้อขาย (Yahoo meta) — ใช้คำนวณ "IPO มาแล้วกี่ปี"
     const ftd = result.meta?.firstTradeDate;
     return res.status(200).json({
       symbol, interval, range: rng, count: candles.length,
       firstTradeDate: ftd ? new Date(ftd * 1000).toISOString().slice(0, 10) : null,
-      data: candles
+      data: series
     });
   } catch (e) {
     return res.status(500).json({ error: e.message });
