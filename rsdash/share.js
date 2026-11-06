@@ -590,21 +590,22 @@
 
 
   // กล่องสไตล์กระจกนูน (glassmorphism): ไล่แสงบน-ล่าง + ขอบไฮไลต์ + เงาใน
+  const GLASS = { a: 0.055, b: 0.018, hi: 0.14, sh: 0.55 };
   function glassPanel(x, th, bx, by, bw, bh, r) {
     const rr2 = r || 20;
     x.save();
     const g = x.createLinearGradient(bx, by, bx, by + bh);
-    g.addColorStop(0, "rgba(255,255,255,0.055)");
-    g.addColorStop(1, "rgba(255,255,255,0.018)");
+    g.addColorStop(0, "rgba(255,255,255," + GLASS.a + ")");
+    g.addColorStop(1, "rgba(255,255,255," + GLASS.b + ")");
     x.save();
-    x.shadowColor = "rgba(0,0,0,0.55)"; x.shadowBlur = 18; x.shadowOffsetY = 6;
+    x.shadowColor = "rgba(0,0,0," + GLASS.sh + ")"; x.shadowBlur = 18; x.shadowOffsetY = 6;
     x.fillStyle = g; rr(x, bx, by, bw, bh, rr2); x.fill();
     x.restore();
     // ขอบบนสว่างบาง ๆ (ให้ความรู้สึกนูนขึ้น)
     x.beginPath();
     x.moveTo(bx + rr2 * 1.1, by + 1);
     x.lineTo(bx + bw - rr2 * 1.1, by + 1);
-    x.strokeStyle = "rgba(255,255,255,0.14)";
+    x.strokeStyle = "rgba(255,255,255," + GLASS.hi + ")";
     x.lineWidth = 1; x.stroke();
     x.restore();
   }
@@ -960,6 +961,7 @@
     let nameX = 52;
     if (tlogo) { x.save(); rr(x, 52, 104, 66, 66, 33); x.clip(); x.drawImage(tlogo, 52, 104, 66, 66); x.restore(); nameX = 132; }
     x.fillStyle = th.text; x.font = font(900, 58); x.fillText(tk, nameX, 160);
+    const tkW0 = x.measureText(tk).width;                 // วัดด้วยฟอนต์ชื่อย่อก่อนเปลี่ยนฟอนต์
     x.fillStyle = th.body; x.font = font(500, 21);
     x.fillText((nm || "").slice(0, 30), nameX, 192);
     if (row.industry || row.sector) { x.fillStyle = th.muted; x.font = font(600, 17); x.fillText(String(row.industry || row.sector).slice(0, 26), nameX, 218); }
@@ -968,9 +970,16 @@
     const px = row.price != null ? row.price : (lastBar ? (lastBar.c ?? lastBar.close) : null);
     const prevBar = bars.length > 1 ? bars[bars.length - 2] : null;
     const chg = row.change != null ? row.change : (px != null && prevBar ? ((px / (prevBar.c ?? prevBar.close) - 1) * 100) : null);
-    x.fillStyle = th.text; x.font = font(900, 62);
-    x.fillText(px != null ? Number(px).toFixed(2) : "—", 52, 300);
-    if (chg != null) { x.fillStyle = chg >= 0 ? th.up : th.down; x.font = font(800, 28); x.fillText((chg >= 0 ? "▲ +" : "▼ ") + Number(chg).toFixed(2) + "%", 52, 338); }
+    // ราคา + % วางต่อจากชื่อย่อ (ใช้พื้นที่ว่างด้านขวา)
+    let pxX = nameX + tkW0 + 26;
+    x.fillStyle = th.text; x.font = font(900, 46);
+    const priceTxt2 = px != null ? Number(px).toFixed(2) : "—";
+    x.fillText(priceTxt2, pxX, 158);
+    if (chg != null) {
+      pxX += x.measureText(priceTxt2).width + 14;
+      x.fillStyle = chg >= 0 ? th.up : th.down; x.font = font(800, 24);
+      x.fillText((chg >= 0 ? "▲ +" : "▼ ") + Number(chg).toFixed(2) + "%", pxX, 156);
+    }
 
     const rs = row.rs != null ? row.rs : (row.rs3 ?? row.rs6 ?? "—");
     const hi = f && f.hi ? f.hi : null;
@@ -979,7 +988,7 @@
                 ["3 เดือน", row.p3m != null ? (row.p3m >= 0 ? "+" : "") + Number(row.p3m).toFixed(1) + "%" : "—"],
                 ["Mcap", f && f.mcap ? fmtCap(f.mcap) : "—"]];
     st.forEach((sv, i) => {
-      const bx = 52 + (i % 2) * 236, by = 356 + Math.floor(i / 2) * 72;
+      const bx = 52 + (i % 2) * 236, by = 268 + Math.floor(i / 2) * 76;
       glassPanel(x, th, bx, by, 220, 62, 14);
       x.fillStyle = th.muted; x.font = labelFont(600, 13); x.fillText(sv[0], bx + 14, by + 23);
       const neg = /^-/.test(String(sv[1]));
@@ -989,7 +998,7 @@
 
     const chips = f ? fundChips(f).filter((kv) => !/mcap|มูลค่าตลาด/i.test(String(kv[0]))).slice(0, 4) : [];
     chips.forEach((kv, i) => {
-      const bx = 52 + (i % 4) * 118, by = 520;
+      const bx = 52 + (i % 4) * 118, by = 448;
       x.fillStyle = th.muted; x.font = labelFont(500, 12);
       x.fillText(String(kv[0]).slice(0, 12), bx, by);
       x.fillStyle = th.text; x.font = font(700, 21);
@@ -1067,6 +1076,8 @@
   }
 
   const ShareCard = {
+    setGlass(o) { Object.assign(GLASS, o || {}); return GLASS; },
+    getGlass() { return Object.assign({}, GLASS); },
     async openGrid(opts) {
       await ensureFonts();
       const oldFmt = document.getElementById("shFmt"); if (oldFmt) oldFmt.remove();
