@@ -156,7 +156,6 @@
     const grd = x.createLinearGradient(0, 0, W, H);
     grd.addColorStop(0, th.bg); grd.addColorStop(1, th.bg2);
     x.fillStyle = grd; x.fillRect(0, 0, W, H);
-    x.strokeStyle = th.line; x.lineWidth = 2; rr(x, 26, 26, W - 52, H - 52, 30); x.stroke();
 
     if (logo) { try { x.drawImage(logo, 70, 60, 44, 44); } catch (e) {} }
     x.fillStyle = th.text; x.font = font(800, 30); x.fillText("THUS", 126, 94);
@@ -223,9 +222,9 @@
       const px = r.price != null ? Number(r.price).toFixed(2) : "—";
       const ch = r.change != null ? Number(r.change) : null;
       x.textAlign = "right";
-      x.fillStyle = th.text; x.font = font(700, 27); x.fillText(px, W - 250, y + boxH / 2 - 2);
+      x.fillStyle = th.text; fitSize(x, px, 180, 36, 18, 700); x.fillText(px, W - 250, y + boxH / 2 - 2);
       if (ch != null) {
-        x.fillStyle = ch >= 0 ? th.up : th.down; x.font = font(600, 16);
+        x.fillStyle = ch >= 0 ? th.up : th.down; x.font = font(600, 18);
         x.fillText((ch >= 0 ? "+" : "") + ch.toFixed(2) + "%", W - 250, y + boxH / 2 + 20);
       }
 
@@ -294,12 +293,14 @@
     }
     return out;
   }
+  const HEAT_MID = [22, 18, 28];
   function heatColor(v, th) {
+    if (!v || Math.abs(v) < 0.05) return `rgb(${HEAT_MID.join(",")})`;   // 0% = กลางจืด ไม่ติดเขียว/แดง
     const t = Math.max(-1, Math.min(1, v / 3));
-    const mid = th === THEMES.dark ? [26, 22, 32] : [232, 229, 220];
-    const up = [24, 158, 106], dn = [192, 57, 43];
-    const end = t >= 0 ? up : dn, k = Math.abs(t);
-    const c = mid.map((m, i) => Math.round(m + (end[i] - m) * (0.18 + 0.82 * k)));
+    const mid = th === THEMES.dark ? HEAT_MID : [232, 229, 220];
+    const up = [79, 209, 181], dn = [240, 138, 126];
+    const end = t > 0 ? up : dn, k = Math.abs(t);
+    const c = mid.map((m, i) => Math.round(m + (end[i] - m) * (0.16 + 0.84 * k)));
     return `rgb(${c[0]},${c[1]},${c[2]})`;
   }
   async function drawHeat(opts) {
@@ -310,7 +311,6 @@
     const g2 = x.createLinearGradient(0, 0, W, H);
     g2.addColorStop(0, th.bg); g2.addColorStop(1, th.bg2);
     x.fillStyle = g2; x.fillRect(0, 0, W, H);
-    x.strokeStyle = th.line; x.lineWidth = 3; rr(x, 28, 28, W - 56, H - 56, 36); x.stroke();
 
     const logo = await loadImg("/brand/thus-symbol-white.png");
     if (logo) { try { x.drawImage(logo, 70, 66, 54, 54); } catch (e) {} }
@@ -385,7 +385,7 @@
     x.fillText(byChg ? "สี = % เปลี่ยนวันนี้ · ขนาด = ขนาดการเปลี่ยน (%)" : "สี = % เปลี่ยนวันนี้ · ขนาด = มูลค่าตลาด", 70, ly);
     ["-3%", "0", "+3%"].forEach((t, i) => {
       const bx = W - 70 - 240 + i * 80;
-      x.fillStyle = i === 0 ? "rgb(192,57,43)" : (i === 1 ? (th === THEMES.dark ? "rgb(26,22,32)" : "rgb(232,229,220)") : "rgb(24,158,106)");
+      x.fillStyle = i === 0 ? heatColor(-3, th) : (i === 1 ? heatColor(0, th) : heatColor(3, th));
       x.fillRect(bx, ly - 16, 26, 16);
       x.fillStyle = th.muted; x.font = font(500, 18); x.fillText(t, bx + 32, ly);
     });
@@ -494,8 +494,10 @@
         x.fillText(String(it.ticker || "").slice(0, 10), tx, cy + 34 * sc);
 
         const chg = Number(it.change);
-        x.fillStyle = th.body; x.font = font(600, 19 * sc);
+        x.fillStyle = th.body;
         const priceTxt = it.price != null ? Number(it.price).toFixed(2) : "—";
+        fitSize(x, priceTxt, cw2 * 0.46, Math.round(27 * sc), 14, 700);
+        const pSize = x.font;
         x.fillText(priceTxt, tx, cy + 60 * sc);
         const pw0 = x.measureText(priceTxt).width;
         if (Number.isFinite(chg)) {
@@ -512,8 +514,8 @@
           x.beginPath(); x.arc(cxr, cyr, rad, 0, Math.PI * 2); x.stroke();
           x.strokeStyle = th.gold;
           x.beginPath(); x.arc(cxr, cyr, rad, -Math.PI / 2, -Math.PI / 2 + (rs / 99) * Math.PI * 2); x.stroke();
-          x.fillStyle = th.text; x.font = font(700, 17 * sc); x.textAlign = "center";
-          x.fillText(String(Math.round(rs)), cxr, cyr + 6 * sc);
+          x.fillStyle = th.text; fitSize(x, String(Math.round(rs)), rad * 1.5, Math.round(20 * sc), 12, 700); x.textAlign = "center";
+          x.fillText(String(Math.round(rs)), cxr, cyr + 7 * sc);
           x.textAlign = "left";
         }
 
@@ -590,6 +592,40 @@
 
 
   // กล่องสไตล์กระจกนูน (glassmorphism): ไล่แสงบน-ล่าง + ขอบไฮไลต์ + เงาใน
+
+
+  // RS สำรอง: ถ้าหน้าปัจจุบันยังไม่โหลดข้อมูลสแกน ให้อ่านจาก rshist lite
+  const RS_CACHE = {};
+  async function rsFallback(tk, mk) {
+    const k = mk === "america" ? "us" : "th";
+    try {
+      if (!RS_CACHE[k]) {
+        const r = await fetch("/rshist_" + k + "_lite.json", { cache: "force-cache" });
+        const j = await r.json();
+        const map = {};
+        const rsMap = j.rs || {};
+        Object.keys(rsMap).forEach(function (t) {
+          const arr = rsMap[t];
+          if (Array.isArray(arr) && arr.length) map[t] = arr[arr.length - 1];
+          else if (typeof arr === "number") map[t] = arr;
+        });
+        RS_CACHE[k] = map;
+      }
+      return RS_CACHE[k][tk];
+    } catch (e) { return undefined; }
+  }
+
+  // เลือกขนาดฟอนต์ใหญ่สุดที่ยังพอดีความกว้าง (ตัวเลขอ่านชัดขึ้น)
+  function fitSize(x, txt, maxW, start, min, weight, fam) {
+    let sz = start;
+    while (sz > min) {
+      x.font = (fam === "label" ? labelFont(weight, sz) : font(weight, sz));
+      if (x.measureText(txt).width <= maxW) break;
+      sz -= 1;
+    }
+    x.font = (fam === "label" ? labelFont(weight, sz) : font(weight, sz));
+    return sz;
+  }
   const GLASS = { a: 0.028, b: 0.009, hi: 0.07, sh: 0.42 };
   function glassPanel(x, th, bx, by, bw, bh, r) {
     const rr2 = r || 20;
@@ -727,7 +763,7 @@
   function drawTrendBlock(x, th, q, box) {
     const pts = (q || []).filter((z) => z && z.d && (z.rev != null || z.ni != null));
     if (pts.length < 2) return;
-    const padL = 18, padR = 18, padT = 46, padB = 34;
+    const padL = 18, padR = 18, padT = 46, padB = 42;
     const px = box.x + padL, py = box.y + padT, pw = box.w - padL - padR, ph = box.h - padT - padB;
     const revs = pts.map((z) => Number(z.rev) || 0), nis = pts.map((z) => Number(z.ni) || 0);
     const mxRev = Math.max(...revs.map(Math.abs), 1), mxNi = Math.max(...nis.map(Math.abs), 1);
@@ -766,7 +802,7 @@
       x.font = font(700, 11); x.textAlign = "center";
       if (slot > 62) {
         if (rH > 14) { x.fillStyle = "#E2BE6E"; x.fillText(fmtS(rv), cx - bw / 2 - bgap / 4, (rv >= 0 ? base - rH - 7 : base + rH + 13)); }
-        if (nH > 14) { x.fillStyle = th.up; x.fillText(fmtS(ni), cx + bw / 2 + bgap / 4, (ni >= 0 ? base - nH - 7 : base + nH + 13)); }
+        if (nH > 26) { x.fillStyle = th.up; x.fillText(fmtS(ni), cx + bw / 2 + bgap / 4, (ni >= 0 ? base - nH - 7 : base + nH + 13)); }
       }
       x.textAlign = "left";
     });
@@ -822,7 +858,6 @@
     const grd = x.createLinearGradient(0, 0, W, H);
     grd.addColorStop(0, th.bg); grd.addColorStop(1, th.bg2);
     x.fillStyle = grd; x.fillRect(0, 0, W, H);
-    x.strokeStyle = th.line; x.lineWidth = 3; rr(x, 28, 28, W - 56, H - 56, 36); x.stroke();
 
     // หัวเว็บ
     if (logo) { try { x.drawImage(logo, 70, 62, 48, 48); } catch (e) {} }
@@ -863,13 +898,21 @@
     x.textAlign = "left";
 
     // ── ชิปสถิติ 4 ช่อง ──
-    const rs = row.rs != null ? row.rs : (row.rs3 != null ? row.rs3 : (row.rs6 ?? row.rs1 ?? "—"));
+    let rs = row.rs != null ? row.rs : (row.rs3 != null ? row.rs3 : (row.rs6 ?? row.rs1 ?? null));
+    if (rs == null || Number(rs) === 0) { const rf = await rsFallback(tk, mk); if (rf != null) rs = rf; }
+    if (rs == null) rs = "—";
     const hi = f && f.hi ? f.hi : null;
     const toHi = (hi && px) ? ((px / hi - 1) * 100) : null;
+    let p3 = row.p3m;
+    if (p3 == null && bars && bars.length > 64) {
+      const c0 = bars[bars.length - 1], c1 = bars[bars.length - 64];
+      const v0 = c0.c != null ? c0.c : c0.close, v1 = c1.c != null ? c1.c : c1.close;
+      if (v0 && v1) p3 = (v0 / v1 - 1) * 100;
+    }
     const stats = [
       ["RS", String(rs ?? "—")],
       ["จาก 52W สูง", toHi == null ? "—" : toHi.toFixed(1) + "%"],
-      ["3 เดือน", row.p3m != null ? (row.p3m >= 0 ? "+" : "") + Number(row.p3m).toFixed(1) + "%" : "—"],
+      ["3 เดือน", p3 != null ? (p3 >= 0 ? "+" : "") + Number(p3).toFixed(1) + "%" : "—"],
       ["Mcap", f && f.mcap ? fmtCap(f.mcap) : (row.mcap ? fmtCap(row.mcap) : "—")],
     ];
     const bw = (W - 140 - 3 * 14) / 4;
@@ -879,14 +922,14 @@
       glassPanel(x, th, bx, by, bw, bh, 14);
       if (i === 0) {
         // RS = วงแหวนกลางกล่อง
-        const rr0 = 27, cyc = by + bh / 2 - 4;
+        const rr0 = 34, cyc = by + bh / 2 - 2;
         const val = Math.max(0, Math.min(99, Number(sv[1]) || 0));
         x.lineWidth = 5; x.lineCap = "round";
         x.strokeStyle = th.line; x.beginPath(); x.arc(cx, cyc, rr0, 0, Math.PI * 2); x.stroke();
         x.strokeStyle = th.gold; x.beginPath();
         x.arc(cx, cyc, rr0, -Math.PI / 2, -Math.PI / 2 + (val / 99) * Math.PI * 2); x.stroke();
-        x.fillStyle = th.text; x.font = font(700, 24); x.textAlign = "center";
-        x.fillText(String(Math.round(val)), cx, cyc + 9);
+        x.fillStyle = th.text; fitSize(x, String(Math.round(val)), rr0 * 1.45, 32, 18, 700); x.textAlign = "center";
+        x.fillText(String(Math.round(val)), cx, cyc + 10);
         x.fillStyle = th.muted; x.font = font(600, 11);
         try { x.letterSpacing = "1px"; } catch (e) {}
         x.fillText("RS", cx, by + bh - 8);
@@ -895,11 +938,11 @@
         return;
       }
       x.textAlign = "center";
-      x.fillStyle = th.body; x.font = font(600, 13);
+      x.fillStyle = th.body; x.font = font(600, 14);
       try { x.letterSpacing = "0.7px"; } catch (e) {}
       x.fillText(String(sv[0]).toUpperCase(), cx, by + 30);
       try { x.letterSpacing = "0px"; } catch (e) {}
-      x.fillStyle = th.text; x.font = font(700, 30);
+      x.fillStyle = th.text; fitSize(x, String(sv[1]), bw - 16, 34, 20, 700);
       x.fillText(sv[1], cx, by + 66);
       x.textAlign = "left";
     });
@@ -945,8 +988,9 @@
       while (x.measureText(lb).width > cw3 - 20 && lb.length > 4) lb = lb.slice(0, -1);
       x.fillText(lb, cx + cw3 / 2, cy + 25);
       try { x.letterSpacing = "0px"; } catch (e) {}
-      x.fillStyle = th.text; x.font = font(700, 25);
-      x.fillText(kv[1], cx + cw3 / 2, cy + 54);
+      x.fillStyle = th.text;
+      fitSize(x, String(kv[1]), cw3 - 14, 40, 22, 700);
+      x.fillText(kv[1], cx + cw3 / 2, cy + 56);
       x.textAlign = "left";
     });
 
@@ -995,7 +1039,6 @@
     const grd = x.createLinearGradient(0, 0, W, H);
     grd.addColorStop(0, th.bg); grd.addColorStop(1, th.bg2);
     x.fillStyle = grd; x.fillRect(0, 0, W, H);
-    x.strokeStyle = th.line; x.lineWidth = 3; rr(x, 20, 20, W - 40, H - 40, 28); x.stroke();
 
     if (logo) { try { x.drawImage(logo, 52, 44, 40, 40); } catch (e) {} }
     x.fillStyle = th.text; x.font = font(900, 26); x.fillText("THUS", 102, 76);
@@ -1026,11 +1069,13 @@
       x.fillText((chg >= 0 ? "▲ +" : "▼ ") + Number(chg).toFixed(2) + "%", pxX, 156);
     }
 
-    const rs = row.rs != null ? row.rs : (row.rs3 ?? row.rs6 ?? "—");
+    let rs = row.rs != null ? row.rs : (row.rs3 ?? row.rs6 ?? null);
+    if (rs == null || Number(rs) === 0) { const rf = await rsFallback(tk, mk); if (rf != null) rs = rf; }
+    if (rs == null) rs = "—";
     const hi = f && f.hi ? f.hi : null;
     const toHi = (hi && px) ? ((px / hi - 1) * 100) : null;
     const st = [["RS", String(rs ?? "—")], ["จาก 52W สูง", toHi == null ? "—" : toHi.toFixed(1) + "%"],
-                ["3 เดือน", row.p3m != null ? (row.p3m >= 0 ? "+" : "") + Number(row.p3m).toFixed(1) + "%" : "—"],
+                ["3 เดือน", p3 != null ? (p3 >= 0 ? "+" : "") + Number(p3).toFixed(1) + "%" : "—"],
                 ["Mcap", f && f.mcap ? fmtCap(f.mcap) : "—"]];
     st.forEach((sv, i) => {
       const bx = 52 + (i % 2) * 236, by = 268 + Math.floor(i / 2) * 76;
@@ -1042,7 +1087,8 @@
       x.fillText(lbW, bx + 110, by + 23);
       const neg = /^-/.test(String(sv[1]));
       x.fillStyle = i === 1 || i === 2 ? (neg ? th.down : th.up) : th.text;
-      x.font = font(700, 24); x.fillText(sv[1], bx + 110, by + 50);
+      fitSize(x, String(sv[1]), 200, 40, 22, 700);
+      x.fillText(sv[1], bx + 110, by + 52);
       x.textAlign = "left";
     });
 
@@ -1053,8 +1099,9 @@
       x.textAlign = "center";
       x.fillStyle = th.muted; x.font = labelFont(500, 12);
       x.fillText(String(kv[0]).slice(0, 12), bx, by);
-      x.fillStyle = th.text; x.font = font(700, 21);
-      x.fillText(String(kv[1]).slice(0, 8), bx, by + 28);
+      x.fillStyle = th.text;
+      fitSize(x, String(kv[1]).slice(0, 8), vW - 6, 30, 16, 700);
+      x.fillText(String(kv[1]).slice(0, 8), bx, by + 29);
       x.textAlign = "left";
     });
 
