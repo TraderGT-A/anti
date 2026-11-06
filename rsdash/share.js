@@ -54,16 +54,30 @@
   function quarterBars(f, cur) {
     const q = (f && f.q) || [];
     if (!q.length) return "";
-    const mx = Math.max(...q.map((x) => Math.abs(x.ni || 0)), 1);
+    const mxN = Math.max(...q.map((x) => Math.abs(x.ni || 0)), 1);
+    const mxR = Math.max(...q.map((x) => Math.abs(x.rev || 0)), 1);
     const bars = q.map((x) => {
-      const h = Math.max(4, Math.round((Math.abs(x.ni || 0) / mx) * 54));
+      const hN = Math.max(3, Math.round((Math.abs(x.ni || 0) / mxN) * 52));
+      const hR = Math.max(3, Math.round((Math.abs(x.rev || 0) / mxR) * 52));
       const up = (x.ni || 0) >= 0;
-      const lab = (cur || "") + fmtBig(x.ni || 0);
-      const dt = String(x.d || ""); const yy = Number(dt.slice(2, 4)), mm = Number(dt.slice(5, 7));
+      const dt = String(x.d || "");
+      const yy = Number(dt.slice(2, 4)), mm = Number(dt.slice(5, 7));
       const ql = mm ? ("Q" + Math.ceil(mm / 3) + "/" + (yy + 43)) : dt.slice(2, 7);
-      return `<div class="fb-q"><span class="fb-qv">${esc(lab)}</span><div class="fb-b" style="height:${h}px;background:${up ? "var(--up)" : "var(--down)"};opacity:.9" title="${esc(dt)} · กำไร ${lab}"></div><span class="fb-qd">${esc(ql)}</span></div>`;
+      const tip = `${dt} · รายได้ ${cur}${fmtBig(x.rev)} · กำไร ${cur}${fmtBig(x.ni)}`;
+      return `<div class="fb-q" title="${esc(tip)}">
+        <span class="fb-qv">${esc(cur + fmtBig(x.ni))}</span>
+        <div class="fb-pair">
+          <div class="fb-b rv" style="height:${hR}px"></div>
+          <div class="fb-b ni" style="height:${hN}px;background:${up ? "var(--up)" : "var(--down)"}"></div>
+        </div>
+        <span class="fb-qd">${esc(ql)}</span></div>`;
     }).join("");
-    return `<div class="fb-qbox"><div class="fb-qlbl">กำไรสุทธิรายไตรมาส <i>(${q.length} ไตรมาสล่าสุด · ${cur === "$" ? "USD" : "ล้านบาท"})</i></div><div class="fb-bars">${bars}</div></div>`;
+    return `<div class="fb-qbox">
+      <div class="fb-qlbl">รายได้และกำไรสุทธิรายไตรมาส <i>(${q.length} ไตรมาสล่าสุด · ${cur === "$" ? "USD" : "ล้านบาท"})</i>
+        <span class="fb-lg"><i class="rv"></i>รายได้</span><span class="fb-lg"><i class="ni"></i>กำไรสุทธิ</span></div>
+      <div class="fb-bars">${bars}</div>
+      <div class="fb-note">แท่งรายได้และกำไรใช้สเกลของตัวเอง · ตัวเลขบนหัวแท่งคือกำไรสุทธิ</div>
+    </div>`;
   }
 
   async function FundRender(tk, mk, elId) {
@@ -125,14 +139,14 @@
     return rows.find((x) => x.ticker === tk) || hit || null;
   }
 
-  async function draw(tk, nm, mk) {
+  async function draw(tk, nm, mk, withLogo) {
     const th = (document.documentElement.getAttribute("data-theme") === "light") ? THEMES.light : THEMES.dark;
     const W = 1080, H = 1350;
     const c = document.createElement("canvas");
     c.width = W; c.height = H;
     const x = c.getContext("2d");
     const row = (await rowOf(tk, mk)) || {};
-    const [f, bars, logo, tlogo] = await Promise.all([loadFund(tk, mk), barsOf(tk, mk), loadImg("/brand/thus-symbol-white.png"), stockLogo(tk, mk)]);
+    const [f, bars, logo, tlogo] = await Promise.all([loadFund(tk, mk), barsOf(tk, mk), loadImg("/brand/thus-symbol-white.png"), (withLogo === false ? loadImg(avatarData(tk)) : stockLogo(tk, mk))]);
 
     // พื้นหลัง
     const grd = x.createLinearGradient(0, 0, W, H);
@@ -254,10 +268,16 @@
   .fb-qbox{border-top:1px solid var(--line);padding-top:8px}
   .fb-qlbl{font-size:10.5px;color:var(--muted);margin-bottom:6px}
   .fb-qlbl i{font-style:normal;color:var(--faint)}
-  .fb-bars{display:flex;align-items:flex-end;justify-content:space-around;gap:8px;height:86px;padding-bottom:0}
+  .fb-bars{display:flex;align-items:flex-end;justify-content:space-around;gap:6px;height:96px}
   .fb-q{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;flex:1;min-width:0}
   .fb-qv{font-size:10.5px;color:var(--body);font-variant-numeric:tabular-nums}
-  .fb-b{width:min(100%,30px);border-radius:4px 4px 0 0}
+  .fb-pair{display:flex;align-items:flex-end;gap:3px;height:56px}
+  .fb-b{width:12px;border-radius:3px 3px 0 0;flex:none}
+  .fb-b.rv{background:var(--mk);opacity:.55}
+  .fb-lg{display:inline-flex;align-items:center;gap:4px;margin-left:8px;color:var(--muted)}
+  .fb-lg i{width:8px;height:8px;border-radius:2px;display:inline-block}
+  .fb-lg i.rv{background:var(--mk);opacity:.55}.fb-lg i.ni{background:var(--up)}
+  .fb-note{font-size:9.5px;color:var(--faint);margin-top:5px}
   .fb-qd{font-size:10.5px;color:var(--muted);white-space:nowrap}
   .sh-modal{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:14px}
   .sh-modal.on{display:flex}
@@ -285,8 +305,10 @@
       if (!box) return;
       box.classList.add("on");
       const img = document.getElementById("shImg");
-      const c = await drawList(opts);
-      const url = c.toDataURL("image/png");
+      let url = "";
+      try { url = (await drawList(opts)).toDataURL("image/png"); }
+      catch (e) { url = ""; }
+      if (!url) { box.classList.remove("on"); alert("สร้างการ์ดไม่สำเร็จ ลองใหม่อีกครั้ง"); return; }
       img.src = url;
       const fname = `rsdash_${(opts.title || "list").replace(/[^\w\u0E00-\u0E7F]+/g, "_")}_${new Date().toISOString().slice(0, 10)}.png`;
       document.getElementById("shDl").onclick = () => { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); };
@@ -313,8 +335,14 @@
       box.classList.add("on");
       const img = document.getElementById("shImg");
       img.src = "";
-      const c = await draw(tk, nm, mk);
-      const url = c.toDataURL("image/png");
+      let url = "";
+      try {
+        url = (await draw(tk, nm, mk, true)).toDataURL("image/png");
+      } catch (e) {
+        // โลโก้หุ้นบางตัวไม่มี CORS → canvas tainted: วาดใหม่โดยใช้ตัวอักษรย่อแทน
+        try { url = (await draw(tk, nm, mk, false)).toDataURL("image/png"); } catch (e2) { url = ""; }
+      }
+      if (!url) { box.classList.remove("on"); alert("สร้างการ์ดไม่สำเร็จ ลองใหม่อีกครั้ง"); return; }
       img.src = url;
       const fname = `rsdash_${tk}_${new Date().toISOString().slice(0, 10)}.png`;
       document.getElementById("shDl").onclick = () => {
