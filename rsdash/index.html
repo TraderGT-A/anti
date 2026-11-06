@@ -5016,10 +5016,18 @@ async function bsStamp(el,data){
   const cb=cut?cb0.filter(b=>String(b.time)<=cut):cb0;
   const fsB=bsFileSig(rh,tk), rB=fsB?{v:fsB.v,asOf:fsB.asOf}:null;
   const r=rB?rB:bsEval(s,cb,(s&&Number.isFinite(Number(s.rs)))?Number(s.rs):bsRsAt(rh,tk,cb[cb.length-1].time)), badge='<span class="bsb bs-'+r.v+'" title="'+r.why.join('\n').replace(/"/g,'')+'">'+r.v+'</span>';
-  const root=el.closest('.scard,.ldc'), slot=root&&root.querySelector('.bs-slot'); let host;
-  if(slot){ slot.innerHTML=badge; host=slot; }   // ป้ายเล็กในหัวการ์ด ข้างลำดับ ไม่ทับกราฟ
-  else{ const w=document.createElement('div'); w.className='bsw'; w.innerHTML='<span class="bsrow">'+badge+'</span>'; el.insertAdjacentElement('beforebegin',w); host=w.firstChild; }
-  const g=await bsSecGroups(m); if(g&&host.isConnected) host.insertAdjacentHTML('beforeend',bsGrpHtml(bsGrpOf(g,s)));
+  const root=el.closest('.scard,.ldc'), slot=root&&root.querySelector('.bs-slot'); let host=null;
+  // การ์ดที่มีป้ายตัวอักษร B/W/S + ดาวอยู่แล้ว (sgChip) → ไม่ต้องเติมคำเต็มซ้ำ (บอส 6 พ.ย. 2569: ห้ามขึ้นทั้ง W และ Wait/นำตลาดพร้อมกัน)
+  const hasSgc = !!(root && root.querySelector('.sgc'));
+  if(slot){
+    if(hasSgc){ slot.innerHTML=''; }
+    else { slot.innerHTML=badge; host=slot; }
+  } else {
+    const w=document.createElement('div'); w.className='bsw'; w.innerHTML='<span class="bsrow">'+badge+'</span>'; el.insertAdjacentElement('beforebegin',w); host=w.firstChild;
+  }
+  if(host){
+    const g=await bsSecGroups(m); if(g&&host.isConnected) host.insertAdjacentHTML('beforeend',bsGrpHtml(bsGrpOf(g,s)));
+  }
 }
 
 // สถานะ Buy/Wait/Sell จาก "ไฟล์สัญญาณ" (แหล่งเดียวกับรายการ Buy/Wait และลูกศรบนกราฟ)
