@@ -348,10 +348,10 @@
       x.fillStyle = heatColor(chg, th === THEMES.light ? THEMES.light : THEMES.dark);
       x.fillRect(rx, ry, rw, rh);
       if (rw > 52 && rh > 34) {
-        const lg = logos[src.ticker];
+        const lg = (rw > 120 && rh > 96) ? logos[src.ticker] : null;
         const hasLg = !!lg;
-        const lgS = hasLg ? Math.max(20, Math.min(40, Math.min(rw, rh) * 0.34)) : 0;
-        const fs = Math.max(13, Math.min(30, Math.floor(Math.min(rw / 3.4, rh / 2.6))));
+        const lgS = hasLg ? Math.max(22, Math.min(38, Math.min(rw, rh) * 0.26)) : 0;
+        const fs = Math.max(13, Math.min(30, Math.floor(Math.min(rw / 3.9, rh / 2.7))));
         x.textAlign = "center";
         if (hasLg) {
           // โลโก้วงกลมมุมซ้ายบน
@@ -365,11 +365,14 @@
         }
         x.fillStyle = "#fff";
         x.font = font(800, fs);
-        x.fillText(String(src.ticker || "").slice(0, 8), rx + rw / 2, ry + rh / 2 + fs * 0.12);
+        let lbl = String(src.ticker || "");
+        while (lbl.length > 2 && x.measureText(lbl).width > rw - 16) lbl = lbl.slice(0, -1);
+        const ty = ry + rh / 2 + fs * 0.12 + (hasLg ? lgS * 0.45 : 0);
+        x.fillText(lbl, rx + rw / 2, ty);
         if (rh > 58) {
-          x.font = font(700, Math.max(11, fs * 0.62));
+          x.font = font(700, Math.max(11, fs * 0.6));
           x.globalAlpha = 0.92;
-          x.fillText((chg >= 0 ? "+" : "") + chg.toFixed(2) + "%", rx + rw / 2, ry + rh / 2 + fs * 0.95);
+          x.fillText((chg >= 0 ? "+" : "") + chg.toFixed(2) + "%", rx + rw / 2, ty + fs * 0.92);
           x.globalAlpha = 1;
         }
         x.textAlign = "left";
@@ -976,18 +979,21 @@
                 ["3 เดือน", row.p3m != null ? (row.p3m >= 0 ? "+" : "") + Number(row.p3m).toFixed(1) + "%" : "—"],
                 ["Mcap", f && f.mcap ? fmtCap(f.mcap) : "—"]];
     st.forEach((sv, i) => {
-      const bx = 52 + (i % 2) * 232, by = 366 + Math.floor(i / 2) * 74;
-      x.fillStyle = th.panel; rr(x, bx, by, 216, 64, 14); x.fill();
-      x.strokeStyle = th.lineHi || th.line; x.lineWidth = 1.4; x.stroke();
-      x.fillStyle = th.muted; x.font = font(600, 15); x.fillText(sv[0], bx + 14, by + 24);
-      x.fillStyle = th.text; x.font = font(800, 24); x.fillText(sv[1], bx + 14, by + 52);
+      const bx = 52 + (i % 2) * 236, by = 356 + Math.floor(i / 2) * 72;
+      glassPanel(x, th, bx, by, 220, 62, 14);
+      x.fillStyle = th.muted; x.font = labelFont(600, 13); x.fillText(sv[0], bx + 14, by + 23);
+      const neg = /^-/.test(String(sv[1]));
+      x.fillStyle = i === 1 || i === 2 ? (neg ? th.down : th.up) : th.text;
+      x.font = font(700, 24); x.fillText(sv[1], bx + 14, by + 50);
     });
 
     const chips = f ? fundChips(f).filter((kv) => !/mcap|มูลค่าตลาด/i.test(String(kv[0]))).slice(0, 4) : [];
     chips.forEach((kv, i) => {
-      const bx = 52 + (i % 2) * 232, by = 512 + Math.floor(i / 2) * 26;
-      x.fillStyle = th.muted; x.font = font(600, 14); x.fillText(kv[0], bx, by);
-      x.fillStyle = th.text; x.font = font(800, 19); x.fillText(kv[1], bx + x.measureText(kv[0]).width + 10, by);
+      const bx = 52 + (i % 4) * 118, by = 520;
+      x.fillStyle = th.muted; x.font = labelFont(500, 12);
+      x.fillText(String(kv[0]).slice(0, 12), bx, by);
+      x.fillStyle = th.text; x.font = font(700, 21);
+      x.fillText(String(kv[1]).slice(0, 8), bx, by + 28);
     });
 
     const box = { x: 520, y: 100, w: W - 570, h: H - 190 };
