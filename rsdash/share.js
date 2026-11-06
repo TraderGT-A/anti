@@ -609,6 +609,25 @@
         const bodyTop = Math.min(Y(o), Y(cl)), bodyH = Math.max(1.6, Math.abs(Y(o) - Y(cl)));
         x.fillRect(cx - Math.max(1.6, cw0 * 0.32), bodyTop, Math.max(2.4, cw0 * 0.64), bodyH);
       });
+      // เส้น MA20 (ทอง) และ MA50 (ฟ้า) บนกราฟการ์ดรายตัว
+      const MA20C = "#e8b04b", MA50C = "#5b9df9";
+      [[20, MA20C], [50, MA50C]].forEach(function (pair) {
+        const n = pair[0], col = pair[1];
+        x.strokeStyle = col; x.lineWidth = 3; x.beginPath();
+        let started = false;
+        for (let i = 0; i < n0; i++) {
+          const v = smaAt(barsS, i, n);
+          if (v == null) continue;
+          const bx = padL + i * cw0 + cw0 / 2;
+          if (!started) { x.moveTo(bx, Y(v)); started = true; } else x.lineTo(bx, Y(v));
+        }
+        if (started) x.stroke();
+      });
+      // คำอธิบายเส้น
+      x.font = font(700, 20); x.textAlign = "right";
+      x.fillStyle = MA50C; x.fillText("MA50", W - 96, 706);
+      x.fillStyle = MA20C; x.fillText("MA20", W - 176, 706);
+      x.textAlign = "left";
       if (lo < Infinity) {
         x.fillStyle = th.muted; x.font = font(600, 22);
         x.fillText(hi ? "52W " + Number(hi).toFixed(2) : "", 84, 690);
