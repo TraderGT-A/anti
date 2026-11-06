@@ -147,57 +147,99 @@
   async function drawList(opts) {
     const th = (document.documentElement.getAttribute("data-theme") === "light") ? THEMES.light : THEMES.dark;
     const W = 1080, H = 1350;
-    const c = document.createElement("canvas");
-    c.width = W; c.height = H;
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
-    const rows = (opts.rows || []).slice(0, opts.max || 11);
+    const rows = (opts.rows || []).slice(0, opts.max || 12);
     const logo = await loadImg("/brand/thus-symbol-white.png");
     const thumbs = await Promise.all(rows.map((r) => stockLogo(r.ticker || r.tk, opts.mk)));
 
     const grd = x.createLinearGradient(0, 0, W, H);
     grd.addColorStop(0, th.bg); grd.addColorStop(1, th.bg2);
     x.fillStyle = grd; x.fillRect(0, 0, W, H);
-    x.strokeStyle = th.line; x.lineWidth = 3; rr(x, 28, 28, W - 56, H - 56, 36); x.stroke();
+    x.strokeStyle = th.line; x.lineWidth = 2; rr(x, 26, 26, W - 52, H - 52, 30); x.stroke();
 
-    if (logo) { try { x.drawImage(logo, 70, 66, 54, 54); } catch (e) {} }
-    x.fillStyle = th.text; x.font = font(900, 34); x.fillText("THUS", 140, 108);
-    x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
-    x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 100);
+    if (logo) { try { x.drawImage(logo, 70, 60, 44, 44); } catch (e) {} }
+    x.fillStyle = th.text; x.font = font(800, 30); x.fillText("THUS", 126, 94);
+    x.fillStyle = th.muted; x.font = font(500, 19); x.textAlign = "right";
+    x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 92);
     x.textAlign = "left";
 
-    x.fillStyle = th.text; x.font = font(900, 58); x.fillText((opts.title || "").slice(0, 28), 70, 232);
-    if (opts.sub) { x.fillStyle = th.muted; x.font = font(500, 24); x.fillText(String(opts.sub).slice(0, 70), 70, 274); }
+    // หัวเรื่อง
+    x.fillStyle = th.text; x.font = font(800, 46); x.fillText(String(opts.title || "").slice(0, 26), 70, 186);
+    if (opts.sub) {
+      x.fillStyle = th.muted; x.font = font(500, 20);
+      try { x.letterSpacing = "0.4px"; } catch (e) {}
+      x.fillText(String(opts.sub).slice(0, 64).toUpperCase(), 70, 218);
+      try { x.letterSpacing = "0px"; } catch (e) {}
+    }
 
-    let y = 322;
-    const rowH = Math.min(88, Math.floor((1090 - y) / Math.max(rows.length, 1)));
+    const y0 = 250, bottom = 1258;
+    const rowH = Math.min(190, Math.floor((bottom - y0) / Math.max(rows.length, 1)));
+    const boxH = rowH - 10;
+    const blockH = rowH * rows.length;
+    const startY = y0 + Math.max(0, (bottom - y0 - blockH) / 2);   // จัดกลุ่มแถวให้อยู่กลาง ไม่ลอยขึ้นบน
+
     rows.forEach((r, i) => {
-      const tk = r.ticker || r.tk || "";
-      x.fillStyle = th.panel; rr(x, 70, y, W - 140, rowH - 10, 16); x.fill();
-      x.strokeStyle = th.line; x.lineWidth = 1.5; x.stroke();
-      const t = thumbs[i];
-      if (t) { x.save(); rr(x, 86, y + (rowH - 10) / 2 - 24, 48, 48, 24); x.clip(); x.drawImage(t, 86, y + (rowH - 10) / 2 - 24, 48, 48); x.restore(); }
-      x.fillStyle = th.text; x.font = font(800, 30); x.fillText(tk, 150, y + rowH / 2 + 8);
-      const sub = [String(r.industry || r.sector || r.group || "").slice(0, 22), String(r.lead || "").toLowerCase() === "leading" ? "★ นำตลาด" : ""].filter(Boolean).join(" · ");
-      if (sub) { x.fillStyle = th.muted; x.font = font(500, 19); x.fillText(sub, 150, y + rowH / 2 + 30); }
-      const px = r.price != null ? Number(r.price).toFixed(2) : "—";
-      x.textAlign = "right";
-      x.fillStyle = th.text; x.font = font(800, 30); x.fillText(px, W - 190, y + rowH / 2 + 4);
-      const ch = r.change != null ? Number(r.change) : null;
-      if (ch != null) { x.fillStyle = ch >= 0 ? th.up : th.down; x.font = font(700, 22); x.fillText((ch >= 0 ? "+" : "") + ch.toFixed(2) + "%", W - 190, y + rowH / 2 + 30); }
-      const rs = r.rs != null ? r.rs : (r.rs3 != null ? r.rs3 : null);
-      x.fillStyle = th.gold; x.font = font(800, 26); x.fillText(rs != null ? "RS " + rs : "", W - 88, y + rowH / 2 + 10);
-      x.textAlign = "left";
-      y += rowH;
-    });
-    if (!rows.length) { x.fillStyle = th.muted; x.font = font(600, 30); x.fillText("ยังไม่มีรายการ", 90, 420); }
+      const y = startY + i * rowH;
+      glassPanel(x, th, 70, y, W - 140, boxH, 14);
 
-    x.fillStyle = th.muted; x.font = font(500, 24);
-    x.textAlign = "right";
-    x.fillText(opts.note || "ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 82);
+      // ลำดับ
+      x.fillStyle = th.muted; x.font = font(600, 15); x.textAlign = "center";
+      x.fillText(String(i + 1), 100, y + boxH / 2 + 5);
+      x.textAlign = "left";
+
+      // โลโก้
+      const t = thumbs[i], lgS = 44, lgX = 118, lgY = y + (boxH - lgS) / 2;
+      if (t) {
+        x.save(); x.beginPath(); x.arc(lgX + lgS / 2, lgY + lgS / 2, lgS / 2, 0, Math.PI * 2); x.clip();
+        x.drawImage(t, lgX, lgY, lgS, lgS); x.restore();
+        x.strokeStyle = th.lineHi || th.line; x.lineWidth = 1; x.beginPath();
+        x.arc(lgX + lgS / 2, lgY + lgS / 2, lgS / 2, 0, Math.PI * 2); x.stroke();
+      }
+
+      // ชื่อย่อ + ชื่อบริษัท
+      const tx = lgX + lgS + 16;
+      x.fillStyle = th.text; x.font = font(700, 28); x.fillText(String(r.ticker || r.tk || ""), tx, y + boxH / 2 - 2);
+      let nm = String(r.name || r.industry || r.sector || "");
+      const nmMax = (W - 250) - tx - 24;
+      x.fillStyle = th.muted; x.font = font(500, 15);
+      if (x.measureText(nm).width > nmMax) {
+        while (nm.length > 4 && x.measureText(nm + "…").width > nmMax) nm = nm.slice(0, -1);
+        nm += "…";
+      }
+      x.fillText(nm, tx, y + boxH / 2 + 20);
+
+      // ราคา + เปลี่ยน
+      const px = r.price != null ? Number(r.price).toFixed(2) : "—";
+      const ch = r.change != null ? Number(r.change) : null;
+      x.textAlign = "right";
+      x.fillStyle = th.text; x.font = font(700, 27); x.fillText(px, W - 250, y + boxH / 2 - 2);
+      if (ch != null) {
+        x.fillStyle = ch >= 0 ? th.up : th.down; x.font = font(600, 16);
+        x.fillText((ch >= 0 ? "+" : "") + ch.toFixed(2) + "%", W - 250, y + boxH / 2 + 20);
+      }
+
+      // RS วงกลมเล็ก
+      const rs = r.rs != null ? Number(r.rs) : (r.rs3 != null ? Number(r.rs3) : null);
+      if (rs != null) {
+        const cxr = W - 150, cyr = y + boxH / 2, rad = 22;
+        x.lineWidth = 4; x.lineCap = "round";
+        x.strokeStyle = th.line; x.beginPath(); x.arc(cxr, cyr, rad, 0, Math.PI * 2); x.stroke();
+        x.strokeStyle = th.gold; x.beginPath();
+        x.arc(cxr, cyr, rad, -Math.PI / 2, -Math.PI / 2 + (Math.max(0, Math.min(99, rs)) / 99) * Math.PI * 2); x.stroke();
+        x.fillStyle = th.text; x.font = font(700, 18); x.textAlign = "center";
+        x.fillText(String(Math.round(rs)), cxr, cyr + 6);
+      }
+      x.textAlign = "left";
+    });
+
+    if (!rows.length) { x.fillStyle = th.muted; x.font = font(600, 26); x.fillText("ยังไม่มีรายการ", 90, 400); }
+
+    x.fillStyle = th.muted; x.font = font(500, 17); x.textAlign = "right";
+    x.fillText(opts.note || "ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 44);
     x.textAlign = "left";
     return c;
   }
-
 
   /* ---------- Heatmap card: วาด treemap ลง canvas ---------- */
   function squarify(items, x, y, w, h) {
@@ -521,8 +563,8 @@
     x.lineWidth = 1.2; x.stroke();
     // ไฮไลต์ด้านบน (นูนขึ้น)
     x.beginPath();
-    x.moveTo(bx + r * 0.7, by + 1);
-    x.lineTo(bx + bw - r * 0.7, by + 1);
+    x.moveTo(bx + r * 1.15, by + 1);
+    x.lineTo(bx + bw - r * 1.15, by + 1);
     x.strokeStyle = dark ? "rgba(255,255,255,0.42)" : "rgba(255,255,255,1)";
     x.lineWidth = 2; x.stroke();
     // เงาในด้านล่าง
