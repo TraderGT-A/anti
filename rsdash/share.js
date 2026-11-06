@@ -331,24 +331,30 @@
   }
 
 
-  /* ---------- การ์ดกราฟรวม: ตารางมินิชาร์ต ---------- */
-  function drawMiniCandles(x, bars, px, py, pw, ph, up, dn) {
-    if (!bars || bars.length < 5) return;
-    const b = bars.slice(-60);
-    let lo = Infinity, hi = -Infinity;
-    b.forEach((d) => { if (d.low < lo) lo = d.low; if (d.high > hi) hi = d.high; });
-    if (!(hi > lo)) return;
-    const n = b.length, cw = pw / n;
-    const Y = (v) => py + ph - ((v - lo) / (hi - lo)) * ph;
-    b.forEach((d, i) => {
-      const cx = px + i * cw + cw / 2;
-      const col = d.close >= d.open ? up : dn;
-      x.strokeStyle = col; x.fillStyle = col;
-      x.lineWidth = Math.max(1, cw * 0.12);
-      x.beginPath(); x.moveTo(cx, Y(d.high)); x.lineTo(cx, Y(d.low)); x.stroke();
-      const h = Math.max(1, Math.abs(Y(d.open) - Y(d.close)));
-      x.fillRect(cx - Math.max(1, cw * 0.3), Math.min(Y(d.open), Y(d.close)), Math.max(1.6, cw * 0.6), h);
-    });
+  /* ---------- การ์ดกราฟรวม: ตารางมินิชาร์ต (โลโก้ + MA20/50 + แบ่งหน้า) ---------- */
+  function smaAt(bars, i, n) {
+    if (i < n - 1) return null;
+    let sum = 0;
+    for (let k = i - n + 1; k <= i; k++) sum += (bars[k].close != null ? bars[k].close : bars[k].c);
+    return sum / n;
+  }
+  async function fetchBars(tk, mk, rng) {
+    try {
+      const r = await fetch('/api/chart?market=' + mk + '&symbol=' + encodeURIComponent(tk) + '&interval=1d&range=' + (rng || '1y'));
+      const j = await r.json();
+      return (j && j.data) || [];
+    } catch (e) { return []; }
+  }
+  async function warmBars(items, mk) {
+    const need = items.filter((it) => !it.bars || !it.bars.length);
+    let idx = 0;
+    async function worker() {
+      while (idx < need.length) {
+        const it = need[idx++];
+        it.bars = await fetchBars(it.ticker, mk, '1y');
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(5, need.length) }, worker));
   }
   async function drawGrid(opts) {
     const th = (document.documentElement.getAttribute("data-theme") === "light") ? THEMES.light : THEMES.dark;
@@ -367,36 +373,94 @@
     x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 100);
     x.textAlign = "left";
 
-    x.fillStyle = th.text; x.font = font(900, 46); x.fillText(String(opts.title || "").slice(0, 30), 70, 196);
-    if (opts.sub) { x.fillStyle = th.muted; x.font = font(500, 21); x.fillText(String(opts.sub).slice(0, 72), 70, 230); }
+    x.fillStyle = th.text; x.font = font(900, 46); x.fillText(String(opts.title || "").slice(0, 26), 70, 196);
+    const subTxt = (opts.sub || "") + (opts.pageTotal > 1 ? " · หน้า " + opts.page + "/" + opts.pageTotal : "");
+    if (subTxt) { x.fillStyle = th.muted; x.font = font(500, 21); x.fillText(subTxt.slice(0, 74), 70, 230); }
 
     const items = (opts.items || []).slice(0, 9);
     const cols = 3, rows = Math.ceil(items.length / cols) || 1;
     const X0 = 60, GW = W - 120, GH = 1000;
     const gap = 14, cwid = GW / cols;
-    const chei = rows === 1 ? 830 : (rows === 2 ? 470 : 318);   // การ์ดใหญ่ขึ้นเมื่อมีแถวน้อย แต่ไม่ยืดเต็มหน้า
+    const chei = rows === 1 ? 830 : (rows === 2 ? 470 : 318);
     const Y0 = 262;
 
-    items.forEach((it, i) => {
+    const MA20 = "#e8b04b", MA50 = "#5b9df9";
+
+    for (let i = 0; i < items.length; i++) {
+      const it = items[i];
       const cx = X0 + (i % cols) * cwid + gap / 2;
       const cy = Y0 + Math.floor(i / cols) * chei + gap / 2;
       const cw2 = cwid - gap, ch2 = chei - gap;
       x.fillStyle = th.panel; rr(x, cx, cy, cw2, ch2, 16); x.fill();
       x.strokeStyle = th.line; x.lineWidth = 1.5; x.stroke();
 
-      // หัวการ์ด: ticker + RS
-      x.fillStyle = th.text; x.font = font(800, 26); x.fillText(String(it.ticker).slice(0, 10), cx + 14, cy + 32);
-      if (it.rs != null) { x.fillStyle = th.gold; x.font = font(800, 18); x.textAlign = "right"; x.fillText("RS " + it.rs, cx + cw2 - 14, cy + 30); x.textAlign = "left"; }
-      // ราคา + %
+      // โลโก้บริษัท + ชื่อย่อ + RS
+      let tx = cx + 14;
+      try {
+        const lg = await stockLogo(it.ticker, opts.mk || "thailand");
+        if (lg && lg.naturalWidth > 0) {
+          x.save(); x.beginPath(); x.arc(cx + 14 + 16, cy + 30, 16, 0, Math.PI * 2); x.clip();
+          x.drawImage(lg, cx + 14, cy + 14, 32, 32); x.restore();
+          x.strokeStyle = th.line; x.lineWidth = 1; x.beginPath(); x.arc(cx + 14 + 16, cy + 30, 16, 0, Math.PI * 2); x.stroke();
+          tx = cx + 58;
+        }
+      } catch (e) {}
+      x.fillStyle = th.text; x.font = font(800, 24); x.fillText(String(it.ticker).slice(0, 10), tx, cy + 38);
+      if (it.rs != null) { x.fillStyle = th.gold; x.font = font(800, 18); x.textAlign = "right"; x.fillText("RS " + it.rs, cx + cw2 - 14, cy + 36); x.textAlign = "left"; }
       const chg = Number(it.change);
-      x.fillStyle = th.body; x.font = font(700, 20);
-      x.fillText(it.price != null ? Number(it.price).toFixed(2) : "—", cx + 14, cy + 58);
+      x.fillStyle = th.body; x.font = font(700, 19);
+      x.fillText(it.price != null ? Number(it.price).toFixed(2) : "—", tx, cy + 64);
       if (Number.isFinite(chg)) {
-        x.fillStyle = chg >= 0 ? th.up : th.down; x.font = font(700, 17);
-        x.fillText((chg >= 0 ? "+" : "") + chg.toFixed(2) + "%", cx + 84, cy + 58);
+        x.fillStyle = chg >= 0 ? th.up : th.down; x.font = font(700, 16);
+        x.fillText((chg >= 0 ? "+" : "") + chg.toFixed(2) + "%", tx + 62, cy + 64);
       }
-      drawMiniCandles(x, it.bars, cx + 10, cy + 70, cw2 - 20, ch2 - 92, th.up, th.down);
-    });
+      x.font = font(600, 12); x.textAlign = "right";
+      x.fillStyle = "#e8b04b";
+      x.fillText("MA20", cx + cw2 - 14 - 40, cy + 64);
+      x.fillStyle = "#5b9df9"; x.fillText("MA50", cx + cw2 - 14, cy + 64);
+      x.textAlign = "left";
+
+      // กราฟ: แท่งเทียน + MA20/MA50
+      const bars = it.bars || [];
+      const px = cx + 10, py = cy + 76, pw = cw2 - 20, ph = ch2 - 100;
+      if (bars.length > 10) {
+        const n0 = Math.min(bars.length, 60), off = bars.length - n0;
+        let lo = Infinity, hi2 = -Infinity;
+        for (let k = off; k < bars.length; k++) {
+          const b = bars[k];
+          const l = b.low != null ? b.low : b.l, hh = b.high != null ? b.high : b.h;
+          if (l < lo) lo = l; if (hh > hi2) hi2 = hh;
+        }
+        const Y = (v) => py + ph - ((v - lo) / (hi2 - lo || 1)) * ph;
+        const cw3 = pw / n0;
+        x.save(); x.beginPath(); x.rect(px, py, pw, ph); x.clip();   // กันแท่ง/เส้นล้นขอบการ์ด
+        for (let j = 0; j < n0; j++) {
+          const b = bars[off + j];
+          const o = b.open != null ? b.open : b.o, cl = b.close != null ? b.close : b.c;
+          const hh = b.high != null ? b.high : b.h, l = b.low != null ? b.low : b.l;
+          if (o == null || cl == null) continue;
+          const bx = px + j * cw3 + cw3 / 2;
+          const col = cl >= o ? th.up : th.down;
+          x.strokeStyle = col; x.fillStyle = col; x.lineWidth = Math.max(1, cw3 * 0.12);
+          x.beginPath(); x.moveTo(bx, Y(hh)); x.lineTo(bx, Y(l)); x.stroke();
+          const bt = Math.min(Y(o), Y(cl)), bh = Math.max(1.2, Math.abs(Y(o) - Y(cl)));
+          x.fillRect(bx - Math.max(1, cw3 * 0.3), bt, Math.max(1.4, cw3 * 0.6), bh);
+        }
+        [[20, MA20], [50, MA50]].forEach(function (pair) {
+          const n = pair[0], col = pair[1];
+          x.strokeStyle = col; x.lineWidth = 1.6; x.beginPath();
+          let started = false;
+          for (let j = 0; j < n0; j++) {
+            const v = smaAt(bars, off + j, n);
+            if (v == null) continue;
+            const bx = px + j * cw3 + cw3 / 2;
+            if (!started) { x.moveTo(bx, Y(v)); started = true; } else x.lineTo(bx, Y(v));
+          }
+          if (started) x.stroke();
+        });
+        x.restore();
+      }
+    }
 
     x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
     x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 78);
@@ -517,7 +581,8 @@
       x.fillStyle = th.text; x.font = font(800, 40); x.fillText(s[1], bx + 22, 618);
     });
 
-    // กราฟ 1 ปี
+    // กราฟ 1 ปี (แสดง 130 แท่งล่าสุดให้แท่งอ่านง่าย)
+    if (Array.isArray(bars) && bars.length > 130) bars = bars.slice(-130);
     x.fillStyle = th.panel; rr(x, 70, 668, W - 140, 300, 24); x.fill();
     x.strokeStyle = th.line; x.lineWidth = 2; x.stroke();
     if (bars.length > 5) {
@@ -527,13 +592,19 @@
       const padL = 100, padR = 100, py0 = 700, py1 = 930;
       const X = (i) => padL + (i / (bars.length - 1)) * (W - padL - padR);
       const Y = (v) => py1 - ((v - lo) / (up2 - lo || 1)) * (py1 - py0);
-      x.beginPath();
-      bars.forEach((b, i) => { const cl = b.c ?? b.close; const yy = Y(cl); if (i === 0) x.moveTo(X(i), yy); else x.lineTo(X(i), yy); });
-      x.strokeStyle = th.gold; x.lineWidth = 4; x.lineJoin = "round"; x.stroke();
-      x.lineTo(X(bars.length - 1), py1); x.lineTo(X(0), py1); x.closePath();
-      x.globalAlpha = 0.12; x.fillStyle = th.gold; x.fill(); x.globalAlpha = 1;
-      const lastc = bars[bars.length - 1].c ?? bars[bars.length - 1].close;
-      x.beginPath(); x.arc(X(bars.length - 1), Y(lastc), 8, 0, Math.PI * 2); x.fillStyle = th.gold; x.fill();
+      // แท่งเทียนจริง (ไม่ใช่เส้น) — บอสสั่งให้การ์ดรายตัวเป็นกราฟสวย ๆ
+      const n0 = bars.length, cw0 = (W - padL - padR) / n0;
+      bars.forEach((b, i) => {
+        const o = b.o ?? b.open, hh = b.h ?? b.high, ll = b.l ?? b.low, cl = b.c ?? b.close;
+        if (o == null || cl == null) return;
+        const cx = padL + i * cw0 + cw0 / 2;
+        const col = cl >= o ? th.up : th.down;
+        x.strokeStyle = col; x.fillStyle = col;
+        x.lineWidth = Math.max(1.4, cw0 * 0.12);
+        x.beginPath(); x.moveTo(cx, Y(hh)); x.lineTo(cx, Y(ll)); x.stroke();
+        const bodyTop = Math.min(Y(o), Y(cl)), bodyH = Math.max(1.6, Math.abs(Y(o) - Y(cl)));
+        x.fillRect(cx - Math.max(1.6, cw0 * 0.32), bodyTop, Math.max(2.4, cw0 * 0.64), bodyH);
+      });
       if (lo < Infinity) {
         x.fillStyle = th.muted; x.font = font(600, 22);
         x.fillText(hi ? "52W " + Number(hi).toFixed(2) : "", 84, 690);
@@ -625,20 +696,63 @@
       const box = ensureShareBox();
       box.classList.add("on");
       const img = document.getElementById("shImg");
-      let url = "";
-      try { url = (await drawGrid(opts)).toDataURL("image/png"); } catch (e) { url = ""; }
-      if (!url) { box.classList.remove("on"); alert("สร้างการ์ดไม่สำเร็จ ลองใหม่อีกครั้ง"); return; }
-      img.src = url;
-      const fname = `rsdash_cards_${new Date().toISOString().slice(0, 10)}.png`;
-      document.getElementById("shDl").onclick = () => { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); };
-      document.getElementById("shShare").onclick = async () => {
-        try {
-          const blob = await (await fetch(url)).blob();
-          const file = new File([blob], fname, { type: "image/png" });
-          if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: opts.title || "RS Dashboard" });
-          else { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); }
-        } catch (e) { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); }
-      };
+      const items = (opts.items || []).slice();
+      const mk = opts.mk || "thailand";
+      if (!items.length) { alert("ไม่มีหุ้นในรายการ"); return; }
+      let pager = document.getElementById("shPager");
+      if (!pager) {
+        pager = document.createElement("div");
+        pager.id = "shPager"; pager.className = "sh-row";
+        const row = box.querySelector(".sh-row");
+        row.parentNode.insertBefore(pager, row);
+      }
+      const per = 9, total = Math.max(1, Math.ceil(items.length / per));
+      let page = 1, urls = {};
+      const name = (p) => `rsdash_cards_${new Date().toISOString().slice(0, 10)}_p${p}.png`;
+
+      async function render(p) {
+        page = p;
+        img.style.opacity = ".35";
+        if (!urls[p]) {
+          await warmBars(items.slice((p - 1) * per, p * per), mk);
+          const cv = await drawGrid({
+            title: opts.title, sub: opts.sub, mk: mk,
+            items: items.slice((p - 1) * per, p * per), page: p, pageTotal: total,
+          });
+          urls[p] = cv.toDataURL("image/png");
+        }
+        img.src = urls[p]; img.style.opacity = "1";
+        pager.innerHTML =
+          (total > 1 ? '<button class="sh-btn" id="shPrev"' + (p === 1 ? ' disabled' : '') + '>◀</button>'
+            + '<span class="sh-pg">หน้า ' + p + ' / ' + total + '</span>'
+            + '<button class="sh-btn" id="shNext"' + (p === total ? ' disabled' : '') + '>▶</button>' : '')
+          + (total > 1 ? '<button class="sh-btn" id="shAll">ดาวน์โหลดทั้งหมด</button>' : '');
+        const pv = document.getElementById("shPrev"), nx = document.getElementById("shNext"), al = document.getElementById("shAll");
+        if (pv) pv.onclick = (e) => { e.preventDefault(); if (page > 1) render(page - 1); };
+        if (nx) nx.onclick = (e) => { e.preventDefault(); if (page < total) render(page + 1); };
+        if (al) al.onclick = async (e) => {
+          e.preventDefault();
+          for (let q = 1; q <= total; q++) {
+            if (!urls[q]) {
+              await warmBars(items.slice((q - 1) * per, q * per), mk);
+              const cv = await drawGrid({ title: opts.title, sub: opts.sub, mk: mk, items: items.slice((q - 1) * per, q * per), page: q, pageTotal: total });
+              urls[q] = cv.toDataURL("image/png");
+            }
+            const a = document.createElement("a"); a.href = urls[q]; a.download = name(q); a.click();
+            await new Promise((r) => setTimeout(r, 350));
+          }
+        };
+        document.getElementById("shDl").onclick = () => { const a = document.createElement("a"); a.href = urls[page]; a.download = name(page); a.click(); };
+        document.getElementById("shShare").onclick = async () => {
+          try {
+            const blob = await (await fetch(urls[page])).blob();
+            const file = new File([blob], name(page), { type: "image/png" });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: opts.title || "RS Dashboard" });
+            else { const a = document.createElement("a"); a.href = urls[page]; a.download = name(page); a.click(); }
+          } catch (e) { const a = document.createElement("a"); a.href = urls[page]; a.download = name(page); a.click(); }
+        };
+      }
+      await render(1);
     },
     async openHeat(opts) {
       const box = ensureShareBox();
