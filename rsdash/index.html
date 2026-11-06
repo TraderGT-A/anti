@@ -1184,6 +1184,8 @@ html .gs-empty{padding:8px 10px;color:#5d6b7d;font-size:11.5px}
                       <span class="hm-idx" id="hmIdx"></span>
                       <button id="hmChg" class="tf-chip active" onclick="setHmMetric('change')">วันนี้</button>
                       <button id="hmYtd" class="tf-chip" onclick="setHmMetric('ytd')">YTD</button>
+                      <button id="hmModeA" class="tf-chip active" onclick="hmSetMode('mcap')" title="ขนาดบล็อก = มูลค่าตลาด">ปกติ</button>
+                      <button id="hmModeB" class="tf-chip" onclick="hmSetMode('blend')" title="ขนาดบล็อก = มูลค่าตลาด × % เปลี่ยนแปลง">ถ่วง %</button>
                       <button class="tf-chip hm-zb" onclick="hmZoomBtn(1.6)" aria-label="ซูมเข้า">+</button>
                       <button class="tf-chip hm-zb" onclick="hmZoomBtn(1/1.6)" aria-label="ซูมออก">−</button>
                       <button class="tf-chip" onclick="hmReset()">รีเซ็ต</button>
@@ -1551,11 +1553,11 @@ html .gs-empty{padding:8px 10px;color:#5d6b7d;font-size:11.5px}
           <div id="modalEarn" class="ern-wrap mt-1"></div>
         </div>
         <div class="flex items-center gap-3 flex-wrap mb-1"><div class="flex gap-1.5 bg-[#0a0f16] p-1 rounded-lg border border-[#243044] w-fit">
-          <button class="tf-chip" onclick="changeModalTF('30m')">30m</button>
-          <button class="tf-chip" onclick="changeModalTF('1d')">1D</button>
-          <button class="tf-chip" onclick="changeModalTF('1wk')">1W</button>
-          <button class="tf-chip" onclick="changeModalTF('1mo')">1M</button>
-          <button class="tf-chip active" onclick="changeModalTF('1y')">3Y</button>
+          <button class="tf-chip" onclick="changeModalTF('30m', event)">30m</button>
+          <button class="tf-chip" onclick="changeModalTF('1d', event)">1D</button>
+          <button class="tf-chip" onclick="changeModalTF('1wk', event)">1W</button>
+          <button class="tf-chip" onclick="changeModalTF('1mo', event)">1M</button>
+          <button class="tf-chip active" onclick="changeModalTF('1y', event)">3Y</button>
         </div><span id="modalBS"></span></div><div id="modalBSWhy" class="bswhy" hidden></div>
         <div id="modalLegend" class="mb-1"></div>
     <div id="modalChart" class="w-full h-[420px] rounded-lg bg-[#05070b] border border-[#1e2634]"></div>
@@ -2236,7 +2238,7 @@ function hmShare(){
   try{
     const mk=currentMarket, d=hmCache[mk]; if(!d||!d.data){ alert('ข้อมูล Heatmap ยังโหลดไม่เสร็จ'); return; }
     const k = (hmMetric==='ytd') ? 'ytd' : 'change';
-    const items = d.data.filter(x=>x&&x.ticker).map(x=>({ticker:x.ticker, mcap:Number(x.mcap)||0, chg:Number(x[k])||0}));
+    const items = d.data.filter(x=>x&&x.ticker).map(x=>({ticker:x.ticker, mcap:hmW(x), chg:Number(x[k])||0}));
     if(!items.length){ alert('ยังไม่มีข้อมูลให้แชร์'); return; }
     ShareCard.openHeat({
       title:'Heatmap · '+(d.index || (mk==='america'?'S&P 500':'SET100')),
@@ -2968,12 +2970,33 @@ function hmZoomSec(si){
   const W=b.clientWidth, H=b.clientHeight, k=Math.max(1,Math.min(14,Math.min(W/r.w,H/r.h)*0.97));
   hmT.k=k; hmT.x=W/2-(r.x+r.w/2)*k; hmT.y=H/2-(r.y+r.h/2)*k; hmClamp(); hmApply(true);
 }
+let hmMode = (function(){ try{ return localStorage.getItem('rsd_hmMode')==='blend' ? 'blend' : 'mcap'; }catch(e){ return 'mcap'; } })();
+function hmValOf(s){ return hmMetric==='ytd' ? s.ytd : s.change; }
+function hmW(s){
+  const mc = Number(s.mcap)||0;
+  if(hmMode!=='blend') return mc;
+  const v = Number(hmValOf(s))||0;
+  const f = Math.max(0.25, Math.min(2.5, 1 + v/100));   // % บวก = บล็อกใหญ่ขึ้น, % ลบ = เล็กลง
+  return mc * f;
+}
+function hmSetMode(m){
+  hmMode = (m==='blend') ? 'blend' : 'mcap';
+  try{ localStorage.setItem('rsd_hmMode', hmMode); }catch(e){}
+  try{ hmModeBtn(); }catch(e){}
+  try{ hmDraw(); }catch(e){}
+}
+function hmModeBtn(){
+  const a=document.getElementById('hmModeA'), b=document.getElementById('hmModeB');
+  if(a) a.classList.toggle('active', hmMode==='mcap');
+  if(b) b.classList.toggle('active', hmMode==='blend');
+}
+
 function hmDraw(){
   const inn=document.getElementById('hmIn'), box=document.getElementById('hmBox'); if(!inn||!box) return;
   const d=hmCache[currentMarket]; if(!d || !d.data) return;
   const W=box.clientWidth, H=box.clientHeight; if(W<50||H<50) return;
   const K=hmT.k, val=s=>hmMetric==='ytd' ? s.ytd : s.change;
-  const g={}; d.data.forEach(s=>{ (g[s.sector]=g[s.sector]||{name:s.sector,v:0,list:[]}); g[s.sector].v+=s.mcap; g[s.sector].list.push({v:s.mcap,s:s}); });
+  const g={}; d.data.forEach(s=>{ const w=hmW(s); (g[s.sector]=g[s.sector]||{name:s.sector,v:0,list:[]}); g[s.sector].v+=w; g[s.sector].list.push({v:w,s:s}); });
   const secs=Object.values(g).sort((a,b)=>b.v-a.v);
   let html=''; hmSecR={};
   hmSq(secs,0,0,W,H).forEach((sr,si)=>{
@@ -3001,7 +3024,7 @@ async function renderHeatmap(force){
   const box=document.getElementById('hmBox'); if(!box) return;
   const mk=currentMarket, id=document.getElementById('hmIdx');
   if(id) id.textContent = mk==='america' ? 'S&P 500' : 'SET100';
-  hmMetric='change'; hmSetMetricBtn(); hmT={k:1,x:0,y:0};
+  hmMetric='change'; hmSetMetricBtn(); try{ hmModeBtn(); }catch(e){} hmT={k:1,x:0,y:0};
   box.style.height = Math.max(520, window.innerHeight-270)+'px';
   box.innerHTML='<div id="hmIn" class="hm-in"></div>'; hmApply(false);
   if(!box.dataset.bound){
@@ -5759,12 +5782,18 @@ function openModal(tk,nm,mkt){
   document.getElementById('chartModal').classList.remove('hidden'); document.getElementById('chartModal').classList.add('flex'); fetchModal('1y');
 }
 function closeModal(){ document.getElementById('chartModal').classList.add('hidden'); document.getElementById('chartModal').classList.remove('flex'); activeTicker=''; }
-function changeModalTF(iv){ [...document.querySelectorAll('#chartModal .tf-chip')].forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); fetchModal(iv); }
+function changeModalTF(iv, ev){
+  const btns=[...document.querySelectorAll('#chartModal .tf-chip')];
+  btns.forEach(b=>b.classList.remove('active'));
+  const hit=(ev&&ev.target&&ev.target.closest)?ev.target.closest('#chartModal .tf-chip'):btns.find(b=>((b.getAttribute('onclick')||'').indexOf("'"+iv+"'")>=0));
+  if(hit) hit.classList.add('active');
+  fetchModal(iv);
+}
 async function fetchModal(iv){
   const el=document.getElementById('modalChart'); el.innerHTML='<div class="flex items-center justify-center h-full text-sky-400 animate-pulse text-sm">กำลังโหลด...</div>';
   try{
     const _idxTh = activeMarket==='thailand' && String(activeTicker).charAt(0)==='^';   // ดัชนีไทย: Yahoo มีแท่งเดียว → ดึงจาก TradingView (/api/idxchart)
-    const r=await fetch(API+(_idxTh?'/api/idxchart?symbol=':'/api/chart?market='+activeMarket+'&symbol=')+encodeURIComponent(activeTicker)+'&interval='+(iv==='1y'?'1d':iv)+'&range='+({['30m']:'1mo',['1mo']:'5y',['1wk']:'2y',['1y']:'3y'}[iv]||'3y'));
+    const r=await fetch(API+(_idxTh?'/api/idxchart?symbol=':'/api/chart?market='+activeMarket+'&symbol=')+encodeURIComponent(activeTicker)+'&interval='+((iv==='1y'||iv==='1mo')?'1d':iv)+'&range='+({['30m']:'1mo',['1mo']:'1mo',['1wk']:'2y',['1y']:'3y'}[iv]||'3y'));
     const j=await r.json(); if(j.firstTradeDate) chartFirstDate[activeTicker]=j.firstTradeDate;
     const _mi=document.getElementById('modalIpo'); if(_mi) _mi.textContent=ipoAge(chartFirstDate[activeTicker]);
     let data=(j.data||[]).sort((a,b)=>typeof a.time==='number'?(a.time-b.time):String(a.time).localeCompare(String(b.time)));
