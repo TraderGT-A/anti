@@ -644,7 +644,7 @@
   function drawTrendBlock(x, th, q, box) {
     const pts = (q || []).filter((z) => z && z.d && (z.rev != null || z.ni != null));
     if (pts.length < 2) return;
-    const padL = 26, padR = 26, padT = 34, padB = 42;
+    const padL = 34, padR = 34, padT = 34, padB = 42;
     const px = box.x + padL, py = box.y + padT, pw = box.w - padL - padR, ph = box.h - padT - padB;
     const revs = pts.map((z) => Number(z.rev) || 0), nis = pts.map((z) => Number(z.ni) || 0);
     const rMax = Math.max(...revs, 1), rMin = Math.min(0, ...revs);
@@ -788,7 +788,7 @@
     const lastQ = qs.length ? qLabel(qs[qs.length - 1].d) : "";
     x.fillStyle = th.muted; x.font = font(600, 16);
     try { x.letterSpacing = "0.8px"; } catch (e) {}
-    x.fillText(("พื้นฐาน" + (lastQ ? " · ล่าสุด " + lastQ : "")).toUpperCase(), 70, 1012);
+    x.fillText(("พื้นฐาน" + (lastQ ? " · ล่าสุด " + lastQ : "")).toUpperCase(), 70, 1008);
     try { x.letterSpacing = "0px"; } catch (e) {}
     const rawChips = f ? fundChips(f) : [];
     const chips = rawChips
@@ -806,7 +806,7 @@
     const chipsH = 70, chipsGap = 12;
     chips.forEach((kv, i) => {
       const cx = leftX + (i % 2) * (colW / 2 + 4);
-      const cy = 1016 + Math.floor(i / 2) * (chipsH + chipsGap);
+      const cy = 1028 + Math.floor(i / 2) * (chipsH + chipsGap);
       const cw3 = colW / 2 - 8;
       glassPanel(x, th, cx, cy, cw3, chipsH, 10);
 
@@ -824,7 +824,7 @@
 
     // ── แนวโน้มรายได้/กำไร (ครึ่งขวา สูงขึ้น) ──
     if (qs.length >= 2) {
-      const tb = { x: rightX, y: 1016, w: colW, h: 3 * chipsH + 2 * chipsGap };
+      const tb = { x: rightX, y: 1028, w: colW, h: 3 * chipsH + 2 * chipsGap };
       glassPanel(x, th, tb.x, tb.y, tb.w, tb.h, 14);
 
       let note = "";
