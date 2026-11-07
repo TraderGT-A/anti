@@ -2839,13 +2839,40 @@ function mfSvg(items,kind){
   for(let j=0;j<=4;j++){ const v=E.x0+(E.x1-E.x0)*j/4, w=E.y0+(E.y1-E.y0)*j/4;
     s+='<text x="'+X(v)+'" y="'+(H-pb+15)+'" class="mf-tick" text-anchor="middle">'+f(v)+'</text><text x="'+(pl-5)+'" y="'+(Y(w)+4)+'" class="mf-tick" text-anchor="end">'+f(w)+'</text>'; }
   s+='<text x="'+((pl+W-pr)/2)+'" y="'+(H-2)+'" class="mf-tick" text-anchor="middle">RS-Ratio (ความแข็งแกร่งเทียบตลาด) →</text><text transform="rotate(-90 11 '+(H/2)+')" x="11" y="'+(H/2)+'" class="mf-tick" text-anchor="middle">Momentum →</text><g clip-path="url(#mfclip)">';
-  items.forEach((it,n)=>{ const col='hsl('+((n*47)%360)+',68%,56%)', pts=it.pts.map(p=>X(p.x).toFixed(1)+','+Y(p.y).toFixed(1)).join(' '), h=it.pts[it.pts.length-1], on=(MF.hi===it.k), right=X(h.x)>W-150;
+  const placed=[];
+  function hit(r){ return placed.some(b=>!(r.x+r.w<b.x||r.x>b.x+b.w||r.y+r.h<b.y||r.y>b.y+b.h)); }
+  const ranked=[...items].sort((a,b)=>{ const A=a.pts[a.pts.length-1],B=b.pts[b.pts.length-1]; return (B.x+B.y)-(A.x+A.y); });
+  ranked.forEach((it)=>{ it.__col='hsl('+((items.indexOf(it)*47)%360)+',68%,56%)'; });
+  items.forEach((it,n)=>{
+    const col='hsl('+((n*47)%360)+',68%,56%)', pts=it.pts.map(p=>X(p.x).toFixed(1)+','+Y(p.y).toFixed(1)).join(' '), h=it.pts[it.pts.length-1], on=(MF.hi===it.k);
     s+='<g class="mf-g'+(on?' on':'')+'" data-k="'+it.k+'" onclick="mfSel(\''+it.k+'\')" onmouseenter="mfHi(\''+it.k+'\')" onmouseleave="mfHi(\'\')">'+
       (on?'<polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="2" opacity=".85"/>'+
         it.pts.slice(0,-1).map(p=>'<circle cx="'+X(p.x).toFixed(1)+'" cy="'+Y(p.y).toFixed(1)+'" r="2.6" fill="'+col+'" opacity=".85"/>').join(''):'')+
-      '<circle cx="'+X(h.x).toFixed(1)+'" cy="'+Y(h.y).toFixed(1)+'" r="'+(on?6.5:4.5)+'" fill="'+col+'"/>'+
-      '<text x="'+(right?X(h.x)-9:X(h.x)+9).toFixed(1)+'" y="'+(Y(h.y)-7).toFixed(1)+'" class="mf-lb'+(on?' on':'')+'"'+(right?' text-anchor="end"':'')+'>'+(MF.names[kind+':'+it.k]||it.k)+'</text></g>'; });
-
+      '<circle cx="'+X(h.x).toFixed(1)+'" cy="'+Y(h.y).toFixed(1)+'" r="'+(on?6.5:4.5)+'" fill="'+col+'" opacity="'+(on?1:.92)+'"/></g>';
+  });
+  // ป้ายชื่อ: หาตำแหน่งว่างรอบจุด + เส้นโยง (สไตล์เดียวกับการ์ดแชร์)
+  ranked.forEach((it)=>{
+    const col=it.__col, h=it.pts[it.pts.length-1], cx=X(h.x), cy=Y(h.y), on=(MF.hi===it.k);
+    const full=String(MF.names[kind+':'+it.k]||it.k);
+    const mTx=full.match(/\(([^)]{2,12})\)\s*$/);
+    const txt=(mTx?mTx[1]:full).slice(0,10);
+    let tw=Math.max(16, txt.length*6.0), thh=11;
+    try{ const mc=document.createElement('canvas').getContext('2d'); mc.font='700 10px Inter, system-ui, -apple-system, sans-serif'; tw=Math.ceil(mc.measureText(txt).width)+2; thh=10; }catch(e){}
+    const cand=[[9,4],[-9-tw,4],[0,-11],[0,17],[9,-11],[-9-tw,-11],[9,17],[-9-tw,17],[17,4],[-17-tw,4],[0,-20],[0,26],[18,-20],[-18-tw,-20],[18,25],[-18-tw,25],[26,4],[-26-tw,4],[0,-30],[0,36]];
+    let put=null;
+    for(let k2=0;k2<cand.length&&!put;k2++){
+      const lx=cx+cand[k2][0], ly=cy+cand[k2][1];
+      if(lx<pl+2||lx+tw>W-pr-2||ly<pt+10||ly>H-pb-2) continue;
+      const r={x:lx-2,y:ly-9,w:tw+4,h:thh+2};
+      if(hit(r)) continue;
+      put={x:lx,y:ly,r:r};
+    }
+    if(!put){ put={x:cx+8,y:cy+4,r:{x:cx+6,y:cy-6,w:tw+4,h:thh}}; }
+    placed.push(put.r);
+    const dist=Math.hypot(put.x-cx, put.y-cy);
+    if(dist>16) s+='<line x1="'+cx.toFixed(1)+'" y1="'+cy.toFixed(1)+'" x2="'+put.x.toFixed(1)+'" y2="'+(put.y-3).toFixed(1)+'" stroke="'+col+'" stroke-width=".7" opacity=".45"/>';
+    s+='<text x="'+put.x.toFixed(1)+'" y="'+put.y.toFixed(1)+'" class="mf-lb'+(on?' on':'')+'" style="fill:'+(on?'#fff':col)+';font-size:'+(on?12:11)+'px">'+txt.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</text>';
+  });
   return s+'</g></svg>';
 }
 
@@ -2856,8 +2883,10 @@ function mfShareRRG(){
     const items = MF.rot.items.map(it=>({ k:it.k, n:(MF.names[kind+':'+it.k]||it.k), x:it.x, y:it.y, q:it.q, days:it.days||0, vel:it.vel||0,
       pts:it.pts.map(p=>({x:p.x,y:p.y})) }));
     const title = kind==='sec' ? 'หมุนเวียนกลุ่มอุตสาหกรรม' : (kind==='th' ? 'หมุนเวียนหุ้นไทย' : (kind==='cty' ? 'หมุนเวียน ETF ประเทศ' : 'หมุนเวียนสินทรัพย์'));
-    if(!window.ShareCard || !ShareCard.openRRG){ alert('ยังโหลดตัวสร้างการ์ดไม่เสร็จ ลองอีกครั้ง'); return; }
-    ShareCard.openRRG({ title:title, sub:(MF.rot.kind==='sec'?'US · ':'')+MF_SENS[MF.sens][2]+' · 8 สัปดาห์ล่าสุด', items:items });
+    const fn = (window.ShareCard && (ShareCard.openRRGWide || ShareCard.openRRG)) || null;
+    if(!fn){ alert('ยังโหลดตัวสร้างการ์ดไม่เสร็จ ลองอีกครั้ง'); return; }
+    const payload = { title:title, sub:(MF.rot.kind==='sec'?'US · ':'')+'ปกติ · 8 สัปดาห์ล่าสุด', items:items };
+    if(ShareCard.openRRGWide) ShareCard.openRRGWide(payload); else ShareCard.openRRG(payload);
   }catch(e){ alert('สร้างการ์ดไม่สำเร็จ: '+(e&&e.message?e.message:e)); }
 }
 
@@ -3031,7 +3060,7 @@ async function mfRusH(){
   const j=await mfJ('/api/flow?kind=etf&set=sector'); j.meta.forEach(m=>MF.names['rus:'+m.k]=m.n+' ('+m.k+')');
   const items=mfRotItems(j,j.series.SPY,j.meta.map(m=>m.k)), H=j.holdings||{};
   return mfRotPage(items,'rus',k=>{ const t=(H[k]||[]).slice(0,5).map(h=>h.s).join(' · '); return (t?t+' · ':'')+'<a onclick="event.stopPropagation();mfEtf(\''+k+'\')">กราฟ ETF</a>'; },mfBy('rus'),
-    'กลุ่ม = ETF ภาคส่วน S&P 500 (SPDR) เทียบ SPY · ราคา ETF เป็น USD ไม่ได้แปลงเป็นบาท · รายสัปดาห์ หางยาว 8 สัปดาห์ · หมุนตามเข็มนาฬิกาตามวงจรปกติ · <b>กดกลุ่ม = การ์ดกราฟหุ้นใหญ่สุด ~10 ตัวใน ETF นั้น (Yahoo)</b> หรือกด "กราฟ ETF" · ถึง '+j.asOf);
+    'กลุ่ม = ETF ภาคส่วน S&P 500 (SPDR) เทียบ SPY · ราคา ETF เป็น USD ไม่ได้แปลงเป็นบาท · รายสัปดาห์ หางยาว 8 สัปดาห์ · หมุนตามเข็มนาฬิกาตามวงจรปกติ · <b>กดกลุ่ม = การ์ดกราฟหุ้นใหญ่สุด ~10 ตัวใน ETF นั้น</b> หรือกด "กราฟ ETF" · ถึง '+j.asOf);
 }
 const mfRthH=()=>mfGroupsH('th',MF.by.rth,'rth');
 /* ---- คำอธิบาย Universe หุ้น (พับไว้ กดเปิดอ่าน) — ตัวเลขเกณฑ์ตรงกับตัวคัดหุ้นของระบบ; ถ้าปรับเกณฑ์ต้องแก้ตารางด้านล่างด้วย ---- */
@@ -3114,7 +3143,7 @@ async function mfPick(kind,k){
   if(kind==='rus'){
     try{ const j=await mfJ('/api/flow?kind=etf&set=sector'), hs=(j.holdings||{})[k]||[], rows=await mfScanRows('america');
       const by=new Map(rows.map(s=>[String(s.ticker).replace(/-/g,'.'),s])), list=hs.map(h=>by.get(String(h.s).replace(/-/g,'.'))).filter(Boolean);
-      if(list.length){ openStockList(MF.names['rus:'+k],'หุ้นใหญ่สุดใน ETF นี้ (Yahoo)',list,'america'); return; } }catch(e){}
+      if(list.length){ openStockList(MF.names['rus:'+k],'หุ้นใหญ่สุดใน ETF นี้',list,'america'); return; } }catch(e){}
     mfEtf(k); return; }
   if(kind==='rg'){ try{ const C=MF.gctx, rows=await mfScanRows(C.mkt), set=new Set(C.members[k]||[]);
       openStockList(MF.names['rg:'+k]||k,(C.mk==='us'?'US':'ไทย')+' · ดัชนีกลุ่มของเรา',rows.filter(s=>set.has(s.ticker)).sort((a,b)=>(b.rs||0)-(a.rs||0)),C.mkt); }catch(e){} return; }

@@ -570,6 +570,126 @@
     return c;
   }
 
+
+  // ---------- การ์ด Netflow/RRG แนวนอน: กราฟซ้าย (ชื่อย่อเท่านั้น) + สรุปด้านขวา ----------
+  async function drawRRGWide(o) {
+    const th = shareTheme();
+    const W = 1480, H = 800;
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d");
+    const g2 = x.createLinearGradient(0, 0, W, H); g2.addColorStop(0, th.bg); g2.addColorStop(1, th.bg2);
+    x.fillStyle = g2; x.fillRect(0, 0, W, H);
+
+    await brandHead(x, th, 48, 34, 30, 21);
+    x.textAlign = "right"; x.fillStyle = th.muted; x.font = font(500, 16);
+    x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 48, 58);
+    x.textAlign = "left";
+    x.fillStyle = th.text; x.font = font(800, 30); x.fillText(cutText(o.title || "Relative Rotation", 44), 48, 112);
+    x.fillStyle = th.muted; x.font = font(500, 15); x.fillText(cutText(o.sub || "", 78), 48, 138);
+
+    const items = (o.items || []).filter(function (i) { return isFinite(i.x) && isFinite(i.y); });
+    if (!items.length) { x.fillStyle = th.muted; x.font = font(600, 24); x.fillText("ไม่มีข้อมูล", 48, 250); return c; }
+
+    const QCOL = { Leading: "#4FD1B5", Weakening: "#E2BE6E", Improving: "#9B7BE0", Lagging: "#F08A7E" };
+    const QORD = ["Leading", "Improving", "Weakening", "Lagging"];
+
+    const PX = 48, PY = 168, PW = 930, PH = 548;
+    const xs = items.map(function (i) { return i.x; }), ys = items.map(function (i) { return i.y; });
+    const dx = Math.max(100 - Math.min.apply(null, xs), Math.max.apply(null, xs) - 100, 0.8) * 1.18;
+    const dy = Math.max(100 - Math.min.apply(null, ys), Math.max.apply(null, ys) - 100, 0.7) * 1.22;
+    const E = { x0: 100 - dx, x1: 100 + dx, y0: 100 - dy, y1: 100 + dy };
+    const X = function (v) { return PX + (v - E.x0) / (E.x1 - E.x0) * PW; };
+    const Y = function (v) { return PY + (1 - (v - E.y0) / (E.y1 - E.y0)) * PH; };
+    const mx = X(100), my = Y(100);
+
+    x.fillStyle = "rgba(155,123,224,.09)"; x.fillRect(PX, PY, mx - PX, my - PY);
+    x.fillStyle = "rgba(79,209,181,.10)"; x.fillRect(mx, PY, PX + PW - mx, my - PY);
+    x.fillStyle = "rgba(240,138,126,.09)"; x.fillRect(PX, my, mx - PX, PY + PH - my);
+    x.fillStyle = "rgba(226,190,110,.09)"; x.fillRect(mx, my, PX + PW - mx, PY + PH - my);
+    x.strokeStyle = th.line; x.lineWidth = 1.4;
+    x.beginPath(); x.moveTo(mx, PY); x.lineTo(mx, PY + PH); x.stroke();
+    x.beginPath(); x.moveTo(PX, my); x.lineTo(PX + PW, my); x.stroke();
+
+    x.font = font(700, 13);
+    x.fillStyle = QCOL.Improving; x.fillText("Improving", PX + 10, PY + 18);
+    x.textAlign = "right"; x.fillStyle = QCOL.Leading; x.fillText("Leading", PX + PW - 10, PY + 18);
+    x.textAlign = "left"; x.fillStyle = QCOL.Lagging; x.fillText("Lagging", PX + 10, PY + PH - 10);
+    x.textAlign = "right"; x.fillStyle = QCOL.Weakening; x.fillText("Weakening", PX + PW - 10, PY + PH - 10);
+    x.textAlign = "left";
+    x.fillStyle = th.muted; x.font = font(500, 12);
+    x.fillText("RS-Ratio →", PX + PW - 84, PY + PH + 18);
+    x.save(); x.translate(PX - 22, PY + PH / 2 + 34); x.rotate(-Math.PI / 2); x.fillText("Momentum ↑", 0, 0); x.restore();
+
+    // จุดตามตำแหน่งจริง + ป้ายทุกตัวกันชนด้วยการย้ายตำแหน่ง + เส้นโยง
+    const usedBoxes = [], usedDots = items.map(function (it) { return { x: X(it.x), y: Y(it.y) }; });
+    function hits(rect) {
+      return usedBoxes.some(function (b) { return !(rect.x + rect.w < b.x || rect.x > b.x + b.w || rect.y + rect.h < b.y || rect.y > b.y + b.h); });
+    }
+    const ranked = items.slice().sort(function (a, b) { return (b.x + b.y) - (a.x + a.y); });
+    ranked.forEach(function (it) {
+      const col = QCOL[it.q] || th.gold;
+      const cx = X(it.x), cy = Y(it.y);
+      x.beginPath(); x.arc(cx, cy, 4.6, 0, Math.PI * 2); x.fillStyle = col; x.fill();
+      const tk = String(it.k).replace(/\.BK$/, "").slice(0, 8);
+      x.font = font(700, 11.5);
+      const tw = x.measureText(tk).width, th2 = 13;
+      const cand = [[12, 4], [-12 - tw, 4], [4, -14], [4, 16], [12, -14], [-12 - tw, -14], [12, 16], [-12 - tw, 16],
+                    [0, -24], [0, 26], [20, -22], [-20 - tw, -22], [20, 24], [-20 - tw, 24],
+                    [26, 4], [-26 - tw, 4], [4, -34], [4, 36], [30, -32], [-30 - tw, -32], [30, 34], [-30 - tw, 34]];
+      let placed = null;
+      for (let k = 0; k < cand.length && !placed; k++) {
+        const lx2 = cx + cand[k][0], ly2 = cy + cand[k][1];
+        if (lx2 < PX - 34 || lx2 + tw > PX + PW + 12 || ly2 < PY - 12 || ly2 > PY + PH + 26) continue;
+        const rect = { x: lx2 - 2, y: ly2 - 10, w: tw + 4, h: th2 };
+        if (usedBoxes.some(function (b) { return !(rect.x + rect.w < b.x || rect.x > b.x + b.w || rect.y + rect.h < b.y || rect.y > b.y + b.h); })) continue;
+        const dotHit = usedDots.some(function (d2) { return Math.abs(d2.x - (lx2 + tw / 2)) < tw / 2 + 4 && Math.abs(d2.y - ly2) < 8 && (Math.abs(d2.x - cx) > 3 || Math.abs(d2.y - cy) > 3); });
+        if (dotHit) continue;
+        placed = { x: lx2, y: ly2, rect: rect };
+      }
+      if (!placed) return;
+      usedBoxes.push(placed.rect);
+      const d = Math.hypot(placed.x - cx, placed.y - cy);
+      if (d > 18) { x.strokeStyle = col; x.globalAlpha = 0.4; x.lineWidth = 1; x.beginPath(); x.moveTo(cx, cy); x.lineTo(placed.x, placed.y); x.stroke(); x.globalAlpha = 1; }
+      x.fillStyle = th.text; x.textAlign = "left";
+      x.fillText(tk, placed.x, placed.y + 2);
+    });
+    x.textAlign = "left";
+
+    // แผงขวา: สรุปจำนวน + รายชื่อทั้งหมด (3 คอลัมน์)
+    const LX = 1000, LW = W - LX - 48, LY = 168, PH2 = 548;
+    glassPanel(x, th, LX, LY, LW, PH2, 16);
+    x.fillStyle = th.text; x.font = font(800, 19); x.fillText("Regime Summary", LX + 18, LY + 32);
+    const groups = {}; QORD.forEach(function (q) { groups[q] = []; });
+    items.forEach(function (it) { (groups[it.q] || groups.Lagging).push(it); });
+    let cy2 = LY + 56;
+    QORD.forEach(function (q) {
+      if (!groups[q].length) return;
+      x.fillStyle = QCOL[q]; x.font = font(800, 12.5);
+      x.fillText(q.toUpperCase() + " " + groups[q].length, LX + 18, cy2); cy2 += 15;
+    });
+    const cols = 3, colW2 = (LW - 36) / cols, ROW = 13.5;
+    let ci = 0, ri = 0;
+    QORD.forEach(function (q) {
+      if (!groups[q].length) return;
+      const arr = groups[q].slice().sort(function (a, b) { return (b.x + b.y) - (a.x + a.y); });
+      let bx0 = LX + 18 + ci * colW2, yy = LY + 112 + ri * ROW;
+      x.fillStyle = QCOL[q]; x.font = font(800, 10.5);
+      x.fillText(q.slice(0, 4).toUpperCase(), bx0, yy); yy += ROW; ri++;
+      arr.forEach(function (it) {
+        if (yy > LY + PH2 - 18) { ci++; ri = 0; bx0 = LX + 18 + ci * colW2; yy = LY + 112 + ri * ROW; }
+        x.fillStyle = th.body; x.font = font(600, 11);
+        x.fillText(String(it.k).replace(/\.BK$/, "").slice(0, 7), bx0, yy);
+        x.textAlign = "right"; x.fillStyle = th.muted; x.font = font(600, 10);
+        x.fillText("d" + (it.days || 0), bx0 + colW2 - 10, yy); x.textAlign = "left";
+        yy += ROW; ri++;
+      });
+      ri += 0.4;
+    });
+
+    await brandFoot(x, th, W, H, { text: "RS-Ratio/Momentum รายสัปดาห์ · ตำแหน่งตามค่าจริง · เพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน" });
+    return c;
+  }
+
   async function drawGrid(opts) {
     const th = shareTheme();                       // การ์ดใช้พื้นดำ #0D0A11 เสมอ
     const W = 1080, H = 1350;
@@ -1417,13 +1537,17 @@
     const tkW0 = x.measureText(tk).width;                 // วัดด้วยฟอนต์ชื่อย่อก่อนเปลี่ยนฟอนต์
     x.fillStyle = th.body; x.font = font(500, 21);
     x.fillText((nm || "").slice(0, 30), nameX, 192);
-    if (row.industry || row.sector) { x.fillStyle = th.muted; x.font = font(600, 17); x.fillText(String(row.industry || row.sector).slice(0, 26), nameX, 218); }
+    if (drRef) {
+      const dtxt = "DR อ้างอิง " + drRef.p + (drRef.i ? " · ออกโดย " + drRef.i : "");
+      x.fillStyle = th.gold; x.font = font(700, 17); x.fillText(dtxt.slice(0, 50), nameX, 218);
+    } else if (row.industry || row.sector) { x.fillStyle = th.muted; x.font = font(600, 17); x.fillText(String(row.industry || row.sector).slice(0, 26), nameX, 218); }
     { let tg = instrumentTags(tk, mk);
       if (drRef) {
         const MAP = (typeof DR_US !== "undefined" && DR_US) ? (DR_US.byTicker || DR_US) : {};
-        tg = (MAP[drRef.p] || []).slice(0, 4).map(function (z) { return { kind: "DR", text: z.t, title: z.i || "" }; });
+        tg = (MAP[drRef.p] || []).filter(function (z) { return String(z.t).toUpperCase() !== String(tk).toUpperCase(); })
+          .slice(0, 3).map(function (z) { return { kind: "DR", text: z.t, title: z.i || "" }; });
       }
-      if (tg.length) drawTags(x, th, tg, nameX + tkW0 + 62, 206, W - 420);
+      if (tg.length) drawTags(x, th, tg, nameX + tkW0 + 62, 200, W - 420);
     }
 
     const lastBar = bars.length ? bars[bars.length - 1] : null;
@@ -1445,9 +1569,14 @@
 
     let rs = row.rs != null ? row.rs : (row.rs3 ?? row.rs6 ?? null);
     if (rs == null || Number(rs) === 0) { const rf = await rsFallback(tk, mk); if (rf != null) rs = rf; }
+    if (drRef && (!isFinite(Number(rs)) || Number(rs) === 0)) { const rp = await rsFallback(drRef.p, "america"); if (rp != null) rs = rp; }
     if (rs == null) rs = "—";
     const hi = f && f.hi ? f.hi : null;
-    const toHi = (hi && px) ? ((px / hi - 1) * 100) : null;
+    let toHi = (hi && px) ? ((px / hi - 1) * 100) : null;
+    if (drRef && bars && bars.length) {
+      const hiD = Math.max.apply(null, bars.slice(-252).map(function (b) { return b.h != null ? b.h : (b.c != null ? b.c : b.close); }));
+      if (px && hiD) toHi = (px / hiD - 1) * 100;
+    }
     let p3w = row.p3m;
     if (p3w == null && bars && bars.length > 64) {
       const c0 = bars[bars.length - 1], c1 = bars[bars.length - 64];
@@ -1669,8 +1798,21 @@
   }
 
   const ShareCard = {
+    async openRRGWide(o) {
+      await ensureFonts();
+      const oldFmt5 = document.getElementById("shFmt"); if (oldFmt5) oldFmt5.remove();
+      const box = ensureShareBox(); box.classList.add("on");
+      const img = document.getElementById("shImg");
+      let url = "";
+      try { url = (await drawRRGWide(o)).toDataURL("image/png"); } catch (e) { try { globalThis.__rrgWErr = String(e); } catch (_) {} }
+      if (!url) { box.classList.remove("on"); alert("สร้างการ์ดไม่สำเร็จ ลองอีกครั้ง"); return; }
+      img.src = url;
+      const nm = "rsdash_rrg_" + new Date().toISOString().slice(0, 10) + ".png";
+      document.getElementById("shDl").onclick = () => { const a = document.createElement("a"); a.href = url; a.download = nm; a.click(); };
+    },
     async openRRG(o) {
       await ensureFonts();
+      const oldFmt3 = document.getElementById("shFmt"); if (oldFmt3) oldFmt3.remove();
       const box = ensureShareBox(); box.classList.add("on");
       const img = document.getElementById("shImg");
       let url = "";
@@ -1682,6 +1824,7 @@
     },
     async openInstrument(o) {
       await ensureFonts();
+      const oldFmt4 = document.getElementById("shFmt"); if (oldFmt4) oldFmt4.remove();
       const box = ensureShareBox(); box.classList.add("on");
       const img = document.getElementById("shImg");
       let url = "";
