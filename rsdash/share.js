@@ -291,11 +291,13 @@
     return out;
   }
   const HEAT_MID = [22, 18, 28];
+  let HEAT_MODE = "pastel";   // pastel = แบบเดิม · normal = แดง/เขียวเข้มแบบกระดาน
   function heatColor(v, th) {
     if (!v || Math.abs(v) < 0.05) return `rgb(${HEAT_MID.join(",")})`;   // 0% = กลางจืด ไม่ติดเขียว/แดง
     const t = Math.max(-1, Math.min(1, v / 3));
     const mid = th === THEMES.dark ? HEAT_MID : [232, 229, 220];
-    const up = [79, 209, 181], dn = [240, 138, 126];
+    const up = HEAT_MODE === "normal" ? [22, 163, 74] : [79, 209, 181];
+    const dn = HEAT_MODE === "normal" ? [220, 38, 38] : [240, 138, 126];
     const end = t > 0 ? up : dn, k = Math.abs(t);
     const c = mid.map((m, i) => Math.round(m + (end[i] - m) * (0.16 + 0.84 * k)));
     return `rgb(${c[0]},${c[1]},${c[2]})`;
@@ -1398,6 +1400,8 @@
       };
       window.__brandRerender = async () => { try { const u2 = (await drawInstrument(o)).toDataURL("image/png"); if (u2) { url = u2; img.src = u2; } } catch (e) {} };
     },
+    setHeatMode(m) { HEAT_MODE = (m === "normal" ? "normal" : "pastel"); return HEAT_MODE; },
+    getHeatMode() { return HEAT_MODE; },
     setBrand(b) { BRAND = (b === "gt" ? "gt" : "thus"); try { localStorage.setItem("rsd_cardBrand", BRAND); } catch (e) {} return BRAND; },
     getBrand() { return BRAND; },
     setGlass(o) { Object.assign(GLASS, o || {}); return GLASS; },
@@ -1479,6 +1483,19 @@
       img.src = url;
       window.__brandRerender = async () => {
         try { const u2 = (await drawHeat(opts)).toDataURL("image/png"); if (u2) { url = u2; img.src = u2; } } catch (e) {}
+      };
+      let hm = document.getElementById("shHeatMode");
+      if (!hm) {
+        hm = document.createElement("button"); hm.id = "shHeatMode"; hm.className = "sh-btn";
+        const rr = document.querySelector(".sh-box .sh-row");
+        if (rr) rr.insertBefore(hm, rr.firstChild);
+      }
+      const paintHm = () => { hm.textContent = "สี: " + (HEAT_MODE === "normal" ? "แดง/เขียวปกติ" : "พาสเทล"); };
+      paintHm();
+      hm.onclick = async () => {
+        HEAT_MODE = HEAT_MODE === "normal" ? "pastel" : "normal";
+        paintHm();
+        try { const u3 = (await drawHeat(opts)).toDataURL("image/png"); if (u3) { url = u3; img.src = u3; } } catch (e) {}
       };
       const fname = `rsdash_heat_${new Date().toISOString().slice(0, 10)}.png`;
       document.getElementById("shDl").onclick = () => { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); };
