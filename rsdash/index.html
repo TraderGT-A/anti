@@ -6139,7 +6139,15 @@ async function openFundInfo(code, idxTk){
       <a href="https://www.finnomena.com/fund/${encodeURIComponent(item.t)}" target="_blank" rel="noopener" class="flex-1 text-center h-9 leading-9 rounded-lg border border-[#2b3purple] text-[12px] font-semibold border-[#2b3a52]">Finnomena</a>
     </div>`;
 }
+const MSTACK=[];
 function openModal(tk,nm,mkt){
+  try{
+    const vis=!document.getElementById('chartModal').classList.contains('hidden');
+    if(!vis){ MSTACK.length=0; }
+    else if(!window.__popping && activeTicker && activeTicker!==tk){
+      MSTACK.push({tk:activeTicker, nm:(document.getElementById('modalName')||{}).textContent||'', mk:activeMarket});
+    }
+  }catch(e){}
   activeTicker=tk;
   { const m=document.getElementById('chartModal'); m.classList.remove('show-more'); const a=document.getElementById('modalMoreArrow'); if(a) a.textContent='▾'; const s=document.getElementById('modalTTsum'); if(s) s.textContent=''; }
   document.getElementById('modalTicker').textContent=tk;
@@ -6213,7 +6221,20 @@ function openModal(tk,nm,mkt){
   if(_drEl) _drEl.innerHTML = (mk==='america') ? drTableHTML(tk) : '';   // DR ไทย (เฉพาะหุ้นเมกา)
   document.getElementById('chartModal').classList.remove('hidden'); document.getElementById('chartModal').classList.add('flex'); fetchModal('1y');
 }
-function closeModal(){ document.getElementById('chartModal').classList.add('hidden'); document.getElementById('chartModal').classList.remove('flex'); activeTicker=''; }
+function closeModal(){
+  try{
+    if(MSTACK.length && !window.__popping){
+      const p=MSTACK.pop();
+      window.__popping=true;
+      openModal(p.tk, p.nm, p.mk);
+      window.__popping=false;
+      return;
+    }
+  }catch(e){}
+  document.getElementById('chartModal').classList.add('hidden');
+  document.getElementById('chartModal').classList.remove('flex');
+  activeTicker=''; MSTACK.length=0;
+}
 function changeModalTF(iv, ev){
   const btns=[...document.querySelectorAll('#chartModal .tf-chip')];
   btns.forEach(b=>b.classList.remove('active'));
