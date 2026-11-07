@@ -83,7 +83,7 @@ def main():
         except Exception:
             prev = {}
 
-    result = {}
+    result = dict(prev)   # คงกองเดิมไว้ แล้วอัปเดตเฉพาะที่ดึงรอบนี้
     for c in codes:
         print("•", c, flush=True)
         fid = fund_id(c)
