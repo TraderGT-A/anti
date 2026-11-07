@@ -425,21 +425,32 @@
 
   // หัวการ์ด: โลโก้ THUS + คำว่า THUS + โล่ GT ต่อท้าย (สองแบรนด์อยู่ด้วยกัน)
   async function brandHead(x, th, x0, y0, size, wordSize) {
-    const isLight = (th === THEMES.light);
+    if (BRAND === "gt") {
+      const shield = await loadImg("/brand/gt_shield.png");
+      const word = await loadImg("/brand/gt_word.png");
+      if (shield) { const hh = size * 1.05, ww = Math.round(shield.width * (hh / shield.height)); try { x.drawImage(shield, x0, y0, ww, hh); } catch (e) {} }
+      if (word) {
+        const wh = size * 0.62, ww2 = Math.round(word.width * (wh / word.height));
+        try { x.drawImage(word, x0 + size * 1.15, y0 + (size - wh) / 2, ww2, wh); } catch (e) {}
+      }
+      return;
+    }
+    const isLight = (th === THEMES.light || th === THEMES.gtLight);
     const thus = await loadImg(isLight ? "/brand/thus-symbol-color.png" : "/brand/thus-symbol-white.png");
-    const gt = await loadImg("/brand/gt_shield.png");
     if (thus) { try { x.drawImage(thus, x0, y0, size, size); } catch (e) {} }
-    let cx = x0 + size + 12;
+    const cx = x0 + size + 12;
     x.fillStyle = th.text; x.font = font(800, wordSize || Math.round(size * 0.66));
     x.fillText("THUS", cx, y0 + size * 0.78);
-    cx += x.measureText("THUS").width + 14;
-    if (gt) {
-      const gh = size * 0.92, gw = Math.round(gt.width * (gh / gt.height));
-      try { x.drawImage(gt, cx, y0 + (size - gh) / 2, gw, gh); } catch (e) {}
-    }
   }
   async function brandFoot(x, th, W, H, opt) {
     const o = opt || {};
+    if (BRAND === "gt") {
+      const word = await loadImg("/brand/gt_word.png");
+      if (word) {
+        const hh = o.wordH || 26, ww = Math.round(word.width * (hh / word.height));
+        try { x.drawImage(word, W - 70 - ww, H - 84, ww, hh); } catch (e) {}
+      }
+    }
     x.fillStyle = th.muted; x.font = font(400, o.note || 17); x.textAlign = "left";
     x.fillText(o.text || "ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", 70, H - 66);
     x.textAlign = "left";
@@ -597,6 +608,8 @@
   /* ---------- การ์ดแชร์ ---------- */
   const THEMES = {
     dark: { bg: "#0D0A11", bg2: "#120E18", panel: "#120E18", hi: "#1B1624", line: "#241E30", lineHi: "#332B42", text: "#F3EFF8", body: "#B8B1C2", muted: "#8F879A", gold: "#E2BE6E", gold2: "#F0D79B", up: "#4FD1B5", down: "#F08A7E", ma20: "#E2BE6E", ma50: "#9B7BE0" },
+    gtDark: { bg: "#0A1226", bg2: "#101C36", panel: "#101C36", hi: "#16233D", line: "#243352", lineHi: "#33456A", text: "#F6F1E6", body: "#C8C2B4", muted: "#9A9486", gold: "#E3C48B", gold2: "#F0D9AC", up: "#4FD1B5", down: "#F08A7E", ma20: "#E3C48B", ma50: "#9B7BE0" },
+    gtLight: { bg: "#F4F1E4", bg2: "#FFFCF0", panel: "#FFFCF0", hi: "#FFFFFF", line: "#E0D7BF", lineHi: "#C6B892", text: "#241E12", body: "#4A4232", muted: "#7B7059", gold: "#8A6A2E", gold2: "#A98A45", up: "#0E7C6B", down: "#B4442C", ma20: "#A9822F", ma50: "#6B4FA8" },
     light: { bg: "#F2EFE8", bg2: "#FCFAF5", panel: "#FCFAF5", hi: "#FFFFFF", line: "#DBD2C2", lineHi: "#C2B6A0", text: "#1C1A22", body: "#3D3848", muted: "#6A6472", gold: "#8A6A2E", gold2: "#A98A45", up: "#0E7C6B", down: "#B4442C", ma20: "#A9822F", ma50: "#6B4FA8" },
   };
   const FONT = '600 %spx Prompt, Inter, "Noto Sans Thai", "Leelawadee UI", sans-serif';
@@ -682,11 +695,16 @@
   }
   const GLASS = { a: 0.028, b: 0.009, hi: 0.07, sh: 0.42 };
 
+  let BRAND = "thus";
+  try { BRAND = localStorage.getItem("rsd_cardBrand") === "gt" ? "gt" : "thus"; } catch (e) {}
   function shareTheme() {
+    let light = false;
     try {
       const t = document.documentElement.getAttribute("data-theme") || localStorage.getItem("rsd_theme") || "dark";
-      return t === "light" ? THEMES.light : THEMES.dark;
-    } catch (e) { return THEMES.dark; }
+      light = (t === "light");
+    } catch (e) {}
+    if (BRAND === "gt") return light ? THEMES.gtLight : THEMES.gtDark;
+    return light ? THEMES.light : THEMES.dark;
   }
   function glassPanel(x, th, bx, by, bw, bh, r) {
     const rr2 = r || 20;
@@ -1252,11 +1270,25 @@
     box.innerHTML = `<div class="sh-box"><img id="shImg" class="sh-img" alt="share card" /><div class="sh-row"><button class="sh-btn primary" id="shDl">ดาวน์โหลด PNG</button><button class="sh-btn" id="shShare">แชร์</button><button class="sh-btn" id="shClose">ปิด</button></div><div class="sh-note">1080 × 1350 px · พร้อมลงโซเชียล</div></div>`;
     document.body.appendChild(box);
     box.addEventListener("click", (e) => { if (e.target === box) box.classList.remove("on"); });
+    const bb = document.createElement("button");
+    bb.id = "shBrand"; bb.className = "sh-btn";
+    const row0 = box.querySelector(".sh-row");
+    if (row0) row0.insertBefore(bb, row0.firstChild);
+    const paintBrand = () => { bb.textContent = "แบรนด์: " + (BRAND === "gt" ? "GT" : "THUS"); };
+    paintBrand();
+    bb.onclick = () => {
+      BRAND = (BRAND === "gt" ? "thus" : "gt");
+      try { localStorage.setItem("rsd_cardBrand", BRAND); } catch (e) {}
+      paintBrand();
+      window.__brandRerender && window.__brandRerender();
+    };
     document.getElementById("shClose").onclick = () => box.classList.remove("on");
     return box;
   }
 
   const ShareCard = {
+    setBrand(b) { BRAND = (b === "gt" ? "gt" : "thus"); try { localStorage.setItem("rsd_cardBrand", BRAND); } catch (e) {} return BRAND; },
+    getBrand() { return BRAND; },
     setGlass(o) { Object.assign(GLASS, o || {}); return GLASS; },
     getGlass() { return Object.assign({}, GLASS); },
     async openGrid(opts) {
@@ -1311,6 +1343,7 @@
             await new Promise((r) => setTimeout(r, 350));
           }
         };
+        window.__brandRerender = () => { urls = {}; return render(page); };
         document.getElementById("shDl").onclick = () => { const a = document.createElement("a"); a.href = urls[page]; a.download = name(page); a.click(); };
         document.getElementById("shShare").onclick = async () => {
           try {
@@ -1333,6 +1366,9 @@
       try { url = (await drawHeat(opts)).toDataURL("image/png"); } catch (e) { url = ""; }
       if (!url) { box.classList.remove("on"); alert("สร้างการ์ดไม่สำเร็จ ลองใหม่อีกครั้ง"); return; }
       img.src = url;
+      window.__brandRerender = async () => {
+        try { const u2 = (await drawHeat(opts)).toDataURL("image/png"); if (u2) { url = u2; img.src = u2; } } catch (e) {}
+      };
       const fname = `rsdash_heat_${new Date().toISOString().slice(0, 10)}.png`;
       document.getElementById("shDl").onclick = () => { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); };
       document.getElementById("shShare").onclick = async () => {
@@ -1353,6 +1389,9 @@
       catch (e) { url = ""; }
       if (!url) { box.classList.remove("on"); alert("สร้างการ์ดไม่สำเร็จ ลองใหม่อีกครั้ง"); return; }
       img.src = url;
+      window.__brandRerender = async () => {
+        try { const u2 = (await drawList(opts)).toDataURL("image/png"); if (u2) { url = u2; img.src = u2; } } catch (e) {}
+      };
       const fname = `rsdash_${(opts.title || "list").replace(/[^\w\u0E00-\u0E7F]+/g, "_")}_${new Date().toISOString().slice(0, 10)}.png`;
       document.getElementById("shDl").onclick = () => { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); };
       document.getElementById("shShare").onclick = async () => {
@@ -1429,6 +1468,12 @@
         };
       }
       bind();
+      window.__brandRerender = async () => {
+        try {
+          const u = await render(cur.mode);
+          if (u) { cur.url = u; img.src = u; bind(); }
+        } catch (e) {}
+      };
     },
   };
 
