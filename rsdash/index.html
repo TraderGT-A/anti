@@ -2710,8 +2710,10 @@ function mfRRG(a,b,n,m,tail){
   const idx=[]; for(let i=a.length-1;i>=0;i-=5) idx.unshift(i);
   const rs=idx.map(i=>a[i]!=null&&b[i]!=null?a[i]/b[i]:null);
   const ratio=rs.map((v,t)=>{ if(t<n-1||v==null) return null; const w=rs.slice(t-n+1,t+1); return w.some(x=>x==null)?null:100*v/(w.reduce((s,x)=>s+x,0)/n); });
-  const rat=ratio.map((v,t)=>{ if(t<2) return null; const w=ratio.slice(t-2,t+1); return w.some(x=>x==null)?null:w.reduce((s,x)=>s+x,0)/3; });
-  const pts=[]; for(let t=m;t<rat.length;t++){ if(rat[t]==null||rat[t-m]==null) continue; pts.push({x:rat[t],y:100+rat[t]-rat[t-m],i:idx[t]}); }
+  const pts=[]; for(let t=m-1;t<ratio.length;t++){ if(ratio[t]==null) continue;
+    const w=ratio.slice(t-m+1,t+1); if(w.some(x=>x==null)) continue;
+    const av=w.reduce((s2,x)=>s2+x,0)/m; if(!av) continue;
+    pts.push({x:ratio[t],y:100*ratio[t]/av,i:idx[t]}); }   // momentum = 100×ratio/ค่าเฉลี่ย ratio (สูตร RRG มาตรฐาน)
   return pts.slice(-(tail+1));
 }
 const mfQ=p=>p.x>=100?(p.y>=100?'Leading':'Weakening'):(p.y>=100?'Improving':'Lagging');
@@ -2740,10 +2742,13 @@ function mfSvg(items,kind){
   for(let j=0;j<=4;j++){ const v=E.x0+(E.x1-E.x0)*j/4, w=E.y0+(E.y1-E.y0)*j/4;
     s+='<text x="'+X(v)+'" y="'+(H-pb+15)+'" class="mf-tick" text-anchor="middle">'+f(v)+'</text><text x="'+(pl-5)+'" y="'+(Y(w)+4)+'" class="mf-tick" text-anchor="end">'+f(w)+'</text>'; }
   s+='<text x="'+((pl+W-pr)/2)+'" y="'+(H-2)+'" class="mf-tick" text-anchor="middle">RS-Ratio (ความแข็งแกร่งเทียบตลาด) →</text><text transform="rotate(-90 11 '+(H/2)+')" x="11" y="'+(H/2)+'" class="mf-tick" text-anchor="middle">Momentum →</text><g clip-path="url(#mfclip)">';
-  items.forEach((it,n)=>{ const col='hsl('+((n*47)%360)+',68%,56%)', pts=it.pts.map(p=>X(p.x).toFixed(1)+','+Y(p.y).toFixed(1)).join(' '), h=it.pts[it.pts.length-1], right=X(h.x)>W-150;
-    s+='<g class="mf-g'+(MF.hi===it.k?' on':'')+'" data-k="'+it.k+'" onclick="mfPick(\''+kind+'\',\''+it.k+'\')" onmouseenter="mfHi(\''+it.k+'\')" onmouseleave="mfHi(\'\')"><polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="1.6" opacity=".75"/>'+
-      it.pts.slice(0,-1).map(p=>'<circle cx="'+X(p.x).toFixed(1)+'" cy="'+Y(p.y).toFixed(1)+'" r="2" fill="'+col+'" opacity=".7"/>').join('')+
-      '<circle cx="'+X(h.x).toFixed(1)+'" cy="'+Y(h.y).toFixed(1)+'" r="5.5" fill="'+col+'"/><text x="'+(right?X(h.x)-8:X(h.x)+8).toFixed(1)+'" y="'+(Y(h.y)-6).toFixed(1)+'" class="mf-lb"'+(right?' text-anchor="end"':'')+'>'+(MF.names[kind+':'+it.k]||it.k)+'</text></g>'; });
+  items.forEach((it,n)=>{ const col='hsl('+((n*47)%360)+',68%,56%)', pts=it.pts.map(p=>X(p.x).toFixed(1)+','+Y(p.y).toFixed(1)).join(' '), h=it.pts[it.pts.length-1], on=(MF.hi===it.k), right=X(h.x)>W-150;
+    s+='<g class="mf-g'+(on?' on':'')+'" data-k="'+it.k+'" onclick="mfSel(\''+it.k+'\')" onmouseenter="mfHi(\''+it.k+'\')" onmouseleave="mfHi(\'\')">'+
+      (on?'<polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="2" opacity=".85"/>'+
+        it.pts.slice(0,-1).map(p=>'<circle cx="'+X(p.x).toFixed(1)+'" cy="'+Y(p.y).toFixed(1)+'" r="2.6" fill="'+col+'" opacity=".85"/>').join(''):'')+
+      '<circle cx="'+X(h.x).toFixed(1)+'" cy="'+Y(h.y).toFixed(1)+'" r="'+(on?6.5:4.5)+'" fill="'+col+'"/>'+
+      '<text x="'+(right?X(h.x)-9:X(h.x)+9).toFixed(1)+'" y="'+(Y(h.y)-7).toFixed(1)+'" class="mf-lb'+(on?' on':'')+'"'+(right?' text-anchor="end"':'')+'>'+(MF.names[kind+':'+it.k]||it.k)+'</text></g>'; });
+
   return s+'</g></svg>';
 }
 function mfRotDraw(){ const c=document.getElementById('mfRotSvg'); if(c&&MF.rot) c.innerHTML=mfSvg(MF.rot.items,MF.rot.kind); }
@@ -2755,9 +2760,11 @@ function mfZoom(f,cx,cy){
   MF.view=(n.x1-n.x0>(A.x1-A.x0)*1.05)?null:n; mfRotDraw();
 }
 function mfZoomReset(){ MF.view=null; mfRotDraw(); }
+function mfSel(k){ MF.sel=(MF.sel===k?'':k); mfHi(MF.sel); }
 function mfHi(k){
-  MF.hi=k||''; const s=document.querySelector('#mfRotSvg svg'); if(s){ s.classList.toggle('hl',!!k); s.querySelectorAll('.mf-g').forEach(g=>g.classList.toggle('on',g.dataset.k===k)); }
-  document.querySelectorAll('#mfRotTbl tr[data-k]').forEach(r=>r.classList.toggle('on',r.dataset.k===k));
+  MF.hi=(k===undefined?MF.sel:(k||MF.sel))||''; const s=document.querySelector('#mfRotSvg svg'); if(s){ s.classList.toggle('hl',!!k); s.querySelectorAll('.mf-g').forEach(g=>g.classList.toggle('on',g.dataset.k===k)); }
+  document.querySelectorAll('#mfRotTbl tr[data-k]').forEach(r=>r.classList.toggle('on',r.dataset.k===MF.hi));
+  try{ mfRotDraw(); }catch(e){}
 }
 function mfRotBind(){
   const c=document.getElementById('mfRotSvg'); if(!c||c._b) return; c._b=1;

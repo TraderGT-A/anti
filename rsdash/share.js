@@ -851,6 +851,50 @@
   }
 
   // กราฟเส้นแนวโน้มรายได้ / กำไรสุทธิ รายไตรมาส
+
+
+  // DR ไทย → หุ้นแม่ (ใช้ข้อมูลพื้นฐาน/โลโก้/RS จากหุ้นแม่) + ผู้ออก DR
+  function drOf(tk, mk) {
+    if (mk !== "thailand" || typeof DR_US === "undefined" || !DR_US || !DR_US.byTicker) return null;
+    const code = String(tk).toUpperCase();
+    for (const parent in DR_US.byTicker) {
+      const hit = (DR_US.byTicker[parent] || []).find(function (z) { return String(z.t).toUpperCase() === code; });
+      if (hit) return { p: parent, i: hit.i || "", t: hit.t };
+    }
+    return null;
+  }
+  // ป้าย DR (รหัส DR ที่ซื้อในไทยได้) + ป้าย SSF
+  function instrumentTags(tk, mk) {
+    const out = [];
+    try {
+      if (mk === "america" && typeof DR_US !== "undefined" && DR_US && DR_US.byTicker) {
+        const list = DR_US.byTicker[String(tk).toUpperCase()] || [];
+        list.slice(0, 4).forEach(function (x) { if (x && x.t) out.push({ kind: "DR", text: x.t, title: x.i || "" }); });
+      }
+    } catch (e) {}
+    try {
+      if (mk === "thailand" && typeof hasSSF === "function" && hasSSF(tk)) out.push({ kind: "SSF", text: "SSF", title: "มี Single Stock Futures บน TFEX" });
+    } catch (e) {}
+    return out;
+  }
+
+  function drawTags(x, th, tags, x0, y0, maxW) {
+    let cx = x0;
+    tags.forEach(function (t) {
+      const label = t.text;
+      x.font = font(700, 15);
+      const w = x.measureText(label).width + 20;
+      if (maxW && (cx + w - x0) > maxW) return;
+      const col = t.kind === "SSF" ? th.up : "#F08A7E";
+      x.save();
+      x.globalAlpha = 0.14; x.fillStyle = col; rr(x, cx, y0 - 18, w, 26, 13); x.fill(); x.restore();
+      x.strokeStyle = col; x.lineWidth = 1.2; rr(x, cx, y0 - 18, w, 26, 13); x.stroke();
+      x.fillStyle = col; x.textAlign = "center";
+      x.fillText(label, cx + w / 2, y0 + 1);
+      x.textAlign = "left";
+      cx += w + 8;
+    });
+  }
   function drawTrendBlock(x, th, q, box) {
     const pts = (q || []).filter((z) => z && z.d && (z.rev != null || z.ni != null));
     if (pts.length < 2) return;
@@ -944,7 +988,15 @@
     const W = 1080, H = 1350;
     const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
-    const { f, bars, logo, tlogo, row } = await loadCardData(tk, mk, withLogo);
+    const drRef = drOf(tk, mk);
+    let { f, bars, logo, tlogo, row } = await loadCardData(tk, mk, withLogo);
+    const drPrice = row.price, drChg = row.change;
+    if (drRef) {   // การ์ด DR: พื้นฐาน/RS/MCAP/โลโก้/งบ ใช้ของหุ้นแม่ แต่ราคายังเป็นการ์ด DR
+      try {
+        const pd = await loadCardData(drRef.p, "america", true);
+        if (pd && pd.row) { row = Object.assign({}, pd.row, { price: drPrice, change: drChg }); f = pd.f || f; tlogo = pd.tlogo || tlogo; }
+      } catch (e) {}
+    }
 
     const grd = x.createLinearGradient(0, 0, W, H);
     grd.addColorStop(0, th.bg); grd.addColorStop(1, th.bg2);
@@ -1143,6 +1195,12 @@
     x.fillStyle = th.body; x.font = font(500, 21);
     x.fillText((nm || "").slice(0, 30), nameX, 192);
     if (row.industry || row.sector) { x.fillStyle = th.muted; x.font = font(600, 17); x.fillText(String(row.industry || row.sector).slice(0, 26), nameX, 218); }
+    { const tg = instrumentTags(tk, mk); if (tg.length) drawTags(x, th, tg, nameX, 262, W - nameX - 90); }
+    if (drRef) {
+      x.fillStyle = th.gold; x.font = font(700, 17);
+      const txt = "DR อ้างอิง " + drRef.p + (drRef.i ? "  ·  ออกโดย " + drRef.i : "");
+      x.fillText(txt.slice(0, 64), nameX, 312);
+    }
 
     const lastBar = bars.length ? bars[bars.length - 1] : null;
     const px = row.price != null ? row.price : (lastBar ? (lastBar.c ?? lastBar.close) : null);
