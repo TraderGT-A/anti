@@ -1127,8 +1127,14 @@
     if (rs == null) rs = "—";
     const hi = f && f.hi ? f.hi : null;
     const toHi = (hi && px) ? ((px / hi - 1) * 100) : null;
+    let p3w = row.p3m;
+    if (p3w == null && bars && bars.length > 64) {
+      const c0 = bars[bars.length - 1], c1 = bars[bars.length - 64];
+      const v0 = c0.c != null ? c0.c : c0.close, v1 = c1.c != null ? c1.c : c1.close;
+      if (v0 && v1) p3w = (v0 / v1 - 1) * 100;
+    }
     const st = [["RS", String(rs ?? "—")], ["จาก 52W สูง", toHi == null ? "—" : toHi.toFixed(1) + "%"],
-                ["3 เดือน", p3 != null ? (p3 >= 0 ? "+" : "") + Number(p3).toFixed(1) + "%" : "—"],
+                ["3 เดือน", p3w != null ? (p3w >= 0 ? "+" : "") + Number(p3w).toFixed(1) + "%" : "—"],
                 ["Mcap", f && f.mcap ? fmtCap(f.mcap) : "—"]];
     st.forEach((sv, i) => {
       const bx = 52 + (i % 2) * 236, by = 268 + Math.floor(i / 2) * 76;
@@ -1347,7 +1353,7 @@
           return (await (m === "wide" ? drawWide(tk, nm, mk, true) : draw(tk, nm, mk, true))).toDataURL("image/png");
         } catch (e) {
           try { return (await (m === "wide" ? drawWide(tk, nm, mk, false) : draw(tk, nm, mk, false))).toDataURL("image/png"); }
-          catch (e2) { return ""; }
+          catch (e2) { try { globalThis.__cardErr = String(e) + " || " + String(e2); } catch (_) {} return ""; }
         }
       };
       const cur = { mode: (fmt === "wide") ? "wide" : "card", url: "" };
@@ -1365,12 +1371,21 @@
       }
       const paintFmt = () => { fb.textContent = cur.mode === "wide" ? "สัดส่วน 4:5" : "สัดส่วน Facebook"; };
       paintFmt();
+      // เตรียมทั้งสองสัดส่วนไว้ล่วงหน้า → กดสลับแล้วขึ้นทันที ไม่ค้าง
+      const cache = {};
+      cache[cur.mode] = cur.url;
+      let wideP = null;
       fb.onclick = async () => {
-        fb.disabled = true;
         const next = cur.mode === "wide" ? "card" : "wide";
-        const u2 = await render(next);
+        let u2 = cache[next];
+        if (!u2) {
+          fb.disabled = true;
+          try { u2 = await render(next); } catch (e) { u2 = ""; }
+          if (u2) cache[next] = u2;
+          fb.disabled = false;
+        }
         if (u2) { cur.url = u2; cur.mode = next; img.src = u2; paintFmt(); bind(); }
-        fb.disabled = false;
+        else { alert("สร้างสัดส่วน " + (next === "wide" ? "Facebook" : "4:5") + " ไม่สำเร็จ ลองอีกครั้ง"); }
       };
 
       function bind() {
