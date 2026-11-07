@@ -1547,9 +1547,9 @@
       if (drRef) {
         const MAP = (typeof DR_US !== "undefined" && DR_US) ? (DR_US.byTicker || DR_US) : {};
         tg = (MAP[drRef.p] || []).filter(function (z) { return String(z.t).toUpperCase() !== String(tk).toUpperCase(); })
-          .slice(0, 3).map(function (z) { return { kind: "DR", text: z.t, title: z.i || "" }; });
+          .slice(0, 2).map(function (z) { return { kind: "DR", text: z.t, title: z.i || "" }; });
       }
-      if (tg.length) drawTags(x, th, tg, nameX + tkW0 + 74, 200, W - 430);
+      if (tg.length) { const stx = nameX + tkW0 + 74; drawTags(x, th, tg, stx, 200, W - stx - 60); }
     }
 
     const lastBar = bars.length ? bars[bars.length - 1] : null;
