@@ -11,15 +11,17 @@
   ],
   "th": [
    {
-    "t": "K-SET50-A",
-    "n": "K SET50",
+    "t": "K-SET50",
+    "n": "K SET50 (กองทุนรวมไทย)",
     "mk": "thailand",
     "fee": 0.85,
     "amc": "บลจ. กสิกรไทย (KAsset)",
     "div": "สะสม",
     "hedge": "-",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/K-SET50-A"
+    "link": "https://www.wealthx.co/funds/K-SET50",
+    "wx": "https://www.wealthx.co/funds/K-SET50",
+    "fn": "https://www.finnomena.com/fund/K-SET50"
    },
    {
     "t": "SCBSET50",
@@ -30,7 +32,9 @@
     "div": "สะสม",
     "hedge": "-",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/SCBSET50"
+    "link": "https://www.wealthx.co/funds/SCBSET50",
+    "wx": "https://www.wealthx.co/funds/SCBSET50",
+    "fn": "https://www.finnomena.com/fund/SCBSET50"
    }
   ]
  },
@@ -45,15 +49,17 @@
   ],
   "th": [
    {
-    "t": "K-SET50-A",
-    "n": "K SET50",
+    "t": "K-SET50",
+    "n": "K SET50 (กองทุนรวมไทย)",
     "mk": "thailand",
     "fee": 0.85,
     "amc": "บลจ. กสิกรไทย (KAsset)",
     "div": "สะสม",
     "hedge": "-",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/K-SET50-A"
+    "link": "https://www.wealthx.co/funds/K-SET50",
+    "wx": "https://www.wealthx.co/funds/K-SET50",
+    "fn": "https://www.finnomena.com/fund/K-SET50"
    },
    {
     "t": "SCBSET50",
@@ -64,7 +70,9 @@
     "div": "สะสม",
     "hedge": "-",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/SCBSET50"
+    "link": "https://www.wealthx.co/funds/SCBSET50",
+    "wx": "https://www.wealthx.co/funds/SCBSET50",
+    "fn": "https://www.finnomena.com/fund/SCBSET50"
    }
   ]
  },
@@ -105,7 +113,9 @@
     "div": "สะสม",
     "hedge": "Unhedged",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/K-US500X-AA"
+    "link": "https://www.wealthx.co/funds/K-US500X-A(A)",
+    "wx": "https://www.wealthx.co/funds/K-US500X-A(A)",
+    "fn": "https://www.finnomena.com/fund/K-US500X-A(A)"
    },
    {
     "t": "SCBS&P500",
@@ -116,7 +126,9 @@
     "div": "ปันผล",
     "hedge": "Unhedged",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/SCBS&P500"
+    "link": "https://www.wealthx.co/funds/SCBS&P500",
+    "wx": "https://www.wealthx.co/funds/SCBS&P500",
+    "fn": "https://www.finnomena.com/fund/SCBS&P500"
    },
    {
     "t": "KT-US500-A",
@@ -127,7 +139,9 @@
     "div": "สะสม",
     "hedge": "Unhedged",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/KT-US500-A"
+    "link": "https://www.wealthx.co/funds/KT-US500-A",
+    "wx": "https://www.wealthx.co/funds/KT-US500-A",
+    "fn": ""
    },
    {
     "t": "TLUS500-UH-X",
@@ -138,7 +152,9 @@
     "div": "สะสม",
     "hedge": "Unhedged",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/TLUS500-UH-X"
+    "link": "https://www.wealthx.co/funds/TLUS500-UH-X",
+    "wx": "https://www.wealthx.co/funds/TLUS500-UH-X",
+    "fn": "https://www.finnomena.com/fund/TLUS500-UH-X"
    },
    {
     "t": "TLUS500-H",
@@ -149,7 +165,9 @@
     "div": "สะสม",
     "hedge": "Hedge",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/TLUS500-H"
+    "link": "https://www.wealthx.co/funds/TLUS500-H",
+    "wx": "https://www.wealthx.co/funds/TLUS500-H",
+    "fn": "https://www.finnomena.com/fund/TLUS500-H"
    }
   ]
  },
@@ -184,7 +202,9 @@
     "div": "สะสม",
     "hedge": "Unhedged",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/K-USXNDQ-AA"
+    "link": "https://www.wealthx.co/funds/K-USXNDQ-A(A)",
+    "wx": "https://www.wealthx.co/funds/K-USXNDQ-A(A)",
+    "fn": "https://www.finnomena.com/fund/K-USXNDQ-A(A)"
    },
    {
     "t": "SCBNDQ(A)",
@@ -195,7 +215,9 @@
     "div": "สะสม",
     "hedge": "Unhedged",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/SCBNDQA"
+    "link": "https://www.wealthx.co/funds/SCBNDQ(A)",
+    "wx": "https://www.wealthx.co/funds/SCBNDQ(A)",
+    "fn": "https://www.finnomena.com/fund/SCBNDQ(A)"
    },
    {
     "t": "TLUSNDQ-UH-A",
@@ -206,7 +228,9 @@
     "div": "สะสม",
     "hedge": "Unhedged",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/TLUSNDQ-UH-A"
+    "link": "https://www.wealthx.co/funds/TLUSNDQ-UH-A",
+    "wx": "https://www.wealthx.co/funds/TLUSNDQ-UH-A",
+    "fn": "https://www.finnomena.com/fund/TLUSNDQ-UH-A"
    }
   ]
  },
@@ -235,7 +259,9 @@
     "div": "สะสม",
     "hedge": "Unhedged",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/K-USXNDQ-AA"
+    "link": "https://www.wealthx.co/funds/K-USXNDQ-A(A)",
+    "wx": "https://www.wealthx.co/funds/K-USXNDQ-A(A)",
+    "fn": "https://www.finnomena.com/fund/K-USXNDQ-A(A)"
    },
    {
     "t": "SCBNDQ(A)",
@@ -246,7 +272,9 @@
     "div": "สะสม",
     "hedge": "Unhedged",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/SCBNDQA"
+    "link": "https://www.wealthx.co/funds/SCBNDQ(A)",
+    "wx": "https://www.wealthx.co/funds/SCBNDQ(A)",
+    "fn": "https://www.finnomena.com/fund/SCBNDQ(A)"
    },
    {
     "t": "TLUSNDQ-UH-A",
@@ -257,7 +285,9 @@
     "div": "สะสม",
     "hedge": "Unhedged",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/TLUSNDQ-UH-A"
+    "link": "https://www.wealthx.co/funds/TLUSNDQ-UH-A",
+    "wx": "https://www.wealthx.co/funds/TLUSNDQ-UH-A",
+    "fn": "https://www.finnomena.com/fund/TLUSNDQ-UH-A"
    }
   ]
  },
@@ -280,7 +310,9 @@
     "div": "สะสม",
     "hedge": "Unhedged",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/SCBDJIA"
+    "link": "https://www.wealthx.co/funds/SCBDJI(A)",
+    "wx": "https://www.wealthx.co/funds/SCBDJI(A)",
+    "fn": "https://www.finnomena.com/fund/SCBDJI(A)"
    }
   ]
  },
@@ -309,7 +341,9 @@
     "div": "สะสม",
     "hedge": "Unhedged",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/SCBRS2000A"
+    "link": "https://www.wealthx.co/funds/SCBRS2000(A)",
+    "wx": "https://www.wealthx.co/funds/SCBRS2000(A)",
+    "fn": "https://www.finnomena.com/fund/SCBRS2000(A)"
    },
    {
     "t": "B-US2000P",
@@ -320,7 +354,9 @@
     "div": "สะสม",
     "hedge": "Unhedged",
     "min": 1000,
-    "link": "https://www.wealthx.co/funds/B-US2000P"
+    "link": "https://www.wealthx.co/funds/B-US2000P",
+    "wx": "https://www.wealthx.co/funds/B-US2000P",
+    "fn": "https://www.finnomena.com/fund/B-US2000P"
    }
   ]
  }
