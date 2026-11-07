@@ -1617,7 +1617,7 @@ html .gs-empty{padding:8px 10px;color:#5d6b7d;font-size:11.5px}
 
 <div id="chartModal" class="fixed inset-0 z-50 hidden items-start justify-center p-4 bg-black/80 overflow-y-auto">
   <div class="m-auto bg-[#0d1219] border border-[#1e2634] rounded-xl max-w-4xl w-full p-5 relative max-h-[85vh] overflow-y-auto">
-    <button id="modalShare" onclick="ShareCard.open(activeTicker, document.getElementById('modalName').textContent, activeMarket)" title="สร้างการ์ดแชร์">
+    <button id="modalShare" onclick="window.__SIG=bsLabelOf(activeTicker,activeMarket);ShareCard.open(activeTicker, document.getElementById('modalName').textContent, activeMarket)" title="สร้างการ์ดแชร์">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.7 15.4 6.3M8.6 13.3l6.8 4.4"/></svg> แชร์
     </button>
     <button onclick="closeModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white font-bold text-xl bg-[#161d29] w-8 h-8 rounded-full">✕</button>
@@ -1814,8 +1814,12 @@ function drTableHTML(tk){   // ตารางเต็ม (ใน modal) เร
     <div class="overflow-x-auto"><table class="w-full text-[11px]">
       <thead><tr class="text-slate-400 border-b border-[#243044]"><th class="p-1.5 text-left text-[10px]">DR</th><th class="p-1.5 text-left text-[10px]">ค่ายผู้ออก</th><th class="p-1.5 text-right text-[10px]">ราคา</th><th class="p-1.5 text-right text-[10px]">%วัน</th><th class="p-1.5 text-right text-[10px]" title="ราคาที่ควรเป็น = ราคาหุ้นแม่ (ปิดคืนก่อน) × อัตราแลกเปลี่ยน ÷ อัตราแปลงหน่วย">ควรเป็น</th><th class="p-1.5 text-right text-[10px]" title="ราคา DR เทียบราคาที่ควรเป็น (บวก = แพงกว่าที่ควร)">ส่วนต่าง</th><th class="p-1.5 text-right text-[10px]">Volume</th><th class="p-1.5 text-right text-[10px]">มูลค่าซื้อขาย</th><th class="p-1.5 text-right text-[10px]">YTD</th></tr></thead>
       <tbody>${rows}</tbody></table></div>
-    <div id="drFairNote" class="text-[10px] text-amber-300/90 mt-1"></div>
-    <div class="text-[10px] text-slate-500 mt-2">ราคา DR คิดจาก หุ้นแม่ (USD) × อัตราแลกเปลี่ยน × อัตราแปลงหน่วยของ DR · พรีเมียม = ราคา DR เทียบกับตัวที่แปลงหน่วยถูกที่สุดของหุ้นแม่เดียวกัน (บวก = ซื้อแพงกว่าคู่แข่ง) · เลขท้ายชื่อ DR = ผู้ออก — 01 บัวหลวง · 03 พาย · 06 เกียรตินิภัทร · 11 กสิกรไทย · 13 KGI · 19 หยวนต้า · 23 InnovestX · 24 ฟินันเซีย · 80 กรุงไทย</div>
+    <details class="mt-1"><summary class="text-[10px] text-slate-400 cursor-pointer select-none">ดูวิธีคำนวณราคา DR / อัตราแปลง</summary>
+      <div id="drFairNote" class="text-[10px] text-amber-300/90 mt-1"></div>
+    </details>
+    <details class="mt-1"><summary class="text-[10px] text-slate-400 cursor-pointer select-none">วิธีอ่านตารางนี้ / เลขผู้ออก DR</summary>
+      <div class="text-[10px] text-slate-500 mt-1">ราคา DR คิดจาก หุ้นแม่ (USD) × อัตราแลกเปลี่ยน × อัตราแปลงหน่วยของ DR · "ควรเป็น" คือราคาตามสูตรนี้ · "ส่วนต่าง" บวก = แพงกว่าที่ควร · เลขท้ายชื่อ DR = ผู้ออก — 01 บัวหลวง · 03 พาย · 06 เกียรตินิภัทร · 11 กสิกรไทย · 13 KGI · 19 หยวนต้า · 23 InnovestX · 24 ฟินันเซีย · 80 กรุงไทย</div>
+    </details>
   </div>`;
 }
 /* ===== ข้อมูลรายวันอ่านจาก GitHub raw (ไม่ต้องดีพลายซ้ำทุกวัน) ===== */
@@ -5475,6 +5479,23 @@ async function bsModal(data,tk,m){
   const g=await bsSecGroups(m); if(g&&activeTicker===tk) b.insertAdjacentHTML('beforeend',bsGrpHtml(bsGrpOf(g,s),true));
 }
 function bsToggleWhy(){ const w=document.getElementById('modalBSWhy'); if(w) w.hidden=!w.hidden; }
+
+/* ป้าย B/W/S ของหุ้นรายตัว (ใช้ทั้งหน้าเว็บและการ์ดแชร์) — แหล่งเดียวกับกล่อง Buy/Wait/Sell */
+function bsLabelOf(tk, mk){
+  try{
+    const m = mk || currentMarket;
+    let lbl = '';
+    const r = (BSS && BSS.res) ? BSS.res[m] : null;
+    if(r){
+      if((r.Buy||[]).some(x=>x.ticker===tk||x.t===tk)) lbl = 'Buy';
+      else if((r.Wait||[]).some(x=>x.ticker===tk||x.t===tk)) lbl = 'Wait';
+      else if((r.Sell||[]).some(x=>x.ticker===tk||x.t===tk)) lbl = 'Sell';
+    }
+    if(!lbl){ const row=(stockData||[]).find(x=>x.ticker===tk)||(stockDB[m]||[]).find(x=>x.ticker===tk); if(row && row.l) lbl=row.l; }
+    return lbl;
+  }catch(e){ return ''; }
+}
+
 const bsLegend=()=>'<span class="grp"><span class="lbl" title="'+BS_RULE+'">ป้าย Buy / Wait / Sell · ชี้ป้ายดูเงื่อนไข</span></span>';
 
 /* ===== รายชื่อหุ้นในหน้าต่างเดียว: มุมมอง "กราฟ" (การ์ดกราฟพร้อมกันทุกตัว) ↔ "รายการ" + เลือกจำนวนต่อแถว =====
@@ -5509,7 +5530,7 @@ async function shareCardGrid(){
     }
     const rows=(clState&&clState.rows)||[]; const m=(clState&&clState.m)||currentMarket;
     if(!rows.length){ alert('ยังไม่มีหุ้นในรายการ'); return; }
-    const items=rows.map(function(s){ return {ticker:s.ticker, price:s.price, change:s.change, rs:s.rs}; });
+    const items=rows.map(function(s){ return {ticker:s.ticker, price:s.price, change:s.change, rs:s.rs, sig:(s.l||bsLabelOf(s.ticker,m))}; });
     ShareCard.openGrid({title:(clState.title||'การ์ดกราฟ'), sub:(clState.sub?clState.sub+' · ':'')+items.length+' ตัว', mk:m, items:items});
   }catch(e){ alert('สร้างการ์ดไม่สำเร็จ'); }
 }
@@ -6227,6 +6248,14 @@ async function shareInstrument(kind, code, name, mk, extra){
     ShareCard.openInstrument(o);
   }catch(e){ alert('สร้างการ์ดไม่สำเร็จ'); }
 }
+
+function shareFundCard(t){
+  const c=(window.__fundCache||{})[String(t)]||{};
+  shareInstrument('fund', t, c.n||'', 'thailand', { fee:(c.fee==null?null:c.fee), amc:c.amc||'', div:c.div||'', hedge:c.hedge||'',
+    nav:(c.nav==null?null:c.nav), navDate:c.navDate||'', navs:c.navs||null, ret1y:(c.ret1y==null?null:c.ret1y), idx1y:(c.idx1y==null?null:c.idx1y),
+    master:c.master||'', masterTk:c.masterTk||'' });
+}
+
 async function idxProxyRender(tk, mk){
   const el=document.getElementById('modalIndexBuy'); if(!el) return;
   el.innerHTML='';
@@ -6312,6 +6341,8 @@ async function openFundInfo(code, idxTk){
   if(!item){ alert('ไม่พบข้อมูลกองนี้'); return; }
   const navDb=await fundNavLoad();
   const navItem=(navDb&&navDb[code])||null;
+  let masterItem=null;
+  try{ const mj=await fetchSiteJSON('fund_master.json'); masterItem=((mj&&mj.items)||{})[code]||null; }catch(e){}
   let idx1y=null;
   try{
     let d=[];
@@ -6343,6 +6374,7 @@ async function openFundInfo(code, idxTk){
     ${row('บลจ.', item.amc||'-')}
     ${row('ชนิดหน่วย', (item.div||'-') + (item.div==='สะสม'?' (ไม่จ่ายปันผล)':' (จ่ายปันผล)'))}
     ${row('ค่าเงิน', item.hedge==='Hedge'?'Hedge (ป้องกันความเสี่ยงค่าเงิน)':(item.hedge==='Unhedged'?'Unhedged (ไม่ป้องกันค่าเงิน)':'-'))}
+    ${row('กองทุนหลัก (ถือจริง)', masterItem? (masterItem.master||'-')+(masterItem.ticker?' ('+masterItem.ticker+')':'') : '—')}
     ${row('ค่าธรรมเนียมรวมโดยประมาณ', item.fee!=null?Number(item.fee).toFixed(2)+'% / ปี':'-')}
     ${row('เงินลงทุนขั้นต่ำ', item.min?('ประมาณ '+Number(item.min).toLocaleString()+' บาท'):'-')}
     ${navItem&&navItem.ret?row('ผลตอบแทนกอง (1 เดือน / 3 เดือน / 6 เดือน / 1 ปี)', [navItem.ret['1M'],navItem.ret['3M'],navItem.ret['6M'],navItem.ret['1Y']].map(v=>v==null?'—':(v>=0?'+':'')+Number(v).toFixed(1)+'%').join(' · ')):''}
@@ -6354,7 +6386,14 @@ async function openFundInfo(code, idxTk){
       ${item.wx?`<a href="${item.wx}" target="_blank" rel="noopener" class="flex-1 text-center h-9 leading-9 rounded-lg bg-amber-400/90 text-black text-[12px] font-bold">เปิดรายละเอียดเต็มกอง (WealthX)</a>`:""}
       ${item.fn?`<a href="${item.fn}" target="_blank" rel="noopener" class="flex-1 text-center h-9 leading-9 rounded-lg text-[12px] font-semibold border border-[#2b3a52]">Finnomena</a>`:""}
     </div>
-    <button class="mt-2 w-full h-9 rounded-lg bg-[#1b2740] text-sky-200 text-[12px] font-bold" onclick="shareInstrument('fund','${jq(item.t)}','${jq(item.n||'')}','thailand',{fee:${item.fee==null?'null':Number(item.fee)},amc:'${jq(item.amc||'')}',div:'${jq(item.div||'')}',hedge:'${jq(item.hedge||'')}',nav:${navItem?Number(navItem.last.nav):null},navDate:'${navItem?navItem.last.date:''}',navs:${navItem?JSON.stringify(navItem.navs.slice(-260)):'null'},ret1y:${navItem&&navItem.ret&&navItem.ret['1Y']!=null?Number(navItem.ret['1Y']):null},idx1y:${idx1y==null?'null':Number(idx1y.toFixed(1))}})">แชร์การ์ดกองนี้</button>`;
+    <button class="mt-2 w-full h-9 rounded-lg bg-[#1b2740] text-sky-200 text-[12px] font-bold" onclick="shareFundCard('${jq(item.t)}')">แชร์การ์ดกองนี้</button>`;
+  try{ window.__fundCache = window.__fundCache || {};
+    window.__fundCache[String(item.t)] = { n:item.n||'', amc:item.amc||'', div:item.div||'', hedge:item.hedge||'', fee:item.fee, idx1y:(idx1y==null?null:Number(idx1y.toFixed(1))),
+      nav:(navItem&&navItem.last)?Number(navItem.last.nav):null, navDate:(navItem&&navItem.last)?navItem.last.date:'',
+      navs:(navItem&&navItem.navs)?navItem.navs.slice(-260):null,
+      ret1y:(navItem&&navItem.ret&&navItem.ret['1Y']!=null)?Number(navItem.ret['1Y']):null,
+      master:masterItem?(masterItem.master||''):'', masterTk:masterItem?(masterItem.ticker||''):'' };
+  }catch(e){}
   try{ if(navItem&&navItem.navs){ setTimeout(function(){ drawNavChart(document.getElementById('fundNavCv'), navItem.navs.slice(-260)); }, 60); } }catch(e){}
 }
 const MSTACK=[];

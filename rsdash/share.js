@@ -585,12 +585,12 @@
     x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 92);
     x.textAlign = "left";
 
-    x.fillStyle = th.text; x.font = font(700, 44); x.fillText(String(opts.title || "").slice(0, 26), 70, 190);
+    x.fillStyle = th.text; x.font = font(700, 44); fitSize(x, cutText(opts.title || "", 34), W - 300, 44, 26, 700); x.fillText(cutText(opts.title || "", 34), 70, 190);
     const subTxt = String(opts.sub || "").toUpperCase();
     if (subTxt) {
       x.fillStyle = th.gold; x.font = labelFont(600, 15);
       try { x.letterSpacing = "1.4px"; } catch (e) {}
-      x.fillText(subTxt.slice(0, 60), 70, 222);
+      x.fillText(cutText(subTxt, 70), 70, 222);
       try { x.letterSpacing = "0px"; } catch (e) {}
     }
     if (opts.pageTotal > 1) {
@@ -634,7 +634,8 @@
           }
         } catch (e) {}
         x.fillStyle = th.text; x.font = font(700, 23 * sc);
-        x.fillText(String(it.ticker || "").slice(0, 10), tx, cy + 34 * sc);
+        { const alt = tx; const bw2 = drawSig(x, it.sig, tx, cy + 26 * sc, sc * 0.92); if (bw2) tx += bw2 + 6 * sc; 
+          x.fillText(String(it.ticker || "").slice(0, 10), tx, cy + 34 * sc); tx = alt; }
 
         const chg = Number(it.change);
         x.fillStyle = th.body;
@@ -974,6 +975,35 @@
 
 
 
+
+
+  // ป้าย B / W / S สีเดียวกับหน้าเว็บ (Buy #30d158 · Wait #e0a800 · Sell #ff453a)
+  const SIGCOL = { Buy: "#30d158", Wait: "#e0a800", Sell: "#ff453a" };
+  function drawSig(x, label, cx, cy, sc) {
+    if (!label || !SIGCOL[label]) return 0;
+    const col = SIGCOL[label];
+    const s = 26 * (sc || 1), r2 = 7 * (sc || 1);
+    const letter = label.charAt(0);
+    x.save();
+    x.globalAlpha = 0.16; x.fillStyle = col; rr(x, cx, cy - s / 2, s, s, r2); x.fill(); x.restore();
+    x.strokeStyle = col; x.lineWidth = 1.4; rr(x, cx, cy - s / 2, s, s, r2); x.stroke();
+    x.fillStyle = col; x.font = font(800, Math.round(15 * (sc || 1)));
+    x.textAlign = "center"; x.textBaseline = "middle";
+    x.fillText(letter, cx + s / 2, cy + 1);
+    x.textAlign = "left"; x.textBaseline = "alphabetic";
+    return s;
+  }
+  // ตัดข้อความไทยแบบไม่ผ่ากลางพยางค์/สระ (grapheme-aware)
+  function cutText(t, n) {
+    t = String(t == null ? "" : t);
+    try {
+      if (typeof Intl !== "undefined" && Intl.Segmenter) {
+        const seg = new Intl.Segmenter("th", { granularity: "grapheme" });
+        return Array.from(seg.segment(t)).slice(0, n).map(function (x) { return x.segment; }).join("");
+      }
+    } catch (e) {}
+    return t.slice(0, n);
+  }
   // ADR% = เฉลี่ย (High−Low)/Close 20 แท่งล่าสุด (ความผันผวนรายวัน)
   function adrOf(bars, n) {
     const arr = (bars || []).filter(function (b) { return b && b.h != null && b.l != null && (b.c != null || b.close != null); });
@@ -1166,6 +1196,8 @@
       x.save(); rr(x, 70, 150, 88, 88, 44); x.clip(); x.drawImage(tlogo, 70, 150, 88, 88); x.restore();
       nameX = 178;
     }
+    { const sig0 = (typeof window !== "undefined" && window.__SIG) ? window.__SIG : "";
+      if (sig0) { const w0 = drawSig(x, sig0, nameX - 40, 186, 1.05); if (w0) nameX += 8; } }
     x.fillStyle = th.text; x.font = font(800, 52);
     x.fillText(tk, nameX, 208);
     const tw = x.measureText(tk).width;
@@ -1379,6 +1411,8 @@
 
     let nameX = 52;
     if (tlogo) { x.save(); rr(x, 52, 104, 66, 66, 33); x.clip(); x.drawImage(tlogo, 52, 104, 66, 66); x.restore(); nameX = 132; }
+    { const sigW = (typeof window !== "undefined" && window.__SIG) ? window.__SIG : "";
+      if (sigW) { const w1 = drawSig(x, sigW, nameX - 38, 140, 1.0); if (w1) nameX += 6; } }
     x.fillStyle = th.text; x.font = font(900, 58); x.fillText(tk, nameX, 160);
     const tkW0 = x.measureText(tk).width;                 // วัดด้วยฟอนต์ชื่อย่อก่อนเปลี่ยนฟอนต์
     x.fillStyle = th.body; x.font = font(500, 21);
@@ -1554,7 +1588,7 @@
     x.fillText(nm, 70, 242);
     x.fillStyle = th.gold; x.font = labelFont(600, 15);
     try { x.letterSpacing = "1.4px"; } catch (e) {}
-    x.fillText((o.kind === "fund" ? "FEEDER FUND · ไทย" : "ETF · " + (o.mk === "america" ? "US" : "TH")), 70, 272);
+    x.fillText((o.kind === "fund" ? "FEEDER FUND · ไทย" + (o.master ? " · ถือ " + o.master + (o.masterTk ? " (" + o.masterTk + ")" : "") : "") : "ETF · " + (o.mk === "america" ? "US" : "TH")).slice(0, 62), 70, 272);
     try { x.letterSpacing = "0px"; } catch (e) {}
 
     // มูลค่าใหญ่: ราคา ETF หรือ NAV กอง

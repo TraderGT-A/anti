@@ -1,0 +1,59 @@
+{
+ "items": {
+  "K-SET50": {
+   "master": "ดัชนี SET50 (ลงทุนหุ้นไทยโดยตรง)",
+   "ticker": "",
+   "src": "finnomena"
+  },
+  "SCBSET50": {
+   "master": "ดัชนี SET50 (ลงทุนหุ้นไทยโดยตรง)",
+   "ticker": "",
+   "src": "finnomena"
+  },
+  "K-US500X-A(A)": {
+   "master": "iShares Core S&P 500 ETF",
+   "ticker": "IVV",
+   "src": "finnomena"
+  },
+  "SCBS&P500": {
+   "master": "iShares Core S&P 500 ETF",
+   "ticker": "IVV",
+   "src": "finnomena"
+  },
+  "TLUS500-UH-X": {
+   "master": "iShares Core S&P 500 ETF",
+   "ticker": "IVV",
+   "src": "finnomena"
+  },
+  "TLUS500-H": {
+   "master": "iShares Core S&P 500 ETF",
+   "ticker": "IVV",
+   "src": "finnomena"
+  },
+  "K-USXNDQ-A(A)": {
+   "master": "Invesco NASDAQ 100 ETF",
+   "ticker": "QQQM",
+   "src": "finnomena"
+  },
+  "SCBNDQ(A)": {
+   "master": "Invesco NASDAQ 100 ETF",
+   "ticker": "QQQM",
+   "src": "finnomena"
+  },
+  "TLUSNDQ-UH-A": {
+   "master": "Invesco NASDAQ 100 ETF",
+   "ticker": "QQQM",
+   "src": "finnomena"
+  },
+  "SCBDJI(A)": {
+   "master": "SPDR Dow Jones Industrial Average ETF Trust",
+   "ticker": "DIA",
+   "src": "finnomena"
+  },
+  "SCBRS2000(A)": {
+   "master": "iShares Russell 2000 ETF",
+   "ticker": "IWM",
+   "src": "finnomena"
+  }
+ }
+}
