@@ -6045,37 +6045,48 @@ async function idxProxyRender(tk, mk){
   el.innerHTML='';
   if(String(tk).charAt(0)!=='^'){ el.style.display='none'; return; }
   const db=await idxProxyLoad();
-  const list=(db&&db[tk])||[];
+  const entry=(db&&db[tk])||null;
+  const etfs=Array.isArray(entry)?entry:(entry&&entry.etf)||[];
+  const ths=Array.isArray(entry)?[]:((entry&&entry.th)||[]);
   el.style.display='';
-  if(!list.length){ el.innerHTML='<div class="text-xs text-slate-500">ยังไม่มีข้อมูลสินค้าอ้างอิงดัชนีนี้</div>'; return; }
+  if(!etfs.length && !ths.length){ el.innerHTML='<div class="text-xs text-slate-500">ยังไม่มีข้อมูลสินค้าอ้างอิงดัชนีนี้</div>'; return; }
   el.innerHTML='<div class="text-xs text-slate-400">กำลังโหลดมูลค่าซื้อขาย…</div>';
-  const rows=await Promise.all(list.map(async x=>{
-    let val=null;
-    try{
-      const r=await fetch('/api/chart?market='+x.mk+'&symbol='+encodeURIComponent(x.t)+'&interval=1d&range=1mo');
-      const j=await r.json(); const d=(j&&j.data)||[]; const last=d[d.length-1];
-      if(last&&last.volume) val=last.volume*(last.close||0);
-    }catch(e){}
-    return Object.assign({},x,{val:val});
-  }));
-  rows.sort((a,b)=> (b.val||0)-(a.val||0) || (a.fee||9)-(b.fee||9));
-  const trs=rows.map(x=>{
-    const v=x.val!=null?(x.val>=1e9?(x.val/1e9).toFixed(2)+'B':x.val>=1e6?(x.val/1e6).toFixed(1)+'M':'—'):'—';
-    const clickable = x.typ === 'ETF' && x.mk;
-    return `<tr class="border-b border-[#16202e] ${clickable?'hover:bg-[#131c2b] cursor-pointer':''}" ${clickable?`onclick="openModal('${jq(x.t)}','${jq(x.n)}','${x.mk}')"`:''}>
-      <td class="p-1.5 font-semibold text-amber-300">${x.t}</td>
-      <td class="p-1.5 text-slate-300">${x.n}</td>
-      <td class="p-1.5 text-slate-400">${x.typ}</td>
-      <td class="p-1.5 text-right">${x.fee!=null?x.fee.toFixed(2)+'%':'-'}</td>
-      <td class="p-1.5 text-right text-slate-400">${v}</td>
-    </tr>`;
-  }).join('');
+
+  async function withVol(list){
+    const rows=await Promise.all(list.map(async x=>{
+      let val=null, ok=false;
+      try{
+        const r=await fetch('/api/chart?market='+x.mk+'&symbol='+encodeURIComponent(x.t)+'&interval=1d&range=1mo');
+        const j=await r.json(); const d=(j&&j.data)||[]; const last=d[d.length-1];
+        if(last){ ok=true; if(last.volume) val=last.volume*(last.close||0); }
+      }catch(e){}
+      return Object.assign({},x,{val:val,hasChart:ok});
+    }));
+    rows.sort((a,b)=> (b.val||0)-(a.val||0) || (a.fee||9)-(b.fee||9));
+    return rows;
+  }
+  const fmtV=v=> v==null?'—':(v>=1e9?(v/1e9).toFixed(2)+'B': v>=1e6?(v/1e6).toFixed(1)+'M':'—');
+  const table=(rows,isEtf)=>{
+    if(!rows.length) return '<div class="text-[11px] text-slate-500">— ไม่มีข้อมูล —</div>';
+    return `<div class="overflow-x-auto"><table class="w-full text-[11px]">
+      <thead><tr class="text-slate-400 border-b border-[#243044]"><th class="p-1.5 text-left text-[10px]">รหัส</th><th class="p-1.5 text-left text-[10px]">ชื่อสินค้า</th><th class="p-1.5 text-right text-[10px]">ค่าธรรมเนียม/ปี</th><th class="p-1.5 text-right text-[10px]">มูลค่าซื้อขาย</th></tr></thead>
+      <tbody>${rows.map(x=>{
+        const click=isEtf&&x.hasChart;
+        return `<tr class="border-b border-[#16202e] ${click?'hover:bg-[#131c2b] cursor-pointer':''}" ${click?`onclick="openModal('${jq(x.t)}','${jq(x.n)}','${x.mk}')"`:''}>
+          <td class="p-1.5 font-semibold ${isEtf?'text-amber-300':'text-sky-300'}">${x.t}</td>
+          <td class="p-1.5 text-slate-300">${x.n}</td>
+          <td class="p-1.5 text-right">${x.fee!=null?x.fee.toFixed(2)+'%':'-'}</td>
+          <td class="p-1.5 text-right text-slate-400">${fmtV(x.val)}</td>
+        </tr>`;}).join('')}</tbody></table></div>`;
+  };
+
+  const [e2,t2]=await Promise.all([withVol(etfs), withVol(ths)]);
   el.innerHTML=`<div class="bg-[#0d1219] border border-[#1e2634] rounded-lg p-3">
-    <div class="text-xs font-bold text-amber-300 mb-1">อยากซื้อดัชนีนี้ — ซื้อผ่านอะไรได้บ้าง</div>
-    <div class="overflow-x-auto"><table class="w-full text-[11px]">
-      <thead><tr class="text-slate-400 border-b border-[#243044]"><th class="p-1.5 text-left text-[10px]">รหัส</th><th class="p-1.5 text-left text-[10px]">ชื่อสินค้า</th><th class="p-1.5 text-left text-[10px]">ประเภท</th><th class="p-1.5 text-right text-[10px]">ค่าธรรมเนียม/ปี</th><th class="p-1.5 text-right text-[10px]">มูลค่าซื้อขาย</th></tr></thead>
-      <tbody>${trs}</tbody></table></div>
-    <div class="text-[10px] text-slate-500 mt-2">เรียงตามมูลค่าซื้อขายล่าสุด · ค่าธรรมเนียมเป็นอัตราประมาณต่อปี · กด ETF เพื่อเปิดกราฟ</div>
+    <div class="text-xs font-bold text-amber-300 mb-2">อยากซื้อดัชนีนี้ — ซื้อผ่านอะไรได้บ้าง</div>
+    <div class="text-[11px] font-semibold text-slate-300 mb-1">ETF (ซื้อบนตลาดหลักทรัพย์${mk==='america'?'สหรัฐ':'ไทย'})</div>
+    ${table(e2,true)}
+    ${ths.length?`<div class="text-[11px] font-semibold text-slate-300 mt-3 mb-1">กองทุนรวมไทย (Feeder Fund) — ซื้อผ่านแอป บลจ. ไม่ต้องเปิดบัญชีต่างประเทศ</div>${table(t2,false)}`:''}
+    <div class="text-[10px] text-slate-500 mt-2">เรียงตามมูลค่าซื้อขายล่าสุด · ค่าธรรมเนียมเป็นอัตรารวมโดยประมาณต่อปี · กด ETF เพื่อเปิดกราฟ</div>
   </div>`;
 }
 function openModal(tk,nm,mkt){

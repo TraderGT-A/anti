@@ -1,31 +1,213 @@
 {
-  "_note": "สินค้าอ้างอิงดัชนี (ETF/กองทุน) — fee = ค่าธรรมเนียมต่อปี % โดยประมาณ, vol = มูลค่าซื้อขายล่าสุด (ดึงสดจากกราฟ)",
-  "^SET.BK": [
-    { "t": "TDEX", "n": "ThaiDEX SET50 ETF", "mk": "thailand", "typ": "ETF", "fee": 0.43 },
-    { "t": "K-SET50-A", "n": "กองทุน K SET50 (กองทุนรวม)", "mk": "thailand", "typ": "กองทุน", "fee": 0.85 },
-    { "t": "SCBSET50", "n": "SCB SET50 (กองทุนรวม)", "mk": "thailand", "typ": "กองทุน", "fee": 1.07 }
+ "_note": "สินค้าอ้างอิงดัชนี — แยก etf (ตลาดหลักทรัพย์) กับ th (กองทุนรวมไทย feeder) · fee = ค่าธรรมเนียมรวมโดยประมาณ %/ปี",
+ "^SET.BK": {
+  "etf": [
+   {
+    "t": "TDEX",
+    "n": "ThaiDEX SET50 ETF",
+    "mk": "thailand",
+    "fee": 0.43
+   }
   ],
-  "^SET50.BK": [
-    { "t": "TDEX", "n": "ThaiDEX SET50 ETF", "mk": "thailand", "typ": "ETF", "fee": 0.43 },
-    { "t": "K-SET50-A", "n": "กองทุน K SET50", "mk": "thailand", "typ": "กองทุน", "fee": 0.85 },
-    { "t": "SCBSET50", "n": "SCB SET50", "mk": "thailand", "typ": "กองทุน", "fee": 1.07 }
-  ],
-  "^GSPC": [
-    { "t": "SPY", "n": "SPDR S&P 500 ETF Trust", "mk": "america", "typ": "ETF", "fee": 0.0945 },
-    { "t": "VOO", "n": "Vanguard S&P 500 ETF", "mk": "america", "typ": "ETF", "fee": 0.03 },
-    { "t": "IVV", "n": "iShares Core S&P 500 ETF", "mk": "america", "typ": "ETF", "fee": 0.03 },
-    { "t": "SPLG", "n": "SPDR Portfolio S&P 500 ETF", "mk": "america", "typ": "ETF", "fee": 0.02 }
-  ],
-  "^IXIC": [
-    { "t": "QQQ", "n": "Invesco QQQ Trust (Nasdaq-100)", "mk": "america", "typ": "ETF", "fee": 0.2 },
-    { "t": "QQQM", "n": "Invesco Nasdaq-100 ETF", "mk": "america", "typ": "ETF", "fee": 0.15 },
-    { "t": "ONEQ", "n": "Fidelity Nasdaq Composite ETF", "mk": "america", "typ": "ETF", "fee": 0.21 }
-  ],
-  "^DJI": [
-    { "t": "DIA", "n": "SPDR Dow Jones Industrial Average ETF", "mk": "america", "typ": "ETF", "fee": 0.16 }
-  ],
-  "^RUT": [
-    { "t": "IWM", "n": "iShares Russell 2000 ETF", "mk": "america", "typ": "ETF", "fee": 0.19 },
-    { "t": "VTWO", "n": "Vanguard Russell 2000 ETF", "mk": "america", "typ": "ETF", "fee": 0.1 }
+  "th": [
+   {
+    "t": "K-SET50-A",
+    "n": "K SET50 (กองทุนรวมไทย)",
+    "mk": "thailand",
+    "fee": 0.85
+   },
+   {
+    "t": "SCBSET50",
+    "n": "SCB SET50 (กองทุนรวมไทย)",
+    "mk": "thailand",
+    "fee": 1.07
+   }
   ]
+ },
+ "^SET50.BK": {
+  "etf": [
+   {
+    "t": "TDEX",
+    "n": "ThaiDEX SET50 ETF",
+    "mk": "thailand",
+    "fee": 0.43
+   }
+  ],
+  "th": [
+   {
+    "t": "K-SET50-A",
+    "n": "K SET50 (กองทุนรวมไทย)",
+    "mk": "thailand",
+    "fee": 0.85
+   },
+   {
+    "t": "SCBSET50",
+    "n": "SCB SET50 (กองทุนรวมไทย)",
+    "mk": "thailand",
+    "fee": 1.07
+   }
+  ]
+ },
+ "^GSPC": {
+  "etf": [
+   {
+    "t": "SPY",
+    "n": "SPDR S&P 500 ETF Trust",
+    "mk": "america",
+    "fee": 0.0945
+   },
+   {
+    "t": "VOO",
+    "n": "Vanguard S&P 500 ETF",
+    "mk": "america",
+    "fee": 0.03
+   },
+   {
+    "t": "IVV",
+    "n": "iShares Core S&P 500 ETF",
+    "mk": "america",
+    "fee": 0.03
+   },
+   {
+    "t": "VTI",
+    "n": "Vanguard Total Stock Market ETF",
+    "mk": "america",
+    "fee": 0.03
+   }
+  ],
+  "th": [
+   {
+    "t": "K-US500X-A(A)",
+    "n": "เค หุ้นยูเอส พาสซีฟ — feeder iShares Core S&P 500",
+    "mk": "thailand",
+    "fee": 0.32
+   },
+   {
+    "t": "SCBS&P500",
+    "n": "ไทยพาณิชย์ หุ้นยูเอส — feeder iShares Core S&P 500",
+    "mk": "thailand",
+    "fee": 0.53
+   },
+   {
+    "t": "KT-US500-A",
+    "n": "เคแทม US 500 — feeder",
+    "mk": "thailand",
+    "fee": 0.62
+   }
+  ]
+ },
+ "^IXIC": {
+  "etf": [
+   {
+    "t": "QQQ",
+    "n": "Invesco QQQ Trust (Nasdaq-100)",
+    "mk": "america",
+    "fee": 0.2
+   },
+   {
+    "t": "QQQM",
+    "n": "Invesco Nasdaq-100 ETF",
+    "mk": "america",
+    "fee": 0.15
+   },
+   {
+    "t": "ONEQ",
+    "n": "Fidelity Nasdaq Composite Index ETF",
+    "mk": "america",
+    "fee": 0.21
+   }
+  ],
+  "th": [
+   {
+    "t": "K-USXNDQ-A(A)",
+    "n": "เค หุ้นยูเอส ดัชนี NDQ 100 — feeder Invesco QQQ",
+    "mk": "thailand",
+    "fee": 0.71
+   },
+   {
+    "t": "SCBNDQ(A)",
+    "n": "ไทยพาณิชย์ หุ้นยูเอส เอ็นดีคิว — feeder Invesco QQQ",
+    "mk": "thailand",
+    "fee": 1.07
+   }
+  ]
+ },
+ "^NDX": {
+  "etf": [
+   {
+    "t": "QQQ",
+    "n": "Invesco QQQ Trust",
+    "mk": "america",
+    "fee": 0.2
+   },
+   {
+    "t": "QQQM",
+    "n": "Invesco Nasdaq-100 ETF",
+    "mk": "america",
+    "fee": 0.15
+   }
+  ],
+  "th": [
+   {
+    "t": "K-USXNDQ-A(A)",
+    "n": "เค หุ้นยูเอส ดัชนี NDQ 100",
+    "mk": "thailand",
+    "fee": 0.71
+   },
+   {
+    "t": "SCBNDQ(A)",
+    "n": "ไทยพาณิชย์ หุ้นยูเอส เอ็นดีคิว",
+    "mk": "thailand",
+    "fee": 1.07
+   }
+  ]
+ },
+ "^DJI": {
+  "etf": [
+   {
+    "t": "DIA",
+    "n": "SPDR Dow Jones Industrial Average ETF",
+    "mk": "america",
+    "fee": 0.16
+   }
+  ],
+  "th": [
+   {
+    "t": "SCBDJI(A)",
+    "n": "ไทยพาณิชย์ หุ้นยูเอส ดีเจไอ — feeder SPDR Dow Jones",
+    "mk": "thailand",
+    "fee": 0.85
+   }
+  ]
+ },
+ "^RUT": {
+  "etf": [
+   {
+    "t": "IWM",
+    "n": "iShares Russell 2000 ETF",
+    "mk": "america",
+    "fee": 0.19
+   },
+   {
+    "t": "VTWO",
+    "n": "Vanguard Russell 2000 ETF",
+    "mk": "america",
+    "fee": 0.1
+   }
+  ],
+  "th": [
+   {
+    "t": "SCBRS2000(A)",
+    "n": "ไทยพาณิชย์ หุ้นยูเอสสมอลแคปพาสซีฟ — feeder Russell 2000",
+    "mk": "thailand",
+    "fee": 0.75
+   },
+   {
+    "t": "B-US2000P",
+    "n": "บัวหลวง US Equity 2000 PASSIVE — feeder Russell 2000",
+    "mk": "thailand",
+    "fee": 0.8
+   }
+  ]
+ }
 }
