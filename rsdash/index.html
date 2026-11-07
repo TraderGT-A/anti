@@ -2870,8 +2870,8 @@ function mfSvg(items,kind){
     if(!put){ put={x:cx+8,y:cy+4,r:{x:cx+6,y:cy-6,w:tw+4,h:thh}}; }
     placed.push(put.r);
     const dist=Math.hypot(put.x-cx, put.y-cy);
-    if(dist>16) s+='<line x1="'+cx.toFixed(1)+'" y1="'+cy.toFixed(1)+'" x2="'+put.x.toFixed(1)+'" y2="'+(put.y-3).toFixed(1)+'" stroke="'+col+'" stroke-width=".7" opacity=".45"/>';
-    s+='<text x="'+put.x.toFixed(1)+'" y="'+put.y.toFixed(1)+'" class="mf-lb'+(on?' on':'')+'" style="fill:'+(on?'#fff':col)+';font-size:'+(on?12:11)+'px">'+txt.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</text>';
+    if(dist>16) s+='<line x1="'+cx.toFixed(1)+'" y1="'+cy.toFixed(1)+'" x2="'+put.x.toFixed(1)+'" y2="'+(put.y-3).toFixed(1)+'" stroke="'+col+'" stroke-width=".7" opacity="'+(on?'.55':'.18')+'"/>';
+    s+='<text x="'+put.x.toFixed(1)+'" y="'+put.y.toFixed(1)+'" class="mf-lb'+(on?' on':'')+'" style="fill:'+(on?'#fff':col)+';font-size:'+(on?12:9.5)+'px;opacity:'+(on?1:0.32)+(on?'':';filter:blur(.4px)')+'">'+txt.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</text>';
   });
   return s+'</g></svg>';
 }
