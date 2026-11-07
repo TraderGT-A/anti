@@ -1,0 +1,31 @@
+{
+  "_note": "สินค้าอ้างอิงดัชนี (ETF/กองทุน) — fee = ค่าธรรมเนียมต่อปี % โดยประมาณ, vol = มูลค่าซื้อขายล่าสุด (ดึงสดจากกราฟ)",
+  "^SET.BK": [
+    { "t": "TDEX", "n": "ThaiDEX SET50 ETF", "mk": "thailand", "typ": "ETF", "fee": 0.43 },
+    { "t": "K-SET50-A", "n": "กองทุน K SET50 (กองทุนรวม)", "mk": "thailand", "typ": "กองทุน", "fee": 0.85 },
+    { "t": "SCBSET50", "n": "SCB SET50 (กองทุนรวม)", "mk": "thailand", "typ": "กองทุน", "fee": 1.07 }
+  ],
+  "^SET50.BK": [
+    { "t": "TDEX", "n": "ThaiDEX SET50 ETF", "mk": "thailand", "typ": "ETF", "fee": 0.43 },
+    { "t": "K-SET50-A", "n": "กองทุน K SET50", "mk": "thailand", "typ": "กองทุน", "fee": 0.85 },
+    { "t": "SCBSET50", "n": "SCB SET50", "mk": "thailand", "typ": "กองทุน", "fee": 1.07 }
+  ],
+  "^GSPC": [
+    { "t": "SPY", "n": "SPDR S&P 500 ETF Trust", "mk": "america", "typ": "ETF", "fee": 0.0945 },
+    { "t": "VOO", "n": "Vanguard S&P 500 ETF", "mk": "america", "typ": "ETF", "fee": 0.03 },
+    { "t": "IVV", "n": "iShares Core S&P 500 ETF", "mk": "america", "typ": "ETF", "fee": 0.03 },
+    { "t": "SPLG", "n": "SPDR Portfolio S&P 500 ETF", "mk": "america", "typ": "ETF", "fee": 0.02 }
+  ],
+  "^IXIC": [
+    { "t": "QQQ", "n": "Invesco QQQ Trust (Nasdaq-100)", "mk": "america", "typ": "ETF", "fee": 0.2 },
+    { "t": "QQQM", "n": "Invesco Nasdaq-100 ETF", "mk": "america", "typ": "ETF", "fee": 0.15 },
+    { "t": "ONEQ", "n": "Fidelity Nasdaq Composite ETF", "mk": "america", "typ": "ETF", "fee": 0.21 }
+  ],
+  "^DJI": [
+    { "t": "DIA", "n": "SPDR Dow Jones Industrial Average ETF", "mk": "america", "typ": "ETF", "fee": 0.16 }
+  ],
+  "^RUT": [
+    { "t": "IWM", "n": "iShares Russell 2000 ETF", "mk": "america", "typ": "ETF", "fee": 0.19 },
+    { "t": "VTWO", "n": "Vanguard Russell 2000 ETF", "mk": "america", "typ": "ETF", "fee": 0.1 }
+  ]
+}

@@ -145,12 +145,12 @@
 
   /* ---------- การ์ดแชร์แบบรายการ (Buy วันนี้ / Pivot / Pivot group) ---------- */
   async function drawList(opts) {
-    const th = THEMES.dark;
+    const th = shareTheme();
     const W = 1080, H = 1350;
     const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
     const rows = (opts.rows || []).slice(0, opts.max || 12);
-    const logo = await loadImg("/brand/thus-symbol-white.png");
+    const logo = await loadImg("/brand/gt_shield.png");
     const thumbs = await Promise.all(rows.map((r) => stockLogo(r.ticker || r.tk, opts.mk)));
 
     const grd = x.createLinearGradient(0, 0, W, H);
@@ -248,9 +248,7 @@
 
     if (!rows.length) { x.fillStyle = th.muted; x.font = font(600, 26); x.fillText("ยังไม่มีรายการ", 90, 400); }
 
-    x.fillStyle = th.muted; x.font = font(500, 17); x.textAlign = "right";
-    x.fillText(opts.note || "ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 44);
-    x.textAlign = "left";
+    await brandFoot(x, th, W, H);
     return c;
   }
 
@@ -304,7 +302,7 @@
     return `rgb(${c[0]},${c[1]},${c[2]})`;
   }
   async function drawHeat(opts) {
-    const th = THEMES.dark;
+    const th = shareTheme();
     const W = 1080, H = 1350;
     const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
@@ -312,9 +310,8 @@
     g2.addColorStop(0, th.bg); g2.addColorStop(1, th.bg2);
     x.fillStyle = g2; x.fillRect(0, 0, W, H);
 
-    const logo = await loadImg("/brand/thus-symbol-white.png");
+    const logo = await loadImg("/brand/gt_shield.png");
     if (logo) { try { x.drawImage(logo, 70, 66, 54, 54); } catch (e) {} }
-    x.fillStyle = th.text; x.font = font(900, 34); x.fillText("THUS", 140, 108);
     x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
     x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 100);
     x.textAlign = "left";
@@ -390,9 +387,7 @@
       x.fillStyle = th.muted; x.font = font(500, 18); x.fillText(t, bx + 32, ly);
     });
 
-    x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
-    x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 78);
-    x.textAlign = "left";
+    await brandFoot(x, th, W, H);
     return c;
   }
 
@@ -426,8 +421,22 @@
   // ตัวเลขในสเปก = คอลัมน์ × แถว (5 = ตัวแรกเต็มแถว + 2×2, 7 = ตัวแรกเต็มแถว + 2×3)
   const GRID_LAYOUT = { 1: [1], 2: [1, 1], 3: [1, 1, 1], 4: [2, 2], 5: [1, 2, 2], 6: [2, 2, 2], 7: [1, 2, 2, 2], 8: [2, 2, 2, 2], 9: [3, 3, 3] };
 
+
+  // แบรนด์ท้ายการ์ด: GT wordmark มุมขวาล่าง + คำเตือนมุมซ้ายล่าง
+  async function brandFoot(x, th, W, H, opt) {
+    const o = opt || {};
+    const word = await loadImg("/brand/gt_word.png");
+    if (word) {
+      const hh = o.wordH || 26;
+      const ww = Math.round(word.width * (hh / word.height));
+      try { x.drawImage(word, W - 70 - ww, H - 78 - hh + 8, ww, hh); } catch (e) {}
+    }
+    x.fillStyle = th.muted; x.font = font(400, o.note || 17); x.textAlign = "left";
+    x.fillText(o.text || "ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", 70, H - 66);
+    x.textAlign = "left";
+  }
   async function drawGrid(opts) {
-    const th = THEMES.dark;                       // การ์ดใช้พื้นดำ #0D0A11 เสมอ
+    const th = shareTheme();                       // การ์ดใช้พื้นดำ #0D0A11 เสมอ
     const W = 1080, H = 1350;
     const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
@@ -435,9 +444,8 @@
     g2.addColorStop(0, th.bg); g2.addColorStop(1, th.bg2);
     x.fillStyle = g2; x.fillRect(0, 0, W, H);
 
-    const logo = await loadImg("/brand/thus-symbol-white.png");
+    const logo = await loadImg("/brand/gt_shield.png");
     if (logo) { try { x.drawImage(logo, 70, 62, 44, 44); } catch (e) {} }
-    x.fillStyle = th.text; x.font = font(700, 30); x.fillText("THUS", 126, 96);
     x.fillStyle = th.muted; x.font = font(400, 19); x.textAlign = "right";
     x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 92);
     x.textAlign = "left";
@@ -572,17 +580,15 @@
       x.fillStyle = th.body; x.fillText(p2[1], lx + 34, H - 61);
       lx += 34 + x.measureText(p2[1]).width + 26;
     });
-    x.fillStyle = th.body; x.font = font(400, 17); x.textAlign = "right";
-    x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 60);
-    x.textAlign = "left";
     x.restore();
+    await brandFoot(x, th, W, H);
     return c;
   }
 
   /* ---------- การ์ดแชร์ ---------- */
   const THEMES = {
-    dark: { bg: "#0D0A11", bg2: "#120E18", panel: "#120E18", hi: "#1B1624", line: "#241E30", lineHi: "#332B42", text: "#F3EFF8", body: "#B8B1C2", muted: "#8F879A", gold: "#E2BE6E", gold2: "#F0D79B", up: "#4FD1B5", down: "#F08A7E", ma20: "#E2BE6E", ma50: "#9B7BE0" },
-    light: { bg: "#EFEEE9", bg2: "#FAF9F6", panel: "#FAF9F6", hi: "#FFFFFF", line: "#D3CBBE", lineHi: "#B9AE9C", text: "#1F1A24", body: "#3B3342", muted: "#5E5468", gold: "#7A5C24", up: "#0B6E70", down: "#A63B27" },
+    dark: { bg: "#0A1226", bg2: "#101C36", panel: "#101C36", hi: "#16233D", line: "#243352", lineHi: "#33456A", text: "#F6F1E6", body: "#C8C2B4", muted: "#9A9486", gold: "#E3C48B", gold2: "#F0D9AC", up: "#4FD1B5", down: "#F08A7E", ma20: "#E3C48B", ma50: "#9B7BE0" },
+    light: { bg: "#F6F2E9", bg2: "#FFFDF7", panel: "#FFFDF7", hi: "#FFFFFF", line: "#DED5C2", lineHi: "#C6B99C", text: "#1B2338", body: "#3C465C", muted: "#6B7488", gold: "#8A6A2E", gold2: "#A98A45", up: "#0E7C6B", down: "#B4442C", ma20: "#A9822F", ma50: "#6B4FA8" },
   };
   const FONT = '600 %spx Prompt, Inter, "Noto Sans Thai", "Leelawadee UI", sans-serif';
   const font = (w, s) => FONT.replace("600", w).replace("%s", s);
@@ -666,21 +672,34 @@
     return sz;
   }
   const GLASS = { a: 0.028, b: 0.009, hi: 0.07, sh: 0.42 };
+
+  function shareTheme() {
+    try {
+      const t = document.documentElement.getAttribute("data-theme") || localStorage.getItem("rsd_theme") || "dark";
+      return t === "light" ? THEMES.light : THEMES.dark;
+    } catch (e) { return THEMES.dark; }
+  }
   function glassPanel(x, th, bx, by, bw, bh, r) {
     const rr2 = r || 20;
     x.save();
+    const isLight = (th === THEMES.light);
     const g = x.createLinearGradient(bx, by, bx, by + bh);
-    g.addColorStop(0, "rgba(255,255,255," + GLASS.a + ")");
-    g.addColorStop(1, "rgba(255,255,255," + GLASS.b + ")");
+    if (isLight) {
+      g.addColorStop(0, "rgba(255,255,255,0.95)");
+      g.addColorStop(1, "rgba(255,255,255,0.70)");
+    } else {
+      g.addColorStop(0, "rgba(255,255,255," + GLASS.a + ")");
+      g.addColorStop(1, "rgba(255,255,255," + GLASS.b + ")");
+    }
     x.save();
-    x.shadowColor = "rgba(0,0,0," + GLASS.sh + ")"; x.shadowBlur = 18; x.shadowOffsetY = 6;
+    x.shadowColor = th === THEMES.light ? "rgba(27,35,56,0.14)" : "rgba(0,0,0," + GLASS.sh + ")"; x.shadowBlur = 18; x.shadowOffsetY = 6;
     x.fillStyle = g; rr(x, bx, by, bw, bh, rr2); x.fill();
     x.restore();
     // ขอบบนสว่างบาง ๆ (ให้ความรู้สึกนูนขึ้น)
     x.beginPath();
     x.moveTo(bx + rr2 * 1.1, by + 1);
     x.lineTo(bx + bw - rr2 * 1.1, by + 1);
-    x.strokeStyle = "rgba(255,255,255," + GLASS.hi + ")";
+    x.strokeStyle = th === THEMES.light ? "rgba(27,35,56,0.10)" : "rgba(255,255,255," + GLASS.hi + ")";
     x.lineWidth = 1; x.stroke();
     x.restore();
   }
@@ -773,7 +792,7 @@
     barsS.forEach((b) => { const l = b.l ?? b.low, h = b.h ?? b.high; if (l != null && l < lo) lo = l; if (h != null && h > up2) up2 = h; });
     const Y = (v) => py + ph - ((v - lo) / (up2 - lo || 1)) * ph;
     const n0 = barsS.length, cw0 = pw / n0;
-    const MA20C = "#E2BE6E", MA50C = "#9B7BE0";
+    const MA20C = th.ma20, MA50C = th.ma50;
     x.save(); x.beginPath(); x.rect(px - 2, py - 6, pw + 4, ph + 12); x.clip();
     barsS.forEach((b, i) => {
       const o = b.o ?? b.open, hh = b.h ?? b.high, ll = b.l ?? b.low, cl = b.c ?? b.close;
@@ -840,7 +859,7 @@
       const rv = Number(z.rev) || 0, ni = Number(z.ni) || 0;
       const rH = hOf(rv, mxRev, hMax), nH = hOf(ni, mxNi, hMaxNi);
 
-      x.fillStyle = "#E2BE6E";
+      x.fillStyle = th.ma20;
       if (rv >= 0) { rr(x, cx - bw - bgap / 2, base - rH, bw, rH, 4); x.fill(); tops.rev.push([cx - bw / 2 - bgap / 4, base - rH]); }
       else { rr(x, cx - bw - bgap / 2, base, bw, rH, 4); x.fill(); tops.rev.push([cx - bw / 2 - bgap / 4, base + rH]); }
 
@@ -851,7 +870,7 @@
       // ตัวเลขบนหัวแท่ง (เฉพาะเมื่อที่มีที่พอ)
       x.font = font(700, 11); x.textAlign = "center";
       if (slot > 62) {
-        if (rH > 14) { x.fillStyle = "#E2BE6E"; x.fillText(fmtS(rv), cx - bw / 2 - bgap / 4, (rv >= 0 ? base - rH - 7 : base + rH + 13)); }
+        if (rH > 14) { x.fillStyle = th.ma20; x.fillText(fmtS(rv), cx - bw / 2 - bgap / 4, (rv >= 0 ? base - rH - 7 : base + rH + 13)); }
         if (nH > 26) { x.fillStyle = th.up; x.fillText(fmtS(ni), cx + bw / 2 + bgap / 4, (ni >= 0 ? base - nH - 7 : base + nH + 13)); }
       }
       x.textAlign = "left";
@@ -865,7 +884,7 @@
       x.setLineDash([]);
       arr.forEach((p) => { x.beginPath(); x.arc(p[0], p[1], 3.4, 0, Math.PI * 2); x.fillStyle = col; x.fill(); });
     };
-    poly(tops.rev, "#F0D79B");
+    poly(tops.rev, th.gold2);
     poly(tops.ni, th.up, [4, 4]);
 
     // เส้นฐาน + ป้ายไตรมาส
@@ -878,7 +897,7 @@
     // คำอธิบายสี
     x.font = labelFont(600, 12);
     let lx = px;
-    [[("#E2BE6E"), "รายได้"], [(th.up), "กำไร"]].forEach((p2, k) => {
+    [[(th.ma20), "รายได้"], [(th.up), "กำไร"]].forEach((p2, k) => {
       x.fillStyle = p2[0]; rr(x, lx, box.y + 10, 9, 9, 2); x.fill();
       x.fillStyle = th.muted; x.fillText(p2[1], lx + 14, box.y + 18);
       lx += 14 + x.measureText(p2[1]).width + 16;
@@ -887,7 +906,7 @@
 
   async function loadCardData(tk, mk, withLogo) {
     const [f, bars, logo, tlogo] = await Promise.all([
-      loadFund(tk, mk), barsOf(tk, mk), loadImg("/brand/thus-symbol-white.png"),
+      loadFund(tk, mk), barsOf(tk, mk), loadImg("/brand/gt_shield.png"),
       (withLogo === false ? loadImg(avatarData(tk)) : stockLogo(tk, mk)),
     ]);
     let row = {};
@@ -899,7 +918,7 @@
   }
 
   async function draw(tk, nm, mk, withLogo) {
-    const th = THEMES.dark;
+    const th = shareTheme();
     const W = 1080, H = 1350;
     const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
@@ -911,7 +930,6 @@
 
     // หัวเว็บ
     if (logo) { try { x.drawImage(logo, 70, 62, 48, 48); } catch (e) {} }
-    x.fillStyle = th.text; x.font = font(900, 32); x.fillText("THUS", 132, 100);
     x.fillStyle = th.muted; x.font = font(500, 21); x.textAlign = "right";
     x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 96);
     x.textAlign = "left";
@@ -974,7 +992,7 @@
       glassPanel(x, th, bx, by, bw, bh, 14);
       if (i === 0 && String(sv[0]) === "RS") {
         // RS = วงแหวนกลางกล่อง
-        const rr0 = 34, cyc = by + bh / 2 - 2;
+        const rr0 = 34, cyc = by + bh / 2 - 8;
         const val = Math.max(0, Math.min(99, Number(sv[1]) || 0));
         x.lineWidth = 5; x.lineCap = "round";
         x.strokeStyle = th.line; x.beginPath(); x.arc(cx, cyc, rr0, 0, Math.PI * 2); x.stroke();
@@ -984,7 +1002,7 @@
         x.fillText(String(Math.round(val)), cx, cyc + 10);
         x.fillStyle = th.muted; x.font = font(600, 11);
         try { x.letterSpacing = "1px"; } catch (e) {}
-        x.fillText("RS", cx, by + bh - 8);
+        x.fillText("RS", cx, by + bh - 6);
         try { x.letterSpacing = "0px"; } catch (e) {}
         x.textAlign = "left";
         return;
@@ -1075,15 +1093,13 @@
       drawTrendBlock(x, th, qs.slice(-5), { x: tb.x, y: tb.y + 34, w: tb.w, h: tb.h - 40 });
     }
 
-    x.fillStyle = th.muted; x.font = font(500, 17); x.textAlign = "right";
-    x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 70, H - 40);
-    x.textAlign = "left";
+    await brandFoot(x, th, W, H, { note: 16 });
     return c;
   }
 
   // ── การ์ดสัดส่วน Facebook (1200×630) ──
   async function drawWide(tk, nm, mk, withLogo) {
-    const th = THEMES.dark;
+    const th = shareTheme();
     const W = 1200, H = 630;
     const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
@@ -1169,9 +1185,7 @@
     x.strokeStyle = th.line; x.lineWidth = 2; x.stroke();
     drawChartBlock(x, th, bars, { ...box, pl: 40, pr: 90, pt: 44, pb: 40 }, { n: 120 });
 
-    x.fillStyle = th.muted; x.font = font(500, 16); x.textAlign = "right";
-    x.fillText("ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", W - 52, H - 46);
-    x.textAlign = "left";
+    await brandFoot(x, th, W, H);
     return c;
   }
 
