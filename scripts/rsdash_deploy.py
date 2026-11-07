@@ -35,6 +35,24 @@ def deploy():
     print("deploy สำเร็จ")
 
 
+def quota_used_today():
+    """นับจำนวนดีพลอยของบัญชีวันนี้ (ตามเวลา UTC) จาก Vercel API — คืน None ถ้าอ่านไม่ได้"""
+    import datetime, collections
+    try:
+        auth = os.path.join(os.environ.get("APPDATA", ""), "com.vercel.cli", "Data", "auth.json")
+        tok = json.load(open(auth, encoding="utf-8")).get("token")
+        if not tok:
+            return None
+        req = urllib.request.Request("https://api.vercel.com/v6/deployments?limit=100",
+                                     headers={"Authorization": "Bearer " + tok})
+        d = json.load(urllib.request.urlopen(req, timeout=45)).get("deployments", [])
+        today = datetime.datetime.now(datetime.timezone.utc).date()
+        n = sum(1 for x in d if datetime.datetime.fromtimestamp(x["createdAt"] / 1000, datetime.timezone.utc).date() == today)
+        return n
+    except Exception:
+        return None
+
+
 def verify():
     time.sleep(8)
     local = open(os.path.join(SRC, "index.html"), "rb").read()
@@ -55,6 +73,12 @@ def verify():
 
 
 if __name__ == "__main__":
+    used = quota_used_today()
+    if used is not None:
+        print(f"ดีพลอยวันนี้ (UTC): {used} ครั้ง")
+        if used >= 90 and "--force" not in sys.argv:
+            print("ใกล้เพดาน 100 ครั้ง/วัน — หยุดก่อน กันเสียโควตาฟรี (ใช้ --force ถ้าจำเป็นจริง)")
+            raise SystemExit(3)
     sync()
     deploy()
     if "--no-verify" not in sys.argv:
