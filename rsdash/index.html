@@ -6046,11 +6046,11 @@ async function idxProxyRender(tk, mk){
   if(String(tk).charAt(0)!=='^'){ el.style.display='none'; return; }
   const db=await idxProxyLoad();
   const entry=(db&&db[tk])||null;
-  const etfs=Array.isArray(entry)?entry:(entry&&entry.etf)||[];
+  const etfs=Array.isArray(entry)?entry:((entry&&entry.etf)||[]);
   const ths=Array.isArray(entry)?[]:((entry&&entry.th)||[]);
   el.style.display='';
   if(!etfs.length && !ths.length){ el.innerHTML='<div class="text-xs text-slate-500">ยังไม่มีข้อมูลสินค้าอ้างอิงดัชนีนี้</div>'; return; }
-  el.innerHTML='<div class="text-xs text-slate-400">กำลังโหลดมูลค่าซื้อขาย…</div>';
+  el.innerHTML='<div class="text-xs text-slate-400">กำลังโหลดข้อมูล…</div>';
 
   async function withVol(list){
     const rows=await Promise.all(list.map(async x=>{
@@ -6066,28 +6066,78 @@ async function idxProxyRender(tk, mk){
     return rows;
   }
   const fmtV=v=> v==null?'—':(v>=1e9?(v/1e9).toFixed(2)+'B': v>=1e6?(v/1e6).toFixed(1)+'M':'—');
-  const table=(rows,isEtf)=>{
-    if(!rows.length) return '<div class="text-[11px] text-slate-500">— ไม่มีข้อมูล —</div>';
-    return `<div class="overflow-x-auto"><table class="w-full text-[11px]">
+
+  const etfTable=rows=> !rows.length?'<div class="text-[11px] text-slate-500">— ไม่มีข้อมูล —</div>':`<div class="overflow-x-auto"><table class="w-full text-[11px]">
       <thead><tr class="text-slate-400 border-b border-[#243044]"><th class="p-1.5 text-left text-[10px]">รหัส</th><th class="p-1.5 text-left text-[10px]">ชื่อสินค้า</th><th class="p-1.5 text-right text-[10px]">ค่าธรรมเนียม/ปี</th><th class="p-1.5 text-right text-[10px]">มูลค่าซื้อขาย</th></tr></thead>
-      <tbody>${rows.map(x=>{
-        const click=isEtf&&x.hasChart;
-        return `<tr class="border-b border-[#16202e] ${click?'hover:bg-[#131c2b] cursor-pointer':''}" ${click?`onclick="openModal('${jq(x.t)}','${jq(x.n)}','${x.mk}')"`:''}>
-          <td class="p-1.5 font-semibold ${isEtf?'text-amber-300':'text-sky-300'}">${x.t}</td>
+      <tbody>${rows.map(x=>`<tr class="border-b border-[#16202e] ${x.hasChart?'hover:bg-[#131c2b] cursor-pointer':''}" ${x.hasChart?`onclick="openModal('${jq(x.t)}','${jq(x.n)}','${x.mk}')"`:''}>
+          <td class="p-1.5 font-semibold text-amber-300">${x.t}</td>
           <td class="p-1.5 text-slate-300">${x.n}</td>
-          <td class="p-1.5 text-right">${x.fee!=null?x.fee.toFixed(2)+'%':'-'}</td>
-          <td class="p-1.5 text-right text-slate-400">${fmtV(x.val)}</td>
-        </tr>`;}).join('')}</tbody></table></div>`;
-  };
+          <td class="p-1.5 text-right">${x.fee!=null?Number(x.fee).toFixed(2)+'%':'-'}</td>
+          <td class="p-1.5 text-right text-slate-400">${fmtV(x.val)}</td></tr>`).join('')}</tbody></table></div>`;
+
+  const fundTable=rows=> !rows.length?'<div class="text-[11px] text-slate-500">— ไม่มีข้อมูล —</div>':`<div class="overflow-x-auto"><table class="w-full text-[11px]">
+      <thead><tr class="text-slate-400 border-b border-[#243044]"><th class="p-1.5 text-left text-[10px]">รหัส</th><th class="p-1.5 text-left text-[10px]">บลจ.</th><th class="p-1.5 text-left text-[10px]">หน่วย/Hedge</th><th class="p-1.5 text-right text-[10px]">ค่าธรรมเนียม/ปี</th></tr></thead>
+      <tbody>${rows.map(x=>`<tr class="border-b border-[#16202e] hover:bg-[#131c2b] cursor-pointer" onclick="openFundInfo('${jq(x.t)}','${jq(tk)}')">
+          <td class="p-1.5 font-semibold text-sky-300">${x.t}</td>
+          <td class="p-1.5 text-slate-300">${x.amc||'-'}</td>
+          <td class="p-1.5 text-slate-400">${(x.div||'-')} · ${x.hedge||'-'}</td>
+          <td class="p-1.5 text-right">${x.fee!=null?Number(x.fee).toFixed(2)+'%':'-'}</td></tr>`).join('')}</tbody></table></div>`;
 
   const [e2,t2]=await Promise.all([withVol(etfs), withVol(ths)]);
   el.innerHTML=`<div class="bg-[#0d1219] border border-[#1e2634] rounded-lg p-3">
     <div class="text-xs font-bold text-amber-300 mb-2">อยากซื้อดัชนีนี้ — ซื้อผ่านอะไรได้บ้าง</div>
     <div class="text-[11px] font-semibold text-slate-300 mb-1">ETF (ซื้อบนตลาดหลักทรัพย์${mk==='america'?'สหรัฐ':'ไทย'})</div>
-    ${table(e2,true)}
-    ${ths.length?`<div class="text-[11px] font-semibold text-slate-300 mt-3 mb-1">กองทุนรวมไทย (Feeder Fund) — ซื้อผ่านแอป บลจ. ไม่ต้องเปิดบัญชีต่างประเทศ</div>${table(t2,false)}`:''}
-    <div class="text-[10px] text-slate-500 mt-2">เรียงตามมูลค่าซื้อขายล่าสุด · ค่าธรรมเนียมเป็นอัตรารวมโดยประมาณต่อปี · กด ETF เพื่อเปิดกราฟ</div>
+    ${etfTable(e2)}
+    ${ths.length?`<div class="text-[11px] font-semibold text-slate-300 mt-3 mb-1">Feeder Fund (กองทุนรวมไทย)</div>${fundTable(t2)}`:''}
+    <div class="text-[10px] text-slate-500 mt-2">เรียงตามมูลค่าซื้อขาย/ค่าธรรมเนียม · กด ETF ดูกราฟ · กดกองทุนดูรายละเอียด</div>
   </div>`;
+}
+
+/* รายละเอียดกองทุน Feeder (จากข้อมูลที่เราจัดไว้ + ลิงก์ไปหน้าตัวจริง) */
+async function openFundInfo(code, idxTk){
+  const db=await idxProxyLoad();
+  let item=null;
+  Object.keys(db||{}).forEach(k=>{ const e=db[k]; const arr=(e&&e.th)||[]; arr.forEach(x=>{ if(x.t===code) item=item||x; }); });
+  if(!item){ alert('ไม่พบข้อมูลกองนี้'); return; }
+  let idx1y=null;
+  try{
+    let d=[];
+    try{
+      const r=await fetch('/api/chart?market='+(idxTk==='^GSPC'||idxTk==='^IXIC'||idxTk==='^NDX'||idxTk==='^DJI'||idxTk==='^RUT'?'america':'thailand')+'&symbol='+encodeURIComponent(idxTk)+'&interval=1d&range=1y');
+      const j=await r.json(); d=(j&&j.data)||[];
+    }catch(e){}
+    if(d.length<60){
+      const r2=await fetch('/api/idxchart?symbol='+encodeURIComponent(idxTk)+'&interval=1d&range=1y');
+      const j2=await r2.json(); const d2=(j2&&j2.data)||[];
+      if(d2.length>d.length) d=d2;
+    }
+    if(d.length>60){ const a=d[0], b=d[d.length-1]; const va=a.close!=null?a.close:a.c, vb=b.close!=null?b.close:b.c; if(va&&vb) idx1y=(vb/va-1)*100; }
+  }catch(e){}
+  let box=document.getElementById('fundInfoModal');
+  if(!box){
+    box=document.createElement('div'); box.id='fundInfoModal';
+    box.className='fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/80';
+    box.innerHTML='<div class="w-full max-w-[420px] rounded-2xl bg-[#0f1420] border border-[#243044] p-4 text-slate-200"></div>';
+    box.addEventListener('click', e=>{ if(e.target===box) box.remove(); });
+    document.body.appendChild(box);
+  }
+  const row=(k,v)=>`<div class="flex justify-between gap-3 py-1 border-b border-[#1b2434] last:border-0"><span class="text-slate-400 text-[11px]">${k}</span><span class="text-[12px] font-semibold text-right">${v}</span></div>`;
+  box.firstElementChild.innerHTML=`
+    <div class="flex items-start justify-between mb-2">
+      <div><div class="text-base font-bold text-sky-300">${item.t}</div><div class="text-[11px] text-slate-400">${item.n||''}</div></div>
+      <button class="text-slate-400 text-lg leading-none" onclick="document.getElementById('fundInfoModal').remove()">✕</button>
+    </div>
+    ${row('บลจ.', item.amc||'-')}
+    ${row('ชนิดหน่วย', (item.div||'-') + (item.div==='สะสม'?' (ไม่จ่ายปันผล)':' (จ่ายปันผล)'))}
+    ${row('ค่าเงิน', item.hedge==='Hedge'?'Hedge (ป้องกันความเสี่ยงค่าเงิน)':(item.hedge==='Unhedged'?'Unhedged (ไม่ป้องกันค่าเงิน)':'-'))}
+    ${row('ค่าธรรมเนียมรวมโดยประมาณ', item.fee!=null?Number(item.fee).toFixed(2)+'% / ปี':'-')}
+    ${row('เงินลงทุนขั้นต่ำ', item.min?('ประมาณ '+Number(item.min).toLocaleString()+' บาท'):'-')}
+    ${row('ดัชนีอ้างอิง 1 ปี', idx1y!=null?(idx1y>=0?'+':'')+idx1y.toFixed(1)+'%':'—')}
+    <div class="text-[10px] text-slate-500 mt-2">ผลตอบแทนของกองจะใกล้เคียงดัชนีหลังหักค่าธรรมเนียมและผลของค่าเงิน · ตัวเลขค่าธรรมเนียมเป็นอัตรารวมประมาณ</div>
+    <div class="mt-3 flex gap-2">
+      <a href="${item.link||('https://www.wealthx.co/funds/'+encodeURIComponent(item.t))}" target="_blank" rel="noopener" class="flex-1 text-center h-9 leading-9 rounded-lg bg-amber-400/90 text-black text-[12px] font-bold">เปิดรายละเอียดเต็มกอง (WealthX)</a>
+      <a href="https://www.finnomena.com/fund/${encodeURIComponent(item.t)}" target="_blank" rel="noopener" class="flex-1 text-center h-9 leading-9 rounded-lg border border-[#2b3purple] text-[12px] font-semibold border-[#2b3a52]">Finnomena</a>
+    </div>`;
 }
 function openModal(tk,nm,mkt){
   activeTicker=tk;

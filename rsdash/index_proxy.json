@@ -12,15 +12,25 @@
   "th": [
    {
     "t": "K-SET50-A",
-    "n": "K SET50 (กองทุนรวมไทย)",
+    "n": "K SET50",
     "mk": "thailand",
-    "fee": 0.85
+    "fee": 0.85,
+    "amc": "บลจ. กสิกรไทย (KAsset)",
+    "div": "สะสม",
+    "hedge": "-",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/K-SET50-A"
    },
    {
     "t": "SCBSET50",
-    "n": "SCB SET50 (กองทุนรวมไทย)",
+    "n": "SCB SET50",
     "mk": "thailand",
-    "fee": 1.07
+    "fee": 1.07,
+    "amc": "บลจ. ไทยพาณิชย์ (SCBAM)",
+    "div": "สะสม",
+    "hedge": "-",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/SCBSET50"
    }
   ]
  },
@@ -36,15 +46,25 @@
   "th": [
    {
     "t": "K-SET50-A",
-    "n": "K SET50 (กองทุนรวมไทย)",
+    "n": "K SET50",
     "mk": "thailand",
-    "fee": 0.85
+    "fee": 0.85,
+    "amc": "บลจ. กสิกรไทย (KAsset)",
+    "div": "สะสม",
+    "hedge": "-",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/K-SET50-A"
    },
    {
     "t": "SCBSET50",
-    "n": "SCB SET50 (กองทุนรวมไทย)",
+    "n": "SCB SET50",
     "mk": "thailand",
-    "fee": 1.07
+    "fee": 1.07,
+    "amc": "บลจ. ไทยพาณิชย์ (SCBAM)",
+    "div": "สะสม",
+    "hedge": "-",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/SCBSET50"
    }
   ]
  },
@@ -78,21 +98,58 @@
   "th": [
    {
     "t": "K-US500X-A(A)",
-    "n": "เค หุ้นยูเอส พาสซีฟ — feeder iShares Core S&P 500",
+    "n": "เค หุ้นยูเอส พาสซีฟ (kassets)",
     "mk": "thailand",
-    "fee": 0.32
+    "fee": "0.32",
+    "amc": "บลจ. กสิกรไทย (KAsset)",
+    "div": "สะสม",
+    "hedge": "Unhedged",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/K-US500X-AA"
    },
    {
     "t": "SCBS&P500",
-    "n": "ไทยพาณิชย์ หุ้นยูเอส — feeder iShares Core S&P 500",
+    "n": "ไทยพาณิชย์ หุ้นยูเอส",
     "mk": "thailand",
-    "fee": 0.53
+    "fee": "0.53",
+    "amc": "บลจ. ไทยพาณิชย์ (SCBAM)",
+    "div": "ปันผล",
+    "hedge": "Unhedged",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/SCBS&P500"
    },
    {
     "t": "KT-US500-A",
-    "n": "เคแทม US 500 — feeder",
+    "n": "เคแทม US 500",
     "mk": "thailand",
-    "fee": 0.62
+    "fee": "0.62",
+    "amc": "บลจ. กรุงไทย-แอกซ่า (KTAM)",
+    "div": "สะสม",
+    "hedge": "Unhedged",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/KT-US500-A"
+   },
+   {
+    "t": "TLUS500-UH-X",
+    "n": "ทาลิส หุ้นยูเอส 500 (X)",
+    "mk": "thailand",
+    "fee": "0.10",
+    "amc": "บลจ. ทาลิส (Talis)",
+    "div": "สะสม",
+    "hedge": "Unhedged",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/TLUS500-UH-X"
+   },
+   {
+    "t": "TLUS500-H",
+    "n": "ทาลิส หุ้นยูเอส 500",
+    "mk": "thailand",
+    "fee": "0.55",
+    "amc": "บลจ. ทาลิส (Talis)",
+    "div": "สะสม",
+    "hedge": "Hedge",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/TLUS500-H"
    }
   ]
  },
@@ -120,15 +177,36 @@
   "th": [
    {
     "t": "K-USXNDQ-A(A)",
-    "n": "เค หุ้นยูเอส ดัชนี NDQ 100 — feeder Invesco QQQ",
+    "n": "เค หุ้นยูเอส ดัชนี NDQ 100",
     "mk": "thailand",
-    "fee": 0.71
+    "fee": "0.71",
+    "amc": "บลจ. กสิกรไทย (KAsset)",
+    "div": "สะสม",
+    "hedge": "Unhedged",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/K-USXNDQ-AA"
    },
    {
     "t": "SCBNDQ(A)",
-    "n": "ไทยพาณิชย์ หุ้นยูเอส เอ็นดีคิว — feeder Invesco QQQ",
+    "n": "ไทยพาณิชย์ หุ้นยูเอส เอ็นดีคิว",
     "mk": "thailand",
-    "fee": 1.07
+    "fee": "1.07",
+    "amc": "บลจ. ไทยพาณิชย์ (SCBAM)",
+    "div": "สะสม",
+    "hedge": "Unhedged",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/SCBNDQA"
+   },
+   {
+    "t": "TLUSNDQ-UH-A",
+    "n": "ทาลิส หุ้นยูเอส NDQ",
+    "mk": "thailand",
+    "fee": "0.55",
+    "amc": "บลจ. ทาลิส (Talis)",
+    "div": "สะสม",
+    "hedge": "Unhedged",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/TLUSNDQ-UH-A"
    }
   ]
  },
@@ -152,13 +230,34 @@
     "t": "K-USXNDQ-A(A)",
     "n": "เค หุ้นยูเอส ดัชนี NDQ 100",
     "mk": "thailand",
-    "fee": 0.71
+    "fee": "0.71",
+    "amc": "บลจ. กสิกรไทย (KAsset)",
+    "div": "สะสม",
+    "hedge": "Unhedged",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/K-USXNDQ-AA"
    },
    {
     "t": "SCBNDQ(A)",
     "n": "ไทยพาณิชย์ หุ้นยูเอส เอ็นดีคิว",
     "mk": "thailand",
-    "fee": 1.07
+    "fee": "1.07",
+    "amc": "บลจ. ไทยพาณิชย์ (SCBAM)",
+    "div": "สะสม",
+    "hedge": "Unhedged",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/SCBNDQA"
+   },
+   {
+    "t": "TLUSNDQ-UH-A",
+    "n": "ทาลิส หุ้นยูเอส NDQ",
+    "mk": "thailand",
+    "fee": "0.55",
+    "amc": "บลจ. ทาลิส (Talis)",
+    "div": "สะสม",
+    "hedge": "Unhedged",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/TLUSNDQ-UH-A"
    }
   ]
  },
@@ -174,9 +273,14 @@
   "th": [
    {
     "t": "SCBDJI(A)",
-    "n": "ไทยพาณิชย์ หุ้นยูเอส ดีเจไอ — feeder SPDR Dow Jones",
+    "n": "ไทยพาณิชย์ หุ้นยูเอส ดีเจไอ",
     "mk": "thailand",
-    "fee": 0.85
+    "fee": "0.85",
+    "amc": "บลจ. ไทยพาณิชย์ (SCBAM)",
+    "div": "สะสม",
+    "hedge": "Unhedged",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/SCBDJIA"
    }
   ]
  },
@@ -198,15 +302,25 @@
   "th": [
    {
     "t": "SCBRS2000(A)",
-    "n": "ไทยพาณิชย์ หุ้นยูเอสสมอลแคปพาสซีฟ — feeder Russell 2000",
+    "n": "ไทยพาณิชย์ หุ้นยูเอสสมอลแคปพาสซีฟ",
     "mk": "thailand",
-    "fee": 0.75
+    "fee": "0.75",
+    "amc": "บลจ. ไทยพาณิชย์ (SCBAM)",
+    "div": "สะสม",
+    "hedge": "Unhedged",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/SCBRS2000A"
    },
    {
     "t": "B-US2000P",
-    "n": "บัวหลวง US Equity 2000 PASSIVE — feeder Russell 2000",
+    "n": "บัวหลวง US Equity 2000 PASSIVE",
     "mk": "thailand",
-    "fee": 0.8
+    "fee": "0.80",
+    "amc": "บลจ. บัวหลวง (BBLAM)",
+    "div": "สะสม",
+    "hedge": "Unhedged",
+    "min": 1000,
+    "link": "https://www.wealthx.co/funds/B-US2000P"
    }
   ]
  }
