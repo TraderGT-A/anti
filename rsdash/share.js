@@ -444,13 +444,6 @@
   }
   async function brandFoot(x, th, W, H, opt) {
     const o = opt || {};
-    if (BRAND === "gt") {
-      const word = await loadImg("/brand/gt_word.png");
-      if (word) {
-        const hh = o.wordH || 26, ww = Math.round(word.width * (hh / word.height));
-        try { x.drawImage(word, W - 70 - ww, H - 84, ww, hh); } catch (e) {}
-      }
-    }
     x.fillStyle = th.muted; x.font = font(400, o.note || 17); x.textAlign = "left";
     x.fillText(o.text || "ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", 70, H - 66);
     x.textAlign = "left";
@@ -608,7 +601,7 @@
   /* ---------- การ์ดแชร์ ---------- */
   const THEMES = {
     dark: { bg: "#0D0A11", bg2: "#120E18", panel: "#120E18", hi: "#1B1624", line: "#241E30", lineHi: "#332B42", text: "#F3EFF8", body: "#B8B1C2", muted: "#8F879A", gold: "#E2BE6E", gold2: "#F0D79B", up: "#4FD1B5", down: "#F08A7E", ma20: "#E2BE6E", ma50: "#9B7BE0" },
-    gtDark: { bg: "#0A1226", bg2: "#101C36", panel: "#101C36", hi: "#16233D", line: "#243352", lineHi: "#33456A", text: "#F6F1E6", body: "#C8C2B4", muted: "#9A9486", gold: "#E3C48B", gold2: "#F0D9AC", up: "#4FD1B5", down: "#F08A7E", ma20: "#E3C48B", ma50: "#9B7BE0" },
+    gtDark: { bg: "#0D0A11", bg2: "#120E18", panel: "#120E18", hi: "#1B1624", line: "#241E30", lineHi: "#332B42", text: "#F6F0E4", body: "#C6BFAF", muted: "#958F82", gold: "#E3C48B", gold2: "#F0D9AC", up: "#4FD1B5", down: "#F08A7E", ma20: "#E3C48B", ma50: "#9B7BE0" },
     gtLight: { bg: "#F4F1E4", bg2: "#FFFCF0", panel: "#FFFCF0", hi: "#FFFFFF", line: "#E0D7BF", lineHi: "#C6B892", text: "#241E12", body: "#4A4232", muted: "#7B7059", gold: "#8A6A2E", gold2: "#A98A45", up: "#0E7C6B", down: "#B4442C", ma20: "#A9822F", ma50: "#6B4FA8" },
     light: { bg: "#F2EFE8", bg2: "#FCFAF5", panel: "#FCFAF5", hi: "#FFFFFF", line: "#DBD2C2", lineHi: "#C2B6A0", text: "#1C1A22", body: "#3D3848", muted: "#6A6472", gold: "#8A6A2E", gold2: "#A98A45", up: "#0E7C6B", down: "#B4442C", ma20: "#A9822F", ma50: "#6B4FA8" },
   };
