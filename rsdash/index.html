@@ -1703,6 +1703,80 @@ function drLabel(tk, mk){   // (DR) ตัวกะทัดรัดติด�
   const L=drList(tk); if(!L||!L.length) return '';
   return `<i class="dot-dr" title="ซื้อในไทยได้ผ่าน DR ${L.length} ตัว"></i>`;
 }
+
+/* ===== ราคา DR แต่ละตัว + พรีเมียมเทียบหุ้นแม่ =====
+   ราคา DR (บาท) ≈ ราคาหุ้นแม่ (USD) × อัตราแลกเปลี่ยน USD/THB × อัตราแปลงหน่วยของ DR
+   อัตราแปลงหน่วยจริงของแต่ละกองไม่เท่ากัน → เราหา "อัตราแปลงโดยนัย" = ราคา DR ÷ (ราคาแม่ × FX)
+   แล้วเทียบกันในกลุ่มเดียวกัน ตัวที่ต่ำสุดคือถูกที่สุด · พรีเมียม = อัตราโดยนัย ÷ ตัวที่ต่ำสุด − 1 */
+const _DRPX = { px:{}, at:0, fx:null, fxAt:0 };
+
+async function drUsdThb(){
+  if(_DRPX.fx && Date.now()-_DRPX.fxAt < 3600000) return _DRPX.fx;
+  try{
+    const j = await mfJ('/api/chart?symbol=THB%3DX&interval=1d&range=5d&market=america');
+    const d = j.data||[]; const v = d.length ? d[d.length-1].close : null;
+    if(v){ _DRPX.fx = v; _DRPX.fxAt = Date.now(); }
+    return v;
+  }catch(e){ return null; }
+}
+
+async function drQuote(t){
+  const now = Date.now();
+  const c = _DRPX.px[t];
+  if(c && now - c.at < 300000) return c.v;
+  try{
+    const j = await mfJ('/api/chart?symbol='+encodeURIComponent(t+'.BK')+'&interval=1d&range=5d&market=thailand');
+    const d = j.data||[];
+    if(!d.length) return null;
+    const last = d[d.length-1], prev = d.length>1 ? d[d.length-2] : null;
+    const v = { price:last.close, chg: prev && prev.close ? (last.close/prev.close-1)*100 : null };
+    _DRPX.px[t] = { v:v, at:now };
+    return v;
+  }catch(e){ return null; }
+}
+
+async function drFillPrices(tk, parentUsd){
+  const L = drList(tk); if(!L || !L.length) return;
+  const fx = await drUsdThb();
+  let usd = parentUsd;
+  if(usd == null){ try{ const rows=(stockData||[]); const r=rows.find(z=>z.ticker===tk); if(r) usd=r.price; }catch(e){} }
+  if(usd == null){ try{                                    // หน้าการ์ด/ตลาดอื่น: ดึงราคาหุ้นแม่จากกราฟแทน
+      const j = await mfJ('/api/chart?symbol='+encodeURIComponent(tk)+'&interval=1d&range=5d&market=america');
+      const d=j.data||[]; if(d.length) usd = d[d.length-1].close;
+    }catch(e){} }
+  const list = L.slice(0, 8);
+  const qs = await Promise.all(list.map(x=>drQuote(x.t)));
+  const data = [];
+  list.forEach((x,i)=>{ const q=qs[i]; if(q && q.price!=null){
+    const im = (usd && fx) ? q.price/(usd*fx) : null;
+    data.push({ t:x.t, price:q.price, chg:q.chg, im:im }); } });
+  if(!data.length) return;
+  // อัตราแปลงหน่วยจริงมักเป็นเลขกลม ๆ (1:1, 1:10, 1:20000 ฯลฯ) → ปัดอัตราโดยนัยไปหาเลขกลมที่ใกล้ที่สุดในเชิง log
+  const CAND=[1,1/2,1/5,1/10,1/20,1/50,1/100,1/200,1/500,1/1000,1/2000,1/5000,1/10000,1/20000,1/50000,1/100000];
+  function snap(r){
+    let best=CAND[0], bd=Infinity;
+    CAND.forEach(c=>{ const d=Math.abs(Math.log(r/c)); if(d<bd){ bd=d; best=c; } });
+    return best;
+  }
+  data.forEach(z=>{
+    const pxEl = document.querySelector('[data-dr-px="'+z.t+'"]');
+    const chgEl = document.querySelector('[data-dr-chg="'+z.t+'"]');
+    const pmEl = document.querySelector('[data-dr-pm="'+z.t+'"]');
+    if(pxEl) pxEl.textContent = Number(z.price).toFixed(2);
+    if(chgEl && z.chg!=null){ const c=Number(z.chg); chgEl.textContent=(c>0?'+':'')+c.toFixed(2)+'%';
+      chgEl.className='p-1.5 text-right '+(c>=0?'text-emerald-400':'text-rose-400'); }
+    if(pmEl){
+      if(z.im){
+        const rt=snap(z.im), pm=(z.im/rt-1)*100;
+        pmEl.textContent=(Math.abs(pm)<0.05?'0.0':(pm>0?'+':'')+pm.toFixed(1))+'%';
+        pmEl.className='p-1.5 text-right '+(pm>3?'text-rose-300':(pm<-3?'text-emerald-300':'text-slate-400'));
+        const inv=Math.round(1/rt);
+        pmEl.title='อัตราแปลงประมาณ 1 DR = 1/'+inv.toLocaleString()+' หุ้นแม่';
+      } else { pmEl.textContent='–'; }
+    }
+  });
+}
+
 function openDRChart(dr){
   try{
     // DR ซื้อขายบน SET — ใช้กราฟชุดเดียวกับหุ้นไทย (Yahoo: <DR>.BK)
@@ -1716,6 +1790,9 @@ function drTableHTML(tk){   // ตารางเต็ม (ใน modal) เร
     return `<tr class="border-b border-[#16202e]">
       <td class="p-1.5 font-semibold"><button type="button" class="dr-open" onclick="openDRChart('${x.t}')" title="เปิดกราฟ DR ตัวนี้">${x.t}</button></td>
       <td class="p-1.5 text-slate-300">${x.i}</td>
+      <td class="p-1.5 text-right" data-dr-px="${x.t}">–</td>
+      <td class="p-1.5 text-right" data-dr-chg="${x.t}">–</td>
+      <td class="p-1.5 text-right" data-dr-pm="${x.t}">–</td>
       <td class="p-1.5 text-right">${Number(x.vol||0).toLocaleString()}</td>
       <td class="p-1.5 text-right text-slate-400">${Number.isFinite(v)?v.toFixed(1)+'M':'-'}</td>
       <td class="p-1.5 text-right ${y>0?'text-emerald-400':(y<0?'text-rose-400':'text-slate-400')}">${Number.isFinite(y)?(y>0?'+':'')+y.toFixed(1)+'%':'-'}</td>
@@ -1723,9 +1800,9 @@ function drTableHTML(tk){   // ตารางเต็ม (ใน modal) เร
   return `<div class="bg-[#0d1219] border border-[#1e2634] rounded-lg p-3">
     <div class="text-xs font-bold text-rose-300 mb-1">ซื้อหุ้นนี้ผ่าน DR ในตลาดไทยได้ — ${L.length} ตัว (เรียงตาม Volume มาก→น้อย)</div>
     <div class="overflow-x-auto"><table class="w-full text-[11px]">
-      <thead><tr class="text-slate-400 border-b border-[#243044]"><th class="p-1.5 text-left text-[10px]">DR</th><th class="p-1.5 text-left text-[10px]">ค่ายผู้ออก</th><th class="p-1.5 text-right text-[10px]">Volume</th><th class="p-1.5 text-right text-[10px]">มูลค่าซื้อขาย</th><th class="p-1.5 text-right text-[10px]">YTD</th></tr></thead>
+      <thead><tr class="text-slate-400 border-b border-[#243044]"><th class="p-1.5 text-left text-[10px]">DR</th><th class="p-1.5 text-left text-[10px]">ค่ายผู้ออก</th><th class="p-1.5 text-right text-[10px]">ราคา</th><th class="p-1.5 text-right text-[10px]">%วัน</th><th class="p-1.5 text-right text-[10px]" title="เทียบราคา DR ตัวที่ถูกที่สุดของหุ้นแม่ตัวเดียวกัน">พรีเมียม</th><th class="p-1.5 text-right text-[10px]">Volume</th><th class="p-1.5 text-right text-[10px]">มูลค่าซื้อขาย</th><th class="p-1.5 text-right text-[10px]">YTD</th></tr></thead>
       <tbody>${rows}</tbody></table></div>
-    <div class="text-[10px] text-slate-500 mt-2">เลขท้ายชื่อ DR = ผู้ออก — 01 บัวหลวง · 03 พาย · 06 เกียรตินิภัทร · 11 กสิกรไทย · 13 KGI · 19 หยวนต้า · 23 InnovestX · 24 ฟินันเซีย · 80 กรุงไทย</div>
+    <div class="text-[10px] text-slate-500 mt-2">ราคา DR คิดจาก หุ้นแม่ (USD) × อัตราแลกเปลี่ยน × อัตราแปลงหน่วยของ DR · พรีเมียม = ราคา DR เทียบกับตัวที่แปลงหน่วยถูกที่สุดของหุ้นแม่เดียวกัน (บวก = ซื้อแพงกว่าคู่แข่ง) · เลขท้ายชื่อ DR = ผู้ออก — 01 บัวหลวง · 03 พาย · 06 เกียรตินิภัทร · 11 กสิกรไทย · 13 KGI · 19 หยวนต้า · 23 InnovestX · 24 ฟินันเซีย · 80 กรุงไทย</div>
   </div>`;
 }
 /* ===== ข้อมูลรายวันอ่านจาก GitHub raw (ไม่ต้องดีพลายซ้ำทุกวัน) ===== */
@@ -6295,7 +6372,8 @@ function openModal(tk,nm,mkt){
   const _ml = document.getElementById('modalLegend');
   if(_ml) _ml.innerHTML = maLegendHTML()+bsArrowLegend(tk,mk,found);
   const _drEl=document.getElementById('modalDR');
-  if(_drEl) _drEl.innerHTML = (mk==='america') ? drTableHTML(tk) : '';   // DR ไทย (เฉพาะหุ้นเมกา)
+  if(_drEl){ _drEl.innerHTML = (mk==='america') ? drTableHTML(tk) : '';   // DR ไทย (เฉพาะหุ้นเมกา)
+    if(mk==='america'){ try{ const pr=(stockData||[]).find(z=>z.ticker===tk); drFillPrices(tk, pr?pr.price:null); }catch(e){} } }
   document.getElementById('chartModal').classList.remove('hidden'); document.getElementById('chartModal').classList.add('flex'); fetchModal('1y');
 }
 function closeModal(){
