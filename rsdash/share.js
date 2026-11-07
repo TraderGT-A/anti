@@ -1319,7 +1319,7 @@
       nameX = 178;
     }
     { const sig0 = (typeof window !== "undefined" && window.__SIG) ? window.__SIG : "";
-      if (sig0) { const w0 = drawSig(x, sig0, nameX - 40, 186, 1.05); if (w0) nameX += 8; } }
+      if (sig0) { const w0 = drawSig(x, sig0, nameX, 186, 1.05); if (w0) nameX += w0 + 10; } }
     x.fillStyle = th.text; x.font = font(800, 52);
     x.fillText(tk, nameX, 208);
     const tw = x.measureText(tk).width;
@@ -1534,7 +1534,7 @@
     let nameX = 52;
     if (tlogo) { x.save(); rr(x, 52, 104, 66, 66, 33); x.clip(); x.drawImage(tlogo, 52, 104, 66, 66); x.restore(); nameX = 132; }
     { const sigW = (typeof window !== "undefined" && window.__SIG) ? window.__SIG : "";
-      if (sigW) { const w1 = drawSig(x, sigW, nameX - 38, 140, 1.0); if (w1) nameX += 6; } }
+      if (sigW) { const w1 = drawSig(x, sigW, nameX, 140, 1.0); if (w1) nameX += w1 + 8; } }
     x.fillStyle = th.text; x.font = font(900, 58); x.fillText(tk, nameX, 160);
     const tkW0 = x.measureText(tk).width;                 // วัดด้วยฟอนต์ชื่อย่อก่อนเปลี่ยนฟอนต์
     x.fillStyle = th.body; x.font = font(500, 21);
@@ -1549,7 +1549,7 @@
         tg = (MAP[drRef.p] || []).filter(function (z) { return String(z.t).toUpperCase() !== String(tk).toUpperCase(); })
           .slice(0, 3).map(function (z) { return { kind: "DR", text: z.t, title: z.i || "" }; });
       }
-      if (tg.length) drawTags(x, th, tg, nameX + tkW0 + 62, 200, W - 420);
+      if (tg.length) drawTags(x, th, tg, nameX + tkW0 + 74, 200, W - 430);
     }
 
     const lastBar = bars.length ? bars[bars.length - 1] : null;
