@@ -853,6 +853,16 @@
   // กราฟเส้นแนวโน้มรายได้ / กำไรสุทธิ รายไตรมาส
 
 
+
+  // ADR% = เฉลี่ย (High−Low)/Close 20 แท่งล่าสุด (ความผันผวนรายวัน)
+  function adrOf(bars, n) {
+    const arr = (bars || []).filter(function (b) { return b && b.h != null && b.l != null && (b.c != null || b.close != null); });
+    if (arr.length < 5) return null;
+    const w = arr.slice(-Math.min(n || 20, arr.length));
+    let sum = 0, cnt = 0;
+    w.forEach(function (b) { const c = (b.c != null ? b.c : b.close); if (c > 0) { sum += (b.h - b.l) / c; cnt++; } });
+    return cnt ? (sum / cnt) * 100 : null;
+  }
   // DR ไทย → หุ้นแม่ (ใช้ข้อมูลพื้นฐาน/โลโก้/RS จากหุ้นแม่) + ผู้ออก DR
   async function drOf(tk, mk) {
     if (mk !== "thailand") return null;
@@ -1141,6 +1151,13 @@
     if (rng.lo == null) { x.fillStyle = th.muted; x.font = font(600, 26); x.fillText("ไม่มีข้อมูลกราฟ", box.x + 30, box.y + box.h / 2); }
     else { const hiC = (drRef && bars.length) ? Math.max.apply(null, bars.slice(-252).map(function (b) { return b.h != null ? b.h : (b.c != null ? b.c : b.close); })) : hi;
       if (hiC) { x.fillStyle = th.muted; x.font = font(600, 19); x.fillText("52W " + Number(hiC).toFixed(2), box.x + 24, box.y + 26); } }
+    { const ax = adrOf(bars, 20);
+      if (ax != null) {
+        const col = ax < 2 ? th.up : (ax <= 4 ? th.gold : "#F0A07E");
+        x.textAlign = "right"; x.fillStyle = col; x.font = font(700, 19);
+        x.fillText("ADR20 " + ax.toFixed(1) + "%", box.x + box.w - 24, box.y + 26);
+        x.textAlign = "left";
+      } }
 
     // ── พื้นฐาน (บอกช่วงเวลา TTM / ไตรมาส) ──
     const qs = (f && f.q) ? f.q.filter((z) => z && z.d) : [];

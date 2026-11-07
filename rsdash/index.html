@@ -1641,7 +1641,7 @@ html .gs-empty{padding:8px 10px;color:#5d6b7d;font-size:11.5px}
           <button class="tf-chip" onclick="changeModalTF('1wk', event)">1W</button>
           <button class="tf-chip" onclick="changeModalTF('1mo', event)">1M</button>
           <button class="tf-chip active" onclick="changeModalTF('1y', event)">3Y</button>
-        </div><span id="modalBS"></span></div><div id="modalBSWhy" class="bswhy" hidden></div>
+        </div><span id="modalBS"></span><span id="modalADR" class="pill hidden"></span></div><div id="modalBSWhy" class="bswhy" hidden></div>
         <div id="modalLegend" class="mb-1"></div>
     <div id="modalChart" class="w-full h-[420px] rounded-lg bg-[#05070b] border border-[#1e2634]"></div>
     <button class="mm-btn" id="modalMoreBtn" onclick="toggleModalMore()">รายละเอียด <span id="modalTTsum"></span> <span id="modalMoreArrow">▾</span></button>
@@ -1735,43 +1735,54 @@ async function drQuote(t){
   }catch(e){ return null; }
 }
 
+let _DRRATIO=null;
+async function drRatioMap(){
+  if(_DRRATIO) return _DRRATIO;
+  try{ const j=await fetchSiteJSON('dr_ratio.json'); _DRRATIO=(j&&j.items)||{}; }catch(e){ _DRRATIO={}; }
+  return _DRRATIO;
+}
+async function drParentCloses(tk){
+  try{
+    const j=await mfJ('/api/chart?symbol='+encodeURIComponent(tk)+'&interval=1d&range=5d&market=america');
+    const d=(j.data||[]).slice(-2).map(x=>x.close);
+    return d.length? {last:d[d.length-1], prev:(d.length>1?d[d.length-2]:d[0])} : null;
+  }catch(e){ return null; }
+}
 async function drFillPrices(tk, parentUsd){
   const L = drList(tk); if(!L || !L.length) return;
-  const fx = await drUsdThb();
-  let usd = parentUsd;
-  if(usd == null){ try{ const rows=(stockData||[]); const r=rows.find(z=>z.ticker===tk); if(r) usd=r.price; }catch(e){} }
-  if(usd == null){ try{                                    // หน้าการ์ด/ตลาดอื่น: ดึงราคาหุ้นแม่จากกราฟแทน
-      const j = await mfJ('/api/chart?symbol='+encodeURIComponent(tk)+'&interval=1d&range=5d&market=america');
-      const d=j.data||[]; if(d.length) usd = d[d.length-1].close;
-    }catch(e){} }
+  const [fx, ratios, closes] = await Promise.all([drUsdThb(), drRatioMap(), drParentCloses(tk)]);
+  const usdPrev = closes ? closes.prev : null;     // ราคาแม่ปิดคืนก่อน = ข้อมูลที่รอบไทยวันนี้ใช้
   const list = L.slice(0, 8);
   const qs = await Promise.all(list.map(x=>drQuote(x.t)));
   const data = [];
-  list.forEach((x,i)=>{ const q=qs[i]; if(q && q.price!=null){
-    const im = (usd && fx) ? q.price/(usd*fx) : null;
-    data.push({ t:x.t, price:q.price, chg:q.chg, im:im }); } });
+  list.forEach((x,i)=>{ const q=qs[i]; if(!q || q.price==null) return;
+    const r = ratios[x.t];
+    const denom = r ? r.denom : null;
+    const fair = (usdPrev && fx && denom) ? (usdPrev*fx)/denom : null;
+    data.push({ t:x.t, price:q.price, chg:q.chg, fair:fair, denom:denom, fit:r?r.fit:null, loose:r? (Math.abs(r.fit)>3) : true });
+  });
   if(!data.length) return;
-  // อัตราแปลงหน่วยจริงมักเป็นเลขกลม ๆ (1:1, 1:10, 1:20000 ฯลฯ) → ปัดอัตราโดยนัยไปหาเลขกลมที่ใกล้ที่สุดในเชิง log
-  const CAND=[1,1/2,1/5,1/10,1/20,1/50,1/100,1/200,1/500,1/1000,1/2000,1/5000,1/10000,1/20000,1/50000,1/100000];
-  function snap(r){
-    let best=CAND[0], bd=Infinity;
-    CAND.forEach(c=>{ const d=Math.abs(Math.log(r/c)); if(d<bd){ bd=d; best=c; } });
-    return best;
-  }
+  try{   // บรรทัดสรุป: ราคาที่ควรได้ถ้าซื้อตอนนี้ (อิงราคาแม่ล่าสุด + FX ล่าสุด)
+    const note=document.getElementById('drFairNote');
+    if(note && closes && closes.last && fx){
+      const parts=data.filter(z=>z.denom).map(z=>z.t+' '+(closes.last*fx/z.denom).toFixed(2));
+      if(parts.length) note.textContent='ถ้าซื้อตอนนี้ (แม่ '+Number(closes.last).toFixed(2)+' USD × '+Number(fx).toFixed(2)+'): '+parts.join(' · ')+' บาท';
+    }
+  }catch(e){}
   data.forEach(z=>{
-    const pxEl = document.querySelector('[data-dr-px="'+z.t+'"]');
-    const chgEl = document.querySelector('[data-dr-chg="'+z.t+'"]');
-    const pmEl = document.querySelector('[data-dr-pm="'+z.t+'"]');
-    if(pxEl) pxEl.textContent = Number(z.price).toFixed(2);
+    const pxEl=document.querySelector('[data-dr-px="'+z.t+'"]'), chgEl=document.querySelector('[data-dr-chg="'+z.t+'"]');
+    const fairEl=document.querySelector('[data-dr-fair="'+z.t+'"]'), pmEl=document.querySelector('[data-dr-pm="'+z.t+'"]');
+    if(pxEl) pxEl.textContent=Number(z.price).toFixed(2);
     if(chgEl && z.chg!=null){ const c=Number(z.chg); chgEl.textContent=(c>0?'+':'')+c.toFixed(2)+'%';
       chgEl.className='p-1.5 text-right '+(c>=0?'text-emerald-400':'text-rose-400'); }
+    if(fairEl){ fairEl.textContent = z.fair ? (z.loose?'~':'')+Number(z.fair).toFixed(2) : '–';
+      if(z.denom) fairEl.title='อัตราแปลง 1 DR = '+(z.loose?'ประมาณ ':'')+'1/'+Number(z.denom).toLocaleString()+' หุ้น';
+      if(z.loose) fairEl.className='p-1.5 text-right text-slate-400'; }
     if(pmEl){
-      if(z.im){
-        const rt=snap(z.im), pm=(z.im/rt-1)*100;
+      if(z.fair){
+        const pm=(z.price/z.fair-1)*100;
         pmEl.textContent=(Math.abs(pm)<0.05?'0.0':(pm>0?'+':'')+pm.toFixed(1))+'%';
-        pmEl.className='p-1.5 text-right '+(pm>3?'text-rose-300':(pm<-3?'text-emerald-300':'text-slate-400'));
-        const inv=Math.round(1/rt);
-        pmEl.title='อัตราแปลงประมาณ 1 DR = 1/'+inv.toLocaleString()+' หุ้นแม่';
+        pmEl.className='p-1.5 text-right '+(pm>2?'text-rose-300':(pm<-2?'text-emerald-300':'text-slate-400'));
       } else { pmEl.textContent='–'; }
     }
   });
@@ -1792,6 +1803,7 @@ function drTableHTML(tk){   // ตารางเต็ม (ใน modal) เร
       <td class="p-1.5 text-slate-300">${x.i}</td>
       <td class="p-1.5 text-right" data-dr-px="${x.t}">–</td>
       <td class="p-1.5 text-right" data-dr-chg="${x.t}">–</td>
+      <td class="p-1.5 text-right" data-dr-fair="${x.t}">–</td>
       <td class="p-1.5 text-right" data-dr-pm="${x.t}">–</td>
       <td class="p-1.5 text-right">${Number(x.vol||0).toLocaleString()}</td>
       <td class="p-1.5 text-right text-slate-400">${Number.isFinite(v)?v.toFixed(1)+'M':'-'}</td>
@@ -1800,8 +1812,9 @@ function drTableHTML(tk){   // ตารางเต็ม (ใน modal) เร
   return `<div class="bg-[#0d1219] border border-[#1e2634] rounded-lg p-3">
     <div class="text-xs font-bold text-rose-300 mb-1">ซื้อหุ้นนี้ผ่าน DR ในตลาดไทยได้ — ${L.length} ตัว (เรียงตาม Volume มาก→น้อย)</div>
     <div class="overflow-x-auto"><table class="w-full text-[11px]">
-      <thead><tr class="text-slate-400 border-b border-[#243044]"><th class="p-1.5 text-left text-[10px]">DR</th><th class="p-1.5 text-left text-[10px]">ค่ายผู้ออก</th><th class="p-1.5 text-right text-[10px]">ราคา</th><th class="p-1.5 text-right text-[10px]">%วัน</th><th class="p-1.5 text-right text-[10px]" title="เทียบราคา DR ตัวที่ถูกที่สุดของหุ้นแม่ตัวเดียวกัน">พรีเมียม</th><th class="p-1.5 text-right text-[10px]">Volume</th><th class="p-1.5 text-right text-[10px]">มูลค่าซื้อขาย</th><th class="p-1.5 text-right text-[10px]">YTD</th></tr></thead>
+      <thead><tr class="text-slate-400 border-b border-[#243044]"><th class="p-1.5 text-left text-[10px]">DR</th><th class="p-1.5 text-left text-[10px]">ค่ายผู้ออก</th><th class="p-1.5 text-right text-[10px]">ราคา</th><th class="p-1.5 text-right text-[10px]">%วัน</th><th class="p-1.5 text-right text-[10px]" title="ราคาที่ควรเป็น = ราคาหุ้นแม่ (ปิดคืนก่อน) × อัตราแลกเปลี่ยน ÷ อัตราแปลงหน่วย">ควรเป็น</th><th class="p-1.5 text-right text-[10px]" title="ราคา DR เทียบราคาที่ควรเป็น (บวก = แพงกว่าที่ควร)">ส่วนต่าง</th><th class="p-1.5 text-right text-[10px]">Volume</th><th class="p-1.5 text-right text-[10px]">มูลค่าซื้อขาย</th><th class="p-1.5 text-right text-[10px]">YTD</th></tr></thead>
       <tbody>${rows}</tbody></table></div>
+    <div id="drFairNote" class="text-[10px] text-amber-300/90 mt-1"></div>
     <div class="text-[10px] text-slate-500 mt-2">ราคา DR คิดจาก หุ้นแม่ (USD) × อัตราแลกเปลี่ยน × อัตราแปลงหน่วยของ DR · พรีเมียม = ราคา DR เทียบกับตัวที่แปลงหน่วยถูกที่สุดของหุ้นแม่เดียวกัน (บวก = ซื้อแพงกว่าคู่แข่ง) · เลขท้ายชื่อ DR = ผู้ออก — 01 บัวหลวง · 03 พาย · 06 เกียรตินิภัทร · 11 กสิกรไทย · 13 KGI · 19 หยวนต้า · 23 InnovestX · 24 ฟินันเซีย · 80 กรุงไทย</div>
   </div>`;
 }
@@ -6397,6 +6410,24 @@ function changeModalTF(iv, ev){
   if(hit) hit.classList.add('active');
   fetchModal(iv);
 }
+
+/* ADR% = ค่าเฉลี่ย (High−Low)/Close ของ n แท่งล่าสุด — วัดความผันผวนรายวันแบบไม่สนทิศทาง */
+function adrPct(bars, n){
+  const N = n || 20;
+  const arr = (bars||[]).filter(b=>b && b.high!=null && b.low!=null && (b.close||b.c));
+  if(arr.length < 5) return null;
+  const w = arr.slice(-Math.min(N, arr.length));
+  let sum=0, cnt=0;
+  w.forEach(b=>{ const c=(b.close!=null?b.close:b.c); if(c>0){ sum += (b.high-b.low)/c; cnt++; } });
+  return cnt ? (sum/cnt)*100 : null;
+}
+function adrLabel(v){
+  if(v==null) return null;
+  const lv = v<2 ? ['นิ่ง','text-sky-300 border-sky-700/60'] : (v<=4 ? ['ปกติ','text-emerald-300 border-emerald-700/60'] : ['ผันผวน','text-amber-300 border-amber-700/60']);
+  return { txt:'ADR20 '+v.toFixed(1)+'% · '+lv[0], cls:lv[1],
+           tip:'ADR% = เฉลี่ย (High−Low)/Close 20 แท่งล่าสุด · ยิ่งสูงยิ่งแกว่งรายวัน' };
+}
+
 async function fetchModal(iv){
   const el=document.getElementById('modalChart'); el.innerHTML='<div class="flex items-center justify-center h-full text-sky-400 animate-pulse text-sm">กำลังโหลด...</div>';
   try{
@@ -6407,6 +6438,10 @@ async function fetchModal(iv){
     let data=(j.data||[]).sort((a,b)=>typeof a.time==='number'?(a.time-b.time):String(a.time).localeCompare(String(b.time)));
     if(String(activeTicker).charAt(0)==='^' && data.length<20){ el.innerHTML='<div class="flex flex-col items-center justify-center h-full gap-1 text-center px-4"><div class="text-sm text-slate-300">ยังไม่มีกราฟย้อนหลังของดัชนีนี้</div><div class="text-[11px] text-slate-500">ดึงประวัติกราฟดัชนีไม่สำเร็จในตอนนี้ — ตัวเลขระดับ/% เปลี่ยนด้านบนยังเป็นค่าสด ลองใหม่อีกครั้ง</div></div>'; return; }
     if(!data.length) throw new Error('no data');
+    { const _ad=document.getElementById('modalADR'); if(_ad){
+        const v=adrPct(data,20), lb=adrLabel(v);
+        if(lb){ _ad.textContent=lb.txt; _ad.title=lb.tip; _ad.className='pill '+lb.cls; } else { _ad.className='pill hidden'; _ad.textContent=''; }
+      } }
     if(iv==='1y'||iv==='1d'){ data=patchedBars(data, activeTicker, activeMarket); try{ bsModal(data, activeTicker, activeMarket); }catch(e){} }
     try{ if(iv==='1y'||iv==='1d') renderModalTT(data); else { const tt=document.getElementById('modalTT'); if(tt) tt.innerHTML=''; } }catch(e){}
     (function(){ const old=document.getElementById('modalPriceNote'); if(old) old.remove(); })();   // (ป้ายเตือนกราฟช้ากว่า 1 วันทำการ ถูกถอดออกตามผู้ใช้)

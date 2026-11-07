@@ -13,7 +13,7 @@ FILES=(
   rsdash/signals_th.json rsdash/signals_us.json
   rsdash/set_earn.json rsdash/set_filed_th.json
   rsdash/fund_nav.json rsdash/index_proxy.json
-  rsdash/dr_us.json rsdash/vol_th.json rsdash/corr_th.json
+  rsdash/dr_us.json rsdash/dr_ratio.json rsdash/vol_th.json rsdash/corr_th.json
   rsdash/monthly_leaders_th.json rsdash/monthly_leaders_us.json
 )
 ADD=()
