@@ -150,15 +150,14 @@
     const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
     const rows = (opts.rows || []).slice(0, opts.max || 12);
-    const logo = await loadImg("/brand/gt_shield.png");
+    const logo = await loadImg("/brand/thus-symbol-white.png");
     const thumbs = await Promise.all(rows.map((r) => stockLogo(r.ticker || r.tk, opts.mk)));
 
     const grd = x.createLinearGradient(0, 0, W, H);
     grd.addColorStop(0, th.bg); grd.addColorStop(1, th.bg2);
     x.fillStyle = grd; x.fillRect(0, 0, W, H);
 
-    if (logo) { try { x.drawImage(logo, 70, 60, 44, 44); } catch (e) {} }
-    x.fillStyle = th.text; x.font = font(800, 30); x.fillText("THUS", 126, 94);
+    await brandHead(x, th, 70, 60, 44, 30);
     x.fillStyle = th.muted; x.font = font(500, 19); x.textAlign = "right";
     x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 92);
     x.textAlign = "left";
@@ -310,8 +309,8 @@
     g2.addColorStop(0, th.bg); g2.addColorStop(1, th.bg2);
     x.fillStyle = g2; x.fillRect(0, 0, W, H);
 
-    const logo = await loadImg("/brand/gt_shield.png");
-    if (logo) { try { x.drawImage(logo, 70, 66, 54, 54); } catch (e) {} }
+    const logo = await loadImg("/brand/thus-symbol-white.png");
+    await brandHead(x, th, 70, 66, 50, 32);
     x.fillStyle = th.muted; x.font = font(500, 22); x.textAlign = "right";
     x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 100);
     x.textAlign = "left";
@@ -423,14 +422,24 @@
 
 
   // แบรนด์ท้ายการ์ด: GT wordmark มุมขวาล่าง + คำเตือนมุมซ้ายล่าง
+
+  // หัวการ์ด: โลโก้ THUS + คำว่า THUS + โล่ GT ต่อท้าย (สองแบรนด์อยู่ด้วยกัน)
+  async function brandHead(x, th, x0, y0, size, wordSize) {
+    const isLight = (th === THEMES.light);
+    const thus = await loadImg(isLight ? "/brand/thus-symbol-color.png" : "/brand/thus-symbol-white.png");
+    const gt = await loadImg("/brand/gt_shield.png");
+    if (thus) { try { x.drawImage(thus, x0, y0, size, size); } catch (e) {} }
+    let cx = x0 + size + 12;
+    x.fillStyle = th.text; x.font = font(800, wordSize || Math.round(size * 0.66));
+    x.fillText("THUS", cx, y0 + size * 0.78);
+    cx += x.measureText("THUS").width + 14;
+    if (gt) {
+      const gh = size * 0.92, gw = Math.round(gt.width * (gh / gt.height));
+      try { x.drawImage(gt, cx, y0 + (size - gh) / 2, gw, gh); } catch (e) {}
+    }
+  }
   async function brandFoot(x, th, W, H, opt) {
     const o = opt || {};
-    const word = await loadImg("/brand/gt_word.png");
-    if (word) {
-      const hh = o.wordH || 26;
-      const ww = Math.round(word.width * (hh / word.height));
-      try { x.drawImage(word, W - 70 - ww, H - 78 - hh + 8, ww, hh); } catch (e) {}
-    }
     x.fillStyle = th.muted; x.font = font(400, o.note || 17); x.textAlign = "left";
     x.fillText(o.text || "ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", 70, H - 66);
     x.textAlign = "left";
@@ -444,8 +453,8 @@
     g2.addColorStop(0, th.bg); g2.addColorStop(1, th.bg2);
     x.fillStyle = g2; x.fillRect(0, 0, W, H);
 
-    const logo = await loadImg("/brand/gt_shield.png");
-    if (logo) { try { x.drawImage(logo, 70, 62, 44, 44); } catch (e) {} }
+    const logo = await loadImg("/brand/thus-symbol-white.png");
+    await brandHead(x, th, 70, 62, 44, 30);
     x.fillStyle = th.muted; x.font = font(400, 19); x.textAlign = "right";
     x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 92);
     x.textAlign = "left";
@@ -587,8 +596,8 @@
 
   /* ---------- การ์ดแชร์ ---------- */
   const THEMES = {
-    dark: { bg: "#0A1226", bg2: "#101C36", panel: "#101C36", hi: "#16233D", line: "#243352", lineHi: "#33456A", text: "#F6F1E6", body: "#C8C2B4", muted: "#9A9486", gold: "#E3C48B", gold2: "#F0D9AC", up: "#4FD1B5", down: "#F08A7E", ma20: "#E3C48B", ma50: "#9B7BE0" },
-    light: { bg: "#F6F2E9", bg2: "#FFFDF7", panel: "#FFFDF7", hi: "#FFFFFF", line: "#DED5C2", lineHi: "#C6B99C", text: "#1B2338", body: "#3C465C", muted: "#6B7488", gold: "#8A6A2E", gold2: "#A98A45", up: "#0E7C6B", down: "#B4442C", ma20: "#A9822F", ma50: "#6B4FA8" },
+    dark: { bg: "#0D0A11", bg2: "#120E18", panel: "#120E18", hi: "#1B1624", line: "#241E30", lineHi: "#332B42", text: "#F3EFF8", body: "#B8B1C2", muted: "#8F879A", gold: "#E2BE6E", gold2: "#F0D79B", up: "#4FD1B5", down: "#F08A7E", ma20: "#E2BE6E", ma50: "#9B7BE0" },
+    light: { bg: "#F2EFE8", bg2: "#FCFAF5", panel: "#FCFAF5", hi: "#FFFFFF", line: "#DBD2C2", lineHi: "#C2B6A0", text: "#1C1A22", body: "#3D3848", muted: "#6A6472", gold: "#8A6A2E", gold2: "#A98A45", up: "#0E7C6B", down: "#B4442C", ma20: "#A9822F", ma50: "#6B4FA8" },
   };
   const FONT = '600 %spx Prompt, Inter, "Noto Sans Thai", "Leelawadee UI", sans-serif';
   const font = (w, s) => FONT.replace("600", w).replace("%s", s);
@@ -906,7 +915,7 @@
 
   async function loadCardData(tk, mk, withLogo) {
     const [f, bars, logo, tlogo] = await Promise.all([
-      loadFund(tk, mk), barsOf(tk, mk), loadImg("/brand/gt_shield.png"),
+      loadFund(tk, mk), barsOf(tk, mk), loadImg("/brand/thus-symbol-white.png"),
       (withLogo === false ? loadImg(avatarData(tk)) : stockLogo(tk, mk)),
     ]);
     let row = {};
@@ -929,7 +938,7 @@
     x.fillStyle = grd; x.fillRect(0, 0, W, H);
 
     // หัวเว็บ
-    if (logo) { try { x.drawImage(logo, 70, 62, 48, 48); } catch (e) {} }
+    await brandHead(x, th, 70, 62, 46, 30);
     x.fillStyle = th.muted; x.font = font(500, 21); x.textAlign = "right";
     x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 96);
     x.textAlign = "left";
@@ -1109,8 +1118,7 @@
     grd.addColorStop(0, th.bg); grd.addColorStop(1, th.bg2);
     x.fillStyle = grd; x.fillRect(0, 0, W, H);
 
-    if (logo) { try { x.drawImage(logo, 52, 44, 40, 40); } catch (e) {} }
-    x.fillStyle = th.text; x.font = font(900, 26); x.fillText("THUS", 102, 76);
+    await brandHead(x, th, 52, 44, 40, 26);
     x.fillStyle = th.muted; x.font = font(500, 18); x.textAlign = "right";
     x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 52, 72);
     x.textAlign = "left";
