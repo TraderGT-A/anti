@@ -1002,10 +1002,21 @@
     const drRef = await drOf(tk, mk);
     let { f, bars, logo, tlogo, row } = await loadCardData(tk, mk, withLogo);
     const drPrice = row.price, drChg = row.change;
+    const drStats = {};
     if (drRef) {   // การ์ด DR: พื้นฐาน/RS/MCAP/โลโก้/งบ ใช้ของหุ้นแม่ แต่ราคายังเป็นการ์ด DR
       try {
         const pd = await loadCardData(drRef.p, "america", true);
         if (pd && pd.row) { row = Object.assign({}, pd.row, { price: drPrice, change: drChg }); f = pd.f || f; tlogo = pd.tlogo || tlogo; }
+        const pbars = (pd && pd.bars) ? pd.bars : [];
+        const cl = (b) => (b.c != null ? b.c : b.close);
+        if (pbars.length) {
+          const lastP = cl(pbars[pbars.length - 1]);
+          const hiP = Math.max.apply(null, pbars.slice(-252).map(function (b) { return b.h != null ? b.h : cl(b); }));
+          drStats.hi = hiP;
+          drStats.toHi = (lastP && hiP) ? (lastP / hiP - 1) * 100 : null;
+          const i63 = Math.max(0, pbars.length - 64);
+          drStats.p3m = (lastP && cl(pbars[i63])) ? (lastP / cl(pbars[i63]) - 1) * 100 : null;
+        }
       } catch (e) {}
     }
 
@@ -1034,8 +1045,22 @@
     x.fillText((nm || "").slice(0, 34), nameX, 258);
     let tx = nameX;
     const grp = (row.industry || row.sector || "").slice(0, 26);
-    if (grp) { x.fillStyle = th.muted; x.font = font(600, 20); x.fillText(grp, tx, 292); tx += x.measureText(grp).width + 14; }
-    if (String(row.lead || "").toLowerCase() === "leading") { x.fillStyle = th.gold; x.font = font(800, 20); x.fillText("★ นำตลาด", tx, 292); }
+    if (drRef) {
+      const dtxt = "DR อ้างอิง " + drRef.p + (drRef.i ? " · ออกโดย " + drRef.i : "");
+      x.fillStyle = th.gold; x.font = font(700, 19);
+      const dshow = dtxt.slice(0, 46);
+      x.fillText(dshow, nameX, 292);
+      { const MAP = (typeof DR_US !== "undefined" && DR_US) ? (DR_US.byTicker || DR_US) : {};
+        const list = (MAP[drRef.p] || []).filter(function (z) { return String(z.t).toUpperCase() !== String(tk).toUpperCase(); }).slice(0, 4).map(function (z) { return { kind: "DR", text: z.t, title: z.i || "" }; });
+        if (list.length) drawTags(x, th, list, nameX + x.measureText(dshow).width + 16, 300, W - nameX - 120); }
+    } else if (grp) {
+      x.fillStyle = th.muted; x.font = font(600, 20); x.fillText(grp, tx, 292); tx += x.measureText(grp).width + 14;
+      if (String(row.lead || "").toLowerCase() === "leading") { x.fillStyle = th.gold; x.font = font(800, 20); x.fillText("★ นำตลาด", tx, 292); }
+    }
+    if (!drRef) {
+      const tg0 = instrumentTags(tk, mk);
+      if (tg0.length) drawTags(x, th, tg0, nameX + tw + 62, 206, W - 420);
+    }
 
     const lastBar = bars.length ? bars[bars.length - 1] : null;
     const px = row.price != null ? row.price : (lastBar ? (lastBar.c ?? lastBar.close) : null);
@@ -1055,8 +1080,15 @@
     if (rs == null || Number(rs) === 0) { const rf = await rsFallback(tk, mk); if (rf != null) rs = rf; }
     if (rs == null) rs = "—";
     const hi = f && f.hi ? f.hi : null;
-    const toHi = (hi && px) ? ((px / hi - 1) * 100) : null;
+    let toHi = (hi && px) ? ((px / hi - 1) * 100) : null;
     let p3 = row.p3m;
+    if (drRef) {   // DR: RS/MCAP/พื้นฐานจากหุ้นแม่ · 52W/3M คิดจากกราฟ DR เองให้ตรงกับที่เห็น
+      if (bars && bars.length) {
+        const hiD = Math.max.apply(null, bars.slice(-252).map(function (b) { return b.h != null ? b.h : (b.c != null ? b.c : b.close); }));
+        if (px && hiD) toHi = (px / hiD - 1) * 100;
+      }
+      if (!isFinite(Number(rs)) || Number(rs) === 0) { const rp = await rsFallback(drRef.p, "america"); if (rp != null) rs = Number(rp); }
+    }
     if (p3 == null && bars && bars.length > 64) {
       const c0 = bars[bars.length - 1], c1 = bars[bars.length - 64];
       const v0 = c0.c != null ? c0.c : c0.close, v1 = c1.c != null ? c1.c : c1.close;
@@ -1107,7 +1139,8 @@
     glassPanel(x, th, box.x, box.y, box.w, box.h, 18);
     const rng = drawChartBlock(x, th, bars, box, { n: 150 });
     if (rng.lo == null) { x.fillStyle = th.muted; x.font = font(600, 26); x.fillText("ไม่มีข้อมูลกราฟ", box.x + 30, box.y + box.h / 2); }
-    else if (hi) { x.fillStyle = th.muted; x.font = font(600, 19); x.fillText("52W " + Number(hi).toFixed(2), box.x + 24, box.y + 26); }
+    else { const hiC = (drRef && bars.length) ? Math.max.apply(null, bars.slice(-252).map(function (b) { return b.h != null ? b.h : (b.c != null ? b.c : b.close); })) : hi;
+      if (hiC) { x.fillStyle = th.muted; x.font = font(600, 19); x.fillText("52W " + Number(hiC).toFixed(2), box.x + 24, box.y + 26); } }
 
     // ── พื้นฐาน (บอกช่วงเวลา TTM / ไตรมาส) ──
     const qs = (f && f.q) ? f.q.filter((z) => z && z.d) : [];
@@ -1206,12 +1239,12 @@
     x.fillStyle = th.body; x.font = font(500, 21);
     x.fillText((nm || "").slice(0, 30), nameX, 192);
     if (row.industry || row.sector) { x.fillStyle = th.muted; x.font = font(600, 17); x.fillText(String(row.industry || row.sector).slice(0, 26), nameX, 218); }
-    { const tg = instrumentTags(tk, mk); if (tg.length) drawTags(x, th, tg, nameX + tw + 62, 216, W - 400); }
-    if (drRef) {
-      const txt = "DR อ้างอิง " + drRef.p + (drRef.i ? " · ออกโดย " + drRef.i : "");
-      const gw = x.measureText(grp).width;
-      x.fillStyle = th.gold; x.font = font(700, 18);
-      x.fillText(txt.slice(0, 56), tx, 292);
+    { let tg = instrumentTags(tk, mk);
+      if (drRef) {
+        const MAP = (typeof DR_US !== "undefined" && DR_US) ? (DR_US.byTicker || DR_US) : {};
+        tg = (MAP[drRef.p] || []).slice(0, 4).map(function (z) { return { kind: "DR", text: z.t, title: z.i || "" }; });
+      }
+      if (tg.length) drawTags(x, th, tg, nameX + tkW0 + 62, 206, W - 420);
     }
 
     const lastBar = bars.length ? bars[bars.length - 1] : null;
