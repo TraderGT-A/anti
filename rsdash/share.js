@@ -450,6 +450,126 @@
     x.fillText(o.text || "ข้อมูลเพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน", 70, H - 66);
     x.textAlign = "left";
   }
+
+  // ---------- การ์ดแชร์กราฟหมุนเวียน (RRG) ----------
+  async function drawRRG(o) {
+    const th = shareTheme();
+    const W = 1080, H = 1350;
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d");
+    const grd = x.createLinearGradient(0, 0, W, H);
+    grd.addColorStop(0, th.bg); grd.addColorStop(1, th.bg2);
+    x.fillStyle = grd; x.fillRect(0, 0, W, H);
+
+    await brandHead(x, th, 70, 58, 42, 28);
+    x.textAlign = "right"; x.fillStyle = th.muted; x.font = font(500, 19);
+    x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 90);
+    x.textAlign = "left";
+
+    x.fillStyle = th.text; x.font = font(800, 44);
+    x.fillText((o.title || "Relative Rotation").slice(0, 26), 70, 168);
+    x.fillStyle = th.muted; x.font = font(500, 19);
+    x.fillText((o.sub || "").slice(0, 60), 70, 202);
+
+    const items = (o.items || []).filter(function (it) { return isFinite(it.x) && isFinite(it.y); });
+    if (!items.length) { x.fillStyle = th.muted; x.font = font(600, 26); x.fillText("ไม่มีข้อมูล", 70, 320); return c; }
+
+    const QCOL = { Leading: "#4FD1B5", Weakening: "#E2BE6E", Improving: "#9B7BE0", Lagging: "#F08A7E" };
+    const QTH = { Leading: "นำตลาด", Weakening: "ชะลอตัว", Improving: "กำลังดีขึ้น", Lagging: "ตามหลัง" };
+
+    const box = { x: 70, y: 240, w: W - 140, h: 700 };
+    glassPanel(x, th, box.x, box.y, box.w, box.h, 20);
+
+    const xs = items.map(function (i) { return i.x; }), ys = items.map(function (i) { return i.y; });
+    const dx = Math.max(100 - Math.min.apply(null, xs), Math.max.apply(null, xs) - 100, 1.6) * 1.24;
+    const dy = Math.max(100 - Math.min.apply(null, ys), Math.max.apply(null, ys) - 100, 1.2) * 1.28;
+    const E = { x0: 100 - dx, x1: 100 + dx, y0: 100 - dy, y1: 100 + dy };
+    const pl = box.x + 26, pt = box.y + 54, pw = box.w - 52, ph = box.h - 92;
+    const X = function (v) { return pl + (v - E.x0) / (E.x1 - E.x0) * pw; };
+    const Y = function (v) { return pt + (1 - (v - E.y0) / (E.y1 - E.y0)) * ph; };
+    const midX = X(100), midY = Y(100);
+
+    // สี่ช่อง
+    const zones = [
+      [pl, pt, midX - pl, midY - pt, "rgba(155,123,224,.12)", "กำลังดีขึ้น", QCOL.Improving, pl + 14, pt + 24, "left"],
+      [midX, pt, pl + pw - midX, midY - pt, "rgba(79,209,181,.13)", "นำตลาด", QCOL.Leading, pl + pw - 14, pt + 24, "right"],
+      [pl, midY, midX - pl, pt + ph - midY, "rgba(240,138,126,.12)", "ตามหลัง", QCOL.Lagging, pl + 14, pt + ph - 12, "left"],
+      [midX, midY, pl + pw - midX, pt + ph - midY, "rgba(226,190,110,.12)", "ชะลอตัว", QCOL.Weakening, pl + pw - 14, pt + ph - 12, "right"],
+    ];
+    zones.forEach(function (z) { x.fillStyle = z[4]; x.fillRect(z[0], z[1], z[2], z[3]); });
+    // ชื่อช่อง (ไทย + อังกฤษ) มุมละช่อง
+    function qlabel(txt, en, col, xx, yy, align) {
+      x.textAlign = align; x.fillStyle = col; x.font = font(700, 15);
+      x.fillText(txt, xx, yy);
+      x.font = font(600, 12); x.globalAlpha = 0.7;
+      x.fillText(en, xx, yy + 16);
+      x.globalAlpha = 1; x.textAlign = "left";
+    }
+    qlabel("กำลังดีขึ้น", "IMPROVING", QCOL.Improving, pl + 14, pt + 26, "left");
+    qlabel("นำตลาด", "LEADING", QCOL.Leading, pl + pw - 14, pt + 26, "right");
+    qlabel("ตามหลัง", "LAGGING", QCOL.Lagging, pl + 14, pt + ph - 30, "left");
+    qlabel("ชะลอตัว", "WEAKENING", QCOL.Weakening, pl + pw - 14, pt + ph - 30, "right");
+
+    x.strokeStyle = th.line; x.lineWidth = 1.5;
+    x.beginPath(); x.moveTo(midX, pt); x.lineTo(midX, pt + ph); x.stroke();
+    x.beginPath(); x.moveTo(pl, midY); x.lineTo(pl + pw, midY); x.stroke();
+
+    x.fillStyle = th.muted; x.font = font(500, 14);
+    x.fillText("RS-Ratio →", pl + pw - 92, pt + ph + 26);
+    x.save(); x.translate(box.x + 16, pt + ph / 2 + 40); x.rotate(-Math.PI / 2);
+    x.fillText("Momentum ↑", 0, 0); x.restore();
+
+    // จุด + ชื่อ (จาง) และเส้นทางของหัวแถว
+    const ranked = items.slice().sort(function (a, b) { return (b.x + b.y) - (a.x + a.y); });
+    const top = ranked.slice(0, 8).map(function (i) { return i.k; });
+    const labelSet = ranked.slice(0, 11).map(function (i) { return i.k; });
+    items.forEach(function (it, n) {
+      const col = QCOL[it.q] || th.gold;
+      const hi = top.indexOf(it.k) >= 0;
+      if (hi && it.pts && it.pts.length > 1) {
+        x.beginPath();
+        it.pts.forEach(function (p2, j) { const px = X(p2.x), py = Y(p2.y); if (j) x.lineTo(px, py); else x.moveTo(px, py); });
+        x.strokeStyle = col; x.globalAlpha = 0.55; x.lineWidth = 2; x.stroke(); x.globalAlpha = 1;
+      }
+      x.beginPath(); x.arc(X(it.x), Y(it.y), hi ? 7 : 5, 0, Math.PI * 2);
+      x.fillStyle = col; x.fill();
+      if (hi) { x.strokeStyle = th.bg; x.lineWidth = 2; x.stroke(); }
+      if (labelSet.indexOf(it.k) >= 0) {
+        x.fillStyle = hi ? th.text : th.body; x.font = font(hi ? 700 : 600, hi ? 16 : 14);
+        const label = String(it.n).replace(/\s*\(.*?\)\s*/g, "").slice(0, 13);
+        const rightSide = X(it.x) > pl + pw - 150;
+        x.textAlign = rightSide ? "right" : "left";
+        const dyLab = (n % 3 === 1 ? 15 : (n % 3 === 2 ? -9 : -22));
+        x.fillText(label, X(it.x) + (rightSide ? -10 : 10), Y(it.y) + dyLab);
+      }
+    });
+    x.textAlign = "left";
+
+    // ตารางสรุปช่วงท้าย
+    const rows = ranked.slice(0, 7);
+    const ly = 986;
+    x.fillStyle = th.muted; x.font = font(600, 16);
+    x.fillText("สถานะล่าสุด · เรียงตามความแข็งแกร่งรวม", 70, ly - 18);
+    rows.forEach(function (it, i) {
+      const yy = ly + 14 + i * 38;
+      const col = QCOL[it.q] || th.gold;
+      if (i % 2 === 0) { x.fillStyle = th.panel; rr(x, 70, yy - 17, W - 140, 32, 8); x.fill(); }
+      x.fillStyle = col; x.beginPath(); x.arc(94, yy - 3, 6, 0, Math.PI * 2); x.fill();
+      x.fillStyle = th.text; x.font = font(700, 18);
+      x.fillText(String(it.n).replace(/\s*\(.*?\)\s*/g, "").slice(0, 22), 112, yy + 3);
+      x.textAlign = "right"; x.fillStyle = col; x.font = font(700, 16);
+      x.fillText(QTH[it.q] || it.q, W - 300, yy + 3);
+      x.fillStyle = th.muted; x.font = font(600, 15);
+      x.fillText((it.days || 0) + " วัน", W - 210, yy + 3);
+      x.fillStyle = th.body; x.font = font(700, 16);
+      x.fillText("M " + Number(it.y).toFixed(1), W - 86, yy + 3);
+      x.textAlign = "left";
+    });
+
+    await brandFoot(x, th, W, H, { text: "กราฟหมุนเวียนจาก RS-Ratio/Momentum รายสัปดาห์ · เพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุน" });
+    return c;
+  }
+
   async function drawGrid(opts) {
     const th = shareTheme();                       // การ์ดใช้พื้นดำ #0D0A11 เสมอ
     const W = 1080, H = 1350;
@@ -591,8 +711,8 @@
     x.font = labelFont(600, 15);
     let lx = 70;
     [[th.ma20, "MA20"], [th.ma50, "MA50"]].forEach(function (p2) {
-      x.strokeStyle = p2[0]; x.lineWidth = 3; x.beginPath(); x.moveTo(lx, H - 66); x.lineTo(lx + 26, H - 66); x.stroke();
-      x.fillStyle = th.body; x.fillText(p2[1], lx + 34, H - 61);
+      x.strokeStyle = p2[0]; x.lineWidth = 3; x.beginPath(); x.moveTo(lx, H - 106); x.lineTo(lx + 26, H - 106); x.stroke();
+      x.fillStyle = th.body; x.fillText(p2[1], lx + 34, H - 101);
       lx += 34 + x.measureText(p2[1]).width + 26;
     });
     x.restore();
@@ -1238,7 +1358,15 @@
     const W = 1200, H = 630;
     const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
-    const { f, bars, logo, tlogo, row } = await loadCardData(tk, mk, withLogo);
+    const drRef = await drOf(tk, mk);
+    let { f, bars, logo, tlogo, row } = await loadCardData(tk, mk, withLogo);
+    const _drPrice = row.price, _drChg = row.change;
+    if (drRef) {
+      try {
+        const pd = await loadCardData(drRef.p, "america", true);
+        if (pd && pd.row) { row = Object.assign({}, pd.row, { price: _drPrice, change: _drChg }); f = pd.f || f; tlogo = pd.tlogo || tlogo; }
+      } catch (e) {}
+    }
 
     const grd = x.createLinearGradient(0, 0, W, H);
     grd.addColorStop(0, th.bg); grd.addColorStop(1, th.bg2);
@@ -1274,9 +1402,11 @@
     const priceTxt2 = px != null ? Number(px).toFixed(2) : "—";
     x.fillText(priceTxt2, pxX, 158);
     if (chg != null) {
-      pxX += x.measureText(priceTxt2).width + 14;
-      x.fillStyle = chg >= 0 ? th.up : th.down; x.font = font(800, 24);
-      x.fillText((chg >= 0 ? "▲ +" : "▼ ") + Number(chg).toFixed(2) + "%", pxX, 156);
+      const chgTxt = (chg >= 0 ? "▲ +" : "▼ ") + Number(chg).toFixed(2) + "%";
+      pxX += x.measureText(priceTxt2).width + 12;
+      x.fillStyle = chg >= 0 ? th.up : th.down; x.font = font(800, 20);
+      const cw = x.measureText(chgTxt).width;
+      x.fillText(chgTxt, Math.min(pxX, 592 - cw), 155);
     }
 
     let rs = row.rs != null ? row.rs : (row.rs3 ?? row.rs6 ?? null);
@@ -1321,10 +1451,13 @@
       x.textAlign = "left";
     });
 
-    const box = { x: 520, y: 100, w: W - 570, h: H - 190 };
+    const box = { x: 600, y: 100, w: W - 650, h: H - 190 };
     x.fillStyle = th.panel; rr(x, box.x, box.y, box.w, box.h, 22); x.fill();
     x.strokeStyle = th.line; x.lineWidth = 2; x.stroke();
     drawChartBlock(x, th, bars, { ...box, pl: 40, pr: 90, pt: 44, pb: 40 }, { n: 120 });
+    { const ax = adrOf(bars, 20);
+      if (ax != null) { x.textAlign = "right"; x.fillStyle = ax < 2 ? th.up : (ax <= 4 ? th.gold : "#F0A07E");
+        x.font = font(700, 17); x.fillText("ADR20 " + ax.toFixed(1) + "%", box.x + 18, box.y + 26); x.textAlign = "left"; } }
 
     await brandFoot(x, th, W, H);
     return c;
@@ -1502,6 +1635,17 @@
   }
 
   const ShareCard = {
+    async openRRG(o) {
+      await ensureFonts();
+      const box = ensureShareBox(); box.classList.add("on");
+      const img = document.getElementById("shImg");
+      let url = "";
+      try { url = (await drawRRG(o)).toDataURL("image/png"); } catch (e) { try { globalThis.__rrgErr = String(e); } catch (_) {} }
+      if (!url) { box.classList.remove("on"); alert("สร้างการ์ดไม่สำเร็จ ลองอีกครั้ง"); return; }
+      img.src = url;
+      const nm = "rsdash_rrg_" + new Date().toISOString().slice(0, 10) + ".png";
+      document.getElementById("shDl").onclick = () => { const a = document.createElement("a"); a.href = url; a.download = nm; a.click(); };
+    },
     async openInstrument(o) {
       await ensureFonts();
       const box = ensureShareBox(); box.classList.add("on");

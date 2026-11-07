@@ -2761,7 +2761,7 @@ try{ const sv=JSON.parse(localStorage.getItem('rsd_mf')||'{}'); MF_SAVE.forEach(
 function mfSave(){ try{ const o={}; MF_SAVE.forEach(k=>{ o[k]=MF[k]; }); localStorage.setItem('rsd_mf',JSON.stringify(o)); }catch(e){} }
 const MF_SENS={fast:[8,3,'เร็ว'],normal:[13,4,'ปกติ'],slow:[26,8,'ช้า']};
 const MF_PERS=[['1D',1],['1W',5],['1M',21],['3M',63],['6M',126],['YTD','ytd'],['1Y',252]];
-const MF_TABS=[['focus','🎯 Focus TH vs US'],['asset','ข้ามสินทรัพย์'],['cm','Cross Market (ETF ประเทศ)'],['rus','หมุนเวียน US'],['rth','หมุนเวียน TH']];
+const MF_TABS=[['focus','🎯 Focus TH vs US'],['asset','ข้ามสินทรัพย์'],['cm','Cross Market (ETF ประเทศ)'],['rall','รวม ETF ทั้งหมด'],['rus','หมุนเวียน US'],['rth','หมุนเวียน TH']];
 const MF_SECT={'Finance':'การเงิน','Process Industries':'อุตสาหกรรมกระบวนการ','Consumer Non-Durables':'อุปโภคบริโภค','Utilities':'สาธารณูปโภค','Retail Trade':'ค้าปลีก','Distribution Services':'บริการจัดจำหน่าย','Transportation':'ขนส่ง','Producer Manufacturing':'การผลิต','Consumer Services':'บริการผู้บริโภค','Electronic Technology':'เทคโนโลยีอิเล็กทรอนิกส์','Energy Minerals':'พลังงาน/แร่','Technology Services':'บริการเทคโนโลยี','Health Services':'บริการสุขภาพ','Industrial Services':'บริการอุตสาหกรรม','Commercial Services':'บริการเชิงพาณิชย์','Communications':'สื่อสาร','Miscellaneous':'อื่นๆ','Other':'อื่นๆ (กลุ่มเล็ก)'};
 const GRP_TH=Object.assign({},MF_SECT,{
   'Non-Energy Minerals':'แร่ที่ไม่ใช่พลังงาน','Health Technology':'เทคโนโลยีสุขภาพ / เวชภัณฑ์','Consumer Durables':'สินค้าคงทน',
@@ -2810,7 +2810,10 @@ const mfQ=p=>p.x>=100?(p.y>=100?'Leading':'Weakening'):(p.y>=100?'Improving':'La
 function mfRotItems(j,benchSeries,keys,sens){
   const [n,m]=MF_SENS[sens||MF.sens]; const out=[];
   keys.forEach(k=>{ const s=j.series[k]; if(!s) return; const pts=mfRRG(s,benchSeries,n,m,8); if(pts.length<3) return; const p=pts[pts.length-1];
-    const i1=Math.max(0,s.length-1-21), i3=Math.max(0,s.length-1-63); out.push({k,pts,q:mfQ(p),x:p.x,y:p.y,r1:mfR(s,i1),r3:mfR(s,i3)}); });
+    const i1=Math.max(0,s.length-1-21), i3=Math.max(0,s.length-1-63);
+    let days=0; for(let t=pts.length-1;t>=0;t--){ if(mfQ(pts[t])===mfQ(p)) days+=5; else break; }
+    const vel = pts.length>1 ? Math.hypot(p.x-pts[pts.length-2].x, p.y-pts[pts.length-2].y) : 0;
+    out.push({k,pts,q:mfQ(p),x:p.x,y:p.y,r1:mfR(s,i1),r3:mfR(s,i3),days:days,vel:vel}); });
   return out;
 }
 /* ---- กราฟหมุนเวียน: วาด SVG (ซูม/เลื่อนได้, ไฮไลต์เส้นเมื่อชี้ชื่อในตาราง) ---- */
@@ -2841,6 +2844,19 @@ function mfSvg(items,kind){
 
   return s+'</g></svg>';
 }
+
+function mfShareRRG(){
+  try{
+    if(!MF.rot || !MF.rot.items || !MF.rot.items.length){ alert('ยังไม่มีข้อมูลกราฟ'); return; }
+    const kind = MF.rot.kind;
+    const items = MF.rot.items.map(it=>({ k:it.k, n:(MF.names[kind+':'+it.k]||it.k), x:it.x, y:it.y, q:it.q, days:it.days||0, vel:it.vel||0,
+      pts:it.pts.map(p=>({x:p.x,y:p.y})) }));
+    const title = kind==='sec' ? 'หมุนเวียนกลุ่มอุตสาหกรรม' : (kind==='th' ? 'หมุนเวียนหุ้นไทย' : (kind==='cty' ? 'หมุนเวียน ETF ประเทศ' : 'หมุนเวียนสินทรัพย์'));
+    if(!window.ShareCard || !ShareCard.openRRG){ alert('ยังโหลดตัวสร้างการ์ดไม่เสร็จ ลองอีกครั้ง'); return; }
+    ShareCard.openRRG({ title:title, sub:(MF.rot.kind==='sec'?'US · ':'')+MF_SENS[MF.sens][2]+' · 8 สัปดาห์ล่าสุด', items:items });
+  }catch(e){ alert('สร้างการ์ดไม่สำเร็จ: '+(e&&e.message?e.message:e)); }
+}
+
 function mfRotDraw(){ const c=document.getElementById('mfRotSvg'); if(c&&MF.rot) c.innerHTML=mfSvg(MF.rot.items,MF.rot.kind); }
 function mfRotTbl(){ const c=document.getElementById('mfRotTbl'); if(c&&MF.rot) c.innerHTML=mfRotTable(MF.rot.items,MF.rot.kind,MF.rot.extra); }
 function mfZoom(f,cx,cy){
@@ -2952,7 +2968,7 @@ async function mfCM(){
 /* ---- Rotation ---- */
 function mfRotPage(items,kind,extra,tools,foot){
   MF.rot={items,kind,extra};
-  return '<div class="mf-tools">'+tools+mfSensBar()+mfZoomBar()+'</div>'+mfHelp()+'<div class="mf-split"><div id="mfRotSvg" class="mf-rot">'+mfSvg(items,kind)+'</div><div id="mfRotTbl" class="mf-scroll">'+mfRotTable(items,kind,extra)+'</div></div><div class="mf-foot">'+foot+'</div>';
+  return '<div class="mf-tools">'+tools+mfSensBar()+mfZoomBar()+'<span class="grp"><button class="tf-chip" onclick="mfShareRRG()" title="สร้างการ์ดแชร์กราฟหมุนเวียน">แชร์การ์ด</button></span></div>'+mfHelp()+'<div class="mf-split"><div id="mfRotSvg" class="mf-rot">'+mfSvg(items,kind)+'</div><div id="mfRotTbl" class="mf-scroll">'+mfRotTable(items,kind,extra)+'</div></div><div class="mf-foot">'+foot+'</div>';
 }
 const MF_BY={
   rus:[['etf','ETF ภาคส่วน (SPDR)'],['sector','Sector (TradingView)'],['theme','Theme ของเรา']],
@@ -2971,6 +2987,41 @@ async function mfGroupsH(mk,by,tab){
   return mfRotPage(items,'rg',k=>(j.members[k]||[]).length+' ตัว'+(by==='theme'?'':grpThHtml(k)),mfBy(tab)+mfRsBar(),
     'ดัชนีกลุ่ม = ราคาเฉลี่ยถ่วงเท่ากันของหุ้น'+(mk==='us'?(j.source==='full'?'สหรัฐ (ทุกตัวที่ผ่านเกณฑ์ '+j.universe+' ตัว · USD · คำนวณล่วงหน้า '+String(j.generatedAt||'').slice(0,10)+')':'สหรัฐ (สภาพคล่องสูงสุด '+j.universe+' ตัว · USD · โหมดสำรอง)'):'ไทย (ที่ผ่านเกณฑ์ '+j.universe+' ตัว · บาท)')+' จัดกลุ่มตาม '+what+' · เทียบ '+j.benchName+(j.rsMin>0?' · เฉพาะหุ้น RS ≥ '+j.rsMin:'')+extra+' · กดกลุ่ม = การ์ดกราฟหุ้นในกลุ่ม · ถึง '+j.asOf);
 }
+
+/* รวม ETF ทุกชุด (ภาคส่วน US + ประเทศ/สินทรัพย์) ไว้กราฟเดียว เทียบตลาดโลก VT — หา Product ที่น่าสนใจที่สุด */
+async function mfRallH(){
+  const [sec, ctry] = await Promise.all([mfJ('/api/flow?kind=etf&set=sector'), mfJ('/api/flow?kind=etf&set=country')]);
+  const dates = ctry.dates.slice();
+  const idx = {}; dates.forEach((d,i)=>{ idx[d]=i; });
+  const ff = (arr)=>{ let last=null; return arr.map(v=>{ if(v!=null && isFinite(v)) last=v; return last; }); };
+  const series = {}, seen = {};
+  const bench = ff(ctry.series['VT']||[]);
+  const add = (k,n,g)=>{
+    if(seen[k]) return; seen[k]=1;
+    MF.names['rall:'+k] = n + ' (' + k + ')';
+  };
+  (ctry.meta||[]).forEach(m=>{
+    if(m.k==='VT') return;
+    const src=ctry.series[m.k]; if(!src) return;
+    series[m.k]=ff(src.slice(0,dates.length));
+    add(m.k, m.n, 'Country');
+  });
+  const secIdx={}; (sec.dates||[]).forEach((d,i)=>{ secIdx[d]=i; });
+  (sec.meta||[]).forEach(m=>{
+    const src=sec.series[m.k]; if(!src) return;
+    const arr=new Array(dates.length).fill(null);
+    (sec.dates||[]).forEach((d,i)=>{ const j=idx[d]; if(j!=null && src[i]!=null) arr[j]=src[i]; });
+    series[m.k]=ff(arr);
+    add(m.k, m.n, 'Sector');
+  });
+  const keys=Object.keys(series).filter(k=>series[k] && series[k].filter(v=>v!=null).length>40);
+  const items=mfRotItems({series:series}, bench, keys);
+  const qcount={};
+  items.forEach(it=>{ qcount[it.q]=(qcount[it.q]||0)+1; });
+  return mfRotPage(items,'rall',k=>'<a onclick="event.stopPropagation();mfEtf(\''+k+'\')">กราฟ ETF</a>','<span class="grp"><span class="lbl">ชุดข้อมูล</span><button class="tf-chip active">ทุก ETF</button></span>',
+    'รวม ETF ทุกชุดที่เว็บมีข้อมูล ('+keys.length+' ตัว: ภาคส่วน US + ETF ประเทศ/สินทรัพย์) เทียบตลาดโลก VT · ไม่แบ่งตลาด เพื่อเทียบว่า Product ไหนน่าสนใจสุด · ราคาเป็นสกุลท้องถิ่นแปลงเป็น USD แล้ว · รายสัปดาห์ หาง 8 สัปดาห์ · ถึง '+(ctry.asOf||''));
+}
+
 async function mfRusH(){
   if(MF.by.rus!=='etf') return mfGroupsH('us',MF.by.rus,'rus');
   const j=await mfJ('/api/flow?kind=etf&set=sector'); j.meta.forEach(m=>MF.names['rus:'+m.k]=m.n+' ('+m.k+')');
@@ -3072,8 +3123,8 @@ async function mfRender(){
   tabs.innerHTML=MF_TABS.map(([k,l])=>'<button class="tf-chip'+(MF.tab===k?' active':'')+'" onclick="mfTab(\''+k+'\')">'+l+'</button>').join('');
   body.innerHTML='<div class="mf-empty">กำลังโหลด…</div>';
   try{
-    const h=await ({focus:mfFocus,asset:mfAsset,cm:mfCM,rus:mfRusH,rth:mfRthH}[MF.tab])();
-    if(my===MF.tok){ body.innerHTML=h; if(MF.tab==='rus'||MF.tab==='rth') mfRotBind(); uniHelp().then(u=>{ if(my===MF.tok) body.insertAdjacentHTML('beforeend',u); }); }
+    const h=await ({focus:mfFocus,asset:mfAsset,cm:mfCM,rall:mfRallH,rus:mfRusH,rth:mfRthH}[MF.tab])();
+    if(my===MF.tok){ body.innerHTML=h; if(MF.tab==='rus'||MF.tab==='rth'||MF.tab==='rall') mfRotBind(); uniHelp().then(u=>{ if(my===MF.tok) body.insertAdjacentHTML('beforeend',u); }); }
   }catch(e){ if(my===MF.tok) body.innerHTML='<div class="mf-empty">โหลดข้อมูลไม่สำเร็จ ('+String(e.message||e).slice(0,60)+') — ลองใหม่อีกครั้ง</div>'; }
 }
 
