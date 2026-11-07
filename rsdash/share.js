@@ -675,8 +675,10 @@
       let bx0 = LX + 18 + ci * colW2, yy = LY + 112 + ri * ROW;
       x.fillStyle = QCOL[q]; x.font = font(800, 10.5);
       x.fillText(q.slice(0, 4).toUpperCase(), bx0, yy); yy += ROW; ri++;
+      let hdrDone = true;
       arr.forEach(function (it) {
-        if (yy > LY + PH2 - 18) { ci++; ri = 0; bx0 = LX + 18 + ci * colW2; yy = LY + 112 + ri * ROW; }
+        if (yy > LY + PH2 - 18) { ci++; ri = 0; bx0 = LX + 18 + ci * colW2; yy = LY + 112 + ri * ROW; hdrDone = false; }
+        if (!hdrDone) { x.fillStyle = QCOL[q]; x.font = font(800, 10.5); x.fillText(q.slice(0, 4).toUpperCase() + " (ต่อ)", bx0, yy); yy += ROW; ri++; hdrDone = true; }
         x.fillStyle = th.body; x.font = font(600, 11);
         x.fillText(String(it.k).replace(/\.BK$/, "").slice(0, 7), bx0, yy);
         x.textAlign = "right"; x.fillStyle = th.muted; x.font = font(600, 10);
