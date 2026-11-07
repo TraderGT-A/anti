@@ -1279,7 +1279,125 @@
     return box;
   }
 
+
+  // การ์ดแชร์สินค้าอ้างอิง (ETF / กองทุน Feeder) — มีรายละเอียดค่าธรรมเนียม/ผลตอบแทนในใบ
+  async function drawInstrument(o) {
+    const th = shareTheme();
+    const W = 1080, H = 1350;
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d");
+    const g2 = x.createLinearGradient(0, 0, W, H); g2.addColorStop(0, th.bg); g2.addColorStop(1, th.bg2);
+    x.fillStyle = g2; x.fillRect(0, 0, W, H);
+    await brandHead(x, th, 70, 62, 46, 30);
+    x.fillStyle = th.muted; x.font = font(400, 19); x.textAlign = "right";
+    x.fillText(new Date().toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "numeric" }), W - 70, 92);
+    x.textAlign = "left";
+
+    x.fillStyle = th.text; x.font = font(700, 52); x.fillText(o.code, 70, 208);
+    x.fillStyle = th.body; x.font = font(400, 21);
+    let nm = String(o.name || ""); while (nm.length > 4 && x.measureText(nm).width > W - 220) nm = nm.slice(0, -1);
+    x.fillText(nm, 70, 242);
+    x.fillStyle = th.gold; x.font = labelFont(600, 15);
+    try { x.letterSpacing = "1.4px"; } catch (e) {}
+    x.fillText((o.kind === "fund" ? "FEEDER FUND · ไทย" : "ETF · " + (o.mk === "america" ? "US" : "TH")), 70, 272);
+    try { x.letterSpacing = "0px"; } catch (e) {}
+
+    // มูลค่าใหญ่: ราคา ETF หรือ NAV กอง
+    x.fillStyle = th.text; x.font = font(700, 54);
+    const big = o.kind === "fund" ? (o.nav != null ? Number(o.nav).toFixed(4) : "—") : (o.price != null ? Number(o.price).toFixed(2) : "—");
+    x.fillText(big, 70, 344);
+    if (o.chg != null) {
+      x.fillStyle = Number(o.chg) >= 0 ? th.up : th.down; x.font = font(700, 26);
+      x.fillText((Number(o.chg) >= 0 ? "▲ +" : "▼ ") + Number(o.chg).toFixed(2) + "%", 70, 382);
+    }
+    if (o.kind === "fund" && o.navDate) { x.fillStyle = th.muted; x.font = font(400, 16); x.textAlign = "right"; x.fillText("NAV ณ " + o.navDate, W - 70, 344); x.textAlign = "left"; }
+
+    // ชิปข้อมูล
+    const chips = [];
+    if (o.fee != null) chips.push(["ค่าธรรมเนียม/ปี", Number(o.fee).toFixed(2) + "%"]);
+    if (o.ret1y != null) chips.push(["ผลตอบแทน 1 ปี", (o.ret1y >= 0 ? "+" : "") + Number(o.ret1y).toFixed(1) + "%"]);
+    if (o.idx1y != null) chips.push(["ดัชนีอ้างอิง 1 ปี", (o.idx1y >= 0 ? "+" : "") + Number(o.idx1y).toFixed(1) + "%"]);
+    if (o.kind === "fund") { chips.push(["บลจ.", o.amc || "-"]); chips.push(["หน่วย/Hedge", (o.div || "-") + " · " + (o.hedge || "-")]); }
+    else {
+      chips.push(["ตลาด", o.mk === "america" ? "สหรัฐ" : "ไทย"]);
+      if (o.chg != null) chips.push(["เปลี่ยนแปลงวันนี้", (Number(o.chg) >= 0 ? "+" : "") + Number(o.chg).toFixed(2) + "%"]);
+    }
+    const cols = 2, cw = (W - 140 - 14) / cols, chh = 84;
+    chips.slice(0, 6).forEach(function (kv, i) {
+      const bx = 70 + (i % cols) * (cw + 14), by = 420 + Math.floor(i / cols) * (chh + 12);
+      glassPanel(x, th, bx, by, cw, chh, 16);
+      x.textAlign = "center";
+      x.fillStyle = th.muted; x.font = labelFont(600, 13);
+      let lb = String(kv[0]).toUpperCase();
+      while (x.measureText(lb).width > cw - 26 && lb.length > 4) lb = lb.slice(0, -1);
+      x.fillText(lb, bx + cw / 2, by + 27);
+      x.fillStyle = th.text; fitSize(x, String(kv[1]), cw - 20, 30, 16, 700);
+      x.fillText(String(kv[1]), bx + cw / 2, by + 62);
+      x.textAlign = "left";
+    });
+
+    // กราฟ
+    const box = { x: 70, y: 720, w: W - 140, h: 440 };
+    glassPanel(x, th, box.x, box.y, box.w, box.h, 20);
+    if (o.kind === "fund" && o.navs && o.navs.length > 5) {
+      const vals = o.navs.map((z) => Number(z[1]) || 0);
+      const lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+      const pad = 26, X = (i) => box.x + pad + (i / (o.navs.length - 1)) * (box.w - pad * 2);
+      const Y = (v) => box.y + box.h - pad - ((v - lo) / ((hi - lo) || 1)) * (box.h - pad * 2);
+      const up = vals[vals.length - 1] >= vals[0];
+      x.beginPath(); vals.forEach((v, i) => (i ? x.lineTo(X(i), Y(v)) : x.moveTo(X(i), Y(v))));
+      x.strokeStyle = up ? th.up : th.down; x.lineWidth = 3; x.stroke();
+      x.beginPath(); x.moveTo(X(0), Y(vals[0]));
+      vals.forEach((v, i) => x.lineTo(X(i), Y(v)));
+      x.lineTo(X(vals.length - 1), box.y + box.h - pad); x.lineTo(X(0), box.y + box.h - pad); x.closePath();
+      const gg = x.createLinearGradient(0, box.y, 0, box.y + box.h);
+      gg.addColorStop(0, up ? "rgba(79,209,181,0.28)" : "rgba(240,138,126,0.26)"); gg.addColorStop(1, "rgba(0,0,0,0)");
+      x.fillStyle = gg; x.fill();
+      x.fillStyle = th.muted; x.font = font(400, 15);
+      x.fillText(o.navs[0][0], box.x + pad, box.y + box.h - 6);
+      x.textAlign = "right"; x.fillText(o.navs[o.navs.length - 1][0], box.x + box.w - pad, box.y + box.h - 6); x.textAlign = "left";
+    } else if (o.bars && o.bars.length > 10) {
+      const bars = o.bars.slice(-150);
+      let lo = Infinity, hi = -Infinity;
+      bars.forEach((b) => { const l = b.low != null ? b.low : b.l, h2 = b.high != null ? b.high : b.h; if (l < lo) lo = l; if (h2 > hi) hi = h2; });
+      const pad = 22, cw2 = (box.w - pad * 2) / bars.length;
+      const Y = (v) => box.y + box.h - pad - ((v - lo) / ((hi - lo) || 1)) * (box.h - pad * 2);
+      bars.forEach((b, i) => {
+        const o2 = b.open != null ? b.open : b.o, cl = b.close != null ? b.close : b.c;
+        const h2 = b.high != null ? b.high : b.h, l = b.low != null ? b.low : b.l;
+        const bx = box.x + pad + i * cw2 + cw2 / 2, col = cl >= o2 ? th.up : th.down;
+        x.strokeStyle = col; x.fillStyle = col; x.lineWidth = Math.max(1, cw2 * 0.14);
+        x.beginPath(); x.moveTo(bx, Y(h2)); x.lineTo(bx, Y(l)); x.stroke();
+        const bt = Math.min(Y(o2), Y(cl)), bh = Math.max(1.2, Math.abs(Y(o2) - Y(cl)));
+        x.fillRect(bx - Math.max(1, cw2 * 0.3), bt, Math.max(1.4, cw2 * 0.6), bh);
+      });
+    } else {
+      x.fillStyle = th.muted; x.font = font(600, 22); x.fillText("ไม่มีข้อมูลกราฟ", box.x + 30, box.y + box.h / 2);
+    }
+
+    await brandFoot(x, th, W, H);
+    return c;
+  }
+
   const ShareCard = {
+    async openInstrument(o) {
+      await ensureFonts();
+      const box = ensureShareBox(); box.classList.add("on");
+      const img = document.getElementById("shImg");
+      let url = "";
+      try { url = (await drawInstrument(o)).toDataURL("image/png"); } catch (e) { url = ""; }
+      if (!url) { box.classList.remove("on"); alert("สร้างการ์ดไม่สำเร็จ ลองอีกครั้ง"); return; }
+      img.src = url;
+      const fname = `rsdash_${(o.code || "fund").replace(/[^\w\u0E00-\u0E7F]+/g, "_")}_${new Date().toISOString().slice(0, 10)}.png`;
+      document.getElementById("shDl").onclick = () => { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); };
+      document.getElementById("shShare").onclick = async () => {
+        try { const b = await (await fetch(url)).blob(); const file = new File([b], fname, { type: "image/png" });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: o.code });
+          else { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); }
+        } catch (e) { const a = document.createElement("a"); a.href = url; a.download = fname; a.click(); }
+      };
+      window.__brandRerender = async () => { try { const u2 = (await drawInstrument(o)).toDataURL("image/png"); if (u2) { url = u2; img.src = u2; } } catch (e) {} };
+    },
     setBrand(b) { BRAND = (b === "gt" ? "gt" : "thus"); try { localStorage.setItem("rsd_cardBrand", BRAND); } catch (e) {} return BRAND; },
     getBrand() { return BRAND; },
     setGlass(o) { Object.assign(GLASS, o || {}); return GLASS; },
