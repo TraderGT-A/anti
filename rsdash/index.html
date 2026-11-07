@@ -6094,11 +6094,36 @@ async function idxProxyRender(tk, mk){
 }
 
 /* รายละเอียดกองทุน Feeder (จากข้อมูลที่เราจัดไว้ + ลิงก์ไปหน้าตัวจริง) */
+let FUNDNAV=null, FUNDNAV_P=null;
+function fundNavLoad(){
+  if(!FUNDNAV_P) FUNDNAV_P=fetch('/fund_nav.json',{cache:'force-cache'}).then(r=>r.ok?r.json():{}).then(j=>{FUNDNAV=j||{};return FUNDNAV;}).catch(()=>({}));
+  return FUNDNAV_P;
+}
+function drawNavChart(cv, navs){
+  if(!cv||!navs||navs.length<2) return;
+  const dpr=window.devicePixelRatio||1, W=(cv.clientWidth>20?cv.clientWidth:360), H=(cv.clientHeight>20?cv.clientHeight:150);
+  cv.width=W*dpr; cv.height=H*dpr;
+  const x=cv.getContext('2d'); x.scale(dpr,dpr); x.clearRect(0,0,W,H);
+  const vals=navs.map(n=>n[1]); const lo=Math.min(...vals), hi=Math.max(...vals);
+  const pad=6, iw=W-pad*2, ih=H-pad*2;
+  const X=i=>pad+(i/(navs.length-1))*iw, Y=v=>pad+ih-((v-lo)/((hi-lo)||1))*ih;
+  const up=vals[vals.length-1]>=vals[0];
+  const g=x.createLinearGradient(0,0,0,H);
+  g.addColorStop(0, up?'rgba(79,209,181,0.35)':'rgba(240,138,126,0.30)');
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  x.beginPath(); x.moveTo(X(0),Y(vals[0]));
+  vals.forEach((v,i)=>x.lineTo(X(i),Y(v)));
+  x.lineTo(X(vals.length-1),H-pad); x.lineTo(X(0),H-pad); x.closePath(); x.fillStyle=g; x.fill();
+  x.beginPath(); vals.forEach((v,i)=> i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v)));
+  x.strokeStyle= up?'#4FD1B5':'#F08A7E'; x.lineWidth=1.6; x.stroke();
+}
 async function openFundInfo(code, idxTk){
   const db=await idxProxyLoad();
   let item=null;
   Object.keys(db||{}).forEach(k=>{ const e=db[k]; const arr=(e&&e.th)||[]; arr.forEach(x=>{ if(x.t===code) item=item||x; }); });
   if(!item){ alert('ไม่พบข้อมูลกองนี้'); return; }
+  const navDb=await fundNavLoad();
+  const navItem=(navDb&&navDb[code])||null;
   let idx1y=null;
   try{
     let d=[];
@@ -6132,12 +6157,16 @@ async function openFundInfo(code, idxTk){
     ${row('ค่าเงิน', item.hedge==='Hedge'?'Hedge (ป้องกันความเสี่ยงค่าเงิน)':(item.hedge==='Unhedged'?'Unhedged (ไม่ป้องกันค่าเงิน)':'-'))}
     ${row('ค่าธรรมเนียมรวมโดยประมาณ', item.fee!=null?Number(item.fee).toFixed(2)+'% / ปี':'-')}
     ${row('เงินลงทุนขั้นต่ำ', item.min?('ประมาณ '+Number(item.min).toLocaleString()+' บาท'):'-')}
+    ${navItem&&navItem.ret?row('ผลตอบแทนกอง (1 เดือน / 3 เดือน / 6 เดือน / 1 ปี)', [navItem.ret['1M'],navItem.ret['3M'],navItem.ret['6M'],navItem.ret['1Y']].map(v=>v==null?'—':(v>=0?'+':'')+Number(v).toFixed(1)+'%').join(' · ')):''}
+    ${navItem?row('มูลค่าหน่วยลงทุนล่าสุด', Number(navItem.last.nav).toFixed(4)+' ('+navItem.last.date+')'):''}
     ${row('ดัชนีอ้างอิง 1 ปี', idx1y!=null?(idx1y>=0?'+':'')+idx1y.toFixed(1)+'%':'—')}
+    ${navItem&&navItem.navs&&navItem.navs.length>10?'<canvas id="fundNavCv" style="width:100%;height:140px;margin-top:8px;border-radius:10px;background:rgba(255,255,255,0.03)"></canvas>':''}
     <div class="text-[10px] text-slate-500 mt-2">ผลตอบแทนของกองจะใกล้เคียงดัชนีหลังหักค่าธรรมเนียมและผลของค่าเงิน · ตัวเลขค่าธรรมเนียมเป็นอัตรารวมประมาณ</div>
     <div class="mt-3 flex gap-2">
       <a href="${item.link||('https://www.wealthx.co/funds/'+encodeURIComponent(item.t))}" target="_blank" rel="noopener" class="flex-1 text-center h-9 leading-9 rounded-lg bg-amber-400/90 text-black text-[12px] font-bold">เปิดรายละเอียดเต็มกอง (WealthX)</a>
-      <a href="https://www.finnomena.com/fund/${encodeURIComponent(item.t)}" target="_blank" rel="noopener" class="flex-1 text-center h-9 leading-9 rounded-lg border border-[#2b3purple] text-[12px] font-semibold border-[#2b3a52]">Finnomena</a>
+      <a href="https://www.finnomena.com/fund/${encodeURIComponent(item.t)}" target="_blank" rel="noopener" class="flex-1 text-center h-9 leading-9 rounded-lg text-[12px] font-semibold border border-[#2b3a52]">Finnomena</a>
     </div>`;
+  try{ if(navItem&&navItem.navs){ setTimeout(function(){ drawNavChart(document.getElementById('fundNavCv'), navItem.navs.slice(-260)); }, 60); } }catch(e){}
 }
 const MSTACK=[];
 function openModal(tk,nm,mkt){
