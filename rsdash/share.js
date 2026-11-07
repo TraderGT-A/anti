@@ -854,11 +854,21 @@
 
 
   // DR ไทย → หุ้นแม่ (ใช้ข้อมูลพื้นฐาน/โลโก้/RS จากหุ้นแม่) + ผู้ออก DR
-  function drOf(tk, mk) {
-    if (mk !== "thailand" || typeof DR_US === "undefined" || !DR_US || !DR_US.byTicker) return null;
+  async function drOf(tk, mk) {
+    if (mk !== "thailand") return null;
+    const grab = function () {
+      try {
+        if (typeof DR_US === "undefined" || !DR_US) return null;
+        const m = DR_US.byTicker || DR_US;      // รองรับทั้งสองรูปแบบ
+        return (m && Object.keys(m).length) ? m : null;
+      } catch (e) { return null; }
+    };
+    let map = grab();
+    if (!map && typeof loadDrUs === "function") { try { await loadDrUs(); } catch (e) {} map = grab(); }
+    if (!map) return null;
     const code = String(tk).toUpperCase();
-    for (const parent in DR_US.byTicker) {
-      const hit = (DR_US.byTicker[parent] || []).find(function (z) { return String(z.t).toUpperCase() === code; });
+    for (const parent in map) {
+      const hit = (map[parent] || []).find(function (z) { return String(z.t).toUpperCase() === code; });
       if (hit) return { p: parent, i: hit.i || "", t: hit.t };
     }
     return null;
@@ -867,8 +877,9 @@
   function instrumentTags(tk, mk) {
     const out = [];
     try {
-      if (mk === "america" && typeof DR_US !== "undefined" && DR_US && DR_US.byTicker) {
-        const list = DR_US.byTicker[String(tk).toUpperCase()] || [];
+      if (mk === "america" && typeof DR_US !== "undefined" && DR_US) {
+        const MAP = DR_US.byTicker || DR_US;
+        const list = MAP[String(tk).toUpperCase()] || [];
         list.slice(0, 4).forEach(function (x) { if (x && x.t) out.push({ kind: "DR", text: x.t, title: x.i || "" }); });
       }
     } catch (e) {}
@@ -988,7 +999,7 @@
     const W = 1080, H = 1350;
     const c = document.createElement("canvas"); c.width = W; c.height = H;
     const x = c.getContext("2d");
-    const drRef = drOf(tk, mk);
+    const drRef = await drOf(tk, mk);
     let { f, bars, logo, tlogo, row } = await loadCardData(tk, mk, withLogo);
     const drPrice = row.price, drChg = row.change;
     if (drRef) {   // การ์ด DR: พื้นฐาน/RS/MCAP/โลโก้/งบ ใช้ของหุ้นแม่ แต่ราคายังเป็นการ์ด DR
@@ -1195,11 +1206,12 @@
     x.fillStyle = th.body; x.font = font(500, 21);
     x.fillText((nm || "").slice(0, 30), nameX, 192);
     if (row.industry || row.sector) { x.fillStyle = th.muted; x.font = font(600, 17); x.fillText(String(row.industry || row.sector).slice(0, 26), nameX, 218); }
-    { const tg = instrumentTags(tk, mk); if (tg.length) drawTags(x, th, tg, nameX, 262, W - nameX - 90); }
+    { const tg = instrumentTags(tk, mk); if (tg.length) drawTags(x, th, tg, nameX + tw + 62, 216, W - 400); }
     if (drRef) {
-      x.fillStyle = th.gold; x.font = font(700, 17);
-      const txt = "DR อ้างอิง " + drRef.p + (drRef.i ? "  ·  ออกโดย " + drRef.i : "");
-      x.fillText(txt.slice(0, 64), nameX, 312);
+      const txt = "DR อ้างอิง " + drRef.p + (drRef.i ? " · ออกโดย " + drRef.i : "");
+      const gw = x.measureText(grp).width;
+      x.fillStyle = th.gold; x.font = font(700, 18);
+      x.fillText(txt.slice(0, 56), tx, 292);
     }
 
     const lastBar = bars.length ? bars[bars.length - 1] : null;
